@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Báo cáo năng suất tổng mã nội bộ</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 20px 0; letter-spacing: 1px; }
+      .form-grid-3col { display: grid; grid-template-columns: 130px 1fr 130px 1fr 130px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+      .ms-hint { font-size: 10px; color: #888; margin-top: 2px; }
+
+      .ms-combo { position: relative; }
+      .ms-box { display:flex; align-items:center; justify-content:space-between; gap:6px; height:26px; padding:0 8px; border:1px solid #ccc; border-radius:3px; font-size:12px; background:#fff; cursor:pointer; }
+      .ms-box-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#333; }
+      .ms-box-text.placeholder { color:#999; }
+      .ms-arrow { font-size:9px; color:#888; flex-shrink:0; }
+      .ms-panel { display:none; position:absolute; top:100%; left:0; right:0; margin-top:2px; background:#fff; border:1px solid #ccc; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,.15); max-height:220px; overflow-y:auto; z-index:50; }
+      .ms-panel.open { display:block; }
+      .ms-item { display:flex; align-items:center; gap:6px; padding:5px 8px; font-size:12px; cursor:pointer; }
+      .ms-item:hover { background:#e8f4fd; }
+      .ms-item input { margin:0; }
+
+      .bc6-grid-wrap { width:100%; overflow-x:auto; overflow-y:auto; background:#fff; border:1px solid #ccc; max-height: 480px; }
+      .bc6-grid { width:max-content; min-width:100%; border-collapse:collapse; font-size:11px; }
+      .bc6-grid th { padding:4px 6px; border:1px solid #cfd8dc; text-align:center; white-space:nowrap; position:sticky; top:0; z-index:2; background:#1e3a5f; color:#fff; }
+      .bc6-grid th.grp-hdr { background:#274b73; }
+      .bc6-grid td { padding:4px 6px; border:1px solid #eee; text-align:center; white-space:nowrap; }
+      .bc6-grid .tl { text-align:left !important; }
+      .bc6-grid tr:hover td { background:#f1f8ff; }
+      .bc6-grid tr.row-total td { background:#eef3f8 !important; font-weight:bold; color:#003366; }
+      .bc6-grid .col-f0 { position:sticky; left:0; z-index:1; background:#fff; }
+      .bc6-grid .col-f1 { position:sticky; left:40px; z-index:1; background:#fff; }
+      .bc6-grid .col-f2 { position:sticky; left:135px; z-index:1; background:#fff; }
+      .bc6-grid .col-f3 { position:sticky; left:400px; z-index:1; background:#fff; }
+      .bc6-grid .col-f4 { position:sticky; left:520px; z-index:1; background:#fff; }
+      .bc6-grid th.col-f0, .bc6-grid th.col-f1, .bc6-grid th.col-f2, .bc6-grid th.col-f3, .bc6-grid th.col-f4 { z-index:3; background:#1e3a5f; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương › Báo cáo › Báo cáo năng suất tổng mã nội bộ</div>
+      <div class="bc-title">NĂNG SUẤT TỔNG MÃ NỘI BỘ</div>
+      <div id="bc6-alert" class="alert-box"></div>
+
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label>Mã SAP</label>
+          <div class="ms-combo" id="bc6_ma_sap">
+            <div class="ms-box" onclick="msToggle('bc6_ma_sap')">
+              <span class="ms-box-text placeholder">-- Tất cả --</span>
+              <span class="ms-arrow">▾</span>
+            </div>
+            <div class="ms-panel"></div>
+          </div>
+
+          <label>Tên kế toán</label>
+          <div class="ms-combo" id="bc6_ten_kt">
+            <div class="ms-box" onclick="msToggle('bc6_ten_kt')">
+              <span class="ms-box-text placeholder">-- Tất cả --</span>
+              <span class="ms-arrow">▾</span>
+            </div>
+            <div class="ms-panel"></div>
+          </div>
+
+          <label>Mã size nội bộ</label>
+          <div class="ms-combo" id="bc6_ma_nb">
+            <div class="ms-box" onclick="msToggle('bc6_ma_nb')">
+              <span class="ms-box-text placeholder">-- Tất cả --</span>
+              <span class="ms-arrow">▾</span>
+            </div>
+            <div class="ms-panel"></div>
+          </div>
+
+          <label>Quy cách tính lương</label>
+          <div class="ms-combo" id="bc6_qc">
+            <div class="ms-box" onclick="msToggle('bc6_qc')">
+              <span class="ms-box-text placeholder">-- Tất cả --</span>
+              <span class="ms-arrow">▾</span>
+            </div>
+            <div class="ms-panel"></div>
+          </div>
+
+          <label class="lbl-red">Từ ngày (*)</label>
+          <input type="date" id="bc6_tungay" value="2026-05-01">
+
+          <label class="lbl-red">Đến ngày (*)</label>
+          <input type="date" id="bc6_denngay" value="2026-05-31">
+        </div>
+      </div>
+
+      <div class="form-panel" style="background:#f0f4ff; border:1px solid #b3c6e0; padding:12px 15px; margin-bottom:15px;">
+        <div style="font-weight:bold;color:#003366;font-size:12px;margin-bottom:8px;">Sắp xếp tiến trình / quy cách khi xuất báo cáo</div>
+        <div style="display:grid; grid-template-columns:140px 1fr 140px 1fr; gap:8px 12px; align-items:center; font-size:12px;">
+          <label class="lbl-red" style="font-size:12px;">Nguyên tắc sắp xếp (*)</label>
+          <select id="bc6_sort_rule" style="padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">
+            <option value="REPORT_TEMPLATE_ORDER" selected>Theo thứ tự cấu hình báo cáo</option>
+            <option value="PROCESS_NAME">Theo tên tiến trình/công đoạn</option>
+            <option value="PRODUCT_SPEC_GROUP">Theo nhóm sản phẩm/quy cách</option>
+            <option value="SHIFT_TYPE">Theo loại ca</option>
+            <option value="UOM">Theo đơn vị tính</option>
+            <option value="SAP_INTERNAL_CODE">Theo mã SAP / mã nội bộ</option>
+            <option value="QUANTITY_DESC">Theo sản lượng phát sinh giảm dần</option>
+            <option value="HAS_DATA_FIRST">Có phát sinh trước, không phát sinh sau</option>
+            <option value="PROCESS_CODE">Theo mã tiến trình</option>
+            <option value="USER_CUSTOM">Theo cấu hình cá nhân</option>
+          </select>
+          <label class="lbl-red" style="font-size:12px;">Chiều sắp xếp (*)</label>
+          <div style="display:flex;gap:15px;align-items:center;">
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc6_sort_dir" value="ASC" checked> Tăng dần</label>
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc6_sort_dir" value="DESC"> Giảm dần</label>
+          </div>
+          <label style="font-size:12px;">Ẩn QCTL không phát sinh</label>
+          <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="checkbox" id="bc6_hide_empty" checked> Chỉ xuất QCTL có năng suất phát sinh</label>
+        </div>
+      </div>
+
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc6Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="bc6Export()">Xuất Excel</button>
+      </div>
+
+      <div class="bc6-grid-wrap">
+        <table class="bc6-grid">
+          <thead id="bc6-thead"></thead>
+          <tbody id="bc6-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+          📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      </div>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if (!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    // Danh mục Mã size nội bộ (Mã SAP / Mã size nội bộ / Tên kế toán)
+    const bc6MaSap = [
+      { ma_sap:'50510749', ma_nb:'5LGLO',        ten:'BT NOBASHI 5LGLO (12PX30) GLORY016' },
+      { ma_sap:'50501283', ma_nb:'12AQMRH',       ten:'BT NOBASHI 12AQMRH (10PX4X5X2) AQUAKING' },
+      { ma_sap:'50501549', ma_nb:'12NS',          ten:'BT NOBASHI 12NS (10PX20X2) JP.NS' },
+      { ma_sap:'50512069', ma_nb:'15NOJFDAEB',    ten:'BT NOBASHI 13/15 (15PX8X2) 15NOJFDA-EB' },
+      { ma_sap:'50523057', ma_nb:'61/70RING.SB.EP', ten:'VM CPTORING 61/70 (6X255G)SOBEY-EP(170G)' },
+      { ma_sap:'50523058', ma_nb:'61/70RING.WM.EP', ten:'VM CPTORING 61/70 (10X370G) WM-EP (285G)' },
+    ];
+
+    // Danh mục Quy cách tính lương (dùng chung với dm7)
+    const bc6QuyCach = [
+      { ma:'LXPTO', ten:'Lặt xẻ PTO' },
+      { ma:'NBN',   ten:'Nobashi N' },
+      { ma:'SUSH',  ten:'Sushi' },
+      { ma:'PD',    ten:'Peeled Deveined (Lột vỏ, rút chỉ)' },
+      { ma:'HLSO',  ten:'Headless Shell-on (Bỏ đầu, còn vỏ)' },
+      { ma:'CPTO',  ten:'Cooked Peeled Tail-on (Luộc, lột vỏ, chừa đuôi)' },
+    ];
+
+    // Danh mục Công đoạn (cột động của lưới) — nhóm theo Bộ phận
+    const bc6CongDoan = [
+      { bp:'PTO', ma:'THCATW',     ten:'Thất vỏ, W đuôi',              dvt:'kg'  },
+      { bp:'PTO', ma:'THCKIEM',    ten:'Kiểm hàng',                     dvt:'kg'  },
+      { bp:'PTO', ma:'THDTLX',     ten:'Đóng thùng lột xẻ',             dvt:'kg'  },
+      { bp:'CB',  ma:'THMLTTH',    ten:'Cắt bụng mở lưng thẻ',          dvt:'kg'  },
+      { bp:'BEN', ma:'THNHGC',     ten:'Nhúng hóa chất',                dvt:'kg'  },
+      { bp:'PTO', ma:'THPVGC',     ten:'Phục vụ gia công',              dvt:'kg'  },
+      { bp:'NO',  ma:'THSUTXE',    ten:'Sơ chế tươi xẻ',                dvt:'Con' },
+      { bp:'NO',  ma:'THSUTXEMV',  ten:'Sơ chế tươi xẻ máy (vỏ lưng)',  dvt:'Con' },
+      { bp:'PTO', ma:'THTDUOI',    ten:'Trụng đuôi',                    dvt:'con' },
+      { bp:'BEN', ma:'THXH',       ten:'Cắt EZ',                        dvt:'kg'  },
+    ];
+
+    // Dữ liệu năng suất theo Mã size nội bộ x Công đoạn
+    const bc6Data = [
+      { ma_sap:'50510749', vals:{ THCKIEM:27.20,  THSUTXEMV:4164.31 } },
+      { ma_sap:'50501283', vals:{ THCKIEM:26.87,  THSUTXEMV:7824.38 } },
+      { ma_sap:'50501549', vals:{ THCKIEM:3.88,   THSUTXEMV:1969.83 } },
+      { ma_sap:'50512069', vals:{ THDTLX:1294.26, THMLTTH:258.85, THNHGC:5769.61, THPVGC:8176.91, THXH:146.85 } },
+      { ma_sap:'50523057', vals:{ THDTLX:213.83,  THNHGC:719.37,  THPVGC:831.93 } },
+      { ma_sap:'50523058', vals:{ THDTLX:1026.79, THMLTTH:129.25, THNHGC:4806.96, THPVGC:6725.18, THXH:146.85 } },
+    ];
+
+    // ============ MULTI-SELECT COMBOBOX ============
+    const msState = {};
+
+    function msInit(id, options) {
+      msState[id] = { options, selected: new Set() };
+      msRenderPanel(id);
+      msUpdateBoxText(id);
+    }
+
+    function msRenderPanel(id) {
+      const panel = document.querySelector('#' + id + ' .ms-panel');
+      const state = msState[id];
+      panel.innerHTML = state.options.map(o => {
+        const checked = state.selected.has(o.value) ? 'checked' : '';
+        return '<label class="ms-item"><input type="checkbox" value="' + o.value + '" ' + checked + ' onchange="msToggleOption(\'' + id + '\', this)"> ' + o.label + '</label>';
+      }).join('');
+    }
+
+    function msToggleOption(id, checkbox) {
+      const state = msState[id];
+      if (checkbox.checked) state.selected.add(checkbox.value);
+      else state.selected.delete(checkbox.value);
+      msUpdateBoxText(id);
+    }
+
+    function msUpdateBoxText(id) {
+      const state = msState[id];
+      const box = document.querySelector('#' + id + ' .ms-box-text');
+      if (state.selected.size === 0) {
+        box.textContent = '-- Tất cả --';
+        box.classList.add('placeholder');
+      } else {
+        const labels = state.options.filter(o => state.selected.has(o.value)).map(o => o.label);
+        box.textContent = state.selected.size <= 2 ? labels.join(', ') : state.selected.size + ' mục đã chọn';
+        box.classList.remove('placeholder');
+      }
+    }
+
+    function msToggle(id) {
+      const panel = document.querySelector('#' + id + ' .ms-panel');
+      const willOpen = !panel.classList.contains('open');
+      document.querySelectorAll('.ms-panel.open').forEach(p => p.classList.remove('open'));
+      if (willOpen) panel.classList.add('open');
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.ms-combo')) document.querySelectorAll('.ms-panel.open').forEach(p => p.classList.remove('open'));
+    });
+
+    function bc6InitFilters() {
+      msInit('bc6_ma_sap', bc6MaSap.map(x => ({ value: x.ma_sap, label: x.ma_sap })));
+      msInit('bc6_ten_kt', bc6MaSap.map(x => ({ value: x.ma_sap, label: x.ten })));
+      msInit('bc6_ma_nb', bc6MaSap.map(x => ({ value: x.ma_sap, label: x.ma_nb + ' - ' + x.ten })));
+      msInit('bc6_qc', bc6QuyCach.map(x => ({ value: x.ma, label: x.ma + ' - ' + x.ten })));
+    }
+
+    function bc6SelectedValues(id) {
+      return Array.from(msState[id].selected);
+    }
+
+    function bc6RenderHeader() {
+      const thead = document.getElementById('bc6-thead');
+      let r1 = '<tr>';
+      r1 += '<th class="col-f0" rowspan="4" style="min-width:40px;">STT</th>';
+      r1 += '<th class="col-f1" rowspan="4" style="min-width:90px;">Mã sap</th>';
+      r1 += '<th class="col-f2 tl" rowspan="4" style="min-width:260px;">Tên kế toán</th>';
+      r1 += '<th class="col-f3" rowspan="4" style="min-width:120px;">Mã size nội bộ</th>';
+      r1 += '<th class="col-f4 tl" rowspan="4" style="min-width:150px;">Tên size nội bộ</th>';
+      bc6CongDoan.forEach(cd => { r1 += '<th class="grp-hdr" style="min-width:90px;">' + cd.bp + '</th>'; });
+      r1 += '</tr>';
+
+      let r2 = '<tr>';
+      bc6CongDoan.forEach(cd => { r2 += '<th>' + cd.ma + '</th>'; });
+      r2 += '</tr>';
+
+      let r3 = '<tr>';
+      bc6CongDoan.forEach(cd => { r3 += '<th class="tl" style="font-weight:normal;">' + cd.ten + '</th>'; });
+      r3 += '</tr>';
+
+      let r4 = '<tr>';
+      bc6CongDoan.forEach(cd => { r4 += '<th>' + cd.dvt + '</th>'; });
+      r4 += '</tr>';
+
+      thead.innerHTML = r1 + r2 + r3 + r4;
+    }
+
+    function bc6Fmt(v) {
+      return v ? Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+    }
+
+    function bc6Search() {
+      const tungay = document.getElementById('bc6_tungay').value;
+      const denngay = document.getElementById('bc6_denngay').value;
+      if (!tungay || !denngay) return showAlert2('bc6-alert', 'Vui lòng chọn đầy đủ Từ ngày và Đến ngày.', 'error');
+      if (tungay > denngay) return showAlert2('bc6-alert', 'Từ ngày phải nhỏ hơn hoặc bằng Đến ngày.', 'error');
+
+      const maSapSel = bc6SelectedValues('bc6_ma_sap');
+      const tenKtSel = bc6SelectedValues('bc6_ten_kt');
+      const maNbSel = bc6SelectedValues('bc6_ma_nb');
+      const selectedSap = new Set([...maSapSel, ...tenKtSel, ...maNbSel]);
+
+      let rows = bc6MaSap.map((sap, idx) => {
+        const dv = bc6Data.find(d => d.ma_sap === sap.ma_sap) || { vals:{} };
+        return { stt: idx + 1, ...sap, vals: dv.vals };
+      });
+
+      if (selectedSap.size > 0) rows = rows.filter(r => selectedSap.has(r.ma_sap));
+
+      bc6RenderHeader();
+      const tbody = document.getElementById('bc6-tbody');
+      if (rows.length === 0) {
+        const colspan = 5 + bc6CongDoan.length;
+        tbody.innerHTML = '<tr><td colspan="' + colspan + '" style="text-align:center;padding:20px;color:#888;">Không có dữ liệu phù hợp điều kiện tìm kiếm.</td></tr>';
+        return;
+      }
+
+      const totals = {};
+      bc6CongDoan.forEach(cd => totals[cd.ma] = 0);
+
+      let html = '';
+      rows.forEach((r, i) => {
+        html += '<tr>';
+        html += '<td class="col-f0">' + (i + 1) + '</td>';
+        html += '<td class="col-f1" style="font-weight:bold;">' + r.ma_sap + '</td>';
+        html += '<td class="col-f2 tl">' + r.ten + '</td>';
+        html += '<td class="col-f3">' + r.ma_sap + '</td>';
+        html += '<td class="col-f4 tl">' + r.ma_nb + '</td>';
+        bc6CongDoan.forEach(cd => {
+          const v = (r.vals && r.vals[cd.ma]) || 0;
+          totals[cd.ma] += v;
+          html += '<td>' + bc6Fmt(v) + '</td>';
+        });
+        html += '</tr>';
+      });
+
+      html += '<tr class="row-total">';
+      html += '<td class="col-f0"></td>';
+      html += '<td class="col-f1 tl" colspan="4">Tổng cộng:</td>';
+      bc6CongDoan.forEach(cd => { html += '<td>' + bc6Fmt(totals[cd.ma]) + '</td>'; });
+      html += '</tr>';
+
+      tbody.innerHTML = html;
+    }
+
+    function bc6Export() {
+      showAlert2('bc6-alert', 'Đang xuất Excel báo cáo Năng suất tổng mã nội bộ...', 'success');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      bc6InitFilters();
+      bc6Search();
+    });
+  </script>
+</body>
+</html>

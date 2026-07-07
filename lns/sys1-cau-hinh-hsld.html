@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Thiết lập (System) › Tiêu chí tìm kiếm</div>
+  <div class="page-title">ĐỊNH NGHĨA TIÊU CHÍ TÌM KIẾM</div>
+  <div class="form-panel">
+    <div style="display:grid;grid-template-columns:120px 1fr 120px 1fr;gap:10px 15px;align-items:center;">
+      <label class="lbl-red">Mã tiêu chí</label><input type="text" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label>Tên tiếng Anh</label><input type="text" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label class="lbl-red">Tên tiếng Việt</label><input type="text" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label>Thứ tự</label><input type="text" style="padding:5px;border:1px solid #ccc;width:100px;">
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+      <label style="width:120px">Dùng fn table</label><select style="flex:1;padding:4px;border:1px solid #ccc;"><option></option></select>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-top:8px;">
+      <label class="lbl-red" style="width:120px;padding-top:4px">Công thức (SQL)</label>
+      <textarea style="flex:1;padding:5px;border:1px solid #ccc;min-height:55px;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+      <label style="width:120px">Kiểu dữ liệu</label>
+      <select style="padding:4px;border:1px solid #ccc;width:180px;"><option></option><option>nvarchar</option><option>datetime</option></select>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+      <label style="width:120px">Ghi chú</label><input type="text" style="flex:1;padding:5px;border:1px solid #ccc;">
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+      <label style="width:120px">Sử dụng?</label><input type="checkbox" checked>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button>
+    <button class="btn-refresh">Làm mới</button>
+    <button class="btn-save2">Lưu</button>
+    <button class="btn-delete">Xóa</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap">
+    <table>
+      <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Mã tiêu chí</th><th>Tên tiếng Anh</th><th>Tên tiếng Việt</th><th>Kiểu DL</th><th>Ghi chú</th><th>Thứ tự</th><th>Công thức SQL</th><th>Fn table</th><th>Used</th></tr></thead>
+      <tbody>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>1</td><td>TK_HR_DonViCap3</td><td>TK_HR_DonViCap3</td><td>Đơn vị cấp 3 (Bộ phận tính lương)</td><td>nvarchar</td><td>NULL → WARNING</td><td>1</td><td class="tl">dbo.HR_fnGetDonVi(PR.EmpID, PR.ToDate, 3)</td><td></td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>2</td><td>TK_HR_DonViCap4</td><td>TK_HR_DonViCap4</td><td>Đơn vị cấp 4 (Ka)</td><td>nvarchar</td><td>NULL → WARNING</td><td>2</td><td class="tl">dbo.HR_fnGetDonVi(PR.EmpID, PR.ToDate, 4)</td><td></td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>3</td><td>TK_HR_DonViCap5</td><td>TK_HR_DonViCap5</td><td>Đơn vị cấp 5 (Bàn)</td><td>nvarchar</td><td>NULL → WARNING</td><td>3</td><td class="tl">dbo.HR_fnGetDonVi(PR.EmpID, PR.ToDate, 5)</td><td></td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>4</td><td>TK_HR_LoaiNhanVien</td><td>TK_HR_LoaiNhanVien</td><td>Loại NV: SX / PV</td><td>nvarchar</td><td>NULL → 'SX' + WARNING. BLOCKING OP-02</td><td>4</td><td class="tl">dbo.HR_fnGetLoaiNhanVien(PR.EmpID, PR.FromDate, PR.ToDate)</td><td></td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>5</td><td>TK_PR_NhomTinhNangSuat</td><td>TK_PR_NhomTinhNangSuat</td><td>Nhóm tính NS</td><td>nvarchar</td><td>NULL → BLOCKING</td><td>5</td><td class="tl">dbo.PR_fnGetNhomTinhNangSuat(PR.BanID, PR.PRMonth)</td><td></td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>6</td><td>TK_PR_NhomGomDonVi</td><td>TK_PR_NhomGomDonVi</td><td>Mã nhóm gom ĐV (TH3/TH4)</td><td>nvarchar</td><td>NULL khi TH2</td><td>6</td><td class="tl">dbo.PR_fnGetNhomGomDonVi(PR.BanID, PR.PRMonth)</td><td></td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>7</td><td>TK_HR_LoaiHopDong</td><td>TK_HR_LoaiHopDong</td><td>Loại hợp đồng</td><td>nvarchar</td><td>NULL → ''</td><td>7</td><td class="tl">dbo.HR_fnGetLoaiHopDong(PR.EmpID, PR.FromDate, PR.ToDate)</td><td></td><td>X</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+
+  </script>
+</body>
+</html>

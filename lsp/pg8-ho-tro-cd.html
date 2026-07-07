@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập hỗ trợ (%) quy cách tính lương theo thông báo</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+        /* Custom styles for pg8 */
+    </style>
+</head>
+<body>
+<div class="top-header">
+    <div class="logo"><span style="font-size: 24px; color: #e74c3c;">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+        <span>🇻🇳 VN ⌄</span>
+        <span>🔔 <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">6</span></span>
+        <span>✉ <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">45</span></span>
+        <span style="font-size: 11px; text-align: right; line-height: 1.2;">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+</div>
+<div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a><a href="#">Bảo hiểm</a>
+    <a href="#" class="active">Lương</a><a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+</div>
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rsaquo; Thiết lập &rsaquo; Thiết lập % Hỗ trợ và Hệ số HS1/HS2/HS3</div>
+    <div class="page-title">THIẾT LẬP HỖ TRỢ (%) QUY CÁCH TÍNH LƯƠNG THEO THÔNG BÁO</div>
+    <div id="alertBox" class="alert-box"></div>
+    <div class="form-panel">
+        <div class="form-body">
+            <div>
+                <input type="hidden" id="txtEditId">
+                <div class="field-row">
+                    <label class="text-red">Tiến trình</label>
+                    <select id="cboTienTrinh">
+                        <option value="">-- Chọn Tiến trình --</option>
+                        <option value="TT01">TT01 - Tẩm bột</option>
+                        <option value="TT02">TT02 - Hấp - Xuất khẩu</option>
+                        <option value="TT03">TT03 - Sơ chế – Đóng gói</option>
+                    </select>
+                </div>
+                <div class="field-row"><label class="text-red">% Hỗ trợ</label><input type="text" id="txtMucHoTro" placeholder="VD: 15% hoặc 10% tiền lương theo bậc" value="15%"></div>
+                <div class="field-row"><label>Ghi chú</label><textarea id="txtGhiChu" placeholder="Nhập ghi chú..."></textarea></div>
+                <div class="field-row"><label class="text-red">Ngày hiệu lực</label><input type="text" id="txtNgayHL" placeholder="dd/mm/yyyy" value="01/06/2026"></div>
+                <div class="field-row"><label>File đính kèm (.doc,.xls,.jpg,.pdf)</label><input type="file" id="fileDinhKem" accept=".doc,.docx,.xls,.xlsx,.jpg,.jpeg,.pdf"></div>
+            </div>
+            <div>
+                <div class="field-row">
+                    <label class="text-red">Quy cách tính lương</label>
+                    <select id="cboQuyCach">
+                        <option value="">-- Chọn Quy cách --</option>
+                        <option value="QC01">QC01 - Quy cách tính lương 1</option>
+                        <option value="QC02">QC02 - Quy cách tính lương 2</option>
+                    </select>
+                </div>
+                <div class="field-row"><label>Số thông báo</label><input type="text" id="txtSoThongBao" placeholder="Nhập số thông báo..."></div>
+                <div class="field-row"><label>Ghi chú 2</label><textarea id="txtGhiChu2" placeholder="Nhập ghi chú 2..."></textarea></div>
+                <div class="field-row"><label>Ngày kết thúc</label><input type="text" id="txtNgayKT" placeholder="dd/mm/yyyy" value=""></div>
+                <div class="field-row" style="visibility:hidden"><label>&nbsp;</label><input type="text"></div>
+            </div>
+        </div>
+    </div>
+    <div class="actions-bar">
+        <button class="btn-refresh" onclick="clearForm()">Làm mới</button>
+        <button class="btn-save" onclick="saveData()">Lưu</button>
+        <button class="btn-delete" onclick="deleteData()">Xóa</button>
+        <button class="btn-export">Xuất DL</button>
+        <button class="btn-import">Nhập DL</button>
+    </div>
+    <!-- VÍ DỤ MẪU pg8 -->
+    <div style="margin-top:18px;background:#f3f0ff;border:1px solid #b39ddb;border-radius:6px;padding:14px 16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead>
+                <tr style="background:#d1c4e9;">
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:36px;">STT</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:90px;">Ngày hiệu lực</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:90px;">Ngày kết thúc</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;width:150px;">Tiến trình</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;">Quy cách tính lương</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:80px;">% Hỗ trợ</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;">Ghi chú</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;">Ghi chú 2</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background:#fff;">
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;">1</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;">01/06/2026</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;">30/06/2026</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;"><span style="color:#0d47a1;font-weight:bold;">TT01 - Tẩm bột</span></td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;">QC01 - Quy cách tính lương 1</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;font-weight:bold;color:#d32f2f;">15%</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;color:#555;">Nặng nhọc, nhiều bụi bột</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;color:#555;">Duyệt bởi GĐ</td>
+                </tr>
+                <tr style="background:#f5f2ff;">
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;">2</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;">15/06/2026</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;"></td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;"><span style="color:#0d47a1;font-weight:bold;">TT02 - PTO (lột vỏ tôm)</span></td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;">QC02 - Quy cách tính lương 2</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;font-weight:bold;color:#d32f2f;">8%</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;color:#555;">Lạnh tay, tốc độ cao</td>
+                    <td style="padding:4px 8px;border:1px solid #b39ddb;color:#555;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../shared/mockdata.js"></script>
+<script src="../shared/utils.js"></script>
+<script>
+    let mockData = [];
+    const tbody = document.getElementById('tableBody');
+    function renderTable() {
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        mockData.forEach((row, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><input type="checkbox" class="chk-row" data-id="${row.id}"></td>
+                    <td><span class="edit-icon" onclick="editRow(${row.id})">✎</span></td>
+                    <td>${index + 1}</td>
+                    <td>${row.ngayHL}</td>
+                    <td>${row.ngayKT || ''}</td>
+                    <td class="text-left">${row.tienTrinh}</td>
+                    <td class="text-left">${row.quyCach}</td>
+                    <td class="text-right">${row.mucHT}</td>
+                    <td class="text-left">${row.note}</td>
+                    <td class="text-left">${row.note2 || ''}</td>
+                </tr>
+            `;
+        });
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        if(window.MOCK && window.MOCK.lsp && window.MOCK.lsp.hoTroCD) {
+            mockData = [...window.MOCK.lsp.hoTroCD];
+        }
+        renderTable();
+    });
+    function toggleAll(source) {
+        let checkboxes = document.querySelectorAll('.chk-row');
+        for(let i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = source.checked; }
+    }
+    function showAlert(msg, type) {
+        const box = document.getElementById('alertBox');
+        box.style.display = 'block';
+        box.className = `alert-box alert-${type}`;
+        box.innerHTML = msg;
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+    function prepareAdd() {
+        clearForm();
+        showAlert("Vui lòng nhập thông tin và bấm 'Lưu dữ liệu' để thêm mới.", "success");
+        document.getElementById('txtNgayHL').focus();
+    }
+    function clearForm() {
+        document.getElementById('txtEditId').value = '';
+        document.getElementById('txtNgayHL').value = '01/06/2026';
+        document.getElementById('txtNgayKT').value = '';
+        document.getElementById('cboTienTrinh').value = '';
+        document.getElementById('cboQuyCach').value = '';
+        document.getElementById('txtMucHoTro').value = '';
+        document.getElementById('txtGhiChu').value = '';
+        document.getElementById('txtGhiChu2').value = '';
+        document.getElementById('alertBox').style.display = 'none';
+    }
+    function editRow(id) {
+        const row = mockData.find(x => x.id === id);
+        if(row) {
+            document.getElementById('txtEditId').value = row.id;
+            document.getElementById('txtNgayHL').value = row.ngayHL || '';
+            document.getElementById('txtNgayKT').value = row.ngayKT || '';
+            document.getElementById('cboTienTrinh').value = row.tienTrinh || '';
+            document.getElementById('cboQuyCach').value = row.quyCach || '';
+            document.getElementById('txtMucHoTro').value = row.mucHT || '';
+            document.getElementById('txtGhiChu').value = row.note || '';
+            document.getElementById('txtGhiChu2').value = row.note2 || '';
+            window.scrollTo(0, 0);
+            showAlert("Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu dữ liệu'.", "success");
+        }
+    }
+    function saveData() {
+        const id = document.getElementById('txtEditId').value;
+        const ngayHL = document.getElementById('txtNgayHL').value.trim();
+        const ngayKT = document.getElementById('txtNgayKT').value.trim();
+        const tienTrinh = document.getElementById('cboTienTrinh').value;
+        const quyCach = document.getElementById('cboQuyCach').value;
+        const mucHT = document.getElementById('txtMucHoTro').value.trim();
+        const note = document.getElementById('txtGhiChu').value.trim();
+        const note2 = document.getElementById('txtGhiChu2').value.trim();
+        if (!ngayHL || !tienTrinh || !quyCach || !mucHT) { showAlert("Vui lòng nhập đầy đủ các trường bắt buộc (màu đỏ).", "error"); return; }
+        if (id) {
+            const item = mockData.find(x => x.id == id);
+            if(item) {
+                item.ngayHL = ngayHL; item.ngayKT = ngayKT; item.tienTrinh = tienTrinh; item.quyCach = quyCach; item.mucHT = mucHT; item.note = note; item.note2 = note2;
+                showAlert("Đã cập nhật thiết lập thành công!", "success");
+            }
+        } else {
+            const newId = mockData.length > 0 ? Math.max(...mockData.map(d => d.id)) + 1 : 1;
+            mockData.push({ id: newId, ngayHL: ngayHL, ngayKT: ngayKT, tienTrinh: tienTrinh, quyCach: quyCach, mucHT: mucHT, note: note, note2: note2 });
+            showAlert("Đã thêm mới thiết lập thành công!", "success");
+        }
+        renderTable();
+        clearForm();
+    }
+    function deleteData() {
+        const checkboxes = document.querySelectorAll('.chk-row:checked');
+        if (checkboxes.length === 0) { showAlert("Vui lòng chọn dòng cần xóa.", "warning"); return; }
+        if (confirm(`Bạn có chắc chắn muốn xóa ${checkboxes.length} dòng thiết lập này?`)) {
+            let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-id')));
+            mockData = mockData.filter(x => !selectedIds.includes(x.id));
+            renderTable();
+            document.getElementById('chkAll').checked = false;
+            showAlert("Đã xóa thiết lập thành công!", "success");
+        }
+    }
+<\/script>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+</body>
+</html>

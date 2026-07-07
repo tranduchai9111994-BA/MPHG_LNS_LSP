@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Tiến trình</div>
+  <div class="page-title">DANH MỤC TIẾN TRÌNH</div>
+  <div id="dm1-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Ngày hiệu lực</label>
+      <div class="input-wrap"><input type="text" id="dm1_ngayhl" maxlength="10" placeholder="DD/MM/YYYY"><div class="input-note">Bắt buộc nhập dạng DD/MM/YYYY</div></div>
+      <label class="lbl-red">Mã tiến trình</label>
+      <div class="input-wrap"><input type="text" id="dm1_ma" maxlength="50" placeholder="Nhập mã..."><div class="input-note">Unique. Không dấu, không khoảng trắng.</div></div>
+      <label class="lbl-red">Tên tiếng Việt</label>
+      <div class="input-wrap"><input type="text" id="dm1_tenVI" maxlength="255" placeholder="Tên tiếng Việt..."></div>
+      <label class="lbl-red">Tên tiếng Anh</label>
+      <div class="input-wrap"><input type="text" id="dm1_tenEN" maxlength="255" placeholder="Tên tiếng Anh..."></div>
+      <label>Rank</label>
+      <div class="input-wrap"><input type="text" id="dm1_rank" maxlength="10" placeholder="Nhập rank..."></div>
+      <label>Ghi chú</label>
+      <div class="input-wrap"><textarea id="dm1_note" maxlength="1000" style="height:55px;"></textarea></div>
+      <label></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dm1_use" checked> Sử dụng</label>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dm1Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm1Save()">Lưu</button><button class="btn-delete" onclick="dm1Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm1-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Ngày hiệu lực</th><th>Mã tiến trình</th><th>Tên tiếng Việt</th><th>Tên tiếng Anh</th><th>Rank</th><th>Ghi chú</th><th>Sử dụng</th></tr></thead>
+    <tbody id="dm1-tbody">
+      <tr data-ma="TT_TOM_SU"><td><input type="checkbox" class="dm1-chk"></td><td><span class="edit-icon" onclick="dm1Edit(this)">✎</span></td><td>1</td><td style="text-align:center;">01/01/2026</td><td><b>TT_TOM_SU</b></td><td>Sơ chế Tôm Sú</td><td>Black Tiger Shrimp Processing</td><td>Tiến trình chuẩn cho line tôm sú</td><td style="text-align:center;">1</td><td style="color:green;font-weight:bold">✔</td></tr>
+      <tr data-ma="TT_TOM_THE"><td><input type="checkbox" class="dm1-chk"></td><td><span class="edit-icon" onclick="dm1Edit(this)">✎</span></td><td>2</td><td style="text-align:center;">01/01/2026</td><td><b>TT_TOM_THE</b></td><td>Sơ chế Tôm Thẻ</td><td>Vannamei Shrimp Processing</td><td></td><td style="text-align:center;">2</td><td style="color:green;font-weight:bold">✔</td></tr>
+      <tr data-ma="TT_DONG_GOI"><td><input type="checkbox" class="dm1-chk"></td><td><span class="edit-icon" onclick="dm1Edit(this)">✎</span></td><td>3</td><td style="text-align:center;">01/01/2026</td><td><b>TT_DONG_GOI</b></td><td>Đóng gói thành phẩm</td><td>Final Packaging</td><td>Dùng chung cho nhiều loại tôm</td><td style="text-align:center;">3</td><td style="color:#ccc;font-weight:bold">✘</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<div class="modal-overlay" id="dm1-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC TIẾN TRÌNH</span><button class="x" onclick="hideModal('dm1-imp')">✕</button></div>
+  <div class="modal-body"><p style="font-size:11px;color:#555;margin-bottom:10px;"><strong style="color:red">Lưu ý:</strong> Cột bắt buộc: <b>Mã tiến trình</b> và <b>Tên tiếng Việt</b>.</p><input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a></div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('dm1-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('dm1-imp');showAlert2('dm1-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+const dm1Existing = ['TT_TOM_SU','TT_TOM_THE','TT_DONG_GOI'];
+function dm1Clear() {
+  document.getElementById('dm1_ngayhl').value = '';
+  document.getElementById('dm1_ma').value = '';
+  document.getElementById('dm1_ma').readOnly = false;
+  document.getElementById('dm1_tenVI').value = '';
+  document.getElementById('dm1_tenEN').value = '';
+  document.getElementById('dm1_rank').value = '';
+  document.getElementById('dm1_note').value = '';
+  document.getElementById('dm1_use').checked = true;
+  document.getElementById('dm1-alert').style.display = 'none';
+}
+function dm1Edit(el) {
+  const row = el.closest('tr');
+  document.getElementById('dm1_ngayhl').value = row.cells[3].innerText.trim();
+  document.getElementById('dm1_ma').value = row.cells[4].innerText.trim();
+  document.getElementById('dm1_ma').readOnly = true;
+  document.getElementById('dm1_tenVI').value = row.cells[5].innerText;
+  document.getElementById('dm1_tenEN').value = row.cells[6].innerText;
+  document.getElementById('dm1_rank').value = row.cells[7].innerText.trim();
+  document.getElementById('dm1_note').value = row.cells[8].innerText;
+  document.getElementById('dm1_use').checked = row.cells[9].innerText.includes('✔');
+  window.scrollTo(0,0);
+}
+function dm1Save() {
+  const ngayhl = document.getElementById('dm1_ngayhl').value.trim();
+  const ma = document.getElementById('dm1_ma').value.trim();
+  const vi = document.getElementById('dm1_tenVI').value.trim();
+  const en = document.getElementById('dm1_tenEN').value.trim();
+  const isEdit = document.getElementById('dm1_ma').readOnly;
+  if (!ngayhl || !ma || !vi || !en) return showAlert2('dm1-alert','Vui lòng nhập đầy đủ các trường bắt buộc (màu đỏ).','error');
+  if (!/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/\d{4}$/.test(ngayhl)) return showAlert2('dm1-alert','Ngày hiệu lực phải đúng định dạng DD/MM/YYYY.','error');
+  if (!/^[a-zA-Z0-9_]+$/.test(ma)) return showAlert2('dm1-alert','Mã tiến trình không hợp lệ. Phải viết liền không dấu, không khoảng trắng.','error');
+  if (!isEdit && dm1Existing.includes(ma.toUpperCase())) return showAlert2('dm1-alert','<b>Lỗi (Blocking):</b> Mã tiến trình ['+ma.toUpperCase()+'] đã tồn tại.','error');
+  showAlert2('dm1-alert','Lưu Tiến trình thành công!','success');
+  dm1Clear();
+}
+function dm1Delete() {
+  const chks = document.querySelectorAll('.dm1-chk:checked');
+  if (!chks.length) return showAlert2('dm1-alert','Vui lòng chọn tiến trình cần xóa.','error');
+  let blocked = false;
+  chks.forEach(c => { if (c.closest('tr').getAttribute('data-ma') === 'TT_TOM_SU') { showAlert2('dm1-alert','<b>Lỗi (Blocking):</b> Tiến trình [TT_TOM_SU] đang được sử dụng. Không thể xóa.','error'); blocked = true; } });
+  if (!blocked && confirm('Bạn có chắc muốn xóa?')) showAlert2('dm1-alert','Đã xóa tiến trình thành công.','success');
+}
+
+  </script>
+</body>
+</html>

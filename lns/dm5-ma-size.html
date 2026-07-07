@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Danh mục Mã Size</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Danh mục › Mã Size</div>
+  <div class="page-title">DANH MỤC MÃ SIZE</div>
+  <div id="dm5-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Mã Size</label>
+      <div class="input-wrap">
+        <input type="text" id="dm5_ma" maxlength="20" placeholder="Nhập mã size... VD: 0004, 0006">
+        <div class="input-note">Unique. Thường là số 4 chữ số. VD: 0004, 0020, 0120</div>
+      </div>
+      <label class="lbl-red">Size (Tên hiển thị)</label>
+      <input type="text" id="dm5_size" maxlength="50" placeholder="Tên size... VD: 2/4, 16/20, 91/120">
+      <label>Ghi chú</label>
+      <textarea id="dm5_note" maxlength="500" style="height:50px;" placeholder="Nhập ghi chú..."></textarea>
+      <label></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dm5_use" checked> Sử dụng?</label>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dm5Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm5Save()">Lưu</button><button class="btn-delete" onclick="dm5Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm5-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="dm5-chkAll" onchange="toggleAll('dm5-chkAll','.dm5-chk')"></th>
+        <th>Sửa</th><th>STT</th>
+        <th>Mã Size</th>
+        <th>Size</th>
+        <th>Ghi chú</th>
+        <th>Sử dụng</th>
+      </tr>
+    </thead>
+    <tbody id="dm5-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-overlay" id="dm5-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC MÃ SIZE</span><button class="x" onclick="hideModal('dm5-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;">
+      <strong>Rule Import:</strong><br>
+      1. Mã Size tồn tại → UPDATE tên Size<br>
+      2. Mã Size chưa tồn tại → INSERT mới<br>
+      <span style="color:red">3. Mã trùng trong file → DỪNG, báo lỗi dòng đầu tiên trùng.</span>
+    </div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;">
+    <a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr">
+    <button class="btn-cancel" onclick="hideModal('dm5-imp')">Đóng</button>
+    <button class="btn-ok" onclick="hideModal('dm5-imp');showAlert2('dm5-alert','Import thành công!','success')">Thực hiện Import</button>
+  </div>
+</div></div>
+
+<!-- VÍ DỤ MẪU dm5 -->
+<div style="margin-top:18px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:14px 16px;">
+  <div style="font-weight:bold;color:#e65100;font-size:12px;margin-bottom:10px;">
+    💡 VÍ DỤ MẪU – Danh mục Mã Size (tham khảo khi nhập liệu)
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:11px;">
+    <thead>
+      <tr style="background:#ffe082;">
+        <th style="padding:5px 8px;text-align:center;border:1px solid #ffd600;width:36px;">STT</th>
+        <th style="padding:5px 8px;text-align:center;border:1px solid #ffd600;width:90px;">Mã Size</th>
+        <th style="padding:5px 8px;text-align:center;border:1px solid #ffd600;width:90px;">Size</th>
+        <th style="padding:5px 8px;text-align:left;border:1px solid #ffd600;">Ý nghĩa (số con/kg)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">1</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">0</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">Không phân size (dùng cho hàng bulk)</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">2</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0004</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">2/4</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">2 đến 4 con/pound – size lớn nhất</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">3</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0006</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">4/6</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">4 đến 6 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">4</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0008</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">6/8</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">6 đến 8 con/pound</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">5</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0012</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">8/12</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">8 đến 12 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">6</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0015</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">13/15</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">13 đến 15 con/pound</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">7</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0020</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">16/20</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">16 đến 20 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">8</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0025</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">21/25</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">21 đến 25 con/pound</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">9</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0030</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">26/30</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">26 đến 30 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">10</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0040</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">31/40</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">31 đến 40 con/pound</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">11</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0050</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">41/50</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">41 đến 50 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">12</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0060</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">51/60</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">51 đến 60 con/pound</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">13</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0070</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">61/70</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">61 đến 70 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">14</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0090</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">71/90</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">71 đến 90 con/pound</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">15</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0120</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">91/120</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">91 đến 120 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">16</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0200</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">121/200</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">121 đến 200 con/pound</td></tr>
+      <tr style="background:#fff;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">17</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0300</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">201/300</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">201 đến 300 con/pound</td></tr>
+      <tr style="background:#fffde7;"><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">18</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;font-weight:bold;">0500</td><td style="padding:4px 8px;border:1px solid #ffd600;text-align:center;">301/500</td><td style="padding:4px 8px;border:1px solid #ffd600;color:#555;">301 đến 500 con/pound – size nhỏ nhất</td></tr>
+    </tbody>
+  </table>
+  <div style="margin-top:10px;background:#fff3e0;border:1px solid #ffe082;border-radius:4px;padding:8px 12px;font-size:11px;color:#795548;">
+    <strong>⚠️ Lưu ý nghiệp vụ:</strong>
+    <ul style="margin:4px 0 0 16px;padding:0;">
+      <li>Mã Size là định danh <strong>duy nhất</strong>, dùng để phân loại sản lượng khi tính lương năng suất.</li>
+      <li>Size (VD: <code>16/20</code>) thể hiện <strong>số con/pound</strong> – size nhỏ (số lớn) thường có đơn giá thấp hơn.</li>
+      <li>Mã <code>0</code> dùng cho hàng <strong>không phân size</strong> hoặc hàng bulk.</li>
+      <li>Không xóa mã đang được tham chiếu trong dữ liệu sản lượng thực tế.</li>
+    </ul>
+  </div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+
+    let dm5Data = [
+      { id:1,  ma:'0',    size:'0',       note:'Không phân size (hàng bulk)',              use:true },
+      { id:2,  ma:'0004', size:'2/4',     note:'2 đến 4 con/pound – size lớn nhất',        use:true },
+      { id:3,  ma:'0006', size:'4/6',     note:'4 đến 6 con/pound',                        use:true },
+      { id:4,  ma:'0008', size:'6/8',     note:'6 đến 8 con/pound',                        use:true },
+      { id:5,  ma:'0012', size:'8/12',    note:'8 đến 12 con/pound',                       use:true },
+      { id:6,  ma:'0015', size:'13/15',   note:'13 đến 15 con/pound',                      use:true },
+      { id:7,  ma:'0020', size:'16/20',   note:'16 đến 20 con/pound',                      use:true },
+      { id:8,  ma:'0025', size:'21/25',   note:'21 đến 25 con/pound',                      use:true },
+      { id:9,  ma:'0030', size:'26/30',   note:'26 đến 30 con/pound',                      use:true },
+      { id:10, ma:'0040', size:'31/40',   note:'31 đến 40 con/pound',                      use:true },
+      { id:11, ma:'0050', size:'41/50',   note:'41 đến 50 con/pound',                      use:true },
+      { id:12, ma:'0060', size:'51/60',   note:'51 đến 60 con/pound',                      use:true },
+      { id:13, ma:'0070', size:'61/70',   note:'61 đến 70 con/pound',                      use:true },
+      { id:14, ma:'0090', size:'71/90',   note:'71 đến 90 con/pound',                      use:true },
+      { id:15, ma:'0120', size:'91/120',  note:'91 đến 120 con/pound',                     use:true },
+      { id:16, ma:'0200', size:'121/200', note:'121 đến 200 con/pound',                    use:true },
+      { id:17, ma:'0300', size:'201/300', note:'201 đến 300 con/pound',                    use:true },
+      { id:18, ma:'0500', size:'301/500', note:'301 đến 500 con/pound – size nhỏ nhất',   use:true }
+    ];
+    let dm5NextId = 19;
+
+    function dm5Render() {
+      const tbody = document.getElementById('dm5-tbody');
+      tbody.innerHTML = '';
+      dm5Data.forEach((r, i) => {
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="dm5-chk" value="${r.id}"></td>
+          <td><span class="edit-icon" onclick="dm5EditById(${r.id})">✎</span></td>
+          <td>${i+1}</td>
+          <td><b>${r.ma}</b></td>
+          <td style="font-weight:bold;color:#1565c0;">${r.size}</td>
+          <td>${r.note}</td>
+          <td style="color:${r.use?'green':'#aaa'};font-weight:bold">${r.use?'✔':'✘'}</td>
+        </tr>`;
+      });
+    }
+
+    function dm5Clear() {
+      document.getElementById('dm5_ma').value = '';
+      document.getElementById('dm5_ma').readOnly = false;
+      document.getElementById('dm5_size').value = '';
+      document.getElementById('dm5_note').value = '';
+      document.getElementById('dm5_use').checked = true;
+      document.getElementById('dm5-alert').style.display = 'none';
+    }
+
+    function dm5EditById(id) {
+      const r = dm5Data.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('dm5_ma').value = r.ma;
+      document.getElementById('dm5_ma').readOnly = true;
+      document.getElementById('dm5_size').value = r.size;
+      document.getElementById('dm5_note').value = r.note;
+      document.getElementById('dm5_use').checked = r.use;
+      window.scrollTo(0, 0);
+      showAlert2('dm5-alert', "Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", 'success');
+    }
+
+    function dm5Save() {
+      const ma = document.getElementById('dm5_ma').value.trim();
+      const size = document.getElementById('dm5_size').value.trim();
+      const note = document.getElementById('dm5_note').value.trim();
+      const use  = document.getElementById('dm5_use').checked;
+      const isEdit = document.getElementById('dm5_ma').readOnly;
+      if (!ma || !size) return showAlert2('dm5-alert', 'Vui lòng nhập đầy đủ Mã Size và Size.', 'error');
+      if (!isEdit && dm5Data.find(x => x.ma === ma)) return showAlert2('dm5-alert', '<b>Lỗi:</b> Mã Size [' + ma + '] đã tồn tại.', 'error');
+      if (isEdit) {
+        const r = dm5Data.find(x => x.ma === ma);
+        if (r) { r.size = size; r.note = note; r.use = use; }
+        showAlert2('dm5-alert', 'Cập nhật Mã Size thành công!', 'success');
+      } else {
+        dm5Data.push({ id: dm5NextId++, ma, size, note, use });
+        showAlert2('dm5-alert', 'Thêm mới Mã Size thành công!', 'success');
+      }
+      dm5Render();
+      dm5Clear();
+    }
+
+    function dm5Delete() {
+      const chks = document.querySelectorAll('.dm5-chk:checked');
+      if (!chks.length) return showAlert2('dm5-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} mã size đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        dm5Data = dm5Data.filter(x => !ids.includes(x.id));
+        dm5Render();
+        showAlert2('dm5-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    dm5Render();
+  </script>
+</body>
+</html>

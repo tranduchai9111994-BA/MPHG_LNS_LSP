@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Hệ số điều chỉnh lần 3</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .pg5-empheader{display:grid;grid-template-columns:90px 1fr 24px 110px 1fr 24px 70px 1fr 90px 1fr;gap:5px 6px;align-items:center;font-size:12px;margin-bottom:4px}
+      .pg5-empheader label{font-weight:bold;color:#333;white-space:nowrap}
+      .pg5-empheader input,.pg5-empheader select{padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px;width:100%;box-sizing:border-box}
+      .pg5-empheader .pg5-browse{padding:3px 5px;font-size:11px;cursor:pointer;border:1px solid #999;background:#eee;border-radius:3px;width:auto}
+      .pg5-row2{display:grid;grid-template-columns:90px 1fr 70px 80px 100px 90px 1fr 90px 1fr 90px 1fr;gap:5px 6px;align-items:center;font-size:12px;margin-bottom:4px}
+      .pg5-row2 label{font-weight:bold;color:#333;white-space:nowrap}
+      .pg5-row2 input,.pg5-row2 select{padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px;width:100%;box-sizing:border-box}
+      .pg5-radio-row{display:flex;gap:16px;align-items:center;justify-content:center;font-size:12px;margin-top:2px}
+      .pg5-radio-row label{font-weight:normal;display:flex;align-items:center;gap:3px}
+      .table-responsive{width:100%;overflow-x:auto;background:#fff;border:1px solid #ccc;max-height:500px;overflow-y:auto}
+      .table-responsive table{width:100%;border-collapse:collapse}
+      .table-responsive th,.table-responsive td{padding:8px;border:1px solid #ddd;font-size:12px;text-align:center}
+      .table-responsive th{background:#ffd600;position:sticky;top:0;z-index:10;color:#333;font-weight:bold}
+      .table-responsive input[type="text"],.table-responsive input[type="number"]{width:100%;font-size:12px;padding:4px;box-sizing:border-box;text-align:right}
+      .table-responsive input[type="text"].note{text-align:left}
+      .table-responsive input[readonly]{background:#f5f5f5;color:#555;cursor:default}
+      .pg5-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:9000;justify-content:center;align-items:center}
+      .pg5-overlay.show{display:flex}
+      .pg5-modal{background:#fff;border-radius:8px;padding:20px 24px;min-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+      .pg5-modal h3{margin:0 0 16px;font-size:15px;color:#333;border-bottom:1px solid #eee;padding-bottom:8px}
+      .pg5-modal .pg5-form-row{display:flex;align-items:center;margin-bottom:10px;gap:8px}
+      .pg5-modal .pg5-form-row label{width:110px;font-size:12px;font-weight:bold;flex-shrink:0}
+      .pg5-modal .pg5-form-row input,.pg5-modal .pg5-form-row select{flex:1;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px}
+      .pg5-modal .pg5-modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+      .pg5-modal .pg5-modal-btns button{padding:7px 20px;border:none;border-radius:4px;cursor:pointer;font-size:13px}
+      .pg5-modal .btn-ok{background:#28a745;color:#fff}
+      .pg5-modal .btn-cancel{background:#dc3545;color:#fff}
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương Sản Phẩm &#8250; LSP &#183; Thiết lập &#8250; Hệ số điều chỉnh lần 3</div>
+    <div class="page-title">HỆ SỐ ĐIỀU CHỈNH LẦN 3</div>
+    <div id="pg5-alert" class="alert-box"></div>
+
+    <div class="form-panel">
+      <!-- Row 1: Mã NV, Tên NV, Công ty, ĐV cấp 1 -->
+      <div style="display:grid;grid-template-columns:90px 1fr 24px 90px 1fr 24px 60px 1fr 90px 1fr;gap:5px 6px;align-items:center;font-size:12px">
+        <label style="font-weight:bold;white-space:nowrap">Mã nhân viên</label>
+        <input type="text" id="txtMaNV" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px">
+        <button class="pg5-browse">...</button>
+        <label style="font-weight:bold;white-space:nowrap">Tên nhân viên</label>
+        <input type="text" id="txtTenNV" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px">
+        <button class="pg5-browse">...</button>
+        <label style="font-weight:bold;white-space:nowrap">Công ty</label>
+        <input type="text" id="txtCongTy" value="Công Ty CP Thủy Sản" readonly style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px;background:#f0f0f0">
+        <label style="font-weight:bold;white-space:nowrap">Đơn vị cấp 1</label>
+        <select id="cboDv1" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px"><option value="">-- Chọn --</option><option value="Khối Sản Xuất">Khối Sản Xuất</option><option value="Khối Văn Phòng">Khối Văn Phòng</option></select>
+      </div>
+      <!-- Row 2: ĐV cấp 2 - 6 (cùng 10 cột, khớp dòng 1) -->
+      <div style="display:grid;grid-template-columns:90px 1fr 24px 90px 1fr 24px 60px 1fr 90px 1fr;gap:5px 6px;align-items:center;font-size:12px;margin-top:5px">
+        <label style="font-weight:bold;white-space:nowrap">Đơn vị cấp 2</label>
+        <select id="cboDv2" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px"><option value="">-- Chọn --</option><option value="Nhà máy 1">Nhà máy 1</option><option value="Nhà máy 2">Nhà máy 2</option></select>
+        <span></span>
+        <label style="font-weight:bold;white-space:nowrap">Đơn vị cấp 3</label>
+        <select id="cboDv3" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px"><option value="">-- Chọn --</option><option value="Phân xưởng A">Phân xưởng A</option><option value="Phân xưởng B">Phân xưởng B</option></select>
+        <span></span>
+        <label style="font-weight:bold;white-space:nowrap">ĐV cấp 4</label>
+        <select id="cboDv4" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px"><option value="">-- Chọn --</option><option value="Xưởng 1">Xưởng 1</option><option value="Xưởng 2">Xưởng 2</option></select>
+        <label style="font-weight:bold;white-space:nowrap">Đơn vị cấp 5</label>
+        <select id="cboDv5" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px"><option value="">-- Chọn --</option><option value="Tổ Phile 1">Tổ Phile 1</option><option value="Tổ Phile 2">Tổ Phile 2</option><option value="Tổ Đóng Gói">Tổ Đóng Gói</option></select>
+      </div>
+      <!-- Row 3: Từ tháng, Đến tháng -->
+      <div style="display:grid;grid-template-columns:90px 1fr 24px 90px 1fr;gap:5px 6px;align-items:center;font-size:12px;margin-top:5px;max-width:500px">
+        <label style="font-weight:bold;white-space:nowrap">Từ tháng</label>
+        <input type="text" id="txtTuThang" placeholder="MM/yyyy" value="06/2026" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px">
+        <span></span>
+        <label style="font-weight:bold;white-space:nowrap">Đến tháng</label>
+        <input type="text" id="txtDenThang" placeholder="MM/yyyy" value="" style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:12px">
+      </div>
+      <!-- Row 4: Tình trạng -->
+      <div class="pg5-radio-row" style="margin-top:6px">
+        <span style="font-weight:bold;margin-right:10px;">Tình trạng:</span>
+        <label><input type="radio" name="tinhTrang" value="HienDien"> Hiện diện</label>
+        <label><input type="radio" name="tinhTrang" value="ThoiViec"> Thôi việc</label>
+        <label><input type="radio" name="tinhTrang" value="TatCa" checked> Tất cả</label>
+      </div>
+    </div>
+
+    <div class="actions-bar" style="justify-content:center;">
+      <button class="btn-search" onclick="pg5Search()">Tìm kiếm</button>
+      <button class="btn-refresh" onclick="pg5Clear()">Làm mới</button>
+      <button class="btn-add" onclick="pg5ShowAddPopup()">Thêm mới</button>
+      <button class="btn-save" onclick="pg5Save()">Lưu dữ liệu</button>
+      <button class="btn-delete" onclick="pg5Delete()">Xóa</button>
+      <button class="btn-export">Xuất Excel</button>
+    </div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30px"><input type="checkbox" id="chkAll" onchange="pg5ToggleAll(this)"></th>
+            <th style="width:40px">STT</th>
+            <th style="width:100px">Mã NV</th>
+            <th style="width:150px">Họ và Tên</th>
+            <th style="width:120px">Đơn vị cấp 3</th>
+            <th style="width:120px">Đơn vị cấp 4</th>
+            <th style="width:120px">Đơn vị cấp 5</th>
+            <th style="width:120px">Nhóm lương</th>
+            <th style="width:80px">Tháng</th>
+            <th style="width:80px">Đủ công</th>
+            <th style="width:120px">Số tiền (VNĐ)</th>
+            <th style="width:200px">Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Reference table -->
+    <div style="margin-top:20px;border-top:2px dashed #4caf50;padding-top:15px;overflow-x:auto;">
+      <div style="font-weight:bold;color:#2e7d32;margin-bottom:10px;font-size:14px;text-transform:uppercase;">
+        &#128202; Bảng tham khảo: Hướng dẫn công thức tính toán Lương sản phẩm
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;font-family:Arial,sans-serif;min-width:900px">
+        <thead>
+          <tr style="background:#f5f5f5">
+            <th style="border:1px solid #ccc;padding:6px"></th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">(1)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">(2)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">(3)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">(4)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#ffeb3b">(5)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#ffeb3b">(6)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#ffeb3b">(7)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#c8e6c9">(8)</th>
+          </tr>
+          <tr style="background:#f5f5f5">
+            <th style="border:1px solid #ccc;padding:6px"></th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">%</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">Công thực tế</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">Tiền lương sản phẩm lần 2 (Sum HE + HF + HG + HH)</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center">công đủ</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#ffeb3b">Tiền lương sản phẩm lần 2 - Quy công đủ</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#ffeb3b">Điều chỉnh lần 3</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#ffeb3b">% điều chỉnh lần 3</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;background:#c8e6c9">Quỹ tiền lương tăng giảm</th>
+          </tr>
+          <tr style="background:#f5f5f5;font-style:italic">
+            <th style="border:1px solid #ccc;padding:6px"></th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal">Lấy từ công</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal">Lấy từ công</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal">Sau khi tính LSP lần 2</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal">Lấy từ công</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal;background:#ffeb3b">= F / D / 100 / E * G</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal;background:#ffeb3b">Nhập từ màn hình ĐCL3</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal;background:#ffeb3b">= 1 + I / H</th>
+            <th style="border:1px solid #ccc;padding:6px;text-align:center;font-weight:normal;background:#c8e6c9">1 người giảm 1.400.000 khi đó 1 bộ phận ví dụ 10 người thì sẽ giảm 14.000.000</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #ccc;padding:6px">STT 187<br>_report1_BangTinh</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">110</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">26</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">14,674,415</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">27</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">13,853,468</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">(1,440,000)</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">89.6%</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#e8f5e9;color:red">(14,000,000)</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:6px">STT 17<br>_report1_BangTinh</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">100</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">27</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">8,909,250</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">27</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">8,909,250</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">700,000</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">107.9%</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#e8f5e9">10,000,000</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:6px">Trường hợp cột E đang<br>lấy công của nhân viên<br>hưởng, không phải của<br>người công đủ<br><br>STT 119<br>_report1_BangTinh</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">100</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;color:red">13.5</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">5,301,026</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right">27</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">10,602,052</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold"></td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#fff59d;font-weight:bold">100.0%</td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#e8f5e9"></td>
+          </tr>
+          <tr>
+            <td colspan="8" style="border:none"></td>
+            <td style="border:1px solid #ccc;padding:6px;text-align:right;background:#e8f5e9;color:red">(4,000,000)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Popup Thêm mới -->
+<div class="pg5-overlay" id="pg5AddPopup">
+  <div class="pg5-modal">
+    <h3>Thêm mới - Hệ số điều chỉnh lần 3</h3>
+    <div class="pg5-form-row">
+      <label style="color:#d32f2f;font-weight:bold">Tháng</label>
+      <input type="text" id="popThang" placeholder="MM/yyyy" value="06/2026">
+    </div>
+    <div class="pg5-form-row">
+      <label style="color:#d32f2f;font-weight:bold">Mã NV</label>
+      <input type="text" id="popMaNV" placeholder="Nhập mã nhân viên">
+    </div>
+    <div class="pg5-form-row">
+      <label>Họ và Tên</label>
+      <input type="text" id="popTenNV" placeholder="Tự động hiển thị" readonly style="background:#f5f5f5">
+    </div>
+    <div class="pg5-form-row">
+      <label>Đơn vị cấp 3</label>
+      <input type="text" id="popDv3" placeholder="">
+    </div>
+    <div class="pg5-form-row">
+      <label>Đơn vị cấp 4</label>
+      <input type="text" id="popDv4" placeholder="">
+    </div>
+    <div class="pg5-form-row">
+      <label>Đơn vị cấp 5</label>
+      <input type="text" id="popDv5" placeholder="">
+    </div>
+    <div class="pg5-form-row">
+      <label>Nhóm lương</label>
+      <select id="popNhomLuong"><option value="">-- Chọn --</option><option value="Hệ số">Hệ số</option><option value="Bình quân">Bình quân</option><option value="Năng suất">Năng suất</option></select>
+    </div>
+    <div class="pg5-form-row">
+      <label>Đủ công</label>
+      <div style="flex:1"><input type="checkbox" id="popDuCong" style="width:20px;height:20px;cursor:pointer"></div>
+    </div>
+    <div class="pg5-form-row">
+      <label>Số tiền (VNĐ)</label>
+      <input type="text" id="popSoTien" placeholder="Nhập số tiền">
+    </div>
+    <div class="pg5-form-row">
+      <label>Ghi chú</label>
+      <input type="text" id="popGhiChu" placeholder="Nhập ghi chú">
+    </div>
+    <div class="pg5-modal-btns">
+      <button class="btn-ok" onclick="pg5AddFromPopup()">Lưu</button>
+      <button class="btn-cancel" onclick="pg5CloseAdd()">Hủy</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script>
+var pg5Data = [
+  {id:1, maNV:'1022908420', tenNV:'Huỳnh Thị Nuôi', dv3:'Phân xưởng A', dv4:'Xưởng 1', dv5:'Tổ Phile 1', nhomLuong:'Hệ số', thang:'06/2026', duCong:true, soTien:'500,000', ghiChu:'Phụ cấp thêm'},
+  {id:2, maNV:'1022904000', tenNV:'Bùi Thị Mỹ', dv3:'Phân xưởng B', dv4:'Xưởng 2', dv5:'Tổ Phile 2', nhomLuong:'Bình quân', thang:'06/2026', duCong:false, soTien:'250,000', ghiChu:'Không đủ công'},
+  {id:3, maNV:'1022904001', tenNV:'Trần Văn Phạt', dv3:'Phân xưởng C', dv4:'Xưởng 1', dv5:'Tổ Đóng Gói', nhomLuong:'Năng suất', thang:'06/2026', duCong:true, soTien:'-150,000', ghiChu:'Trừ tiền lỗi sản phẩm'},
+  {id:4, maNV:'187', tenNV:'_report1_BangTinh', dv3:'Phân xưởng D', dv4:'Xưởng 1', dv5:'Toàn bộ', nhomLuong:'Năng suất', thang:'06/2026', duCong:false, soTien:'-14,000,000', ghiChu:'Quỹ tiền lương tăng giảm. 1 người giảm 1.400.000'}
+];
+
+function pg5Render() {
+  var tbody = document.getElementById('tableBody');
+  var html = '';
+  pg5Data.forEach(function(r, i) {
+    var isNeg = (r.soTien||'').indexOf('-') >= 0;
+    var moneyStyle = isNeg ? 'color:red;font-weight:bold;' : '';
+    html += '<tr>'
+      + '<td><input type="checkbox" class="pg5-chk" data-id="' + r.id + '"></td>'
+      + '<td>' + (i+1) + '</td>'
+      + '<td>' + r.maNV + '</td>'
+      + '<td style="text-align:left">' + r.tenNV + '</td>'
+      + '<td style="text-align:left">' + r.dv3 + '</td>'
+      + '<td style="text-align:left">' + r.dv4 + '</td>'
+      + '<td style="text-align:left">' + r.dv5 + '</td>'
+      + '<td style="text-align:left">' + r.nhomLuong + '</td>'
+      + '<td><input type="text" value="' + r.thang + '" style="text-align:center;width:70px" onchange="pg5UpdateThang(' + r.id + ',this.value)"></td>'
+      + '<td><input type="checkbox" ' + (r.duCong?'checked':'') + ' style="width:20px;height:20px;cursor:pointer" onchange="pg5UpdateDuCong(' + r.id + ',this.checked)"></td>'
+      + '<td style="' + moneyStyle + '">' + r.soTien + '</td>'
+      + '<td style="text-align:left;font-size:11px">' + r.ghiChu + '</td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function pg5UpdateThang(id, val) {
+  var row = pg5Data.find(function(x){return x.id===id;});
+  if (row) row.thang = val;
+}
+
+function pg5UpdateDuCong(id, val) {
+  var row = pg5Data.find(function(x){return x.id===id;});
+  if (row) row.duCong = val;
+}
+
+function pg5ToggleAll(src) {
+  var cbs = document.querySelectorAll('.pg5-chk');
+  for (var i=0;i<cbs.length;i++) cbs[i].checked = src.checked;
+}
+
+function pg5Search() {
+  var tuThang = document.getElementById('txtTuThang').value.trim();
+  var denThang = document.getElementById('txtDenThang').value.trim();
+  var filtered = pg5Data;
+  if (tuThang || denThang) {
+    filtered = pg5Data.filter(function(r) {
+      var t = r.thang || '';
+      if (tuThang && t < tuThang) return false;
+      if (denThang && t > denThang) return false;
+      return true;
+    });
+  }
+  var tbody = document.getElementById('tableBody');
+  var html = '';
+  filtered.forEach(function(r, i) {
+    var isNeg = (r.soTien||'').indexOf('-') >= 0;
+    var moneyStyle = isNeg ? 'color:red;font-weight:bold;' : '';
+    html += '<tr>'
+      + '<td><input type="checkbox" class="pg5-chk" data-id="' + r.id + '"></td>'
+      + '<td>' + (i+1) + '</td>'
+      + '<td>' + r.maNV + '</td>'
+      + '<td style="text-align:left">' + r.tenNV + '</td>'
+      + '<td style="text-align:left">' + r.dv3 + '</td>'
+      + '<td style="text-align:left">' + r.dv4 + '</td>'
+      + '<td style="text-align:left">' + r.dv5 + '</td>'
+      + '<td style="text-align:left">' + r.nhomLuong + '</td>'
+      + '<td><input type="text" value="' + r.thang + '" style="text-align:center;width:70px" onchange="pg5UpdateThang(' + r.id + ',this.value)"></td>'
+      + '<td><input type="checkbox" ' + (r.duCong?'checked':'') + ' style="width:20px;height:20px;cursor:pointer" onchange="pg5UpdateDuCong(' + r.id + ',this.checked)"></td>'
+      + '<td style="' + moneyStyle + '">' + r.soTien + '</td>'
+      + '<td style="text-align:left;font-size:11px">' + r.ghiChu + '</td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+  showAlert2('pg5-alert', 'Tìm thấy ' + filtered.length + ' kết quả' + (tuThang ? ' từ ' + tuThang : '') + (denThang ? ' đến ' + denThang : ''), 'success');
+}
+
+function pg5Clear() {
+  document.getElementById('txtMaNV').value = '';
+  document.getElementById('txtTenNV').value = '';
+}
+
+function pg5Save() {
+  showAlert2('pg5-alert', 'Đã lưu dữ liệu thành công', 'success');
+}
+
+function pg5Delete() {
+  var cbs = document.querySelectorAll('.pg5-chk:checked');
+  if (cbs.length === 0) { showAlert2('pg5-alert', 'Vui lòng chọn dòng cần xóa.', 'warning'); return; }
+  if (!confirm('Bạn có chắc chắn muốn xóa ' + cbs.length + ' dòng?')) return;
+  var ids = [];
+  for (var i=0;i<cbs.length;i++) ids.push(parseInt(cbs[i].getAttribute('data-id')));
+  pg5Data = pg5Data.filter(function(x){return ids.indexOf(x.id)<0;});
+  pg5Render();
+  document.getElementById('chkAll').checked = false;
+  showAlert2('pg5-alert', 'Đã xóa ' + ids.length + ' dòng thành công', 'success');
+}
+
+function pg5ShowAddPopup() {
+  document.getElementById('popThang').value = '06/2026';
+  document.getElementById('popMaNV').value = '';
+  document.getElementById('popTenNV').value = '';
+  document.getElementById('popDv3').value = '';
+  document.getElementById('popDv4').value = '';
+  document.getElementById('popDv5').value = '';
+  document.getElementById('popNhomLuong').value = '';
+  document.getElementById('popDuCong').checked = false;
+  document.getElementById('popSoTien').value = '';
+  document.getElementById('popGhiChu').value = '';
+  document.getElementById('pg5AddPopup').classList.add('show');
+}
+
+function pg5CloseAdd() {
+  document.getElementById('pg5AddPopup').classList.remove('show');
+}
+
+function pg5AddFromPopup() {
+  var thang = document.getElementById('popThang').value.trim();
+  var maNV = document.getElementById('popMaNV').value.trim();
+  if (!thang) { alert('Vui lòng nhập Tháng (bắt buộc).'); return; }
+  if (!maNV) { alert('Vui lòng nhập Mã NV (bắt buộc).'); return; }
+  var newId = pg5Data.length > 0 ? Math.max.apply(null, pg5Data.map(function(d){return d.id;})) + 1 : 1;
+  pg5Data.push({
+    id: newId,
+    maNV: maNV,
+    tenNV: document.getElementById('popTenNV').value || '(Tự nhảy)',
+    dv3: document.getElementById('popDv3').value,
+    dv4: document.getElementById('popDv4').value,
+    dv5: document.getElementById('popDv5').value,
+    nhomLuong: document.getElementById('popNhomLuong').value,
+    thang: thang,
+    duCong: document.getElementById('popDuCong').checked,
+    soTien: document.getElementById('popSoTien').value || '0',
+    ghiChu: document.getElementById('popGhiChu').value
+  });
+  pg5Render();
+  pg5CloseAdd();
+  showAlert2('pg5-alert', 'Đã thêm mới thành công!', 'success');
+}
+
+function showAlert2(id, msg, type) {
+  var b = document.getElementById(id);
+  if (!b) return;
+  b.className = 'alert-box alert-' + type;
+  b.innerHTML = msg;
+  b.style.display = 'block';
+  setTimeout(function(){ b.style.display = 'none'; }, 3000);
+}
+
+pg5Render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiết lập nhóm tính lương năng suất (v4)</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC: fn7-nhom-dv-cap5.html  (v4 – Master-Detail redesign)
+       Lưu theo tháng MM/YYYY, master = Công ty+L1-L4
+       Detail = Level 5 gán TH1-TH4
+       ============================================================ */
+
+    /* --- Tabs --- */
+    .tabs { display:flex; gap:0; border-bottom:2px solid #ddd; margin-bottom:0; }
+    .tab { padding:8px 14px; font-size:12px; font-weight:bold; color:#777; cursor:pointer; border:none; border-bottom:3px solid transparent; background:none; transition:all .15s; }
+    .tab:hover { color:#333; background:#f9f9f9; }
+    .tab.active { color:#0056b3; border-bottom-color:#0056b3; }
+    .tab .cnt { display:inline-block; padding:1px 7px; border-radius:10px; font-size:10px; margin-left:4px; font-weight:bold; }
+    .cnt-blue { background:#cce5ff; color:#004085; }
+    .cnt-green { background:#d4edda; color:#155724; }
+    .cnt-red { background:#f8d7da; color:#721c24; }
+    .cnt-th1 { background:#d4edda; color:#155724; }
+    .cnt-th2 { background:#cce5ff; color:#004085; }
+    .cnt-th3 { background:#fff3cd; color:#856404; }
+    .cnt-th4 { background:#fce4ec; color:#880e4f; }
+
+    /* --- Progress bar --- */
+    .progress-wrap { margin-bottom:12px; }
+    .progress-bar { height:20px; background:#e9ecef; border-radius:4px; overflow:hidden; display:flex; }
+    .progress-bar .seg { height:100%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:bold; color:#fff; min-width:22px; transition:width .3s; }
+    .seg-th1 { background:#28a745; }
+    .seg-th2 { background:#007bff; }
+    .seg-th3 { background:#ffc107; color:#333 !important; }
+    .seg-th4 { background:#e91e63; }
+    .seg-un { background:#adb5bd; }
+    .progress-legend { display:flex; gap:14px; margin-top:5px; font-size:10px; color:#555; flex-wrap:wrap; }
+    .progress-legend span::before { content:''; display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
+    .leg-th1::before{background:#28a745} .leg-th2::before{background:#007bff} .leg-th3::before{background:#ffc107} .leg-th4::before{background:#e91e63} .leg-un::before{background:#adb5bd}
+
+    /* --- Filter area --- */
+    .filter-area { background:#f8f9fa; border:1px solid #e0e0e0; border-top:none; border-radius:0 0 4px 4px; padding:10px 14px; margin-bottom:10px; }
+    .filter-row { display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+    .filter-field { display:flex; flex-direction:column; gap:3px; }
+    .filter-field.grow { flex:1; min-width:140px; }
+    .filter-field label { font-size:10px; font-weight:bold; color:#666; text-transform:uppercase; letter-spacing:.3px; }
+    .filter-field select, .filter-field input { height:28px; font-size:11px; padding:0 8px; border:1px solid #ccc; border-radius:3px; }
+    .btn-filter { height:28px; padding:0 12px; border-radius:3px; font-size:11px; font-weight:bold; cursor:pointer; border:1px solid #ccc; background:#fff; color:#333; display:inline-flex; align-items:center; gap:4px; }
+    .btn-filter:hover { background:#e9ecef; }
+    .btn-filter.primary { background:#0056b3; color:#fff; border-color:#0056b3; }
+    .btn-filter.primary:hover { background:#004494; }
+
+    /* --- Active chips --- */
+    .chips { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:bold; background:#cce5ff; color:#004085; border:1px solid #b8daff; }
+    .chip .chip-x { cursor:pointer; font-size:12px; line-height:1; color:#0056b3; }
+    .chip .chip-x:hover { color:#dc3545; }
+
+    /* --- Bulk assign bar --- */
+    .bulk-bar { background:#fff3cd; border:1px solid #ffeeba; border-radius:4px; padding:8px 14px; margin-bottom:10px; display:none; align-items:center; gap:10px; flex-wrap:wrap; }
+    .bulk-bar.visible { display:flex; }
+    .bulk-bar .bulk-label { font-size:12px; font-weight:bold; color:#856404; }
+    .bulk-bar select { height:28px; font-size:11px; padding:0 8px; border:1px solid #ccc; border-radius:3px; }
+    .bulk-bar .bulk-count { font-size:11px; color:#856404; }
+    .btn-bulk { height:28px; padding:0 12px; border-radius:3px; font-size:11px; font-weight:bold; cursor:pointer; background:#28a745; color:#fff; border:1px solid #28a745; }
+
+    /* --- Toolbar --- */
+    .detail-toolbar { display:flex; gap:5px; margin-bottom:8px; flex-wrap:wrap; }
+    .tb-btn { height:26px; padding:0 10px; border-radius:3px; font-size:10px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:4px; border:1px solid #ccc; background:#fff; color:#333; }
+    .tb-btn:hover { background:#e9ecef; }
+    .tb-btn.green { background:#28a745; color:#fff; border-color:#28a745; }
+    .tb-btn.green:hover { background:#218838; }
+    .tb-btn.purple { background:#6f42c1; color:#fff; border-color:#6f42c1; }
+    .tb-btn.blue { background:#007bff; color:#fff; border-color:#007bff; }
+    .tb-btn.danger { color:#dc3545; border-color:#dc3545; }
+    .tb-btn.danger:hover { background:#dc3545; color:#fff; }
+
+    /* --- Detail grid --- */
+    .detail-grid-wrap { overflow-x:auto; border:1px solid #ccc; background:#fff; margin-bottom:8px; }
+    .detail-grid { width:100%; border-collapse:collapse; font-size:11px; white-space:nowrap; }
+    .detail-grid th { padding:6px 8px; border:1px solid #ddd; text-align:center; font-weight:bold; background:#e9ecef; color:#333; font-size:10px; position:sticky; top:0; z-index:1; }
+    .detail-grid td { padding:5px 8px; border:1px solid #eee; text-align:center; }
+    .detail-grid td.tl { text-align:left; }
+    .detail-grid tr:hover td { background:#f1f8ff; }
+    .detail-grid tr.row-unassigned td { background:#fff3cd; }
+    .detail-grid tr.row-unassigned:hover td { background:#ffe8a1; }
+    .detail-grid tr.row-selected td { background:#cce5ff; }
+
+    /* --- Inline assign dropdown --- */
+    .inline-assign { height:22px; font-size:10px; padding:0 4px; border:1px solid #90c4f5; border-radius:3px; background:#e8f4fd; color:#004085; cursor:pointer; font-weight:bold; }
+
+    /* --- Badge nhóm --- */
+    .badge-nhom { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold; white-space:nowrap; }
+    .badge-nhom.TH1 { background:#d4edda; color:#155724; }
+    .badge-nhom.TH2 { background:#cce5ff; color:#004085; }
+    .badge-nhom.TH3 { background:#fff3cd; color:#856404; }
+    .badge-nhom.TH4 { background:#fce4ec; color:#880e4f; }
+    .badge-nhom.NONE { background:#e9ecef; color:#6c757d; }
+
+    /* --- Pager --- */
+    .pager { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:11px; color:#555; border-top:1px solid #ddd; }
+    .pager-btns { display:flex; gap:3px; }
+    .pager-btns button { width:28px; height:28px; border:1px solid #ccc; border-radius:3px; background:#fff; color:#333; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .pager-btns button:hover { background:#e9ecef; }
+    .pager-btns button.cur { background:#0056b3; color:#fff; border-color:#0056b3; }
+    .pager-size { display:flex; gap:6px; align-items:center; }
+    .pager-size a { cursor:pointer; color:#0056b3; text-decoration:underline; font-weight:bold; }
+    .pager-size a.active { color:#333; text-decoration:none; }
+
+    /* --- Master grid row badges --- */
+    .badge-status { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold; }
+    .badge-status.done { background:#d4edda; color:#155724; }
+    .badge-status.partial { background:#fff3cd; color:#856404; }
+    .badge-status.empty { background:#f8d7da; color:#721c24; }
+    .badge-status.locked { background:#d1d1d1; color:#555; }
+
+    /* --- Lock bar --- */
+    .lock-bar { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#f8f9fa; border:1px solid #ddd; border-radius:4px; margin-bottom:10px; }
+    .lock-bar .lock-status { font-size:12px; font-weight:bold; color:#333; flex:1; }
+
+    /* --- Validation checklist --- */
+    .checklist { background:#f8f9fa; border:1px solid #ddd; border-radius:4px; padding:10px 14px; margin-bottom:12px; }
+    .cl-item { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:11px; }
+    .cl-item.ok { color:#155724; }
+    .cl-item.warn { color:#856404; }
+    .cl-item.err { color:#721c24; }
+    .cl-item b { font-weight:bold; }
+
+    /* --- Diff view --- */
+    .diff-wrap { background:#f8f9fa; border:1px solid #ddd; border-radius:4px; padding:10px 14px; margin-bottom:12px; display:none; }
+    .diff-wrap.visible { display:block; }
+    .diff-row { display:grid; grid-template-columns:1fr 30px 1fr; gap:4px; padding:4px 0; border-bottom:1px solid #eee; font-size:10px; align-items:center; }
+    .diff-old { color:#999; text-decoration:line-through; }
+    .diff-new { color:#155724; font-weight:bold; }
+    .diff-arrow { text-align:center; color:#0056b3; }
+    .diff-add { color:#155724; }
+    .diff-del { color:#721c24; }
+
+    /* --- Grouped view --- */
+    .group-card { border:1px solid #ddd; border-radius:4px; margin-bottom:8px; overflow:hidden; }
+    .group-hdr { background:#e9ecef; padding:7px 12px; display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; }
+    .group-hdr:hover { background:#dee2e6; }
+    .group-hdr .badge-nhom { font-size:10px; }
+    .group-hdr .group-title { font-weight:bold; color:#333; flex:1; }
+    .group-hdr .group-meta { font-size:10px; color:#777; }
+    .group-body { border-top:1px solid #ddd; }
+
+    /* --- View toggle --- */
+    .view-toggle { display:inline-flex; border:1px solid #ccc; border-radius:3px; overflow:hidden; }
+    .vt-btn { padding:4px 12px; font-size:10px; font-weight:bold; cursor:pointer; background:#fff; color:#666; border:none; border-right:1px solid #ccc; }
+    .vt-btn:last-child { border-right:none; }
+    .vt-btn.active { background:#0056b3; color:#fff; }
+
+    .suggest-conf { font-size:10px; color:#888; margin-left:auto; }
+
+    /* --- Copy modal --- */
+    .copy-source { background:#e8f4fd; border:1px solid #b8daff; border-radius:4px; padding:10px 14px; margin-bottom:12px; }
+    .copy-source .src-title { font-size:10px; font-weight:bold; color:#004085; text-transform:uppercase; margin-bottom:6px; }
+    .copy-source .src-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; font-size:12px; }
+    .copy-source .src-item span { font-size:10px; color:#666; }
+    .copy-source .src-item b { color:#333; }
+
+    .copy-arrow { text-align:center; padding:8px 0; font-size:16px; color:#0056b3; }
+
+    .copy-preview { background:#f8f9fa; border:1px solid #ddd; border-radius:4px; padding:10px 14px; margin-top:10px; }
+    .copy-preview table { width:100%; border-collapse:collapse; font-size:10px; }
+    .copy-preview th { padding:4px 6px; font-weight:bold; color:#555; border-bottom:1px solid #ccc; text-align:left; }
+    .copy-preview td { padding:4px 6px; border-bottom:1px solid #eee; }
+
+    /* --- Import/Export --- */
+    .ie-card { border:1px solid #ddd; border-radius:4px; overflow:hidden; margin-bottom:12px; }
+    .ie-card-h { background:#e9ecef; padding:8px 14px; font-weight:bold; font-size:12px; color:#333; display:flex; align-items:center; gap:6px; }
+    .ie-card-b { padding:12px 14px; font-size:11px; }
+    .ie-step { display:flex; gap:10px; margin-bottom:12px; }
+    .ie-step-num { width:22px; height:22px; border-radius:50%; background:#0056b3; color:#fff; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold; flex-shrink:0; }
+    .ie-step-body { flex:1; }
+    .ie-step-title { font-weight:bold; color:#333; margin-bottom:3px; }
+    .ie-drop-zone { border:2px dashed #ccc; border-radius:4px; padding:20px; text-align:center; color:#aaa; font-size:12px; cursor:pointer; }
+    .ie-drop-zone:hover { border-color:#0056b3; color:#0056b3; }
+    .ie-tag { display:inline-block; padding:2px 7px; border-radius:8px; font-size:9px; font-weight:bold; margin-right:4px; }
+    .ie-tag.new { background:#d4edda; color:#155724; }
+    .ie-tag.update { background:#fff3cd; color:#856404; }
+    .ie-tag.error { background:#f8d7da; color:#721c24; }
+
+    /* --- History --- */
+    .history-item { display:flex; gap:8px; padding:5px 0; border-bottom:1px solid #eee; font-size:11px; }
+    .history-time { color:#999; white-space:nowrap; min-width:100px; }
+    .history-user { font-weight:bold; color:#0056b3; min-width:100px; }
+    .history-action { color:#333; flex:1; }
+
+    /* --- Misc --- */
+    .text-success { color:#155724; }
+    .text-danger { color:#dc3545; }
+    .text-warning { color:#856404; }
+    .text-muted { color:#999; }
+    .fw-bold { font-weight:bold; }
+    .req { color:red; }
+    .separator { display:flex; align-items:center; gap:10px; margin:10px 0; font-size:11px; font-weight:bold; color:#0056b3; }
+    .separator hr { flex:1; border:none; border-top:1px solid #ccc; }
+
+    /* --- BA note --- */
+    .ba-note-area { margin-top:20px; border-top:2px dashed #ffd600; padding-top:12px; }
+    .ba-note-area .ba-label { font-weight:bold; color:#856404; margin-bottom:6px; font-size:12px; }
+    .ba-note-area textarea { width:100%; border:1px dashed #ffd600; padding:8px; font-size:12px; font-family:Arial; background:#fffef0; resize:vertical; }
+
+    /* --- Modal --- */
+    .modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:1000; justify-content:center; align-items:flex-start; padding-top:30px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-overlay.fullscreen { padding-top:0; align-items:stretch; }
+    .modal-box { background:#fff; border-radius:4px; box-shadow:0 4px 20px rgba(0,0,0,0.2); max-width:700px; width:95%; margin-bottom:30px; }
+    .modal-box.wide { max-width:900px; }
+    .modal-box.fullscreen { max-width:100%; width:100%; height:100vh; margin:0; border-radius:0; display:flex; flex-direction:column; }
+    .modal-box.narrow { max-width:500px; }
+    .modal-hdr { background:#0056b3; color:#fff; padding:10px 15px; display:flex; justify-content:space-between; align-items:center; border-radius:4px 4px 0 0; font-weight:bold; font-size:13px; }
+    .modal-hdr .x { background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; line-height:1; }
+    .modal-body { padding:15px; font-size:12px; max-height:72vh; overflow-y:auto; }
+    .modal-box.fullscreen .modal-hdr { border-radius:0; }
+    .modal-box.fullscreen .modal-body { max-height:none; flex:1; overflow-y:auto; }
+    .modal-box.fullscreen .modal-ftr { flex-shrink:0; }
+    .modal-ftr { padding:10px 15px; border-top:1px solid #ddd; display:flex; justify-content:flex-end; gap:8px; }
+    .modal-ftr-between { justify-content:space-between; }
+
+    /* --- Stat cards (master) --- */
+    .stat-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+    .stat-card { background:#fff; border:1px solid #ddd; border-radius:4px; padding:8px 12px; text-align:center; font-size:10px; color:#555; }
+    .stat-card b { display:block; font-size:20px; margin-top:3px; }
+    .stat-card.c-total b { color:#0056b3; }
+    .stat-card.c-assigned b { color:#28a745; }
+    .stat-card.c-unassigned b { color:#dc3545; }
+    .stat-card.c-locked b { color:#6c757d; }
+
+    /* --- Alert --- */
+    .alert-box { display:none; padding:10px 15px; border-radius:3px; margin-bottom:12px; font-size:12px; }
+    .alert-success { display:block; background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+    .alert-error   { display:block; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+    .alert-warning { display:block; background:#fff3cd; color:#856404; border:1px solid #ffeeba; }
+
+    /* --- Cross-Ka warning --- */
+    .cross-ka-warn { background:#fff3cd; border:1px solid #ffeeba; border-radius:4px; padding:8px 14px; margin-bottom:8px; display:flex; align-items:center; gap:8px; font-size:11px; color:#856404; }
+
+    /* --- Nhóm NS card view (#7) --- */
+    .ns-cards-wrap { display:none; margin-bottom:10px; }
+    .ns-cards-wrap.visible { display:block; }
+    .ns-card { border:1px solid #ddd; border-radius:6px; margin-bottom:10px; overflow:hidden; background:#fff; }
+    .ns-card-hdr { padding:8px 14px; display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; }
+    .ns-card-hdr:hover { filter:brightness(.95); }
+    .ns-card-hdr.th3-hdr { background:linear-gradient(135deg,#fff3cd,#fff8e1); border-bottom:2px solid #ffc107; }
+    .ns-card-hdr.th4-hdr { background:linear-gradient(135deg,#fce4ec,#fce9f0); border-bottom:2px solid #e91e63; }
+    .ns-card-hdr .ns-id { font-family:monospace; font-size:10px; color:#666; background:#fff; padding:1px 6px; border-radius:8px; border:1px solid #ccc; }
+    .ns-card-hdr .ns-title { font-weight:bold; color:#333; flex:1; }
+    .ns-card-hdr .ns-count { font-size:10px; color:#777; }
+    .ns-card-body { padding:10px 14px; border-top:1px solid #eee; }
+    .ns-member { display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px solid #f0f0f0; font-size:11px; }
+    .ns-member:last-child { border-bottom:none; }
+    .ns-member .ns-role { display:inline-block; padding:1px 7px; border-radius:8px; font-size:9px; font-weight:bold; min-width:44px; text-align:center; }
+    .ns-role.sx { background:#d4edda; color:#155724; }
+    .ns-role.pv { background:#fce4ec; color:#880e4f; }
+    .ns-member .ns-name { flex:1; font-weight:bold; color:#333; }
+    .ns-member .ns-code { font-size:9px; color:#999; font-family:monospace; }
+    .ns-member .ns-bp { font-size:10px; color:#666; }
+    .ns-card-warn { background:#fff3cd; border-top:1px solid #ffeeba; padding:6px 14px; font-size:10px; color:#856404; display:flex; align-items:center; gap:6px; }
+    .ns-card-footer { background:#f8f9fa; border-top:1px solid #ddd; padding:6px 14px; display:flex; align-items:center; gap:10px; font-size:10px; }
+    .ns-card-footer .ns-edit { color:#0056b3; cursor:pointer; font-weight:bold; text-decoration:underline; }
+    .ns-card-stat { color:#555; }
+
+    /* --- Validation checklist enhanced --- */
+    .cl-item .cl-detail { font-size:10px; color:#888; margin-left:20px; }
+    .cl-section { font-weight:bold; font-size:11px; color:#0056b3; margin-top:8px; margin-bottom:4px; padding-bottom:3px; border-bottom:1px solid #e0e0e0; }
+  </style>
+</head>
+<body>
+  <!-- ============ TOP HEADER ============ -->
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>VN</span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <!-- ============ CONTENT ============ -->
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương &rsaquo; Tính lương năng suất &rsaquo; Thiết lập nhóm tính lương năng suất</div>
+    <div class="page-title">THIẾT LẬP NHÓM TÍNH LƯƠNG NĂNG SUẤT</div>
+
+    <div class="note-alert">
+      <b>&#9432;</b>
+      Mỗi tháng chỉ <b>1 dòng master</b> cho mỗi tổ hợp Công ty + Level 1&ndash;4. Bấm <b>Chi tiết</b> để gán Level 5 vào nhóm TH1&ndash;TH4. Bấm <b>Sao chép</b> để nhân bản sang bộ phận / tháng khác. Lưu theo <b>MM/YYYY</b>.
+    </div>
+
+    <div id="fn7-alert" class="alert-box"></div>
+
+    <!-- ============ FILTER BAR (Master) ============ -->
+    <div class="form-panel" style="padding:10px 15px;">
+      <div style="display:grid;grid-template-columns:80px 1fr 80px 1fr 80px 1fr 80px 1fr;gap:6px 10px;align-items:center;font-size:11px;">
+        <label style="font-weight:bold">Công ty</label>
+        <select id="fn7-f-cty" style="padding:3px 5px;border:1px solid #ccc;height:26px;">
+          <option value="MPHG" selected>MPHG</option>
+          <option value="MPCA">MPCA</option>
+        </select>
+        <label style="font-weight:bold">Level 1</label>
+        <select id="fn7-f-l1" style="padding:3px 5px;border:1px solid #ccc;height:26px;">
+          <option value="BP_PTO" selected>Bộ phận PTO</option>
+          <option value="BP_SB">Bộ phận Semi-Block</option>
+        </select>
+        <label style="font-weight:bold">Level 2</label>
+        <select id="fn7-f-l2" style="padding:3px 5px;border:1px solid #ccc;height:26px;">
+          <option value="KA" selected>Ka</option>
+        </select>
+        <label style="font-weight:bold">Level 3</label>
+        <select id="fn7-f-l3" style="padding:3px 5px;border:1px solid #ccc;height:26px;">
+          <option value="">-- Tất cả --</option>
+          <option value="KA_SANG">Ka Sáng</option>
+          <option value="KA_CHIEU">Ka Chiều</option>
+          <option value="KA_DEM">Ka Đêm</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;">
+        <label style="font-weight:bold;white-space:nowrap;">Từ tháng</label>
+        <input type="text" id="fn7-f-thang-tu" value="01/2026" placeholder="MM/YYYY" style="padding:3px 5px;border:1px solid #ccc;height:26px;width:90px;">
+        <label style="font-weight:bold;white-space:nowrap;">Đến tháng</label>
+        <input type="text" id="fn7-f-thang-den" value="12/2026" placeholder="MM/YYYY" style="padding:3px 5px;border:1px solid #ccc;height:26px;width:90px;">
+      </div>
+    </div>
+
+    <!-- ============ ACTIONS BAR (Master) ============ -->
+    <div class="actions-bar">
+      <button class="btn-search" onclick="fn7Search()">&#128269; Tìm kiếm</button>
+      <button class="btn-add" onclick="fn7OpenAddMaster()">&#10133; Thêm mới</button>
+      <button class="btn-lock" onclick="fn7Delete()">&#128465; Xóa</button>
+      <button class="btn-export" onclick="fn7Export()">&#128229; Xuất DL</button>
+      <button class="btn-export" style="background:#28a745;color:#fff;" onclick="fn7LockSelected()">&#128274; Khóa</button>
+      <button class="btn-export" style="background:#6c757d;color:#fff;" onclick="fn7UnlockSelected()">&#128275; Mở khóa</button>
+    </div>
+
+
+    <!-- ============ MASTER GRID ============ -->
+    <div class="section-divider"><span>&#128202; DANH SÁCH MASTER</span><hr></div>
+    <div class="grid-wrap" style="max-height:none;">
+      <table style="font-size:11px;">
+        <thead>
+          <tr>
+            <th style="width:30px"><input type="checkbox" id="fn7-master-chk-all"></th>
+            <th style="width:30px">STT</th>
+            <th>Tháng</th>
+            <th>Công ty</th>
+            <th>Level 1</th>
+            <th>Level 2</th>
+            <th>Level 3</th>
+            <th>Level 4</th>
+            <th>L5</th>
+            <th>Gán</th>
+            <th>Thiếu</th>
+            <th>Trạng thái</th>
+            <th style="width:90px">Chi tiết</th>
+            <th style="width:90px">Sao chép</th>
+            <th style="width:70px">Sửa</th>
+            <th style="width:100px">Tình trạng</th>
+          </tr>
+        </thead>
+        <tbody id="fn7-master-body"></tbody>
+      </table>
+    </div>
+
+    <!-- ============ BA NOTE ============ -->
+    <div class="ba-note-area">
+      <div class="ba-label">&#128203; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)</div>
+      <textarea rows="3" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button style="background:#333;color:#fff;border:none;padding:5px 16px;cursor:pointer;border-radius:3px;font-weight:bold;font-size:11px;">&#128190; Lưu ghi chú</button>
+      </div>
+    </div>
+  </div><!-- /container -->
+
+  <!-- ============================================================
+       MODAL: CHI TIẾT LEVEL 5 (Detail form)
+       ============================================================ -->
+  <div class="modal-overlay fullscreen" id="fn7-modal-detail">
+    <div class="modal-box fullscreen">
+      <div class="modal-hdr">
+        <span id="fn7-detail-title">&#128203; Chi tiết thiết lập Level 5</span>
+        <button class="x" onclick="fn7CloseDetail()">&#10005;</button>
+      </div>
+      <div class="modal-body" style="padding:12px 15px;">
+
+        <!-- Master info readonly -->
+        <div style="background:#e8f4fd;border:1px solid #b8daff;border-radius:4px;padding:8px 14px;margin-bottom:10px;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:11px;">
+          <div><span style="font-size:9px;color:#666">THÁNG</span><br><b id="fn7-d-thang">07/2026</b></div>
+          <div><span style="font-size:9px;color:#666">CÔNG TY</span><br><b id="fn7-d-cty">MPHG</b></div>
+          <div><span style="font-size:9px;color:#666">LEVEL 1</span><br><b id="fn7-d-l1">PTO</b></div>
+          <div><span style="font-size:9px;color:#666">LEVEL 2</span><br><b id="fn7-d-l2">Ka</b></div>
+          <div><span style="font-size:9px;color:#666">LEVEL 3</span><br><b id="fn7-d-l3">Ka Sáng</b></div>
+          <div><span style="font-size:9px;color:#666">LEVEL 4</span><br><b id="fn7-d-l4">&mdash;</b></div>
+        </div>
+
+
+        <!-- Progress bar -->
+        <div class="progress-wrap">
+          <div class="progress-bar" id="fn7-progress-bar">
+            <div class="seg seg-th1" id="fn7-seg-th1" style="width:25%"><span>3</span></div>
+            <div class="seg seg-th2" id="fn7-seg-th2" style="width:9%"><span>1</span></div>
+            <div class="seg seg-th3" id="fn7-seg-th3" style="width:9%"><span>1</span></div>
+            <div class="seg seg-th4" id="fn7-seg-th4" style="width:18%"><span>2</span></div>
+            <div class="seg seg-un" id="fn7-seg-un" style="width:36%"><span>4</span></div>
+          </div>
+          <div class="progress-legend">
+            <span class="leg-th1">TH1: <b id="fn7-p-th1">3</b></span>
+            <span class="leg-th2">TH2: <b id="fn7-p-th2">1</b></span>
+            <span class="leg-th3">TH3: <b id="fn7-p-th3">1</b></span>
+            <span class="leg-th4">TH4: <b id="fn7-p-th4">2</b></span>
+            <span class="leg-un">Chưa gán: <b id="fn7-p-un">4</b></span>
+          </div>
+        </div>
+
+        <!-- Validation checklist (hidden by default) -->
+        <div class="checklist" id="fn7-checklist" style="display:none;"></div>
+
+        <!-- Diff view (hidden by default) -->
+        <div class="diff-wrap" id="fn7-diff"></div>
+
+
+        <!-- Tabs -->
+        <div class="tabs" id="fn7-tabs">
+          <button class="tab active" data-tab="all" onclick="fn7SwitchTab('all')">Tất cả <span class="cnt cnt-blue" id="fn7-tab-all">11</span></button>
+          <button class="tab" data-tab="assigned" onclick="fn7SwitchTab('assigned')">Đã gán <span class="cnt cnt-green" id="fn7-tab-assigned">7</span></button>
+          <button class="tab" data-tab="unassigned" onclick="fn7SwitchTab('unassigned')">Chưa gán <span class="cnt cnt-red" id="fn7-tab-unassigned">4</span></button>
+          <button class="tab" data-tab="TH1" onclick="fn7SwitchTab('TH1')">TH1 <span class="cnt cnt-th1" id="fn7-tab-th1">3</span></button>
+          <button class="tab" data-tab="TH2" onclick="fn7SwitchTab('TH2')">TH2 <span class="cnt cnt-th2" id="fn7-tab-th2">1</span></button>
+          <button class="tab" data-tab="TH3" onclick="fn7SwitchTab('TH3')">TH3 <span class="cnt cnt-th3" id="fn7-tab-th3">1</span></button>
+          <button class="tab" data-tab="TH4" onclick="fn7SwitchTab('TH4')">TH4 <span class="cnt cnt-th4" id="fn7-tab-th4">2</span></button>
+        </div>
+
+        <!-- Filter area -->
+        <div class="filter-area">
+          <div class="filter-row">
+            <div class="filter-field grow">
+              <label>&#128269; Tìm nhanh</label>
+              <input type="text" id="fn7-d-search" placeholder="Tên, mã Level 5, nhóm..." oninput="fn7RenderDetail()">
+            </div>
+            <div class="filter-field">
+              <label>Nhóm TH3/TH4</label>
+              <select id="fn7-d-filter-group" onchange="fn7RenderDetail()">
+                <option value="">-- Tất cả nhóm --</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>Bộ phận (cross-Ka)</label>
+              <select id="fn7-d-filter-bp" onchange="fn7RenderDetail()">
+                <option value="">-- Tất cả --</option>
+                <option value="Ka Sáng">Ka Sáng</option>
+                <option value="Ka Chiều">Ka Chiều</option>
+                <option value="Ka Đêm">Ka Đêm</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:4px;align-items:end;">
+              <button class="btn-filter primary" onclick="fn7RenderDetail()">&#128269; Lọc</button>
+              <button class="btn-filter" onclick="fn7ResetDetailFilter()">&#10060;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bulk assign bar -->
+        <div class="bulk-bar" id="fn7-bulk-bar">
+          <span style="font-size:14px;">&#9889;</span>
+          <span class="bulk-label">Gán nhanh</span>
+          <span class="bulk-count">Đã chọn: <b id="fn7-bulk-count">0</b> dòng</span>
+          <span style="font-size:11px;color:#666;">gán vào</span>
+          <select id="fn7-bulk-th">
+            <option value="TH1">TH1 - NS riêng</option>
+            <option value="TH2">TH2 - Chung 1 ĐV</option>
+            <option value="TH3">TH3 - Chung nhiều ĐV</option>
+            <option value="TH4">TH4 - Tách phụ</option>
+          </select>
+          <button class="btn-bulk" onclick="fn7BulkAssign()">&#9989; Gán <span id="fn7-bulk-count2">0</span> dòng</button>
+          <button class="tb-btn" onclick="fn7SelectAllUnassigned()" style="margin-left:auto;">Chọn tất cả chưa gán</button>
+        </div>
+
+        <!-- Detail toolbar -->
+        <div class="detail-toolbar">
+          <button class="tb-btn green" onclick="fn7OpenAssignModal()">&#10133; Gán nhóm</button>
+          <button class="tb-btn danger" onclick="fn7Unassign()">&#128279; Bỏ gán</button>
+          <span style="flex:1"></span>
+          <div class="view-toggle">
+            <button class="vt-btn active" id="fn7-vt-list" onclick="fn7SetView('list')">&#9776; Danh sách</button>
+            <button class="vt-btn" id="fn7-vt-card" onclick="fn7SetView('card')">&#127922; Nhóm NS</button>
+          </div>
+          <button class="tb-btn purple" onclick="fn7OpenImportModal()">&#128228; Import</button>
+          <button class="tb-btn blue" onclick="fn7ExportTab()">&#128229; Export</button>
+        </div>
+
+        <!-- Nhóm NS card view (#7) -->
+        <div class="ns-cards-wrap" id="fn7-ns-cards"></div>
+
+        <!-- Detail grid -->
+        <div class="detail-grid-wrap">
+          <table class="detail-grid">
+            <thead>
+              <tr>
+                <th style="width:24px"><input type="checkbox" id="fn7-d-chk-all" onchange="fn7ToggleAllDetail(this.checked)"></th>
+                <th style="width:30px">STT</th>
+                <th style="text-align:left;">Level 5 (Bàn)</th>
+                <th>Mã</th>
+                <th>Bộ phận</th>
+                <th style="width:70px">Nhóm TL</th>
+                <th style="width:80px">Nhóm NS</th>
+                <th style="width:60px">Vai trò</th>
+                <th style="text-align:left;">Ghi chú</th>
+                <th style="width:100px">Gán nhanh</th>
+                <th style="width:50px"></th>
+              </tr>
+            </thead>
+            <tbody id="fn7-detail-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Pager -->
+        <div class="pager">
+          <div>Hiển thị <b id="fn7-pager-range">1&ndash;11</b> / <b id="fn7-pager-total">11</b> | <span class="pager-size"><a class="active">50</a> &middot; <a>100</a> &middot; <a>200</a> dòng/trang</span></div>
+          <div class="pager-btns">
+            <button>&laquo;</button>
+            <button class="cur">1</button>
+            <button>&raquo;</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-ftr modal-ftr-between">
+        <div style="font-size:11px;color:#555;">Tổng: <b id="fn7-ftr-total">11</b> | Đã gán: <b class="text-success" id="fn7-ftr-assigned">7</b> | Chưa gán: <b class="text-danger" id="fn7-ftr-unassigned">4</b></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-cancel" onclick="fn7CloseDetail()">Đóng</button>
+          <button style="background:#28a745;color:#fff;padding:5px 16px;border:none;cursor:pointer;border-radius:3px;font-size:12px;font-weight:bold;" onclick="fn7SaveDetail()">&#128190; Lưu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: GÁN NHÓM CHO LEVEL 5
+       ============================================================ -->
+  <div class="modal-overlay fullscreen" id="fn7-modal-assign">
+    <div class="modal-box fullscreen">
+      <div class="modal-hdr" style="background:#28a745;">
+        <span>&#127991; Gán nhóm tính lương cho Level 5</span>
+        <button class="x" onclick="document.getElementById('fn7-modal-assign').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body" style="display:grid;grid-template-columns:320px 1fr;gap:16px;height:calc(100vh - 110px);overflow:hidden;">
+
+        <!-- CỘT TRÁI: cấu hình -->
+        <div style="overflow-y:auto;padding-right:8px;border-right:1px solid #ddd;">
+          <div style="font-weight:bold;font-size:11px;color:#333;margin-bottom:6px;">Chọn nhóm tính lương <span class="req">*</span></div>
+          <div id="fn7-assign-radios" style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
+            <label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;"><input type="radio" name="fn7_assign_th" value="TH1"> <span class="badge-nhom TH1">TH1</span> Năng suất riêng</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;"><input type="radio" name="fn7_assign_th" value="TH2"> <span class="badge-nhom TH2">TH2</span> NS chung - 1 ĐV cấp 5</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;"><input type="radio" name="fn7_assign_th" value="TH3"> <span class="badge-nhom TH3">TH3</span> NS chung - Nhiều ĐV cấp 5</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;"><input type="radio" name="fn7_assign_th" value="TH4" checked> <span class="badge-nhom TH4">TH4</span> NS chung - Tách cho phụ</label>
+          </div>
+
+          <div id="fn7-assign-group-section" style="display:none;background:#f8f9fa;border:1px solid #ddd;border-radius:4px;padding:10px 12px;margin-bottom:10px;">
+            <div style="font-weight:bold;font-size:11px;color:#333;margin-bottom:6px;">Chọn Nhóm NS <span class="req">*</span></div>
+            <select id="fn7-assign-group-select" style="width:100%;height:28px;font-size:11px;padding:0 8px;border:1px solid #ccc;border-radius:3px;margin-bottom:6px;" onchange="fn7RefreshAssignTable()">
+              <option value="">-- Chọn nhóm đã có --</option>
+            </select>
+            <div style="text-align:center;font-size:10px;color:#999;margin-bottom:6px;">hoặc tạo mới</div>
+            <div style="display:flex;gap:6px;">
+              <input type="text" id="fn7-assign-group-new" placeholder="Tên nhóm mới..." style="flex:1;height:28px;font-size:11px;padding:0 8px;border:1px solid #ccc;border-radius:3px;">
+              <button class="tb-btn green" onclick="fn7CreateNhomNS()" style="height:28px;">&#10133; Tạo</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:8px;">
+            <div style="font-weight:bold;font-size:11px;color:#333;margin-bottom:4px;">Ghi chú chung</div>
+            <input type="text" id="fn7-assign-ghi-chu" placeholder="Nhập ghi chú (tùy chọn)..." style="width:100%;height:28px;font-size:11px;padding:0 8px;border:1px solid #ccc;border-radius:3px;box-sizing:border-box;">
+          </div>
+
+          <div style="background:#fff3cd;border:1px solid #ffeeba;border-radius:4px;padding:8px 10px;font-size:10px;color:#856404;">
+            <b>&#9888; Lưu ý:</b> Mỗi Level 5 chỉ thuộc <b>1 trong 4 trường hợp</b> và <b>1 Nhóm NS</b>. TH4 phải có ít nhất 1 SX + 1 PV.
+          </div>
+        </div>
+
+        <!-- CỘT PHẢI: chọn L5 + lưới vai trò -->
+        <div style="overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
+          <!-- Chọn L5 bằng checkbox -->
+          <div style="border:1px solid #0056b3;border-radius:4px;overflow:hidden;">
+            <div style="background:#0056b3;color:#fff;padding:5px 10px;font-size:11px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;">
+              <span>Chọn Level 5 chưa gán</span>
+              <label style="font-weight:normal;font-size:10px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" id="fn7-assign-chk-all" onchange="fn7ToggleAllL5(this.checked)"> Chọn tất cả
+              </label>
+            </div>
+            <div id="fn7-assign-l5-list" style="max-height:160px;overflow-y:auto;padding:6px 10px;background:#f0f7ff;font-size:11px;">
+              <span style="color:#aaa;">Đang tải...</span>
+            </div>
+          </div>
+
+          <!-- Bảng L5 đã chọn -->
+          <div id="fn7-assign-table-wrap">
+            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+              <thead>
+                <tr style="background:#f0f0f0;border-bottom:2px solid #ccc;">
+                  <th style="padding:6px 10px;text-align:left;">Level 5</th>
+                  <th style="padding:6px 10px;text-align:left;">Bộ phận</th>
+                  <th id="fn7-assign-role-col" style="padding:6px 10px;text-align:center;display:none;">Vai trò</th>
+                  <th style="padding:6px 10px;text-align:center;width:40px;"></th>
+                </tr>
+              </thead>
+              <tbody id="fn7-assign-tbody"></tbody>
+            </table>
+            <div id="fn7-assign-empty" style="text-align:center;color:#aaa;font-size:11px;padding:20px;">Chưa có Level 5 nào được chọn</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('fn7-modal-assign').classList.remove('open')">Hủy</button>
+        <button style="background:#28a745;color:#fff;padding:5px 16px;border:none;cursor:pointer;border-radius:3px;font-size:12px;font-weight:bold;" onclick="fn7SaveAssign()">&#128190; Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: SAO CHÉP
+       ============================================================ -->
+  <div class="modal-overlay" id="fn7-modal-copy">
+    <div class="modal-box">
+      <div class="modal-hdr" style="background:#e67e22;">
+        <span>&#128203; Sao chép thiết lập</span>
+        <button class="x" onclick="document.getElementById('fn7-modal-copy').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="copy-source">
+          <div class="src-title">&#128196; Nguồn sao chép</div>
+          <div class="src-grid">
+            <div class="src-item"><span>Tháng</span><br><b>07/2026</b></div>
+            <div class="src-item"><span>Công ty</span><br><b>MPHG</b></div>
+            <div class="src-item"><span>Level 1</span><br><b>PTO</b></div>
+            <div class="src-item"><span>Level 2</span><br><b>Ka</b></div>
+            <div class="src-item"><span>Level 3</span><br><b>Ka Sáng</b></div>
+            <div class="src-item"><span>Details</span><br><b>7 L5 đã gán</b></div>
+          </div>
+        </div>
+
+        <div class="copy-arrow">&#11015; Sao chép đến</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-bottom:10px;">
+          <div class="filter-field"><label>Tháng đích</label><input type="text" value="08/2026" placeholder="MM/YYYY"></div>
+          <div class="filter-field"><label>Công ty đích</label><div style="padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-size:11px;color:#555;">MPHG — Minh Phú Hậu Giang</div></div>
+          <div class="filter-field"><label>Level 1 đích</label><div style="padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-size:11px;color:#555;">PTO</div></div>
+          <div class="filter-field"><label>Level 2 đích</label><div style="padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-size:11px;color:#555;">Ka</div></div>
+          <div class="filter-field"><label>Level 3 đích <span style="color:#0056b3;font-size:10px;">(có thể thay đổi)</span></label><select style="border-color:#0056b3;background:#e8f4fd;"><option>Ka Chiều</option><option>Ka Đêm</option></select></div>
+          <div class="filter-field"><label>Level 4 đích</label><div style="padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-size:11px;color:#555;">—</div></div>
+        </div>
+
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('fn7-modal-copy').classList.remove('open')">Hủy</button>
+        <button style="background:#e67e22;color:#fff;padding:5px 16px;border:none;cursor:pointer;border-radius:3px;font-size:12px;font-weight:bold;" onclick="fn7DoCopy()">&#128203; Thực hiện sao chép</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: IMPORT
+       ============================================================ -->
+  <div class="modal-overlay" id="fn7-modal-import">
+    <div class="modal-box">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>&#128228; Import thiết lập Level 5</span>
+        <button class="x" onclick="document.getElementById('fn7-modal-import').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="ie-card">
+          <div class="ie-card-h">&#9312; Tải template hoặc export file hiện tại</div>
+          <div class="ie-card-b">
+            <p>Export file ra, điền cột <b>Mã TH</b> (TH1/TH2/TH3/TH4) và cột <b>Nhóm L5</b> (cho TH3/TH4), rồi import lại.</p>
+            <button class="tb-btn blue" style="margin-top:6px;">&#128229; Tải template trống (.xlsx)</button>
+            <button class="tb-btn blue" style="margin-top:6px;">&#128229; Export tab chưa gán</button>
+          </div>
+        </div>
+        <div class="ie-card">
+          <div class="ie-card-h">&#9313; Chọn file import</div>
+          <div class="ie-card-b">
+            <div class="ie-drop-zone">&#128228; Kéo thả hoặc click để chọn file .xlsx / .csv</div>
+          </div>
+        </div>
+        <div class="ie-card">
+          <div class="ie-card-h">&#9314; Xem trước và xác nhận</div>
+          <div class="ie-card-b">
+            <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px;">
+              <div><span class="ie-tag new">Mới</span> 45 dòng sẽ được gán nhóm TH</div>
+              <div><span class="ie-tag update">Cập nhật</span> 12 dòng sẽ đổi nhóm TH</div>
+              <div><span class="ie-tag error">Lỗi</span> 3 dòng mã L5 không hợp lệ</div>
+            </div>
+            <div style="font-size:11px;">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" checked> Bỏ qua dòng lỗi, import phần hợp lệ</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:4px;"><input type="checkbox"> Ghi đè dòng đã gán</label>
+            </div>
+          </div>
+        </div>
+        <div style="background:#d4edda;border:1px solid #c3e6cb;border-radius:4px;padding:8px 12px;font-size:10px;color:#155724;">
+          <b>&#128161; Quy trình nhanh:</b> Export tab &ldquo;Chưa gán&rdquo; ra Excel &rarr; điền cột Mã TH + Nhóm L5 &rarr; Import lại. Nhanh hơn gán từng dòng khi có 100+ Level 5 chưa gán.
+        </div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('fn7-modal-import').classList.remove('open')">Hủy</button>
+        <button style="background:#6f42c1;color:#fff;padding:5px 16px;border:none;cursor:pointer;border-radius:3px;font-size:12px;font-weight:bold;" onclick="fn7DoImport()">&#128228; Import 57 dòng hợp lệ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: LỊCH SỬ THAY ĐỔI
+       ============================================================ -->
+  <div class="modal-overlay" id="fn7-modal-history">
+    <div class="modal-box">
+      <div class="modal-hdr" style="background:#495057;">
+        <span>&#128337; Lịch sử thay đổi</span>
+        <button class="x" onclick="document.getElementById('fn7-modal-history').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="history-item"><span class="history-time">28/06 16:00</span><span class="history-user">Trần B</span><span class="history-action">Khóa thiết lập 07/2026 Ka Sáng</span></div>
+        <div class="history-item"><span class="history-time">28/06 15:10</span><span class="history-user">Nguyễn Văn A</span><span class="history-action">Đổi DVS_NB_KS từ <span class="badge-nhom TH1">TH1</span> &rarr; <span class="badge-nhom TH3">TH3</span></span></div>
+        <div class="history-item"><span class="history-time">28/06 14:30</span><span class="history-user">Nguyễn Văn A</span><span class="history-action">Import Excel: gán 45 Level 5 vào TH1</span></div>
+        <div class="history-item"><span class="history-time">28/06 10:00</span><span class="history-user">Nguyễn Văn A</span><span class="history-action">Tạo master 07/2026 Ka Sáng (áp dụng từ 06/2026)</span></div>
+        <div class="history-item"><span class="history-time">27/06 09:15</span><span class="history-user">Trần B</span><span class="history-action">Sao chép từ Ka Sáng &rarr; Ka Chiều (7 Level 5)</span></div>
+      </div>
+      <div class="modal-ftr"><button class="btn-cancel" onclick="document.getElementById('fn7-modal-history').classList.remove('open')">Đóng</button></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: THÊM MASTER MỚI
+       ============================================================ -->
+  <div class="modal-overlay" id="fn7-modal-add-master">
+    <div class="modal-box narrow">
+      <div class="modal-hdr">
+        <span>&#10133; Thêm master mới</span>
+        <button class="x" onclick="document.getElementById('fn7-modal-add-master').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:8px 12px;align-items:center;">
+          <label style="font-weight:bold;">Tháng <span class="req">*</span></label>
+          <input type="text" value="07/2026" placeholder="MM/YYYY" style="padding:4px 8px;border:1px solid #ccc;height:28px;">
+          <label style="font-weight:bold;">Công ty <span class="req">*</span></label>
+          <select style="padding:4px 8px;border:1px solid #ccc;height:28px;"><option>MPHG &mdash; Minh Phú Hậu Giang</option></select>
+          <label style="font-weight:bold;">Level 1 <span class="req">*</span></label>
+          <select style="padding:4px 8px;border:1px solid #ccc;height:28px;"><option>Bộ phận PTO</option></select>
+          <label style="font-weight:bold;">Level 2 <span class="req">*</span></label>
+          <select style="padding:4px 8px;border:1px solid #ccc;height:28px;"><option>Ka</option></select>
+          <label style="font-weight:bold;">Level 3</label>
+          <select style="padding:4px 8px;border:1px solid #ccc;height:28px;"><option>Ka Sáng</option><option>Ka Chiều</option><option>Ka Đêm</option></select>
+          <label style="font-weight:bold;">Level 4</label>
+          <select style="padding:4px 8px;border:1px solid #ccc;height:28px;"><option>&mdash;</option></select>
+        </div>
+
+        <div class="suggest-bar visible" style="margin-top:12px;">
+          <div style="font-weight:bold;color:#155724;font-size:11px;margin-bottom:4px;">&#128161; Tháng 06/2026 có thiết lập cho tổ hợp này (380 Level 5 đã gán)</div>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="tb-btn green" onclick="fn7ApplyPrevMonth()">&#128203; Áp dụng từ 06/2026</button>
+            <button class="tb-btn">&#10060; Bỏ qua, tạo trống</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('fn7-modal-add-master').classList.remove('open')">Hủy</button>
+        <button style="background:#28a745;color:#fff;padding:5px 16px;border:none;cursor:pointer;border-radius:3px;font-size:12px;font-weight:bold;" onclick="fn7SaveMaster()">&#128190; Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: SỬA MASTER
+       ============================================================ -->
+  <div class="modal-overlay" id="fn7-modal-edit-master">
+    <div class="modal-box narrow">
+      <div class="modal-hdr" style="background:#007bff;">
+        <span>&#9998; Sửa thông tin Master</span>
+        <button class="x" onclick="document.getElementById('fn7-modal-edit-master').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="fn7-em-id">
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:8px 12px;align-items:center;">
+          <label style="font-weight:bold;">Tháng <span class="req">*</span></label>
+          <input type="text" id="fn7-em-thang" placeholder="MM/YYYY" style="padding:4px 8px;border:1px solid #ccc;height:28px;">
+          <label style="font-weight:bold;">Công ty</label>
+          <div id="fn7-em-cty-disp" style="padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-size:11px;color:#555;"></div>
+          <label style="font-weight:bold;">Level 1</label>
+          <div id="fn7-em-l1-disp" style="padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-size:11px;color:#555;"></div>
+          <label style="font-weight:bold;">Level 2</label>
+          <div id="fn7-em-l2-disp" style="padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-size:11px;color:#555;"></div>
+          <label style="font-weight:bold;">Level 3</label>
+          <select id="fn7-em-l3" style="padding:4px 8px;border:1px solid #0056b3;height:28px;background:#e8f4fd;">
+            <option>Ka Sáng</option>
+            <option>Ka Chiều</option>
+            <option>Ka Đêm</option>
+          </select>
+          <label style="font-weight:bold;">Level 4</label>
+          <select id="fn7-em-l4" style="padding:4px 8px;border:1px solid #ccc;height:28px;">
+            <option value="—">—</option>
+          </select>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:#999;">Công ty, Level 1–2 chỉ đọc vì thay đổi sẽ ảnh hưởng đến toàn bộ Level 5 đã gán.</div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('fn7-modal-edit-master').classList.remove('open')">Hủy</button>
+        <button style="background:#007bff;color:#fff;padding:5px 16px;border:none;cursor:pointer;border-radius:3px;font-size:12px;font-weight:bold;" onclick="fn7SaveEditMaster()">&#128190; Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: QUẢN LÝ NHÓM NS
+       ============================================================ -->
+  <div class="modal-overlay" id="fn7-modal-nhomns">
+    <div class="modal-box wide">
+      <div class="modal-hdr" style="background:#e67e22;">
+        <span>&#128218; Quản lý Nhóm năng suất (Nhóm NS)</span>
+        <button class="x" onclick="document.getElementById('fn7-modal-nhomns').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:#e8f4fd;border:1px solid #b8daff;border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:11px;">
+          <b>&#9432; Nhóm NS</b> dùng để gom nhiều Level 5 chia chung năng suất (TH3) hoặc phân vai trò Sản xuất / Phục vụ (TH4). Mỗi nhóm có mã định danh duy nhất.
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" placeholder="Tên nhóm mới..." id="fn7-nhomns-new-name" style="flex:1;height:28px;font-size:11px;padding:0 8px;border:1px solid #ccc;border-radius:3px;">
+          <select id="fn7-nhomns-new-type" style="height:28px;font-size:11px;padding:0 8px;border:1px solid #ccc;border-radius:3px;">
+            <option value="TH3">TH3 - Chung nhiều ĐV</option>
+            <option value="TH4">TH4 - Tách phụ</option>
+          </select>
+          <button class="tb-btn green" onclick="fn7AddNhomNS()">&#10133; Tạo nhóm</button>
+        </div>
+
+        <div id="fn7-nhomns-list"></div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('fn7-modal-nhomns').classList.remove('open')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
+  <script>
+  /* ============================================================
+     MOCK DATA
+     ============================================================ */
+  const MASTERS = [
+    { id:1, thang:'07/2026', cty:'MPHG', l1:'PTO', l2:'Ka', l3:'Ka Sáng', l4:'—', total_l5:14, assigned:13, unassigned:1, locked:false },
+    { id:2, thang:'07/2026', cty:'MPHG', l1:'PTO', l2:'Ka', l3:'Ka Chiều', l4:'—', total_l5:8, assigned:5, unassigned:3, locked:false },
+    { id:3, thang:'07/2026', cty:'MPHG', l1:'PTO', l2:'Ka', l3:'Ka Đêm', l4:'—', total_l5:8, assigned:7, unassigned:1, locked:true },
+  ];
+
+  // Nhóm NS: định danh các nhóm chia năng suất chung (TH3/TH4)
+  const NHOM_NS = [
+    { id:'NS-001', ten:'Nhóm Lặt đầu + Phân cỡ KS', loai:'TH3', master_id:1 },
+    { id:'NS-002', ten:'Nhóm Tẩm bột + Đóng gói KS', loai:'TH3', master_id:1 },
+    { id:'NS-005', ten:'Nhóm Nobashi + Sơ chế + Hấp sấy KS', loai:'TH3', master_id:1 },
+    { id:'NS-003', ten:'Nhóm SX chính + PV Rửa KS', loai:'TH4', master_id:1 },
+    { id:'NS-004', ten:'Nhóm SX + PV Vận chuyển (cross-Ka)', loai:'TH4', master_id:1 },
+  ];
+
+  const DETAILS = [
+    { ma:'DVS_LAT_KS', ten:'Lặt đầu tôm Ka Sáng', bp:'Ka Sáng', th:'TH3', nhom_id:'NS-001', vai_tro:'', ghi_chu:'', master_id:1 },
+    { ma:'DVS_PHANC_KS', ten:'Phân cỡ tay Ka Sáng', bp:'Ka Sáng', th:'TH3', nhom_id:'NS-001', vai_tro:'', ghi_chu:'', master_id:1 },
+    { ma:'DVS_TAM_KS', ten:'Tẩm bột Ka Sáng', bp:'Ka Sáng', th:'TH3', nhom_id:'NS-002', vai_tro:'', ghi_chu:'', master_id:1 },
+    { ma:'DVS_DONG_KS', ten:'Đóng gói Ka Sáng', bp:'Ka Sáng', th:'TH3', nhom_id:'NS-002', vai_tro:'', ghi_chu:'', master_id:1 },
+    { ma:'DVS_NB_KS', ten:'Nobashi Ka Sáng', bp:'Ka Sáng', th:'TH3', nhom_id:'NS-005', vai_tro:'', ghi_chu:'Chia NS theo nhóm chế biến đặc thù', master_id:1 },
+    { ma:'DVS_SOCHE_KS', ten:'Sơ chế Ka Sáng', bp:'Ka Sáng', th:'TH3', nhom_id:'NS-005', vai_tro:'', ghi_chu:'', master_id:1 },
+    { ma:'DVS_HAPS_KS', ten:'Hấp sấy Ka Sáng', bp:'Ka Sáng', th:'TH3', nhom_id:'NS-005', vai_tro:'', ghi_chu:'', master_id:1 },
+    { ma:'DVS_RUA_KS', ten:'Rửa/Vệ sinh Ka Sáng', bp:'Ka Sáng', th:'TH4', nhom_id:'NS-003', vai_tro:'PV', ghi_chu:'Phục vụ cho Lặt đầu + Phân cỡ', master_id:1 },
+    { ma:'DVS_LAT2_KS', ten:'Lặt đầu tôm #2 Ka Sáng', bp:'Ka Sáng', th:'TH4', nhom_id:'NS-003', vai_tro:'SX', ghi_chu:'', master_id:1 },
+    { ma:'DVS_PHANC2_KS', ten:'Phân cỡ tay #2 Ka Sáng', bp:'Ka Sáng', th:'TH4', nhom_id:'NS-003', vai_tro:'SX', ghi_chu:'', master_id:1 },
+    { ma:'DVS_VAN_KS', ten:'Vận chuyển Ka Sáng', bp:'Ka Sáng', th:'TH4', nhom_id:'NS-004', vai_tro:'PV', ghi_chu:'Cross-Ka', master_id:1 },
+    { ma:'DVS_IQF_KS', ten:'IQF Ka Sáng', bp:'Ka Sáng', th:'TH4', nhom_id:'NS-004', vai_tro:'SX', ghi_chu:'', master_id:1 },
+    { ma:'DVS_PHANC_KC', ten:'Phân cỡ Ka Chiều', bp:'Ka Chiều', th:'TH4', nhom_id:'NS-004', vai_tro:'SX', ghi_chu:'Cross-Ka', master_id:1 },
+    { ma:'DVS_VIRUT_KS', ten:'Hàng Virut Ka Sáng', bp:'Ka Sáng', th:'', nhom_id:'', vai_tro:'', ghi_chu:'', master_id:1 },
+  ];
+
+  let currentMasterId = null;
+  let currentTab = 'all';
+  let selectedDetailRows = new Set();
+
+  /* ============================================================
+     RENDER MASTER GRID
+     ============================================================ */
+  function fn7RenderMaster() {
+    const tbody = document.getElementById('fn7-master-body');
+    tbody.innerHTML = '';
+    let totalL5=0, totalAssigned=0, totalUnassigned=0;
+
+    MASTERS.forEach(function(m, i) {
+      totalL5 += m.total_l5;
+      totalAssigned += m.assigned;
+      totalUnassigned += m.unassigned;
+      const status = m.locked ? 'locked' : (m.unassigned===0 ? 'done' : (m.assigned>0 ? 'partial' : 'empty'));
+      const statusText = m.locked ? '&#128274; Đã khóa' : (m.unassigned===0 ? '&#9989; Đã gán hết' : (m.assigned>0 ? '&#9888; Còn thiếu' : '&#10060; Chưa gán'));
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="checkbox"></td>
+        <td>${i+1}</td>
+        <td>${m.thang}</td>
+        <td>${m.cty}</td>
+        <td>${m.l1}</td>
+        <td>${m.l2}</td>
+        <td style="font-weight:bold;color:#0056b3">${m.l3}</td>
+        <td>${m.l4}</td>
+        <td style="font-weight:bold">${m.total_l5}</td>
+        <td style="color:#28a745;font-weight:bold">${m.assigned}</td>
+        <td style="color:#dc3545;font-weight:bold">${m.unassigned}</td>
+        <td><span class="badge-status ${status}">${statusText}</span></td>
+        <td><button class="btn-edit-row" onclick="fn7OpenDetail(${m.id})" style="background:#6f42c1;width:100%;">&#128203; Chi tiết</button></td>
+        <td><button class="btn-edit-row" onclick="fn7OpenCopyModal(${m.id})" style="background:#e67e22;width:100%;">&#128203; Sao chép</button></td>
+        <td><button class="btn-edit-row" onclick="fn7EditMaster(${m.id})" style="background:#007bff;width:100%;">&#9998; Sửa</button></td>
+        <td style="text-align:center;"><button class="btn-edit-row" onclick="fn7ToggleLockMaster(${m.id})" style="background:${m.locked?'#6c757d':'#28a745'};width:100%;">${m.locked?'&#128275; Mở khóa':'&#128274; Khóa'}</button></td>`;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('fn7-stat-master').textContent = MASTERS.length;
+    document.getElementById('fn7-stat-l5').textContent = totalL5;
+    document.getElementById('fn7-stat-assigned').textContent = totalAssigned;
+    document.getElementById('fn7-stat-unassigned').textContent = totalUnassigned;
+  }
+
+  /* ============================================================
+     DETAIL MODAL
+     ============================================================ */
+  function fn7OpenDetail(masterId) {
+    currentMasterId = masterId;
+    const m = MASTERS.find(x => x.id===masterId);
+    if(!m) return;
+
+    document.getElementById('fn7-d-thang').textContent = m.thang;
+    document.getElementById('fn7-d-cty').textContent = m.cty;
+    document.getElementById('fn7-d-l1').textContent = m.l1;
+    document.getElementById('fn7-d-l2').textContent = m.l2;
+    document.getElementById('fn7-d-l3').textContent = m.l3;
+    document.getElementById('fn7-d-l4').textContent = m.l4;
+
+    selectedDetailRows = new Set();
+    currentTab = 'all';
+    document.querySelectorAll('#fn7-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='all'));
+    document.getElementById('fn7-checklist').style.display = 'none';
+    document.getElementById('fn7-diff').className = 'diff-wrap';
+
+
+    // Populate group filter dropdown
+    const groupSel = document.getElementById('fn7-d-filter-group');
+    groupSel.innerHTML = '<option value="">-- Tất cả nhóm --</option>';
+    NHOM_NS.filter(g => g.master_id===masterId).forEach(g => {
+      groupSel.innerHTML += '<option value="'+g.id+'">'+g.id+' — '+g.ten+'</option>';
+    });
+
+    currentView = 'list';
+    document.getElementById('fn7-vt-list').classList.add('active');
+    document.getElementById('fn7-vt-card').classList.remove('active');
+    document.querySelector('.detail-grid-wrap').style.display = '';
+    document.querySelector('.pager').style.display = '';
+    document.getElementById('fn7-ns-cards').className = 'ns-cards-wrap';
+
+    fn7RenderDetail();
+    document.getElementById('fn7-modal-detail').classList.add('open');
+  }
+
+  function fn7CloseDetail() {
+    document.getElementById('fn7-modal-detail').classList.remove('open');
+  }
+
+  function fn7SwitchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('#fn7-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+    selectedDetailRows = new Set();
+    fn7RenderDetail();
+  }
+
+  function fn7RenderDetail() {
+    const details = DETAILS.filter(d => d.master_id===currentMasterId);
+    const search = (document.getElementById('fn7-d-search').value||'').toLowerCase().trim();
+    const filterGroup = document.getElementById('fn7-d-filter-group').value;
+    const filterBp = document.getElementById('fn7-d-filter-bp').value;
+
+    let filtered = details.filter(d => {
+      if(currentTab==='assigned' && !d.th) return false;
+      if(currentTab==='unassigned' && d.th) return false;
+      if(['TH1','TH2','TH3','TH4'].includes(currentTab) && d.th!==currentTab) return false;
+      if(search && !d.ten.toLowerCase().includes(search) && !d.ma.toLowerCase().includes(search) && !(d.nhom||'').toLowerCase().includes(search)) return false;
+      if(filterGroup && d.nhom_id!==filterGroup) return false;
+      if(filterBp && d.bp!==filterBp) return false;
+      return true;
+    });
+
+    // Update tab counts
+    const all = details.length;
+    const assigned = details.filter(d=>d.th).length;
+    const unassigned = details.filter(d=>!d.th).length;
+    const th1 = details.filter(d=>d.th==='TH1').length;
+    const th2 = details.filter(d=>d.th==='TH2').length;
+    const th3 = details.filter(d=>d.th==='TH3').length;
+    const th4 = details.filter(d=>d.th==='TH4').length;
+
+    document.getElementById('fn7-tab-all').textContent = all;
+    document.getElementById('fn7-tab-assigned').textContent = assigned;
+    document.getElementById('fn7-tab-unassigned').textContent = unassigned;
+    document.getElementById('fn7-tab-th1').textContent = th1;
+    document.getElementById('fn7-tab-th2').textContent = th2;
+    document.getElementById('fn7-tab-th3').textContent = th3;
+    document.getElementById('fn7-tab-th4').textContent = th4;
+    document.getElementById('fn7-ftr-total').textContent = all;
+    document.getElementById('fn7-ftr-assigned').textContent = assigned;
+    document.getElementById('fn7-ftr-unassigned').textContent = unassigned;
+
+    // Progress
+    document.getElementById('fn7-p-th1').textContent = th1;
+    document.getElementById('fn7-p-th2').textContent = th2;
+    document.getElementById('fn7-p-th3').textContent = th3;
+    document.getElementById('fn7-p-th4').textContent = th4;
+    document.getElementById('fn7-p-un').textContent = unassigned;
+    if(all>0) {
+      document.getElementById('fn7-seg-th1').style.width = (th1/all*100)+'%';
+      document.getElementById('fn7-seg-th1').innerHTML = th1>0?'<span>'+th1+'</span>':'';
+      document.getElementById('fn7-seg-th2').style.width = (th2/all*100)+'%';
+      document.getElementById('fn7-seg-th2').innerHTML = th2>0?'<span>'+th2+'</span>':'';
+      document.getElementById('fn7-seg-th3').style.width = (th3/all*100)+'%';
+      document.getElementById('fn7-seg-th3').innerHTML = th3>0?'<span>'+th3+'</span>':'';
+      document.getElementById('fn7-seg-th4').style.width = (th4/all*100)+'%';
+      document.getElementById('fn7-seg-th4').innerHTML = th4>0?'<span>'+th4+'</span>':'';
+      document.getElementById('fn7-seg-un').style.width = (unassigned/all*100)+'%';
+      document.getElementById('fn7-seg-un').innerHTML = unassigned>0?'<span>'+unassigned+'</span>':'';
+    }
+
+    // Render rows
+    const tbody = document.getElementById('fn7-detail-body');
+    tbody.innerHTML = '';
+    filtered.forEach(function(d, i) {
+      const isUnassigned = !d.th;
+      const isSelected = selectedDetailRows.has(d.ma);
+      const tr = document.createElement('tr');
+      if(isUnassigned) tr.className = 'row-unassigned';
+      if(isSelected) tr.className = 'row-selected';
+      tr.innerHTML = `
+        <td><input type="checkbox" ${isSelected?'checked':''} onchange="fn7ToggleDetailRow('${d.ma}',this.checked)"></td>
+        <td>${i+1}</td>
+        <td class="tl"><b>${d.ten}</b></td>
+        <td style="font-size:9px;color:#999;font-family:monospace">${d.ma}</td>
+        <td>${d.bp}</td>
+        <td>${d.th ? '<span class="badge-nhom '+d.th+'">'+d.th+'</span>' : '<span class="badge-nhom NONE">Chưa gán</span>'}</td>
+        <td>${d.nhom_id ? '<span class="ns-id" style="font-size:9px;font-family:monospace;background:#f0f0f0;padding:1px 5px;border-radius:6px;cursor:pointer;" onclick="fn7ScrollToGroup(\''+d.nhom_id+'\')" title="'+(NHOM_NS.find(g=>g.id===d.nhom_id)||{}).ten+'">'+d.nhom_id+'</span>' : '<span style="color:#ccc">&mdash;</span>'}</td>
+        <td>${d.vai_tro==='SX' ? '<span class="ns-role sx">SX</span>' : d.vai_tro==='PV' ? '<span class="ns-role pv">PV</span>' : '<span style="color:#ccc">&mdash;</span>'}</td>
+        <td><input type="text" value="${d.ghi_chu||''}" placeholder="Nhập ghi chú..." style="width:100%;border:1px solid #ddd;border-radius:3px;padding:2px 5px;font-size:10px;color:#555;" onchange="fn7UpdateGhiChu('${d.ma}',this.value)"></td>
+        <td>${isUnassigned ? '<select class="inline-assign" onchange="fn7InlineAssign(\''+d.ma+'\',this.value)"><option value="">-- Chọn --</option><option value="TH1">TH1</option><option value="TH2">TH2</option><option value="TH3">TH3</option><option value="TH4">TH4</option></select>' : '<span style="color:#ccc">&mdash;</span>'}</td>
+        <td><button class="btn-edit-row" onclick="fn7OpenAssignModalFor('${d.ma}')" style="font-size:9px;padding:2px 6px;">${isUnassigned?'&#10133;':'&#9998;'}</button></td>`;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('fn7-pager-range').textContent = filtered.length>0 ? '1–'+filtered.length : '0';
+    document.getElementById('fn7-pager-total').textContent = filtered.length;
+
+    fn7UpdateBulkBar();
+  }
+
+  function fn7ToggleDetailRow(ma, checked) {
+    if(checked) selectedDetailRows.add(ma); else selectedDetailRows.delete(ma);
+    fn7UpdateBulkBar();
+    fn7RenderDetail();
+  }
+
+  function fn7ToggleAllDetail(checked) {
+    const details = DETAILS.filter(d => d.master_id===currentMasterId);
+    selectedDetailRows = new Set();
+    if(checked) details.forEach(d => selectedDetailRows.add(d.ma));
+    fn7RenderDetail();
+  }
+
+  function fn7UpdateBulkBar() {
+    const count = selectedDetailRows.size;
+    const bar = document.getElementById('fn7-bulk-bar');
+    bar.className = count > 0 ? 'bulk-bar visible' : 'bulk-bar';
+    document.getElementById('fn7-bulk-count').textContent = count;
+    document.getElementById('fn7-bulk-count2').textContent = count;
+  }
+
+  function fn7SelectAllUnassigned() {
+    const details = DETAILS.filter(d => d.master_id===currentMasterId && !d.th);
+    details.forEach(d => selectedDetailRows.add(d.ma));
+    fn7RenderDetail();
+  }
+
+  function fn7ResetDetailFilter() {
+    document.getElementById('fn7-d-search').value = '';
+    document.getElementById('fn7-d-filter-group').value = '';
+    document.getElementById('fn7-d-filter-bp').value = '';
+    fn7RenderDetail();
+  }
+
+  /* ============================================================
+     INLINE ASSIGN
+     ============================================================ */
+  function fn7InlineAssign(ma, th) {
+    if(!th) return;
+    const d = DETAILS.find(x => x.ma===ma);
+    if(d) {
+      d.th = th;
+      fn7Alert('success','&#9989; Đã gán <b>'+d.ten+'</b> vào <b>'+th+'</b>');
+      fn7UpdateMasterCounts();
+      fn7RenderDetail();
+    }
+  }
+
+  /* ============================================================
+     BULK ASSIGN
+     ============================================================ */
+  function fn7BulkAssign() {
+    const th = document.getElementById('fn7-bulk-th').value;
+    let count = 0;
+    selectedDetailRows.forEach(ma => {
+      const d = DETAILS.find(x => x.ma===ma);
+      if(d && !d.th) { d.th = th; count++; }
+    });
+    selectedDetailRows = new Set();
+    fn7Alert('success','&#9989; Đã gán nhanh <b>'+count+' Level 5</b> vào <b>'+th+'</b>');
+    fn7UpdateMasterCounts();
+    fn7RenderDetail();
+  }
+
+  /* ============================================================
+     ASSIGN MODAL
+     ============================================================ */
+  let fn7AssignPending = []; // [{ma, vai_tro}] — L5 đang được chọn trong modal
+
+  function fn7AssignModalInit(preselectedMas) {
+    // preselectedMas: array of ma strings to pre-add
+    fn7AssignPending = [];
+    const th = document.querySelector('input[name="fn7_assign_th"]:checked');
+    if(!th) document.querySelector('input[name="fn7_assign_th"][value="TH1"]').checked = true;
+    document.getElementById('fn7-assign-ghi-chu').value = '';
+    fn7ToggleAssignGroupSection();
+
+    // Pre-add selected L5s
+    if(preselectedMas && preselectedMas.length>0) {
+      preselectedMas.forEach((ma, i) => {
+        const d = DETAILS.find(x => x.ma===ma);
+        if(!d) return;
+        // First one defaults PV, rest SX (for TH4 context)
+        fn7AssignPending.push({ ma, vai_tro: i===0 ? 'PV' : 'SX' });
+      });
+    }
+    fn7RefreshL5List();
+    fn7RefreshAssignTable();
+    document.getElementById('fn7-modal-assign').classList.add('open');
+  }
+
+  function fn7OpenAssignModal() {
+    // Get checked rows from detail grid
+    const checked = [...document.querySelectorAll('.detail-grid-wrap input[type=checkbox]:checked')]
+      .map(cb => cb.closest('tr'))
+      .filter(Boolean)
+      .map(tr => {
+        const btn = tr.querySelector('button[onclick*="fn7OpenAssignModalFor"]');
+        if(btn) { const m = btn.getAttribute('onclick').match(/'([^']+)'/); return m?m[1]:null; }
+        return null;
+      }).filter(Boolean);
+    fn7AssignModalInit(checked);
+  }
+
+  function fn7OpenAssignModalFor(ma) {
+    fn7AssignModalInit([ma]);
+    // Pre-set TH if already assigned
+    const d = DETAILS.find(x => x.ma===ma);
+    if(d && d.th) {
+      const r = document.querySelector('input[name="fn7_assign_th"][value="'+d.th+'"]');
+      if(r) { r.checked = true; fn7ToggleAssignGroupSection(); }
+      if(d.th==='TH4') fn7AssignPending[0].vai_tro = d.vai_tro||'SX';
+      fn7RefreshAssignTable();
+    }
+  }
+
+  function fn7ToggleAssignGroupSection() {
+    const val = document.querySelector('input[name="fn7_assign_th"]:checked');
+    const isTH3or4 = val && (val.value==='TH3'||val.value==='TH4');
+    const isTH4 = val && val.value==='TH4';
+    document.getElementById('fn7-assign-group-section').style.display = isTH3or4 ? 'block' : 'none';
+    const roleCol = document.getElementById('fn7-assign-role-col');
+    if(roleCol) roleCol.style.display = isTH4 ? '' : 'none';
+    if(isTH3or4) fn7PopulateGroupSelect(val.value);
+    fn7RefreshAssignTable();
+  }
+
+  function fn7PopulateGroupSelect(loai) {
+    const sel = document.getElementById('fn7-assign-group-select');
+    const groups = NHOM_NS.filter(g => g.loai===loai && g.master_id===currentMasterId);
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">-- Chọn nhóm đã có --</option>';
+    groups.forEach(g => {
+      const cnt = DETAILS.filter(d => d.nhom_id===g.id).length;
+      sel.innerHTML += '<option value="'+g.id+'">'+g.id+' — '+g.ten+' ('+cnt+' L5)</option>';
+    });
+    if(prev) sel.value = prev;
+  }
+
+  function fn7RefreshL5List() {
+    const wrap = document.getElementById('fn7-assign-l5-list');
+    if(!wrap) return;
+    const pendingMas = fn7AssignPending.map(p => p.ma);
+    const available = DETAILS.filter(d => d.master_id===currentMasterId && !d.th && !pendingMas.includes(d.ma));
+    if(available.length===0) {
+      wrap.innerHTML = '<span style="color:#aaa;font-size:10px;">Không còn Level 5 chưa gán.</span>';
+      return;
+    }
+    wrap.innerHTML = available.map(d =>
+      '<label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;border-bottom:1px solid #dde8f5;">'
+      + '<input type="checkbox" value="'+d.ma+'" onchange="fn7OnL5Check(\''+d.ma+'\',this.checked)">'
+      + '<span>'+d.ten+'</span>'
+      + '<span style="font-size:9px;color:#aaa;font-family:monospace;margin-left:auto;">'+d.ma+'</span>'
+      + '</label>'
+    ).join('');
+  }
+
+  function fn7ToggleAllL5(checked) {
+    document.querySelectorAll('#fn7-assign-l5-list input[type=checkbox]').forEach(cb => {
+      if(cb.checked !== checked) { cb.checked = checked; fn7OnL5Check(cb.value, checked); }
+    });
+  }
+
+  function fn7OnL5Check(ma, checked) {
+    if(checked) {
+      if(fn7AssignPending.find(p=>p.ma===ma)) return;
+      const isTH4 = document.querySelector('input[name="fn7_assign_th"]:checked')?.value === 'TH4';
+      const pvExists = fn7AssignPending.some(p=>p.vai_tro==='PV');
+      const vai_tro = (isTH4 && !pvExists) ? 'PV' : 'SX';
+      fn7AssignPending.push({ ma, vai_tro });
+    } else {
+      fn7AssignPending = fn7AssignPending.filter(p => p.ma!==ma);
+    }
+    fn7RefreshAssignTable();
+  }
+
+  function fn7SetPendingRole(ma, role) {
+    // Don't allow removing the last PV if TH4
+    const isTH4 = document.querySelector('input[name="fn7_assign_th"]:checked')?.value === 'TH4';
+    if(isTH4 && role==='SX') {
+      const pvCount = fn7AssignPending.filter(p => p.vai_tro==='PV').length;
+      if(pvCount<=1 && fn7AssignPending.find(p=>p.ma===ma)?.vai_tro==='PV') {
+        fn7Alert('warning','&#9888; Phải có ít nhất 1 Level 5 là PV.'); return;
+      }
+    }
+    const p = fn7AssignPending.find(x => x.ma===ma);
+    if(p) p.vai_tro = role;
+    fn7RefreshAssignTable();
+  }
+
+  function fn7RemovePending(ma) {
+    fn7AssignPending = fn7AssignPending.filter(p => p.ma!==ma);
+    fn7RefreshL5List();
+    fn7RefreshAssignTable();
+  }
+
+  function fn7RefreshAssignTable() {
+    const tbody = document.getElementById('fn7-assign-tbody');
+    const empty = document.getElementById('fn7-assign-empty');
+    const roleCol = document.getElementById('fn7-assign-role-col');
+    const isTH4 = document.querySelector('input[name="fn7_assign_th"]:checked')?.value === 'TH4';
+    if(roleCol) roleCol.style.display = isTH4 ? '' : 'none';
+
+    // Existing group members (already in DETAILS with nhom_id)
+    const grpId = document.getElementById('fn7-assign-group-select')?.value;
+    const existingMembers = grpId ? DETAILS.filter(d => d.nhom_id===grpId) : [];
+
+    if(existingMembers.length===0 && fn7AssignPending.length===0) {
+      tbody.innerHTML = '';
+      if(empty) empty.style.display = '';
+      return;
+    }
+    if(empty) empty.style.display = 'none';
+
+    let html = '';
+    // Existing members (editable role for TH4)
+    existingMembers.forEach(d => {
+      const sxSel = d.vai_tro==='SX' ? 'background:#d4edda;color:#155724;font-weight:bold;border:2px solid #28a745;' : 'background:#fff;color:#555;border:1px solid #ccc;';
+      const pvSel = d.vai_tro==='PV' ? 'background:#fce4ec;color:#880e4f;font-weight:bold;border:2px solid #e91e63;' : 'background:#fff;color:#555;border:1px solid #ccc;';
+      html += '<tr style="background:#f9f9f9;border-bottom:1px solid #eee;">';
+      html += '<td style="padding:5px 10px;font-size:11px;">'+d.ten+'<br><span style="font-size:9px;color:#aaa;font-family:monospace;">'+d.ma+'</span></td>';
+      html += '<td style="padding:5px 10px;font-size:10px;color:#555;">'+d.bp+'</td>';
+      if(isTH4) html += '<td style="padding:5px 10px;text-align:center;white-space:nowrap;"><button onclick="fn7SetMemberRole(\''+d.ma+'\',\'SX\')" style="'+sxSel+';padding:2px 10px;border-radius:4px;cursor:pointer;font-size:10px;margin-right:3px;">SX</button><button onclick="fn7SetMemberRole(\''+d.ma+'\',\'PV\')" style="'+pvSel+';padding:2px 10px;border-radius:4px;cursor:pointer;font-size:10px;">PV</button></td>';
+      html += '<td style="padding:5px 10px;text-align:center;font-size:10px;color:#aaa;">—</td>';
+      html += '</tr>';
+    });
+    // Pending (new) rows
+    fn7AssignPending.forEach(p => {
+      const d = DETAILS.find(x => x.ma===p.ma);
+      if(!d) return;
+      const sxSel = p.vai_tro==='SX' ? 'background:#d4edda;color:#155724;font-weight:bold;border:2px solid #28a745;' : 'background:#fff;color:#555;border:1px solid #ccc;';
+      const pvSel = p.vai_tro==='PV' ? 'background:#fce4ec;color:#880e4f;font-weight:bold;border:2px solid #e91e63;' : 'background:#fff;color:#555;border:1px solid #ccc;';
+      html += '<tr style="background:#f0fff4;border-bottom:1px solid #c3e6cb;">';
+      html += '<td style="padding:5px 10px;font-size:11px;"><span style="font-size:9px;background:#28a745;color:#fff;padding:1px 5px;border-radius:3px;margin-right:4px;">Mới</span>'+d.ten+'<br><span style="font-size:9px;color:#aaa;font-family:monospace;">'+d.ma+'</span></td>';
+      html += '<td style="padding:5px 10px;font-size:10px;color:#555;">'+d.bp+'</td>';
+      if(isTH4) html += '<td style="padding:5px 10px;text-align:center;white-space:nowrap;"><button onclick="fn7SetPendingRole(\''+p.ma+'\',\'SX\')" style="'+sxSel+';padding:2px 10px;border-radius:4px;cursor:pointer;font-size:10px;margin-right:3px;">SX</button><button onclick="fn7SetPendingRole(\''+p.ma+'\',\'PV\')" style="'+pvSel+';padding:2px 10px;border-radius:4px;cursor:pointer;font-size:10px;">PV</button></td>';
+      html += '<td style="padding:5px 10px;text-align:center;"><button onclick="fn7RemovePending(\''+p.ma+'\')" style="background:none;border:none;color:#dc3545;cursor:pointer;font-size:14px;">&#10005;</button></td>';
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function fn7SetMemberRole(ma, role) {
+    const d = DETAILS.find(x => x.ma===ma);
+    if(d) d.vai_tro = role;
+    fn7RefreshAssignTable();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input[name="fn7_assign_th"]').forEach(r => {
+      r.addEventListener('change', fn7ToggleAssignGroupSection);
+    });
+  });
+
+  function fn7SaveAssign() {
+    const th = document.querySelector('input[name="fn7_assign_th"]:checked');
+    if(!th) { fn7Alert('warning','&#9888; Vui lòng chọn trường hợp.'); return; }
+    if(fn7AssignPending.length===0) { fn7Alert('warning','&#9888; Chưa có Level 5 nào được thêm.'); return; }
+    const grpSel = document.getElementById('fn7-assign-group-select');
+    const grpId = grpSel ? grpSel.value : '';
+    if((th.value==='TH3'||th.value==='TH4') && !grpId) { fn7Alert('warning','&#9888; Vui lòng chọn hoặc tạo Nhóm NS.'); return; }
+    if(th.value==='TH4') {
+      const pvCount = fn7AssignPending.filter(p=>p.vai_tro==='PV').length
+                    + DETAILS.filter(d=>d.nhom_id===grpId && d.vai_tro==='PV').length;
+      if(pvCount<1) { fn7Alert('warning','&#9888; TH4 phải có ít nhất 1 Level 5 là PV.'); return; }
+    }
+    const ghiChu = document.getElementById('fn7-assign-ghi-chu').value.trim();
+    fn7AssignPending.forEach(p => {
+      const d = DETAILS.find(x => x.ma===p.ma);
+      if(!d) return;
+      d.th = th.value;
+      d.nhom_id = (th.value==='TH3'||th.value==='TH4') ? grpId : '';
+      d.vai_tro = th.value==='TH4' ? p.vai_tro : '';
+      d.ghi_chu = ghiChu;
+    });
+    document.getElementById('fn7-modal-assign').classList.remove('open');
+    fn7Alert('success','&#9989; Đã gán '+fn7AssignPending.length+' Level 5 thành công!');
+    fn7AssignPending = [];
+    fn7UpdateMasterCounts();
+    fn7RenderDetail();
+  }
+
+  /* ============================================================
+     VALIDATION (#6 — Enhanced)
+     ============================================================ */
+  function fn7Validate() {
+    const details = DETAILS.filter(d => d.master_id===currentMasterId);
+    const groups = NHOM_NS.filter(g => g.master_id===currentMasterId);
+    const unassigned = details.filter(d => !d.th);
+    const el = document.getElementById('fn7-checklist');
+    el.style.display = 'block';
+    el.innerHTML = '';
+
+    // Section 1: Gán nhóm TL
+    el.innerHTML += '<div class="cl-section">&#9312; Gán nhóm tính lương</div>';
+    if(unassigned.length===0) {
+      el.innerHTML += '<div class="cl-item ok">&#9989; <b>'+details.length+'/'+details.length+'</b> Level 5 đã được gán nhóm tính lương</div>';
+    } else {
+      el.innerHTML += '<div class="cl-item err">&#10060; Còn <b>'+unassigned.length+'</b> Level 5 chưa được gán nhóm</div>';
+      el.innerHTML += '<div class="cl-item"><span class="cl-detail">'+unassigned.map(d=>'<span style="background:#f8d7da;padding:1px 5px;border-radius:6px;font-size:9px;">'+d.ma+'</span>').join(' ')+'</span></div>';
+    }
+
+    // Section 2: Nhóm NS — TH3
+    const th3Groups = groups.filter(g => g.loai==='TH3');
+    if(th3Groups.length>0) {
+      el.innerHTML += '<div class="cl-section">&#9313; Nhóm NS — TH3 (Chung nhiều ĐV)</div>';
+      th3Groups.forEach(g => {
+        const members = details.filter(d => d.nhom_id===g.id);
+        if(members.length < 2) {
+          el.innerHTML += '<div class="cl-item err">&#10060; <b>'+g.id+'</b> ('+g.ten+'): chỉ có <b>'+members.length+'</b> L5 &mdash; TH3 cần ít nhất 2 L5</div>';
+        } else {
+          el.innerHTML += '<div class="cl-item ok">&#9989; <b>'+g.id+'</b>: '+members.length+' L5 chia chung NS</div>';
+        }
+      });
+      const th3NoGroup = details.filter(d => d.th==='TH3' && !d.nhom_id);
+      if(th3NoGroup.length>0) {
+        el.innerHTML += '<div class="cl-item err">&#10060; <b>'+th3NoGroup.length+'</b> L5 thuộc TH3 nhưng chưa gán Nhóm NS</div>';
+      }
+    }
+
+    // Section 3: Nhóm NS — TH4
+    const th4Groups = groups.filter(g => g.loai==='TH4');
+    if(th4Groups.length>0) {
+      el.innerHTML += '<div class="cl-section">&#9314; Nhóm NS — TH4 (Tách phụ)</div>';
+      th4Groups.forEach(g => {
+        const members = details.filter(d => d.nhom_id===g.id);
+        const sxCount = members.filter(d => d.vai_tro==='SX').length;
+        const pvCount = members.filter(d => d.vai_tro==='PV').length;
+        const noRole = members.filter(d => !d.vai_tro).length;
+        if(sxCount===0) {
+          el.innerHTML += '<div class="cl-item err">&#10060; <b>'+g.id+'</b> ('+g.ten+'): thiếu vai trò <span class="ns-role sx">SX</span> &mdash; TH4 bắt buộc có ít nhất 1 SX</div>';
+        } else if(pvCount===0) {
+          el.innerHTML += '<div class="cl-item err">&#10060; <b>'+g.id+'</b> ('+g.ten+'): thiếu vai trò <span class="ns-role pv">PV</span> &mdash; TH4 bắt buộc có ít nhất 1 PV</div>';
+        } else {
+          el.innerHTML += '<div class="cl-item ok">&#9989; <b>'+g.id+'</b>: '+sxCount+' SX + '+pvCount+' PV</div>';
+        }
+        if(noRole>0) {
+          el.innerHTML += '<div class="cl-item warn">&#9888; <b>'+g.id+'</b>: '+noRole+' L5 chưa gán vai trò SX/PV</div>';
+        }
+        if(members.length < 2) {
+          el.innerHTML += '<div class="cl-item err">&#10060; <b>'+g.id+'</b>: chỉ có '+members.length+' L5 &mdash; nhóm cần ít nhất 2</div>';
+        }
+      });
+      const th4NoGroup = details.filter(d => d.th==='TH4' && !d.nhom_id);
+      if(th4NoGroup.length>0) {
+        el.innerHTML += '<div class="cl-item err">&#10060; <b>'+th4NoGroup.length+'</b> L5 thuộc TH4 nhưng chưa gán Nhóm NS</div>';
+      }
+    }
+
+    // Section 4: Cross-Ka
+    el.innerHTML += '<div class="cl-section">&#9315; Cross-Ka & trùng lặp</div>';
+    let crossKaCount = 0;
+    groups.forEach(g => {
+      const members = details.filter(d => d.nhom_id===g.id);
+      const bps = [...new Set(members.map(d => d.bp))];
+      if(bps.length > 1) {
+        crossKaCount++;
+        el.innerHTML += '<div class="cl-item warn">&#9888; <b>'+g.id+'</b> chứa L5 từ nhiều bộ phận: '+bps.map(b=>'<b>'+b+'</b>').join(', ')+' &mdash; kiểm tra cross-Ka?</div>';
+      }
+    });
+    if(crossKaCount===0) {
+      el.innerHTML += '<div class="cl-item ok">&#9989; Không có nhóm cross-Ka</div>';
+    }
+
+    // Check duplicate: 1 L5 in multiple groups
+    const l5InGroups = {};
+    details.filter(d => d.nhom_id).forEach(d => {
+      if(!l5InGroups[d.ma]) l5InGroups[d.ma] = [];
+      l5InGroups[d.ma].push(d.nhom_id);
+    });
+    let dupCount = 0;
+    Object.keys(l5InGroups).forEach(ma => {
+      if(l5InGroups[ma].length > 1) {
+        dupCount++;
+        el.innerHTML += '<div class="cl-item err">&#10060; <b>'+ma+'</b> xuất hiện trong '+l5InGroups[ma].length+' nhóm: '+l5InGroups[ma].join(', ')+' &mdash; mỗi L5 chỉ thuộc 1 nhóm</div>';
+      }
+    });
+    if(dupCount===0) {
+      el.innerHTML += '<div class="cl-item ok">&#9989; Không có L5 trùng lặp giữa các nhóm</div>';
+    }
+  }
+
+  /* ============================================================
+     DIFF VIEW
+     ============================================================ */
+  function fn7ShowDiff() {
+    const el = document.getElementById('fn7-diff');
+    el.className = el.className.includes('visible') ? 'diff-wrap' : 'diff-wrap visible';
+    el.innerHTML = `
+      <div style="font-weight:bold;font-size:11px;color:#333;margin-bottom:8px;">&#128260; So sánh 06/2026 &rarr; 07/2026 &mdash; 3 thay đổi</div>
+      <div class="diff-row" style="font-weight:bold;color:#666;border-bottom:2px solid #ccc;"><span>06/2026</span><span></span><span>07/2026</span></div>
+      <div class="diff-row"><span class="diff-old">DVS_NB_KS &mdash; TH1</span><span class="diff-arrow">&rarr;</span><span class="diff-new">DVS_NB_KS &mdash; TH3</span></div>
+      <div class="diff-row"><span style="color:#999;">DVS_NEW_KS &mdash; (không có)</span><span class="diff-arrow" style="color:#28a745;">&#10133;</span><span class="diff-add">DVS_NEW_KS &mdash; TH1 (mới)</span></div>
+      <div class="diff-row"><span class="diff-old">DVS_OLD_KS &mdash; TH2</span><span class="diff-arrow" style="color:#dc3545;">&#128465;</span><span style="color:#dc3545;">(đã xóa)</span></div>
+    `;
+  }
+
+
+  /* ============================================================
+     LOCK / HISTORY
+     ============================================================ */
+  function fn7Lock() {
+    const m = MASTERS.find(x => x.id===currentMasterId);
+    if(!m) return;
+    if(!m.locked && m.unassigned>0) {
+      fn7Validate();
+      fn7Alert('warning','&#9888; Còn '+m.unassigned+' Level 5 chưa gán. Vui lòng kiểm tra trước khi khóa.');
+      return;
+    }
+    m.locked = !m.locked;
+    fn7Alert('success', m.locked ? '&#128274; Đã khóa thiết lập!' : '&#128275; Đã mở khóa!');
+    fn7RenderMaster();
+  }
+
+  function fn7ShowHistory() {
+    document.getElementById('fn7-modal-history').classList.add('open');
+  }
+
+  /* ============================================================
+     UPDATE MASTER COUNTS
+     ============================================================ */
+  function fn7UpdateMasterCounts() {
+    MASTERS.forEach(m => {
+      const details = DETAILS.filter(d => d.master_id===m.id);
+      m.total_l5 = details.length;
+      m.assigned = details.filter(d => d.th).length;
+      m.unassigned = details.filter(d => !d.th).length;
+    });
+    fn7RenderMaster();
+  }
+
+  /* ============================================================
+     MASTER ACTIONS
+     ============================================================ */
+  function fn7OpenAddMaster() { document.getElementById('fn7-modal-add-master').classList.add('open'); }
+  function fn7SaveMaster() { document.getElementById('fn7-modal-add-master').classList.remove('open'); fn7Alert('success','&#9989; Đã tạo master mới!'); }
+  function fn7ApplyPrevMonth() { fn7Alert('success','&#128203; Đã áp dụng thiết lập từ tháng 06/2026!'); }
+  function fn7EditMaster(id) {
+    const m = MASTERS.find(x => x.id===id);
+    if(!m) return;
+    if(m.locked) { fn7Alert('warning','&#128274; Master đã khóa, không thể sửa. Mở khóa trước.'); return; }
+    document.getElementById('fn7-em-id').value = id;
+    document.getElementById('fn7-em-thang').value = m.thang;
+    document.getElementById('fn7-em-cty-disp').textContent = m.cty;
+    document.getElementById('fn7-em-l1-disp').textContent = m.l1;
+    document.getElementById('fn7-em-l2-disp').textContent = m.l2;
+    document.getElementById('fn7-em-l3').value = m.l3;
+    document.getElementById('fn7-em-l4').value = m.l4;
+    document.getElementById('fn7-modal-edit-master').classList.add('open');
+  }
+
+  function fn7SaveEditMaster() {
+    const id = parseInt(document.getElementById('fn7-em-id').value);
+    const m = MASTERS.find(x => x.id===id);
+    if(!m) return;
+    const thang = document.getElementById('fn7-em-thang').value.trim();
+    if(!/^\d{2}\/\d{4}$/.test(thang)) { fn7Alert('warning','&#9888; Tháng không hợp lệ. Nhập đúng định dạng MM/YYYY.'); return; }
+    m.thang = thang;
+    m.l3 = document.getElementById('fn7-em-l3').value;
+    m.l4 = document.getElementById('fn7-em-l4').value;
+    document.getElementById('fn7-modal-edit-master').classList.remove('open');
+    fn7Alert('success','&#9989; Đã cập nhật master thành công!');
+    fn7RenderMaster();
+  }
+  function fn7OpenCopyModal(id) { document.getElementById('fn7-modal-copy').classList.add('open'); }
+  function fn7LockSelected() {
+    const checked = document.querySelectorAll('#fn7-master-body input[type=checkbox]:checked');
+    if(checked.length===0) { fn7Alert('warning','&#9888; Vui lòng chọn ít nhất 1 dòng để khóa.'); return; }
+    let locked=0, skipped=0;
+    checked.forEach(cb => {
+      const masterId = parseInt(cb.closest('tr').querySelector('button').getAttribute('onclick').match(/\d+/)[0]);
+      const m = MASTERS.find(x => x.id===masterId);
+      if(!m) return;
+      if(m.unassigned>0) { skipped++; return; }
+      m.locked = true; locked++;
+    });
+    if(skipped>0) fn7Alert('warning','&#9888; Đã khóa '+locked+' master. Bỏ qua '+skipped+' master còn Level 5 chưa gán.');
+    else fn7Alert('success','&#128274; Đã khóa '+locked+' master.');
+    fn7RenderMaster();
+  }
+
+  function fn7UnlockSelected() {
+    const checked = document.querySelectorAll('#fn7-master-body input[type=checkbox]:checked');
+    if(checked.length===0) { fn7Alert('warning','&#9888; Vui lòng chọn ít nhất 1 dòng để mở khóa.'); return; }
+    let unlocked=0;
+    checked.forEach(cb => {
+      const masterId = parseInt(cb.closest('tr').querySelector('button').getAttribute('onclick').match(/\d+/)[0]);
+      const m = MASTERS.find(x => x.id===masterId);
+      if(!m || !m.locked) return;
+      m.locked = false; unlocked++;
+    });
+    fn7Alert(unlocked>0?'success':'warning', unlocked>0?'&#128275; Đã mở khóa '+unlocked+' master.':'&#9888; Không có master nào đang khóa được chọn.');
+    fn7RenderMaster();
+  }
+
+  function fn7UpdateGhiChu(ma, value) {
+    const d = DETAILS.find(x => x.ma===ma);
+    if(d) d.ghi_chu = value;
+  }
+
+  function fn7RenameGroup(id, newName) {
+    const g = NHOM_NS.find(x => x.id===id);
+    if(g) g.ten = newName.trim() || g.ten;
+  }
+
+  function fn7ToggleLockMaster(masterId) {
+    const m = MASTERS.find(x => x.id===masterId);
+    if(!m) return;
+    if(!m.locked && m.unassigned>0) {
+      fn7Alert('warning','&#9888; Còn '+m.unassigned+' Level 5 chưa gán. Vui lòng hoàn tất trước khi khóa.');
+      return;
+    }
+    m.locked = !m.locked;
+    fn7Alert(m.locked?'success':'warning', m.locked?'&#128274; Đã khóa thiết lập!':'&#128275; Đã mở khóa thiết lập.');
+    fn7RenderMaster();
+  }
+
+  function fn7DoCopy() { document.getElementById('fn7-modal-copy').classList.remove('open'); fn7Alert('success','&#128203; Đã sao chép thành công!'); fn7RenderMaster(); }
+  function fn7Search() { fn7Alert('success','&#128269; Tìm kiếm hoàn tất.'); }
+  function fn7Delete() { fn7Alert('error','&#9940; Không thể xóa master đã có dữ liệu.'); }
+  function fn7Export() { fn7Alert('success','&#128229; Đang xuất dữ liệu...'); }
+  function fn7ExportTab() { fn7Alert('success','&#128229; Đang xuất tab hiện tại...'); }
+  function fn7OpenImportModal() { document.getElementById('fn7-modal-import').classList.add('open'); }
+  function fn7DoImport() { document.getElementById('fn7-modal-import').classList.remove('open'); fn7Alert('success','&#128228; Import hoàn tất: 57 dòng hợp lệ.'); fn7RenderDetail(); }
+  function fn7ChangeGroup() { fn7Alert('warning','&#128260; Chọn các dòng cần đổi nhóm trước.'); }
+  function fn7Unassign() {
+    if(selectedDetailRows.size===0) { fn7Alert('warning','Chọn dòng cần bỏ gán.'); return; }
+    selectedDetailRows.forEach(ma => { const d = DETAILS.find(x=>x.ma===ma); if(d) { d.th=''; d.nhom=''; } });
+    selectedDetailRows = new Set();
+    fn7Alert('success','&#128279; Đã bỏ gán thành công!');
+    fn7UpdateMasterCounts();
+    fn7RenderDetail();
+  }
+  function fn7SaveDetail() { fn7Alert('success','&#128190; Đã lưu thành công!'); fn7UpdateMasterCounts(); }
+
+  /* ============================================================
+     VIEW TOGGLE: List vs Card (#7)
+     ============================================================ */
+  let currentView = 'list';
+
+  function fn7SetView(view) {
+    currentView = view;
+    document.getElementById('fn7-vt-list').classList.toggle('active', view==='list');
+    document.getElementById('fn7-vt-card').classList.toggle('active', view==='card');
+    document.querySelector('.detail-grid-wrap').style.display = view==='list' ? '' : 'none';
+    document.querySelector('.pager').style.display = view==='list' ? '' : 'none';
+    const cardsWrap = document.getElementById('fn7-ns-cards');
+    cardsWrap.className = view==='card' ? 'ns-cards-wrap visible' : 'ns-cards-wrap';
+    if(view==='card') fn7RenderCards();
+  }
+
+  function fn7RenderCards() {
+    const wrap = document.getElementById('fn7-ns-cards');
+    const details = DETAILS.filter(d => d.master_id===currentMasterId);
+    const groups = NHOM_NS.filter(g => g.master_id===currentMasterId);
+    let html = '';
+
+    // TH1 — pills only, no group section
+    const th1Items = details.filter(d => d.th==='TH1');
+    if(th1Items.length>0) {
+      html += '<div style="font-weight:bold;font-size:11px;color:#28a745;margin-bottom:6px;">&#9632; TH1 — Năng suất riêng ('+th1Items.length+' Level 5)</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">';
+      th1Items.forEach(d => {
+        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#d4edda;border:1px solid #c3e6cb;border-radius:16px;font-size:10px;font-weight:bold;color:#155724;">'+d.ten+' <span style="font-size:8px;color:#888;font-family:monospace;">'+d.ma+'</span></span>';
+      });
+      html += '</div>';
+    }
+
+    // TH2 — pills only, no group section
+    const th2Items = details.filter(d => d.th==='TH2');
+    if(th2Items.length>0) {
+      html += '<div style="font-weight:bold;font-size:11px;color:#007bff;margin-bottom:6px;">&#9632; TH2 — NS chung 1 ĐV ('+th2Items.length+' Level 5)</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">';
+      th2Items.forEach(d => {
+        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#cce5ff;border:1px solid #b8daff;border-radius:16px;font-size:10px;font-weight:bold;color:#004085;">'+d.ten+'</span>';
+      });
+      html += '</div>';
+    }
+
+    // TH3 + TH4 — single merged grid, collapsed by default
+    const th34Groups = groups.filter(g => g.loai==='TH3'||g.loai==='TH4');
+    if(th34Groups.length>0) {
+      html += '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px;">';
+      html += '<thead><tr style="background:#f0f0f0;border-bottom:2px solid #aaa;">'
+            + '<th style="padding:6px 10px;text-align:center;font-weight:bold;color:#333;white-space:nowrap;width:80px;">Trường hợp</th>'
+            + '<th style="padding:6px 10px;text-align:left;font-weight:bold;color:#333;white-space:nowrap;width:90px;">Nhóm NS</th>'
+            + '<th style="padding:6px 10px;text-align:left;font-weight:bold;color:#333;">Tên nhóm</th>'
+            + '<th style="padding:6px 10px;text-align:left;font-weight:bold;color:#333;">Level 5</th>'
+            + '<th style="padding:6px 10px;text-align:center;font-weight:bold;color:#155724;white-space:nowrap;width:60px;">SL SX</th>'
+            + '<th style="padding:6px 10px;text-align:center;font-weight:bold;color:#880e4f;white-space:nowrap;width:60px;">SL PV</th>'
+            + '<th style="padding:6px 10px;text-align:left;font-weight:bold;color:#333;">Bộ phận</th>'
+            + '<th style="padding:6px 10px;text-align:left;font-weight:bold;color:#333;">Ghi chú</th>'
+            + '</tr></thead><tbody>';
+      let lastLoai = null;
+      th34Groups.forEach((g, gi) => {
+        const isTH3 = g.loai==='TH3';
+        const members = details.filter(d => d.nhom_id===g.id);
+        const sxList = members.filter(d => d.vai_tro==='SX');
+        const pvList = members.filter(d => d.vai_tro==='PV');
+        const bps = [...new Set(members.map(d => d.bp))];
+        const hasWarn = isTH3 ? members.length<2 : (sxList.length===0||pvList.length===0);
+        const rowBg = gi%2===0 ? '#fff' : '#f9f9f9';
+        const thColor = isTH3 ? '#856404' : '#880e4f';
+        const nsIdBg = isTH3 ? '#fff3cd' : '#fce4ec';
+        const nsIdBorder = isTH3 ? '#ffc107' : '#e91e63';
+        const expandId = 'nsexp_'+g.id.replace('-','');
+
+        // Section divider
+        if(g.loai !== lastLoai) {
+          const sectionLabel = isTH3 ? 'TH3 — Chung nhiều ĐV' : 'TH4 — Tách phụ';
+          html += '<tr><td colspan="8" style="padding:6px 10px;background:#f5f5f5;font-weight:bold;font-size:10px;color:'+thColor+';border-bottom:1px solid #ddd;border-top:'+(lastLoai?'2px solid #ccc':'none')+';">&#9632; '+sectionLabel+'</td></tr>';
+          lastLoai = g.loai;
+        }
+
+        // Summary row (1 row per group)
+        const l5Summary = members.length + ' Level 5'
+          + (isTH3 ? '' : ' ('+sxList.length+' SX, '+pvList.length+' PV)');
+        html += '<tr style="background:'+rowBg+';border-bottom:1px solid #eee;">';
+        html += '<td style="padding:5px 10px;text-align:center;vertical-align:middle;">'
+              + '<span class="badge-nhom '+g.loai+'" style="font-size:10px;">'+g.loai+'</span>'
+              + (hasWarn?'<br><span style="font-size:9px;color:#dc3545;display:block;margin-top:3px;">&#10060;</span>':'')
+              + '</td>';
+        html += '<td style="padding:5px 10px;vertical-align:middle;">'
+              + '<span style="font-family:monospace;font-size:10px;background:'+nsIdBg+';padding:2px 7px;border-radius:8px;border:1px solid '+nsIdBorder+';white-space:nowrap;">'+g.id+'</span>'
+              + '</td>';
+        html += '<td style="padding:5px 10px;vertical-align:middle;">'
+              + '<input type="text" value="'+g.ten.replace(/"/g,'&quot;')+'" '
+              + 'onchange="fn7RenameGroup(\''+g.id+'\',this.value)" '
+              + 'style="font-weight:bold;color:#333;border:1px solid transparent;border-radius:3px;padding:2px 6px;width:100%;font-size:11px;background:transparent;cursor:text;" '
+              + 'onfocus="this.style.borderColor=\'#0056b3\';this.style.background=\'#fff\';" '
+              + 'onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\';">'
+              + (bps.length>1?'<br><span style="font-size:9px;color:#856404;">&#9888; Cross: '+bps.join('+')+'</span>':'')
+              + '</td>';
+        html += '<td style="padding:5px 10px;vertical-align:middle;">'
+              + '<a href="javascript:void(0)" onclick="fn7ToggleNsExpand(\''+expandId+'\')" style="color:#0056b3;text-decoration:none;font-size:10px;" id="'+expandId+'_lnk">'
+              + '&#9654; '+l5Summary
+              + '</a></td>';
+        html += '<td style="padding:5px 10px;text-align:center;vertical-align:middle;font-weight:bold;">'
+              + (isTH3 ? '<span style="color:#aaa;font-size:10px;">—</span>'
+                       : '<span style="background:#d4edda;color:#155724;padding:2px 10px;border-radius:10px;font-size:11px;">'+sxList.length+'</span>')
+              + '</td>';
+        html += '<td style="padding:5px 10px;text-align:center;vertical-align:middle;font-weight:bold;">'
+              + (isTH3 ? '<span style="color:#aaa;font-size:10px;">—</span>'
+                       : '<span style="background:#fce4ec;color:#880e4f;padding:2px 10px;border-radius:10px;font-size:11px;">'+pvList.length+'</span>')
+              + '</td>';
+        html += '<td style="padding:5px 10px;color:#555;font-size:10px;vertical-align:middle;">'+bps.join(', ')+'</td>';
+        html += '<td style="padding:5px 10px;color:#888;font-size:10px;vertical-align:middle;">—</td>';
+        html += '</tr>';
+
+        // Detail rows (hidden by default)
+        members.forEach(d => {
+          const rs = d.vai_tro==='SX'?'background:#d4edda;color:#155724':d.vai_tro==='PV'?'background:#fce4ec;color:#880e4f':'';
+          const roleChip = d.vai_tro ? '<span style="'+rs+';padding:1px 7px;border-radius:8px;font-size:9px;font-weight:bold;margin-right:5px;">'+d.vai_tro+'</span>' : '';
+          html += '<tr class="ns-detail-row" id="'+expandId+'" style="display:none;background:#f0f7ff;border-bottom:1px solid #d0e4f7;">';
+          html += '<td style="padding:4px 10px;"></td>';
+          html += '<td style="padding:4px 10px;"></td>';
+          html += '<td style="padding:4px 10px;"></td>';
+          html += '<td style="padding:4px 10px 4px 20px;color:#333;">'+roleChip+d.ten+'<br><span style="font-size:9px;color:#aaa;font-family:monospace;">'+d.ma+'</span></td>';
+          html += '<td style="padding:4px 10px;"></td>';
+          html += '<td style="padding:4px 10px;"></td>';
+          html += '<td style="padding:4px 10px;color:#555;font-size:10px;">'+d.bp+'</td>';
+          html += '<td style="padding:4px 10px;color:#888;font-size:10px;">'+(d.ghi_chu||'—')+'</td>';
+          html += '</tr>';
+        });
+      });
+      html += '</tbody></table>';
+    }
+
+    // Unassigned
+    const unassigned = details.filter(d => !d.th);
+    if(unassigned.length>0) {
+      html += '<div style="font-weight:bold;font-size:11px;color:#dc3545;margin:10px 0 6px;">&#9632; Chưa gán ('+unassigned.length+' Level 5)</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">';
+      unassigned.forEach(d => {
+        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#f8d7da;border:1px solid #f5c6cb;border-radius:16px;font-size:10px;font-weight:bold;color:#721c24;">'+d.ten+'</span>';
+      });
+      html += '</div>';
+    }
+
+    wrap.innerHTML = html;
+  }
+
+  function fn7ToggleNsExpand(expandId) {
+    const rows = document.querySelectorAll('#'+expandId);
+    const lnk = document.getElementById(expandId+'_lnk');
+    const isOpen = rows.length && rows[0].style.display !== 'none';
+    rows.forEach(r => r.style.display = isOpen ? 'none' : '');
+    if(lnk) lnk.innerHTML = (isOpen ? '&#9654;' : '&#9660;') + lnk.innerHTML.slice(1);
+  }
+
+  function fn7ScrollToGroup(nhomId) {
+    if(currentView!=='card') fn7SetView('card');
+    setTimeout(() => {
+      const el = document.querySelector('.ns-id');
+      if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+    }, 100);
+  }
+
+  /* ============================================================
+     NHÓM NS MANAGEMENT
+     ============================================================ */
+  function fn7OpenNhomNSModal() {
+    fn7RenderNhomNSList();
+    document.getElementById('fn7-modal-nhomns').classList.add('open');
+  }
+
+  function fn7RenderNhomNSList() {
+    const el = document.getElementById('fn7-nhomns-list');
+    const groups = NHOM_NS.filter(g => g.master_id===currentMasterId);
+    let html = '';
+    groups.forEach(g => {
+      const members = DETAILS.filter(d => d.nhom_id===g.id);
+      const sxC = members.filter(d => d.vai_tro==='SX').length;
+      const pvC = members.filter(d => d.vai_tro==='PV').length;
+      const bps = [...new Set(members.map(d => d.bp))];
+      html += '<div style="border:1px solid #ddd;border-radius:4px;padding:10px 14px;margin-bottom:8px;background:#fff;">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+      html += '<span style="font-family:monospace;font-size:11px;background:#e9ecef;padding:2px 8px;border-radius:8px;font-weight:bold;">'+g.id+'</span>';
+      html += '<span class="badge-nhom '+g.loai+'">'+g.loai+'</span>';
+      html += '<b style="flex:1;font-size:12px;">'+g.ten+'</b>';
+      html += '<span style="font-size:10px;color:#666;">'+members.length+' L5</span>';
+      if(g.loai==='TH4') html += '<span style="font-size:10px;color:#666;">| '+sxC+' SX + '+pvC+' PV</span>';
+      html += '<button class="tb-btn danger" onclick="fn7DeleteNhomNS(\''+g.id+'\')" style="height:22px;font-size:9px;">&#128465; Xóa</button>';
+      html += '</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+      members.forEach(d => {
+        const roleTag = d.vai_tro==='SX' ? '<span class="ns-role sx">SX</span> ' : d.vai_tro==='PV' ? '<span class="ns-role pv">PV</span> ' : '';
+        html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f8f9fa;border:1px solid #ddd;border-radius:12px;font-size:10px;">'+roleTag+d.ten+'</span>';
+      });
+      html += '</div>';
+      if(bps.length>1) html += '<div style="margin-top:4px;font-size:10px;color:#856404;">&#9888; Cross-Ka: '+bps.join(' + ')+'</div>';
+      if(members.length<2) html += '<div style="margin-top:4px;font-size:10px;color:#dc3545;">&#10060; Nhóm cần ít nhất 2 Level 5</div>';
+      if(g.loai==='TH4' && (sxC===0||pvC===0)) html += '<div style="margin-top:4px;font-size:10px;color:#dc3545;">&#10060; TH4 cần ít nhất 1 SX + 1 PV</div>';
+      html += '</div>';
+    });
+    if(groups.length===0) html = '<div style="text-align:center;color:#999;padding:20px;font-size:12px;">Chưa có Nhóm NS nào. Tạo nhóm mới ở trên.</div>';
+    el.innerHTML = html;
+  }
+
+  function fn7AddNhomNS() {
+    const name = document.getElementById('fn7-nhomns-new-name').value.trim();
+    const type = document.getElementById('fn7-nhomns-new-type').value;
+    if(!name) { fn7Alert('warning','Nhập tên nhóm.'); return; }
+    const newId = 'NS-' + String(NHOM_NS.length+1).padStart(3,'0');
+    NHOM_NS.push({ id:newId, ten:name, loai:type, master_id:currentMasterId });
+    document.getElementById('fn7-nhomns-new-name').value = '';
+    fn7RenderNhomNSList();
+    fn7Alert('success','&#9989; Đã tạo nhóm <b>'+newId+'</b> — '+name);
+  }
+
+  function fn7CreateNhomNS() {
+    const name = document.getElementById('fn7-assign-group-new').value.trim();
+    if(!name) { fn7Alert('warning','Nhập tên nhóm.'); return; }
+    const th = document.querySelector('input[name="fn7_assign_th"]:checked').value;
+    const newId = 'NS-' + String(NHOM_NS.length+1).padStart(3,'0');
+    NHOM_NS.push({ id:newId, ten:name, loai:th, master_id:currentMasterId });
+    document.getElementById('fn7-assign-group-new').value = '';
+    fn7PopulateGroupSelect(th);
+    document.getElementById('fn7-assign-group-select').value = newId;
+    fn7Alert('success','&#9989; Đã tạo nhóm <b>'+newId+'</b>');
+  }
+
+  function fn7DeleteNhomNS(id) {
+    const members = DETAILS.filter(d => d.nhom_id===id);
+    if(members.length>0) {
+      fn7Alert('warning','&#9888; Nhóm '+id+' còn '+members.length+' Level 5. Bỏ gán L5 trước khi xóa nhóm.');
+      return;
+    }
+    const idx = NHOM_NS.findIndex(g => g.id===id);
+    if(idx>=0) NHOM_NS.splice(idx,1);
+    fn7RenderNhomNSList();
+    fn7Alert('success','&#128465; Đã xóa nhóm '+id);
+  }
+
+  /* ============================================================
+     ALERT HELPER
+     ============================================================ */
+  function fn7Alert(type, msg) {
+    const el = document.getElementById('fn7-alert');
+    el.className = 'alert-box alert-'+type;
+    el.innerHTML = msg;
+    el.style.display = 'block';
+    if(type!=='error') setTimeout(()=>{el.style.display='none';},4000);
+    el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  /* ============================================================
+     INIT
+     ============================================================ */
+  document.addEventListener('DOMContentLoaded', () => fn7RenderMaster());
+  </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Danh mục Mã size nội bộ Lương NS</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Danh mục › Mã size nội bộ</div>
+  <div class="page-title">DANH MỤC MÃ SIZE NỘI BỘ</div>
+  <div id="dm6-alert" class="alert-box"></div>
+
+  <div class="form-panel">
+    <div style="display: grid; grid-template-columns: 100px 1fr 100px 1fr; gap: 8px; align-items: center; padding: 10px">
+      <label class="lbl-red">Từ tháng</label>
+      <input type="text" id="dm6_thang" placeholder="06/2026" maxlength="7" style="width:100%; padding:4px; border:1px solid #ccc; height:26px">
+
+      <label>Đến tháng</label>
+      <input type="text" id="dm6_den_thang" placeholder="12/2026" maxlength="7" style="width:100%; padding:4px; border:1px solid #ccc; height:26px">
+
+      <label class="lbl-red">Mã SAP</label>
+      <input type="text" id="dm6_ma_sap" maxlength="50" placeholder="VD: 50500202" style="width:100%; padding:4px; border:1px solid #ccc; height:26px">
+
+      <label>Mã size nội bộ</label>
+      <input type="text" id="dm6_ma_nb" maxlength="50" style="width:100%; padding:4px; border:1px solid #ccc; height:26px">
+
+      <label class="lbl-red">Tên Kế Toán</label>
+      <input type="text" id="dm6_ten" maxlength="255" style="grid-column: span 3; width:100%; padding:4px; border:1px solid #ccc; height:26px" placeholder="VD: BT RHOSO U15 (10X500G) MK-PRIDE">
+
+      <label>KG/Bọc</label>
+      <input type="number" step="0.01" id="dm6_kg_boc" style="width:100%; padding:4px; border:1px solid #ccc; height:26px" placeholder="0.5">
+
+      <label>Con/B</label>
+      <input type="number" id="dm6_con_b" style="width:100%; padding:4px; border:1px solid #ccc; height:26px" placeholder="1">
+
+      <label>% Tôm</label>
+      <input type="text" id="dm6_pct_tom" style="width:100%; padding:4px; border:1px solid #ccc; height:26px" placeholder="100%">
+
+      <label>G/Con</label>
+      <input type="number" step="0.01" id="dm6_g_con" style="width:100%; padding:4px; border:1px solid #ccc; height:26px" placeholder="500.00">
+
+      <label>Ghi chú</label>
+      <input type="text" id="dm6_note" style="grid-column: span 3; width:100%; padding:4px; border:1px solid #ccc; height:26px" placeholder="Nhập ghi chú...">
+
+      <label></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer; grid-column: span 3">
+        <input type="checkbox" id="dm6_use" checked> Sử dụng?
+      </label>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button>
+    <button class="btn-refresh" onclick="dm6Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm6Save()">Lưu</button>
+    <button class="btn-delete" onclick="dm6Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm6-imp')">Nhập dữ liệu</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+  </div>
+
+  <div class="grid-wrap"><table>
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="dm6-chkAll" onchange="toggleAll('dm6-chkAll','.dm6-chk')"></th>
+        <th>Sửa</th>
+        <th>STT</th>
+        <th>Từ tháng</th>
+        <th>Đến tháng</th>
+        <th>Mã SAP</th>
+        <th>Mã Size Nội Bộ</th>
+        <th class="tl">Tên Kế Toán</th>
+        <th>KG/Bọc</th>
+        <th>Con/B</th>
+        <th>% Tôm</th>
+        <th>G/Con</th>
+        <th class="tl">Ghi chú</th>
+        <th>Sử dụng</th>
+      </tr>
+    </thead>
+    <tbody id="dm6-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-overlay" id="dm6-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC MÃ SAP</span><button class="x" onclick="hideModal('dm6-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;">
+      <strong>Rule Import:</strong><br>
+      1. Mã size nội bộ tồn tại → UPDATE thông tin (Tên, Loại, Bộ phận)<br>
+      2. Mã size nội bộ chưa tồn tại → INSERT mới<br>
+      <span style="color:red">3. Mã size nội bộ trùng trong file → DỪNG, báo lỗi dòng đầu tiên trùng.</span><br>
+      <span style="color:#0056b3">4. Cột bắt buộc: <b>Mã size nội bộ</b>. Các cột còn lại để trống sẽ giữ nguyên nếu là UPDATE.</span>
+    </div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;">
+    <a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr">
+    <button class="btn-cancel" onclick="hideModal('dm6-imp')">Đóng</button>
+    <button class="btn-ok" onclick="hideModal('dm6-imp');showAlert2('dm6-alert','Import thành công!','success')">Thực hiện Import</button>
+  </div>
+</div></div>
+
+
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+
+    let dm6Data = [
+      { id:1, thang:'06/2026', den_thang:'', ma_sap:'50510749', ma_nb:'5LGLO', ten:'BT NOBASHI 5LGLO (12PX30) GLORY016', kg_boc:'0.1920', con_b:'12', pct_tom:'100%', g_con:'16.0000', note:'', use:true },
+      { id:2, thang:'06/2026', den_thang:'12/2026', ma_sap:'50501283', ma_nb:'12AQMRH', ten:'BT NOBASHI 12AQMRH (10PX4X5X2) AQUAKING', kg_boc:'0.3200', con_b:'10', pct_tom:'100%', g_con:'32.0000', note:'', use:true },
+      { id:3, thang:'06/2026', den_thang:'', ma_sap:'50501549', ma_nb:'12NS', ten:'BT NOBASHI 12NS (10PX20X2) JP NS', kg_boc:'0.2900', con_b:'10', pct_tom:'100%', g_con:'29.0000', note:'', use:true },
+      { id:4, thang:'06/2026', den_thang:'08/2026', ma_sap:'50512009', ma_nb:'15NOJFDAEB', ten:'BT NOBASHI 13/15 (12PX8X2) 15NOJFDA-EB', kg_boc:'0.3075', con_b:'15', pct_tom:'100%', g_con:'20.5000', note:'', use:true },
+      { id:5, thang:'06/2026', den_thang:'', ma_sap:'50501282', ma_nb:'15AQMRH', ten:'BT NOBASHI 15AQMRH (15PX4X5X2) AQUAKING', kg_boc:'0.3825', con_b:'15', pct_tom:'100%', g_con:'25.5000', note:'', use:true },
+      { id:6, thang:'06/2026', den_thang:'', ma_sap:'50507695', ma_nb:'15CMCR1EB', ten:'BT NOBASHI 15CMCR1-EB (40PX10) MP(MTR79)', kg_boc:'0.9600', con_b:'40', pct_tom:'100%', g_con:'24.0000', note:'', use:true },
+      { id:7, thang:'06/2026', den_thang:'10/2026', ma_sap:'50501550', ma_nb:'15NS', ten:'BT NOBASHI 15NS (12PX20X2) JP.NS', kg_boc:'0.3750', con_b:'15', pct_tom:'100%', g_con:'25.0000', note:'', use:true },
+      { id:8, thang:'06/2026', den_thang:'', ma_sap:'50512070', ma_nb:'20NOJFDAEB', ten:'BT NOBASHI 16/20 (20PX10X2) 20NOJFDA-EB', kg_boc:'0.3300', con_b:'20', pct_tom:'100%', g_con:'16.5000', note:'', use:true },
+      { id:9, thang:'06/2026', den_thang:'', ma_sap:'50506441', ma_nb:'20SBEB', ten:'BT NOBASHI 20SBEB (15PX30) 20SBEB', kg_boc:'0.2475', con_b:'15', pct_tom:'100%', g_con:'16.5000', note:'', use:true },
+    ];
+    let dm6NextId = 10;
+
+    function dm6Render() {
+      const tbody = document.getElementById('dm6-tbody');
+      tbody.innerHTML = '';
+      dm6Data.forEach((r, i) => {
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="dm6-chk" value="${r.id}"></td>
+          <td><span class="edit-icon" onclick="dm6EditById(${r.id})">✎</span></td>
+          <td>${i+1}</td>
+          <td>${r.thang || ''}</td>
+          <td>${r.den_thang || ''}</td>
+          <td style="font-family:monospace;font-weight:bold;letter-spacing:0.5px;">${r.ma_sap}</td>
+          <td>${r.ma_nb}</td>
+          <td class="tl">${r.ten}</td>
+          <td style="color:#0056b3">${r.kg_boc}</td>
+          <td style="font-weight:bold">${r.con_b}</td>
+          <td style="font-weight:bold">${r.pct_tom}</td>
+          <td style="font-weight:bold">${r.g_con}</td>
+          <td class="tl">${r.note}</td>
+          <td style="color:${r.use?'green':'#aaa'};font-weight:bold">${r.use?'✔':'✘'}</td>
+        </tr>`;
+      });
+    }
+
+    function dm6Clear() {
+      document.getElementById('dm6_thang').value = '';
+      document.getElementById('dm6_den_thang').value = '';
+      document.getElementById('dm6_ma_sap').value = '';
+      document.getElementById('dm6_ma_sap').readOnly = false;
+      document.getElementById('dm6_ma_nb').value = '';
+      document.getElementById('dm6_ten').value = '';
+      document.getElementById('dm6_kg_boc').value = '';
+      document.getElementById('dm6_con_b').value = '';
+      document.getElementById('dm6_pct_tom').value = '';
+      document.getElementById('dm6_g_con').value = '';
+      document.getElementById('dm6_note').value = '';
+      document.getElementById('dm6_use').checked = true;
+      document.getElementById('dm6-alert').style.display = 'none';
+    }
+
+    function dm6EditById(id) {
+      const r = dm6Data.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('dm6_thang').value = r.thang || '';
+      document.getElementById('dm6_den_thang').value = r.den_thang || '';
+      document.getElementById('dm6_ma_sap').value = r.ma_sap;
+      document.getElementById('dm6_ma_sap').readOnly = true;
+      document.getElementById('dm6_ma_nb').value = r.ma_nb;
+      document.getElementById('dm6_ten').value = r.ten;
+      document.getElementById('dm6_kg_boc').value = r.kg_boc;
+      document.getElementById('dm6_con_b').value = r.con_b;
+      document.getElementById('dm6_pct_tom').value = r.pct_tom;
+      document.getElementById('dm6_g_con').value = r.g_con;
+
+      document.getElementById('dm6_note').value = r.note;
+      document.getElementById('dm6_use').checked = r.use;
+      window.scrollTo(0, 0);
+      showAlert2('dm6-alert', "Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", 'success');
+    }
+
+    function dm6Save() {
+      const thang   = document.getElementById('dm6_thang').value.trim();
+      const den_thang = document.getElementById('dm6_den_thang').value.trim();
+      const ma_sap  = document.getElementById('dm6_ma_sap').value.trim();
+      const ma_nb   = document.getElementById('dm6_ma_nb').value.trim();
+      const ten     = document.getElementById('dm6_ten').value.trim();
+      const kg_boc  = document.getElementById('dm6_kg_boc').value.trim();
+      const con_b   = document.getElementById('dm6_con_b').value.trim();
+      const pct_tom = document.getElementById('dm6_pct_tom').value.trim();
+      const g_con   = document.getElementById('dm6_g_con').value.trim();
+      const note    = document.getElementById('dm6_note').value.trim();
+      const use     = document.getElementById('dm6_use').checked;
+      const isEdit  = document.getElementById('dm6_ma_sap').readOnly;
+      
+      if (!thang || !ma_sap || !ten) return showAlert2('dm6-alert', 'Vui lòng nhập đầy đủ Từ tháng, Mã SAP và Tên Kế Toán.', 'error');
+      if (!isEdit && dm6Data.find(x => x.ma_sap === ma_sap)) return showAlert2('dm6-alert', '<b>Lỗi:</b> Mã SAP [' + ma_sap + '] đã tồn tại.', 'error');
+      
+      if (isEdit) {
+        const r = dm6Data.find(x => x.ma_sap === ma_sap);
+        if (r) { r.thang = thang; r.den_thang = den_thang; r.ma_nb = ma_nb; r.ten = ten; r.kg_boc = kg_boc; r.con_b = con_b; r.pct_tom = pct_tom; r.g_con = g_con; r.note = note; r.use = use; }
+        showAlert2('dm6-alert', 'Cập nhật Mã SAP thành công!', 'success');
+      } else {
+        dm6Data.push({ id: dm6NextId++, thang, den_thang, ma_sap, ma_nb, ten, kg_boc, con_b, pct_tom, g_con, note, use });
+        showAlert2('dm6-alert', 'Thêm mới Mã SAP thành công!', 'success');
+      }
+      dm6Render();
+      dm6Clear();
+    }
+
+    function dm6Delete() {
+      const chks = document.querySelectorAll('.dm6-chk:checked');
+      if (!chks.length) return showAlert2('dm6-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} mã size nội bộ đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        dm6Data = dm6Data.filter(x => !ids.includes(x.id));
+        dm6Render();
+        showAlert2('dm6-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    dm6Render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Tính Lương Vệ Sinh</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* PAGE-SPECIFIC: pg11-bang-tinh-vs */
+    .btn-calc { background-color: #28a745; }
+    .btn-lock { background-color: #dc3545; }
+    .btn-refresh { background-color: #007bff; }
+    .btn-export { background-color: #fd7e14; }
+    .section-divider { border: none; border-top: 2px dashed #b8daff; margin: 25px 0 15px 0; }
+    .section-title {
+        font-weight: bold; font-size: 14px; color: #0056b3;
+        border-left: 4px solid #0056b3; padding-left: 10px;
+        margin: 15px 0 10px 0; text-transform: uppercase;
+    }
+    .btn-step { position: relative; padding-left: 36px !important; }
+    .btn-step .step-num {
+        position: absolute; left: 0; top: 0; bottom: 0; width: 28px;
+        background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+        font-size: 13px; border-radius: 3px 0 0 3px;
+    }
+    .filter-row-inline { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .filter-row-inline label { font-weight: bold; white-space: nowrap; }
+    .bq-source-card {
+        display: flex; gap: 25px; flex-wrap: wrap; align-items: center;
+        border: 1px solid #b8daff; background: #eaf4ff; border-radius: 4px;
+        padding: 10px 15px; margin-bottom: 10px; font-size: 12px;
+    }
+    .bq-source-card .metric { line-height: 1.4; }
+    .bq-source-card .metric b { display: block; font-size: 15px; color: #d32f2f; }
+    .row-khu-vuc td {
+        background-color: #dbeafe !important; font-weight: bold; color: #0b3d91;
+        text-align: left; padding: 6px 10px;
+    }
+    .row-subtotal-vs td { background-color: #e8f4f8 !important; font-weight: bold; }
+    .dinh-muc-table { font-size: 11px; border-collapse: collapse; }
+    .dinh-muc-table th, .dinh-muc-table td { border: 1px solid #d0d0d0; padding: 3px 10px; }
+    .dinh-muc-table th { background: #f4d03f; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin ch&agrave;o,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nh&acirc;n s&#7921;</a><a href="#">Th&ocirc;i vi&#7879;c</a><a href="#">Ch&#7845;m c&ocirc;ng</a>
+    <a href="#">B&#7843;o hi&#7875;m</a><a href="#" class="active">L&#432;&#417;ng</a>
+    <a href="#">Th&#432;&#7903;ng</a><a href="#">Thu&#7871;</a><a href="#">H&#7879; th&#7889;ng</a><a href="#">DV c&aacute; nh&acirc;n</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">L&#432;&#417;ng &rsaquo; Ch&#7913;c n&#259;ng &rsaquo; B&#7843;ng t&iacute;nh l&#432;&#417;ng v&#7879; sinh</div>
+    <div class="page-title">B&#7842;NG T&Iacute;NH L&#431;&#416;NG V&#7878; SINH (H&#431;&#7902;NG B&Igrave;NH QU&Acirc;N)</div>
+
+    <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+
+    <!-- ========== NGUỒN BÌNH QUÂN (VS-00) ========== -->
+    <div class="bq-source-card" id="bq-source-card">
+        <div class="metric">Ngu&#7891;n &#273;&#417;n gi&aacute; b&igrave;nh qu&acirc;n (t&#7915; ch&#7913;c n&#259;ng T&iacute;nh BQTL)
+            <b id="src-nhom">&#8212;</b></div>
+        <div class="metric">BQ TLSP th&aacute;ng<b id="src-bq">&#8212;</b></div>
+        <div class="metric">BQ c&ocirc;ng &#273;&#7911;<b id="src-cong">&#8212;</b></div>
+        <div class="metric">Tr&#7841;ng th&aacute;i BQ k&#7923; <span id="src-ky" style="font-weight:bold;"></span><b id="src-status">&#8212;</b></div>
+        <div class="metric">Th&#7901;i &#273;i&#7875;m t&iacute;nh / kh&oacute;a<b id="src-time" style="color:#333;">&#8212;</b></div>
+    </div>
+
+    <!-- ========== PERIOD + PARAMS ========== -->
+    <div class="period-bar" style="flex-wrap: wrap; gap: 10px;">
+        <div class="filter-row-inline">
+            <label style="color:#d32f2f;">K&#7923; / Th&aacute;ng l&#432;&#417;ng</label>
+            <select style="width:140px;"><option>LSP_01_2026</option></select>
+        </div>
+        <div class="filter-row-inline" style="border-left: 2px solid #dee2e6; padding-left: 15px;">
+            <label>Khu v&#7921;c VS</label>
+            <select id="cboKhuVuc" onchange="if(_daTinh)clickTinhVS()">
+                <option value="">-- T&#7845;t c&#7843; --</option>
+            </select>
+        </div>
+        <div class="filter-row-inline" style="border-left: 2px solid #dee2e6; padding-left: 15px;">
+            <label>% &#272;C L&#7847;n 1</label>
+            <input type="number" id="txtDcL1" value="100" style="width:60px; background-color:#fff3cd; font-weight:bold;"> %
+        </div>
+        <div class="filter-row-inline">
+            <label>% H&#7895; tr&#7907; L4</label>
+            <input type="number" id="txtHtL4" value="2" style="width:50px; background-color:#fff3cd; font-weight:bold;"> %
+        </div>
+        <div class="filter-row-inline">
+            <label style="cursor:pointer; font-size:11px; display:flex; align-items:center; gap:4px;">
+                <input type="checkbox" id="chkCong0" onchange="if(_daTinh)clickTinhVS()"> Ch&#7881; hi&#7879;n NV c&oacute; c&ocirc;ng &gt; 0
+            </label>
+        </div>
+        <div class="filter-row-inline" style="border-left: 2px solid #dee2e6; padding-left: 15px;">
+            <table class="dinh-muc-table">
+                <tr><th colspan="2">&#272;&#7883;nh m&#7913;c % h&#432;&#7903;ng (T&#7841;o &#273;&#7883;nh m&#7913;c)</th></tr>
+                <tr><td>V&#7879; sinh th&#432;&#7901;ng</td><td style="font-weight:bold; text-align:center;">90%</td></tr>
+                <tr><td>VS Ki&#7875;m &#273;&#7847;u v&#7887;</td><td style="font-weight:bold; text-align:center;">95%</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ========== ACTION BUTTONS ========== -->
+    <div class="actions-bar" style="display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button class="btn-calc btn-step" onclick="clickTinhVS()">
+            <span class="step-num">1</span>T&iacute;nh l&#432;&#417;ng V&#7879; sinh
+        </button>
+        <button class="btn-lock btn-step" id="btn-khoa-vs" onclick="clickKhoaVS()" disabled style="opacity:0.5; cursor:not-allowed;">
+            <span class="step-num">2</span>Kh&oacute;a / Ch&#7889;t l&#432;&#417;ng VS
+        </button>
+        <span style="border-left:2px solid #dee2e6; height:24px;"></span>
+        <button class="btn-refresh" onclick="location.reload()">L&agrave;m m&#7899;i</button>
+        <button class="btn-export">Xu&#7845;t Excel</button>
+    </div>
+
+    <!-- ========== COLLAPSIBLE: Steps ========== -->
+    <div class="collapsible" onclick="toggleCollapse('stepsVS')"><span>&#9660; Xem c&aacute;c b&#432;&#7899;c t&iacute;nh to&aacute;n (VS-00 &rarr; VS-06)</span></div>
+    <div id="stepsVS" class="content">
+        <table class="steps-table">
+            <tr><th>B&#432;&#7899;c</th><th>M&atilde;</th><th>T&ecirc;n</th><th>Input</th><th>Output / C&ocirc;ng th&#7913;c</th><th>Exception</th></tr>
+            <tr><td>0</td><td>VS-00</td><td>Validate ngu&#7891;n BQ</td><td>K&#7923; LSP</td><td>BQ c&#7911;a k&#7923; ph&#7843;i &#7903; tr&#7841;ng th&aacute;i &#272;&atilde; t&iacute;nh / &#272;&atilde; kh&oacute;a; l&#432;u snapshot bq_run_id</td><td>BQ ch&#432;a kh&oacute;a &rarr; ch&#7863;n t&iacute;nh</td></tr>
+            <tr><td>1</td><td>VS-01</td><td>L&#7845;y &#273;&#417;n gi&aacute; BQ (L)</td><td>Nh&oacute;m BQ c&#7911;a NV</td><td>L = BQ th&aacute;ng c&#7911;a nh&oacute;m h&#432;&#7903;ng (VD BQ CB+XQ+PTO+CBTB+TB); K = BQ c&ocirc;ng &#273;&#7911; nh&oacute;m</td><td>NV ch&#432;a g&aacute;n nh&oacute;m &rarr; WARNING</td></tr>
+            <tr><td>2</td><td>VS-02</td><td>&#272;i&#7873;u ch&#7881;nh L&#7847;n 1 (N)</td><td>L, %&#272;C M</td><td>N = L &times; M (m&#7863;c &#273;&#7883;nh M = 100%)</td><td>M tr&#7889;ng &rarr; 100%</td></tr>
+            <tr><td>3</td><td>VS-03</td><td>&#272;&#7883;nh m&#7913;c % h&#432;&#7903;ng (O)</td><td>Lo&#7841;i c&ocirc;ng vi&#7879;c VS</td><td>O = 90% (VS th&#432;&#7901;ng) / 95% (Ki&#7875;m &#273;&#7847;u v&#7887;) theo danh m&#7909;c &#273;&#7883;nh m&#7913;c</td><td>Kh&ocirc;ng c&oacute; &#273;&#7883;nh m&#7913;c &rarr; h&#432;&#7903;ng 100%</td></tr>
+            <tr><td>4</td><td>VS-04</td><td>Ti&#7873;n th&#7921;c l&atilde;nh (Q)</td><td>N, O, K, C&ocirc;ng TT P</td><td>Q = N &times; O / K &times; P; n&#7871;u P = 0 &rarr; Q = 0</td><td></td></tr>
+            <tr><td>5</td><td>VS-05</td><td>H&#7895; tr&#7907; L4 (S) &amp; T&#7893;ng (T)</td><td>Q, %HT L4</td><td>S = Q &times; 2%; T = Q + S</td><td>% tr&#7889;ng &rarr; 0</td></tr>
+            <tr><td>6</td><td>VS-06</td><td>T&#7893;ng TLSP cu&#7889;i (W)</td><td>T, U, V</td><td>W = T + H&#7895; tr&#7907; L&#272;+VR (U) + &#272;&#7897;c h&#7841;i chi&ecirc;n (V) &mdash; U, V &#273;&#7875; tr&#7889;ng trong k&#7923; th&ocirc;ng th&#432;&#7901;ng</td><td></td></tr>
+        </table>
+    </div>
+
+    <!-- ========== GRID: NV VE SINH ========== -->
+    <div class="section-title">B&#7842;NG T&Iacute;NH L&#431;&#416;NG NH&Acirc;N VI&Ecirc;N V&#7878; SINH THEO KHU V&#7920;C</div>
+    <div class="grid-container" style="max-height:520px;">
+        <table class="data-table">
+            <thead><tr>
+                <th>TT</th><th>M&atilde; NV</th><th class="text-left">H&#7885; t&ecirc;n</th>
+                <th>Lo&#7841;i VS</th>
+                <th>BQ c&ocirc;ng (K)</th>
+                <th class="col-money">BQ TLSP (L)</th>
+                <th>%&#272;C (M)</th>
+                <th class="col-money">BQ TLSP L1 (N)</th>
+                <th>&#272;&#7883;nh m&#7913;c (O)</th>
+                <th>C&ocirc;ng TT (P)</th>
+                <th class="col-money" style="background-color:#fff3cd;">Th&#7921;c l&atilde;nh (Q)</th>
+                <th>%HT (R)</th>
+                <th class="col-money">H&#7895; tr&#7907; (S)</th>
+                <th class="col-money" style="background-color:#d4edda;">T&#7892;NG TLSP (T)</th>
+                <th>HT L&#272;+VR (U)</th>
+                <th>&#272;H Chi&ecirc;n (V)</th>
+                <th class="col-money" style="background-color:#c8e6c9;">T&#7892;NG CU&#7890;I (W)</th>
+                <th class="text-left">Ghi ch&uacute;</th>
+            </tr></thead>
+            <tbody id="tbVS"></tbody>
+            <tfoot id="tfVS"></tfoot>
+        </table>
+    </div>
+    <div style="color:#856404; font-size:11px; margin-top:5px;">
+        <i>* Q = (BQ TLSP L1 &times; &#273;&#7883;nh m&#7913;c %) / BQ c&ocirc;ng &times; c&ocirc;ng th&#7921;c t&#7871;. C&#7897;t U, V &#273;&#7875; tr&#7889;ng &ndash; ch&#7895; d&agrave;nh cho h&#7895; tr&#7907; L&#272;+VR / &#273;&#7897;c h&#7841;i chi&ecirc;n n&#7871;u ph&aacute;t sinh.</i>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            &#128203; GHI CH&Uacute; NGHI&#7878;P V&#7908; (d&agrave;nh cho th&#7849;m &#273;&#7883;nh)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+
+  </div><!-- end container -->
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    var _daTinh = false;
+    var _daKhoa = false;
+    var _bqSnapshot = null; // snapshot đơn giá BQ tại thời điểm tính (bq_run_id)
+
+    function getDinhMucPct(loaiVS) {
+        var dm = window.MOCK.lsp.vsDinhMuc.find(function (d) { return d.loai === loaiVS; });
+        return dm ? dm.pct : 100;
+    }
+
+    /* ============================
+       VS-00: VALIDATE + HIỂN THỊ NGUỒN BQ
+    ============================ */
+    function loadNguonBQ() {
+        var run = window.MOCK.lsp.bqRun;
+        var kq = computeBQNhomLSP('BQ_CB_XQ_PTO', run.phamVi === '3T' ? '3T' : 'ALL');
+        document.getElementById('src-nhom').innerText = kq.nhom.ten;
+        document.getElementById('src-bq').innerText = formatNumber(kq.bqThang) + ' đ';
+        document.getElementById('src-cong').innerText = formatNumber(kq.bqCongDu, 2) + ' công';
+        document.getElementById('src-ky').innerText = '(' + run.ky + ')';
+        var stEl = document.getElementById('src-status');
+        if (run.trangThai === 'Locked') {
+            stEl.innerHTML = '<span class="badge badge-locked" style="font-size:11px;">🔒 Đã khóa</span>';
+        } else {
+            stEl.innerHTML = '<span class="badge badge-draft" style="font-size:11px;">Chưa khóa</span>';
+        }
+        document.getElementById('src-time').innerText = run.thoiGian + ' – ' + run.nguoiTinh;
+        return { run: run, kq: kq };
+    }
+
+    /* ============================
+       BƯỚC 1: TÍNH LƯƠNG VS
+    ============================ */
+    function clickTinhVS() {
+        var src = loadNguonBQ();
+        if (src.run.trangThai !== 'Locked') {
+            showAlert('alertBox', 'VS-00: Bình quân TLSP của kỳ chưa được KHÓA. Vui lòng hoàn tất chức năng "Tính bình quân LSP" trước!', 'error');
+            return;
+        }
+        _bqSnapshot = src.kq;
+
+        var dcL1 = (parseFloat(document.getElementById('txtDcL1').value) || 100) / 100;
+        var htL4Default = parseFloat(document.getElementById('txtHtL4').value) || 0;
+        var chiCong0 = document.getElementById('chkCong0').checked;
+        var kvFilter = document.getElementById('cboKhuVuc').value;
+
+        var L = _bqSnapshot.bqThang;
+        var K = _bqSnapshot.bqCongDu;
+        var N = L * dcL1;
+
+        var tbody = document.getElementById('tbVS');
+        var tfoot = document.getElementById('tfVS');
+        tbody.innerHTML = '';
+
+        // Gom NV theo khu vực (giữ thứ tự xuất hiện)
+        var khuVucs = [], groups = {};
+        window.MOCK.lsp.vsNhanVien.forEach(function (nv) {
+            if (kvFilter && nv.khuVuc !== kvFilter) return;
+            if (chiCong0 && !(nv.congTT > 0)) return;
+            if (!groups[nv.khuVuc]) { groups[nv.khuVuc] = []; khuVucs.push(nv.khuVuc); }
+            groups[nv.khuVuc].push(nv);
+        });
+
+        var grandQ = 0, grandT = 0, grandW = 0, grandCong = 0, soNV = 0;
+
+        khuVucs.forEach(function (kv) {
+            tbody.innerHTML += '<tr class="row-khu-vuc"><td colspan="18">' + kv + '</td></tr>';
+            var subQ = 0, subT = 0, subW = 0, subCong = 0;
+
+            groups[kv].forEach(function (nv, idx) {
+                var O = getDinhMucPct(nv.loaiVS) / 100;
+                var P = nv.congTT;
+                var Q = P > 0 ? Math.round((O > 0 ? N * O : N) / K * P) : 0;
+                var R = nv.htL4Pct !== undefined ? nv.htL4Pct : htL4Default;
+                var S = Math.round(Q * R / 100);
+                var T = Q + S;
+                var W = T; // U, V để trống trong kỳ
+
+                subQ += Q; subT += T; subW += W; subCong += P;
+                soNV++;
+
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + (idx + 1) + '</td>' +
+                    '<td class="font-weight-bold">' + nv.maNV + '</td>' +
+                    '<td class="text-left">' + nv.hoTen + '</td>' +
+                    '<td style="font-size:10px;">' + (nv.loaiVS === 'VS_KDV' ? 'Kiểm đầu vỏ' : 'VS thường') + '</td>' +
+                    '<td>' + formatNumber(K, 2) + '</td>' +
+                    '<td class="col-money">' + formatNumber(L) + '</td>' +
+                    '<td>' + Math.round(dcL1 * 100) + '%</td>' +
+                    '<td class="col-money">' + formatNumber(Math.round(N)) + '</td>' +
+                    '<td>' + Math.round(O * 100) + '%</td>' +
+                    '<td class="font-weight-bold">' + formatNumber(P, 1) + '</td>' +
+                    '<td class="col-money" style="background-color:#fffdf0;">' + formatNumber(Q) + '</td>' +
+                    '<td>' + (R > 0 ? R + '%' : '-') + '</td>' +
+                    '<td class="col-money">' + (S > 0 ? formatNumber(S) : '-') + '</td>' +
+                    '<td class="col-money font-weight-bold" style="background-color:#f4fff6;">' + formatNumber(T) + '</td>' +
+                    '<td>-</td><td>-</td>' +
+                    '<td class="col-money font-weight-bold text-success" style="background-color:#f0fff2;">' + formatNumber(W) + '</td>' +
+                    '<td class="text-left" style="font-size:10px;">' + (nv.ghiChu || '') + '</td></tr>';
+            });
+
+            grandQ += subQ; grandT += subT; grandW += subW; grandCong += subCong;
+            tbody.innerHTML += '<tr class="row-subtotal-vs">' +
+                '<td colspan="9" class="text-right" style="padding-right:10px; color:#0056b3;">TỔNG ' + kv.toUpperCase() + ' (' + groups[kv].length + ' NV):</td>' +
+                '<td>' + formatNumber(subCong, 1) + '</td>' +
+                '<td class="col-money">' + formatNumber(subQ) + '</td>' +
+                '<td></td><td></td>' +
+                '<td class="col-money">' + formatNumber(subT) + '</td>' +
+                '<td></td><td></td>' +
+                '<td class="col-money text-danger">' + formatNumber(subW) + '</td><td></td></tr>';
+        });
+
+        tfoot.innerHTML = '<tr style="background-color:#e8ecef; font-weight:bold;">' +
+            '<td colspan="9" class="text-right" style="padding-right:10px;">TỔNG CỘNG TOÀN BỘ VỆ SINH:</td>' +
+            '<td>' + formatNumber(grandCong, 1) + '</td>' +
+            '<td class="col-money">' + formatNumber(grandQ) + '</td>' +
+            '<td></td><td></td>' +
+            '<td class="col-money">' + formatNumber(grandT) + '</td>' +
+            '<td></td><td></td>' +
+            '<td class="col-money text-danger" style="font-size:13px;">' + formatNumber(grandW) + ' đ</td><td></td></tr>';
+
+        _daTinh = true;
+        var b = document.getElementById('btn-khoa-vs');
+        b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
+        showAlert('alertBox', 'Đã tính lương Vệ sinh cho ' + soNV + ' NV theo đơn giá BQ ' + formatNumber(L) + ' đ (nhóm ' + _bqSnapshot.nhom.ma + ').', 'success');
+    }
+
+    /* ============================
+       BƯỚC 2: KHÓA / CHỐT LƯƠNG VS
+    ============================ */
+    function clickKhoaVS() {
+        if (!_daTinh) {
+            showAlert('alertBox', 'Vui lòng bấm "Tính lương Vệ sinh" trước!', 'warning');
+            return;
+        }
+        if (_daKhoa) return;
+        confirmAction('Khóa / Chốt bảng lương Vệ sinh kỳ LSP_01_2026 và đồng bộ sang Lương tháng (PRM)?\n\nĐơn giá BQ snapshot: ' + formatNumber(_bqSnapshot.bqThang) + ' đ (' + _bqSnapshot.nhom.ma + ').', function () {
+            _daKhoa = true;
+            var b = document.getElementById('btn-khoa-vs');
+            b.disabled = true; b.style.opacity = '0.5'; b.style.cursor = 'not-allowed'; b.innerHTML = '<span class="step-num">2</span>Đã chốt lương VS';
+            showAlert('alertBox', 'Đã khóa bảng lương Vệ sinh và đồng bộ sang phân hệ Lương tháng PRM!', 'success');
+        });
+    }
+
+    /* ============================
+       INIT
+    ============================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        loadNguonBQ();
+        // Đổ danh sách khu vực vào combo lọc
+        var cbo = document.getElementById('cboKhuVuc');
+        var seen = {};
+        window.MOCK.lsp.vsNhanVien.forEach(function (nv) {
+            if (seen[nv.khuVuc]) return;
+            seen[nv.khuVuc] = true;
+            var opt = document.createElement('option');
+            opt.value = nv.khuVuc; opt.textContent = nv.khuVuc;
+            cbo.appendChild(opt);
+        });
+    });
+  </script>
+</body>
+</html>

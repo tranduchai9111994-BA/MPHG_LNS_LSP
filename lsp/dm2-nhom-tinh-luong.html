@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Sản Phẩm</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .ntl-form { background:#f5f5f0; border:1px solid #ccc; padding:14px 18px; margin-bottom:10px; }
+      .ntl-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+      .ntl-row label { min-width:130px; font-size:12px; color:#c00; font-weight:bold; }
+      .ntl-row label.lbl-normal { color:#333; font-weight:normal; }
+      .ntl-row input[type="text"], .ntl-row textarea { flex:1; border:1px solid #aaa; padding:3px 6px; font-size:12px; font-family:Arial; }
+      .ntl-row textarea { height:42px; resize:vertical; }
+      .ntl-row-2col { display:grid; grid-template-columns:130px 1fr 130px 1fr; gap:8px; align-items:center; margin-bottom:8px; }
+      .ntl-row-2col label { font-size:12px; color:#c00; font-weight:bold; }
+      .ntl-row-2col input[type="text"], .ntl-row-2col select { border:1px solid #aaa; padding:3px 6px; font-size:12px; width:100%; box-sizing:border-box; }
+      .ntl-row select { flex:1; border:1px solid #aaa; padding:3px 6px; font-size:12px; font-family:Arial; }
+      .ntl-use-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+      .ntl-use-row label { min-width:130px; font-size:12px; color:#333; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương sản phẩm › Nhóm tính lương</div>
+  <div class="page-title">NHÓM TÍNH LƯƠNG</div>
+  <div id="ntl-alert" class="alert-box"></div>
+
+  <div class="ntl-form">
+    <div class="ntl-row-2col">
+      <label>Mã</label>
+      <input type="text" id="ntl_ma" maxlength="20" placeholder="">
+      <label style="color:#333;">Nhóm lương</label>
+      <select id="ntl_nhomluong">
+        <option value="">-- Chọn nhóm lương --</option>
+        <option value="NL_CHE_BIEN">NL_CHE_BIEN - Nhóm lương Chế biến</option>
+        <option value="NL_PHUC_VU">NL_PHUC_VU - Nhóm lương Phục vụ</option>
+        <option value="NL_VE_SINH">NL_VE_SINH - Nhóm lương Vệ sinh</option>
+      </select>
+    </div>
+    <div class="ntl-row-2col">
+      <label>Tên tiếng Anh</label>
+      <input type="text" id="ntl_tenEN" maxlength="255" placeholder="">
+      <label>Tên tiếng Việt</label>
+      <input type="text" id="ntl_tenVI" maxlength="255" placeholder="">
+    </div>
+    <div class="ntl-row">
+      <label style="color:#333;font-weight:normal;">Ghi chú</label>
+      <textarea id="ntl_note" maxlength="1000"></textarea>
+    </div>
+    <div class="ntl-row-2col">
+      <label style="color:#333;font-weight:normal;">Thứ tự sắp xếp</label>
+      <input type="text" id="ntl_sort" maxlength="10" placeholder="" style="max-width:80px;">
+      <label style="color:#333;font-weight:normal;">Sử dụng?</label>
+      <span><input type="checkbox" id="ntl_use" checked style="accent-color:#f5a623;width:16px;height:16px;"></span>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button>
+    <button class="btn-refresh" onclick="ntlClear()">Làm mới</button>
+    <button class="btn-save2" onclick="ntlSave()">Lưu</button>
+    <button class="btn-delete" onclick="ntlDelete()">Xóa</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+  </div>
+
+  <div class="grid-wrap"><table>
+    <thead>
+      <tr>
+        <th><input type="checkbox" onchange="document.querySelectorAll('.ntl-chk').forEach(c=>c.checked=this.checked)"></th>
+        <th>STT</th>
+        <th>Sửa</th>
+        <th>Mã</th>
+        <th>Tên tiếng Anh</th>
+        <th>Tên tiếng Việt</th>
+        <th>Nhóm lương</th>
+        <th>Ghi chú</th>
+        <th>Thứ tự sắp xếp</th>
+        <th>Sử dụng</th>
+      </tr>
+    </thead>
+    <tbody id="ntl-tbody">
+      <tr data-ma="NTL01" data-nhomluong="NL_CHE_BIEN">
+        <td><input type="checkbox" class="ntl-chk"></td>
+        <td>1</td>
+        <td><span class="edit-icon" onclick="ntlEdit(this)">✎</span></td>
+        <td><b>NTL01</b></td>
+        <td>Hệ số</td>
+        <td>Hệ số</td>
+        <td>NL_CHE_BIEN - Nhóm lương Chế biến</td>
+        <td></td>
+        <td style="text-align:center;">1</td>
+        <td style="text-align:center;">X</td>
+      </tr>
+      <tr data-ma="NTL02" data-nhomluong="NL_CHE_BIEN">
+        <td><input type="checkbox" class="ntl-chk"></td>
+        <td>2</td>
+        <td><span class="edit-icon" onclick="ntlEdit(this)">✎</span></td>
+        <td><b>NTL02</b></td>
+        <td>Năng suất</td>
+        <td>Năng suất</td>
+        <td>NL_CHE_BIEN - Nhóm lương Chế biến</td>
+        <td></td>
+        <td style="text-align:center;">2</td>
+        <td style="text-align:center;">X</td>
+      </tr>
+      <tr data-ma="NTL03" data-nhomluong="NL_PHUC_VU">
+        <td><input type="checkbox" class="ntl-chk"></td>
+        <td>3</td>
+        <td><span class="edit-icon" onclick="ntlEdit(this)">✎</span></td>
+        <td><b>NTL03</b></td>
+        <td>Bình quân lương sản phẩm</td>
+        <td>Bình quân lương sản phẩm</td>
+        <td>NL_PHUC_VU - Nhóm lương Phục vụ</td>
+        <td></td>
+        <td style="text-align:center;">3</td>
+        <td style="text-align:center;">X</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if (!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    const ntlExisting = ['NTL01','NTL02','NTL03'];
+
+    function ntlClear() {
+      document.getElementById('ntl_ma').value = '';
+      document.getElementById('ntl_ma').readOnly = false;
+      document.getElementById('ntl_nhomluong').value = '';
+      document.getElementById('ntl_tenEN').value = '';
+      document.getElementById('ntl_tenVI').value = '';
+      document.getElementById('ntl_note').value = '';
+      document.getElementById('ntl_sort').value = '';
+      document.getElementById('ntl_use').checked = true;
+      document.getElementById('ntl-alert').style.display = 'none';
+    }
+
+    function ntlEdit(el) {
+      const row = el.closest('tr');
+      const cells = row.cells;
+      document.getElementById('ntl_ma').value = cells[3].innerText.trim();
+      document.getElementById('ntl_ma').readOnly = true;
+      document.getElementById('ntl_tenEN').value = cells[4].innerText.trim();
+      document.getElementById('ntl_tenVI').value = cells[5].innerText.trim();
+      document.getElementById('ntl_nhomluong').value = row.getAttribute('data-nhomluong') || '';
+      document.getElementById('ntl_note').value = cells[7].innerText.trim();
+      document.getElementById('ntl_sort').value = cells[8].innerText.trim();
+      document.getElementById('ntl_use').checked = cells[9].innerText.trim() === 'X';
+      window.scrollTo(0, 0);
+    }
+
+    function ntlDelete() {
+      const chks = document.querySelectorAll('.ntl-chk:checked');
+      if (!chks.length) return showAlert2('ntl-alert', 'Vui lòng chọn nhóm tính lương cần xóa.', 'error');
+      if (confirm('Bạn có chắc muốn xóa?')) {
+        chks.forEach(c => c.closest('tr').remove());
+        showAlert2('ntl-alert', 'Đã xóa nhóm tính lương thành công.', 'success');
+      }
+    }
+
+    function ntlSave() {
+      const ma = document.getElementById('ntl_ma').value.trim();
+      const vi = document.getElementById('ntl_tenVI').value.trim();
+      const en = document.getElementById('ntl_tenEN').value.trim();
+      const nhomluong = document.getElementById('ntl_nhomluong').value;
+      const isEdit = document.getElementById('ntl_ma').readOnly;
+      if (!ma || !vi || !en) return showAlert2('ntl-alert', 'Vui lòng nhập đầy đủ Mã, Tên tiếng Việt và Tên tiếng Anh.', 'error');
+      if (!nhomluong) return showAlert2('ntl-alert', 'Vui lòng chọn Nhóm lương.', 'error');
+      if (!/^[a-zA-Z0-9_]+$/.test(ma)) return showAlert2('ntl-alert', 'Mã không hợp lệ. Phải viết liền không dấu, không khoảng trắng.', 'error');
+      if (!isEdit && ntlExisting.includes(ma.toUpperCase())) return showAlert2('ntl-alert', '<b>Lỗi (Blocking):</b> Mã [' + ma.toUpperCase() + '] đã tồn tại.', 'error');
+      showAlert2('ntl-alert', 'Lưu Nhóm tính lương thành công!', 'success');
+      ntlClear();
+    }
+  </script>
+</body>
+</html>

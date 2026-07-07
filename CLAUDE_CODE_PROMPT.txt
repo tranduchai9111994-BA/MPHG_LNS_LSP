@@ -1,0 +1,923 @@
+================================================================================
+CLAUDE CODE – PROMPT TỔNG HỢP
+DỰ ÁN: MPHG iHRP – Prototype Lương Sản Phẩm & Lương Năng Suất
+Phiên bản: 1.0 | Ngày: 2026-06
+================================================================================
+
+CÁCH SỬ DỤNG FILE NÀY
+──────────────────────
+File này gồm 5 SESSION độc lập, thực hiện tuần tự.
+Mỗi SESSION = 1 lần làm việc với Claude Code.
+Paste nội dung từng SESSION vào Claude Code theo thứ tự.
+KHÔNG nhảy SESSION nếu SESSION trước chưa xong và chưa test.
+
+================================================================================
+BỐI CẢNH DỰ ÁN (đọc trước mọi session)
+================================================================================
+
+Tôi là Business Analyst cho dự án HRIS của công ty thủy sản Minh Phú Hậu Giang
+(MPHG). Tôi có 1 file prototype HTML duy nhất tên là:
+
+    MPHG_LuongSanPham_Full.html  (~3,683 dòng)
+
+File này là prototype tương tác đầy đủ gồm 2 module chính:
+  - LSP: Lương Sản Phẩm (pg1–pg9)
+  - LNS: Lương Năng Suất (pg10 với 11 sub-tabs: sys1–4, dm1–2, tl1, fn1–6, fn8)
+
+Cấu trúc kỹ thuật hiện tại:
+  - 1 shell HTML chứa sidebar navigation + iframe
+  - 10 embedded pages trong thẻ <script type="text/html" id="pgX">
+  - Mỗi page là 1 HTML document đầy đủ, load vào iframe qua srcdoc
+  - Page pg10 là "app lồng app" với 11 sub-tabs nội bộ
+  - Mỗi page có <style> riêng → CSS bị duplicate nặng
+  - JS helper functions bị copy paste giữa các page
+
+MỤC TIÊU REFACTOR:
+Chuyển từ 1 file monolith → multi-file structure có thể mở rộng,
+dùng Live Server (VSCode) hoặc double-click mở browser để chạy.
+
+RÀNG BUỘC CỨNG – KHÔNG ĐƯỢC VI PHẠM:
+  1. KHÔNG thay đổi bất kỳ logic nghiệp vụ nào
+  2. KHÔNG thay đổi màu sắc, font, kích thước element
+  3. KHÔNG thêm thư viện ngoài (jQuery, Bootstrap, React, Vue...)
+     → Chỉ dùng Vanilla JS + CSS thuần
+  4. KHÔNG hardcode dữ liệu mẫu trong file HTML page
+     → Tất cả data vào mockdata.js
+  5. File fn6-tinh-lns.html phải giữ nguyên 100% cấu trúc:
+     - 2 sub-tabs (Tab 1: CALC-01→07, Tab 2: CALC-08→12)
+     - Bảng tổng hợp Bàn/Ka với số liệu cố định theo Ví dụ A
+     - Collapsible 12 bước tính đầy đủ + bảng kết quả cuối
+     - Cards: Tổng NV/NV SX/NV PV/Tổng NS TL (Kg)/Đã khóa
+  6. Mỗi batch xong phải báo cáo trước khi tiếp tục batch sau
+
+DESIGN TOKENS (KHÔNG ĐƯỢC THAY ĐỔI):
+  --color-brand-red:    #d32f2f
+  --color-menu-yellow:  #ffd600
+  --color-sidebar-dark: #1f2a44  (LSP sidebar)
+  --color-sidebar-lns:  #1e3a5f  (LNS sidebar)
+  --color-nav-active-border: #ffd600
+  --color-nav-active-bg:     rgba(255,214,0,0.15)
+  --color-btn-calc:     #28a745
+  --color-btn-lock:     #dc3545
+  --color-btn-export:   #fd7e14
+  --color-btn-import:   #17a2b8
+  --color-btn-search:   #ffc107
+  --color-btn-refresh:  #007bff
+  --color-table-header: #f4d03f
+  --color-row-locked:   background #d1d1d1, color #777, font-style italic
+  --color-badge-locked: #dc3545
+  --color-badge-draft:  #6c757d
+  --color-badge-preview:#007bff
+  font-family: Arial, sans-serif
+  font-size-body: 12–13px
+
+PATTERNS HIỆN TẠI (phải nhất quán sau refactor):
+  P1:  Top header = logo (đỏ) + search bar + user actions (flag/bell/mail/name)
+  P2:  Main menu bar = yellow bg, uppercase links, "Lương" active
+  P3:  Breadcrumb = font-size 11px, color #555
+  P4:  Filter panel = white bg, border, grid 2-col/3-col/6-col
+  P5:  Action bar = center-aligned buttons
+  P6:  Data grid = checkbox col + edit icon (✎) + data rows, hover #f1f8ff
+  P7:  Modal overlay = dark backdrop, modal-header/body/footer
+  P8:  Alert box = success(green)/error(red)/warning(yellow), auto-hide 4s
+  P9:  Import modal = file upload + rules list + "Tải Template Mẫu" link
+  P10: Collapsible section = click toggle, display none/block
+  P11: Status badge = border-radius 20px, font-size 11px
+  P12: Period bar = kỳ tháng dropdown + radio lock filter
+  P13: Cards summary = grid 4–5 cards, metric label + bold value
+  P14: Sub-tabs = border-bottom 2px solid #0056b3, active tab blue bg
+
+================================================================================
+SESSION 1: EXTRACT SHARED ASSETS
+================================================================================
+[Ưu tiên: MUST HAVE | Thời gian ước tính: 2–3 giờ]
+
+MỤC TIÊU SESSION 1:
+Đọc file MPHG_LuongSanPham_Full.html và tạo 3 file shared:
+  - shared/style.css
+  - shared/utils.js
+  - shared/mockdata.js
+CHƯA tách bất kỳ file HTML page nào trong session này.
+
+────────────────────────────────────────────────────────────────────────────────
+TASK 1.1 – Tạo shared/style.css
+────────────────────────────────────────────────────────────────────────────────
+
+Đọc toàn bộ các khối <style> trong file MPHG_LuongSanPham_Full.html.
+Phân tích và gom tất cả CSS rules xuất hiện ở 2+ page vào 1 file CSS duy nhất.
+
+File shared/style.css phải bao gồm:
+
+SECTION 1 – CSS Variables (design tokens)
+  Khai báo tất cả màu sắc và giá trị lặp lại dưới dạng CSS custom properties.
+
+SECTION 2 – Reset & Base
+  box-sizing, body, font-family, font-size mặc định.
+
+SECTION 3 – Layout
+  .app, .sidebar, .main, .content-area, .app-body, iframe styles.
+
+SECTION 4 – Top Header & Main Menu
+  .top-header, .logo, .search-bar, .user-actions, .main-menu và links.
+
+SECTION 5 – Sidebar Navigation
+  .sidebar, .brand, .nav-group, .grp-title, .nav-item, .nav-item.active,
+  .sidebar-section, .sidebar-section-title (LNS sidebar variant).
+
+SECTION 6 – Page Structure
+  .container, .page-wrap, .breadcrumb, .page-title, .info-bar,
+  .note-alert, .desc-box.
+
+SECTION 7 – Form & Filter
+  .form-panel, .filter-panel, .form-grid, .form-grid-2col,
+  .form-grid-3col, .form-grid-6col, .field-row, .field,
+  .input-group, .lookup-wrap, .radio-group, .status-row,
+  .period-bar, .period-left, .period-center.
+
+SECTION 8 – Buttons
+  Tất cả .btn-* classes với màu sắc theo design token.
+
+SECTION 9 – Data Grid & Table
+  .grid-container, .grid-wrap, table, thead, th, td,
+  tbody tr:nth-child(even), tbody tr:hover,
+  .row-locked, .edit-icon, .text-left, .text-right,
+  .col-money, .col-total, .pagination.
+
+SECTION 10 – Status Badges
+  .badge, .badge-locked, .badge-draft, .badge-preview,
+  .status-badge, .badge-unlocked.
+
+SECTION 11 – Alert Box
+  .alert-box, .alert-success, .alert-error, .alert-warning,
+  .alert-confirm.
+
+SECTION 12 – Modal
+  .modal-overlay, .modal-content, .modal-box, .modal-box.wide,
+  .modal-header, .modal-hdr, .modal-hdr.cyan,
+  .modal-body, .modal-footer, .modal-ftr,
+  .close-btn, .x, .error-msg.
+
+SECTION 13 – Cards & Collapsible
+  .cards, .card, .collapsible, .collapsible-body,
+  .collapsible-body table.
+
+SECTION 14 – Sub-tabs
+  Tab button styles, active state, tab-content display.
+
+SECTION 15 – Page-specific overrides
+  CSS chỉ dùng ở 1 page duy nhất → comment rõ tên page,
+  vẫn đưa vào file này nhưng đánh dấu:
+  /* PAGE-SPECIFIC: pg2-tinh-lsp */
+
+Sau khi tạo xong style.css:
+- Đếm số dòng
+- Báo cáo % CSS đã được consolidate (ước tính bao nhiêu dòng 
+  duplicate đã được loại bỏ)
+
+────────────────────────────────────────────────────────────────────────────────
+TASK 1.2 – Tạo shared/utils.js
+────────────────────────────────────────────────────────────────────────────────
+
+Đọc tất cả <script> blocks trong file gốc.
+Gom các hàm xuất hiện ở 2+ page vào shared/utils.js.
+
+File shared/utils.js phải chứa TỐI THIỂU các hàm sau:
+
+/* ── ALERT ── */
+function showAlert(boxId, msg, type, autoHideMs = 4000)
+  // Hiển thị alert box theo id, type: 'success'|'error'|'warning'
+  // Tự ẩn sau autoHideMs ms (0 = không tự ẩn)
+
+function showAlert2(id, msg, type)
+  // Alias của showAlert, giữ tên để tương thích backward
+
+/* ── MODAL ── */
+function showModal(id)
+function hideModal(id)
+
+/* ── TABLE HELPERS ── */
+function toggleAll(masterChkId, childChkSelector)
+  // Check/uncheck tất cả checkbox con khi click master checkbox
+
+function toggleAllCheckboxes(source, selector)
+  // Variant dùng element reference thay vì id string
+
+/* ── FORMAT ── */
+function formatNumber(n, decimals = 0)
+  // Format số có dấu phân cách nghìn, tùy chọn số thập phân
+
+function formatDate(dateStr)
+  // Chuyển yyyy-mm-dd → dd/mm/yyyy
+
+function parseDateInput(ddmmyyyy)
+  // Chuyển dd/mm/yyyy → Date object
+
+function validateMonthFormat(val)
+  // Kiểm tra format MM/yyyy, trả về true/false
+
+function autoFillPeriod(monthVal, fromId, toId, codeId)
+  // Từ MM/yyyy → tự fill ngày đầu/cuối tháng và mã kỳ
+
+/* ── COLLAPSIBLE ── */
+function toggleCollapse(id)
+  // Toggle display none/block cho element id
+
+/* ── NAVIGATION (dùng trong index.html) ── */
+function loadPage(src, title)
+  // Load URL vào iframe, cập nhật topbar title và breadcrumb
+
+/* ── MISC ── */
+function confirmAction(msg, onConfirm)
+  // Wrapper cho confirm() với callback
+
+Mỗi hàm phải có JSDoc comment 2–3 dòng mô tả params và return.
+
+Sau khi tạo xong utils.js:
+- Liệt kê tên hàm và số lần hàm đó xuất hiện trong file gốc
+- Báo cáo tổng dòng JS đã được consolidate
+
+────────────────────────────────────────────────────────────────────────────────
+TASK 1.3 – Tạo shared/mockdata.js
+────────────────────────────────────────────────────────────────────────────────
+
+Đọc tất cả data arrays/objects trong file gốc.
+Tạo shared/mockdata.js với cấu trúc namespace rõ ràng:
+
+window.MOCK = {
+
+  // Danh mục dùng chung
+  congDoan: [...],       // CD001–CD005 + thêm từ pg8/pg10/dm2
+  tienTrinh: [...],      // TT_TOM_SU, TT_TOM_THE, TT_DONG_GOI...
+  congTy: [...],         // Công Ty CP Thủy Sản MPHG
+  donVi: {...},          // Cấu trúc đơn vị cấp 1–7
+  boPhan: [...],         // BP_PTO, BP_TB, BP_CHIEN...
+
+  // LSP data
+  lsp: {
+    kyLuong: [...],      // LSP_202605, LSP_202606_DRAFT, ...
+    donGia: [...],       // id, thang, ma, ten, gia, dv, note
+    hoTroBP: [...],      // id, thang, dv, bp, tenBp, hoTro, note
+    hoTroCD: [...],      // id, thang, loai, doiTuong, mucHT, note
+    heSoHS: [...],       // id, thang, dv, bp, tenBp, hs1, hs2, hs3, note
+    ketQua: [...],       // kết quả tính LSP cá nhân
+    ketQuaBP: [...],     // kết quả tính LSP bình quân bộ phận
+  },
+
+  // LNS data (Ví dụ A đầy đủ – Ka Sáng, BP PTO, CD001, tháng 01/2026)
+  lns: {
+    kyLuong: [...],      // fn1 data
+    congThucTe: [...],   // fn2 data
+    heSoThang: [...],    // fn3 data
+    boSungPV: [...],     // fn4 data
+    nsThucTe: [...],     // fn5 data
+    nhanVien: [          // Ví dụ A: 6 NV cố định
+      {ma:'NV001', ten:'Nguyễn Văn An',  loai:'SX', ka:'Ka Sáng', ban:'Bàn 1', ctt:22, hst:100, bspv:0},
+      {ma:'NV002', ten:'Trần Minh Hải',  loai:'SX', ka:'Ka Sáng', ban:'Bàn 1', ctt:20, hst:90,  bspv:0},
+      {ma:'NV003', ten:'Lê Quốc Dũng',   loai:'PV', ka:'Ka Sáng', ban:'Bàn 1', ctt:22, hst:100, bspv:10},
+      {ma:'NV004', ten:'Phạm Thị Lan',   loai:'SX', ka:'Ka Sáng', ban:'Bàn 2', ctt:22, hst:100, bspv:0},
+      {ma:'NV005', ten:'Đặng Hoàng Nam', loai:'SX', ka:'Ka Sáng', ban:'Bàn 2', ctt:18, hst:90,  bspv:0},
+      {ma:'NV006', ten:'Võ Minh Trang',  loai:'PV', ka:'Ka Sáng', ban:'Bàn 2', ctt:22, hst:100, bspv:10},
+    ],
+    nsttTheoNgay: {      // NSTT theo Bàn: input cho CALC-08
+      'Bàn 1': 500,
+      'Bàn 2': 420,
+    },
+    moKhoa: [...],       // fn8 data
+  },
+
+  // System data
+  sys: {
+    tieuChiTimKiem: [...],
+    tieuChiHeThong: [...],
+    tieuChiTinhToan: [...],
+    congThucLuong: [...],
+  }
+};
+
+QUAN TRỌNG: Tất cả data phải khớp với data đang có trong file gốc.
+KHÔNG tự ý thêm hay bớt field. KHÔNG tự ý đổi giá trị.
+Riêng lns.nhanVien: dùng đúng 6 NV trong Ví dụ A như trên (đã cố định).
+
+================================================================================
+SESSION 2: TẠO SHELL INDEX.HTML VÀ NAV CONFIG
+================================================================================
+[Ưu tiên: MUST HAVE | Thực hiện sau Session 1 hoàn tất]
+
+MỤC TIÊU SESSION 2:
+Tạo file index.html mới (shell) và nav-config.js.
+Thay thế cơ chế srcdoc bằng iframe src thật trỏ đến file HTML riêng.
+
+────────────────────────────────────────────────────────────────────────────────
+TASK 2.1 – Tạo nav-config.js
+────────────────────────────────────────────────────────────────────────────────
+
+Tạo file nav-config.js với cấu trúc:
+
+window.NAV_CONFIG = {
+  groups: [
+    {
+      title: "Chức năng",
+      items: [
+        { id: "pg1", label: "Tạo kỳ Lương Sản Phẩm",    src: "lsp/pg1-tao-ky.html" },
+        { id: "pg2", label: "Tính Lương Sản Phẩm",       src: "lsp/pg2-tinh-lsp.html" },
+        { id: "pg3", label: "Mở khóa Lương Sản Phẩm",   src: "lsp/pg3-mo-khoa.html" },
+        { id: "pg4", label: "Xem LSP từng cá nhân",      src: "lsp/pg4-xem-ca-nhan.html" },
+      ]
+    },
+    {
+      title: "Thiết lập",
+      items: [
+        { id: "pg5", label: "Thiết lập Đơn giá công đoạn",    src: "lsp/pg5-don-gia.html" },
+        { id: "pg6", label: "% Hỗ trợ & Hệ số (tabs)",        src: "lsp/pg6-ho-tro-he-so.html" },
+        { id: "pg7", label: "% Hỗ trợ theo Bộ phận",          src: "lsp/pg7-ho-tro-bp.html" },
+        { id: "pg8", label: "% Hỗ trợ theo Công đoạn/TT",     src: "lsp/pg8-ho-tro-cd.html" },
+        { id: "pg9", label: "Hệ số HS1/HS2/HS3",              src: "lsp/pg9-he-so-hs123.html" },
+      ]
+    },
+    {
+      title: "LNS · Hệ thống",
+      items: [
+        { id: "sys1", label: "Tiêu chí tìm kiếm",   src: "lns/sys1-tieu-chi-tim-kiem.html" },
+        { id: "sys2", label: "Tiêu chí hệ thống",   src: "lns/sys2-tieu-chi-he-thong.html" },
+        { id: "sys3", label: "Tiêu chí tính toán",  src: "lns/sys3-tieu-chi-tinh-toan.html" },
+        { id: "sys4", label: "Tạo công thức lương",  src: "lns/sys4-cong-thuc-luong.html" },
+      ]
+    },
+    {
+      title: "LNS · Danh mục",
+      items: [
+        { id: "dm1", label: "Tiến trình",  src: "lns/dm1-tien-trinh.html" },
+        { id: "dm2", label: "Công đoạn",   src: "lns/dm2-cong-doan.html" },
+      ]
+    },
+    {
+      title: "LNS · Thiết lập",
+      items: [
+        { id: "tl1", label: "Bộ phận theo Công đoạn", src: "lns/tl1-bp-theo-cd.html" },
+      ]
+    },
+    {
+      title: "LNS · Chức năng",
+      items: [
+        { id: "fn1", label: "Tạo kỳ Lương Năng Suất", src: "lns/fn1-tao-ky-lns.html" },
+        { id: "fn2", label: "Công thực tế",            src: "lns/fn2-cong-thuc-te.html" },
+        { id: "fn3", label: "% Hệ số theo tháng",      src: "lns/fn3-he-so-thang.html" },
+        { id: "fn4", label: "% Bổ sung Phục vụ",       src: "lns/fn4-bo-sung-pv.html" },
+        { id: "fn5", label: "Nhập NS thực tế",         src: "lns/fn5-nhap-ns-thuc-te.html" },
+        { id: "fn6", label: "Tính Lương Năng Suất",    src: "lns/fn6-tinh-lns.html" },
+        { id: "fn8", label: "Mở khóa Lương NS",        src: "lns/fn8-mo-khoa-lns.html" },
+      ]
+    },
+  ]
+};
+
+────────────────────────────────────────────────────────────────────────────────
+TASK 2.2 – Tạo index.html (Shell mới)
+────────────────────────────────────────────────────────────────────────────────
+
+Tạo file index.html với các yêu cầu sau:
+
+STRUCTURE:
+  <head>
+    - charset UTF-8, viewport
+    - title: MINH PHU – iHRP Lương Sản Phẩm & Năng Suất
+    - link rel="stylesheet" href="shared/style.css"
+    - script src="nav-config.js"
+    - script src="shared/utils.js"
+    - <style> chỉ cho shell layout (sidebar width, iframe flex-grow...)
+  </head>
+  <body>
+    <div class="app">
+      <div class="sidebar" id="sidebar">
+        <div class="brand">...</div>
+        <!-- Nav groups được render bởi JS từ NAV_CONFIG -->
+        <div id="nav-container"></div>
+      </div>
+      <div class="main">
+        <div class="topbar" id="topbar">
+          <span id="pg-title">...</span>
+          <span class="hint">Demo Prototype – Thẩm định nghiệp vụ</span>
+        </div>
+        <iframe id="main-frame" title="content"></iframe>
+      </div>
+    </div>
+    <script>
+      // Render navigation từ NAV_CONFIG
+      // Load page khi click nav item
+      // Highlight active nav item
+      // Khôi phục active page từ sessionStorage (giữ state khi refresh)
+      // Load trang đầu tiên khi DOMContentLoaded
+    </script>
+  </body>
+
+NAVIGATION BEHAVIOR:
+  - Click nav item → iframe.src = item.src (không dùng srcdoc)
+  - Active item = border-left 4px solid #ffd600 + bg rgba(255,214,0,0.15)
+  - Topbar title cập nhật theo tên page đang active
+  - sessionStorage lưu id của page cuối cùng xem → restore khi F5
+  - Sidebar LSP group: dùng màu #1f2a44
+  - Sidebar LNS group: dùng màu #1e3a5f (hoặc thống nhất 1 màu nếu thấy ổn hơn)
+
+SAU KHI TẠO XONG:
+  - Chạy thử với 1 file HTML tạm (placeholder.html) 
+    để confirm iframe load đúng
+  - Kiểm tra sidebar render đủ 23 nav items
+  - Kiểm tra topbar cập nhật đúng title khi click từng item
+
+================================================================================
+SESSION 3: TÁCH FILE HTML – BATCH 1 (LSP CORE)
+================================================================================
+[Ưu tiên: MUST HAVE | Thực hiện sau Session 2 hoàn tất]
+
+MỤC TIÊU SESSION 3:
+Tách 4 file LSP core functions + file fn6 (đã cập nhật) từ file gốc.
+
+TEMPLATE CHUẨN cho mỗi file HTML page:
+──────────────────────────────────────────
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[Tên màn hình]</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <!-- Chỉ thêm <style> nếu có CSS đặc thù chỉ page này dùng -->
+</head>
+<body>
+  <!-- TOP HEADER (giống nhau ở mọi page) -->
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <!-- MAIN MENU -->
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <!-- PAGE CONTENT -->
+  <div class="container">
+    [NỘI DUNG PAGE]
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // Chỉ JS đặc thù của page này
+    // KHÔNG copy lại hàm đã có trong utils.js
+  </script>
+</body>
+</html>
+──────────────────────────────────────────
+
+BATCH 1A – File cần tách:
+
+1. lsp/pg1-tao-ky.html (từ <script id="pg1"> trong file gốc)
+   - Form: Mã kỳ LSP, Tháng tính, Từ ngày, Đến ngày
+   - Auto-fill khi nhập tháng (autoFillPeriod từ utils.js)
+   - Buttons: Tạo kỳ Lương, Làm mới, Xóa kỳ, Danh sách kỳ
+   - Grid: có badges Locked/Draft/Calculated(Preview)
+   - Data từ MOCK.lsp.kyLuong
+
+2. lsp/pg2-tinh-lsp.html (từ <script id="pg2">)
+   - 2 tabs: (1) Tính LSP Cá nhân, (2) Tính LSP Trung Bình Bộ phận
+   - Tab 1: Filter 6 cột, period bar, buttons, collapsible 10 bước CALC-00→CALC-10
+            Grid: checkbox, STT, Trạng thái LNS, Mã NV, Họ tên, CĐ,
+                  NS Lương, Đơn giá, LSP_Base, Sau HS1/2/3, HT BP, HT CĐ, Tổng LSP_Total
+            Ví dụ số liệu minh họa trong collapsible (NV A, Tẩm bột, 01/2026)
+   - Tab 2: Formula FR.25, filter BP, buttons, 2 grids (BQ theo BP + Chi tiết Kho/KCS)
+            Ví dụ số liệu: PTO tháng 01/2026
+   - Need Confirm box: OP-25, OP-34 vẫn hiển thị
+
+3. lsp/pg3-mo-khoa.html (từ <script id="pg3">)
+   - Filter + radio trạng thái khóa
+   - Buttons: Tìm, Làm mới, Mở khóa, Xóa dữ liệu, Xuất + checkbox "Mở khóa tất cả"
+   - Grid: badge status, kỳ lương, mã NV, họ tên, bộ phận, CĐ, tổng lương SP
+   - Modal xác nhận: textarea lý do bắt buộc + warning "Lương Tháng đã khóa"
+   - Audit log hiển thị sau khi mở khóa thành công
+   - Data từ MOCK.lsp.ketQua (chỉ lấy records đã khóa)
+
+4. lsp/pg4-xem-ca-nhan.html (từ <script id="pg4">)
+   - Lookup NV: input mã NV + button "..."
+   - Preview banner (hiển thị khi IsPreview = true)
+   - Filter tháng + buttons Xem/Trace/Export
+   - Grid chi tiết theo CĐ
+   - Modal Trace: bảng CALC-01→CALC-10 chi tiết cho 1 NV
+
+BATCH 1B – File fn6 (đã được cập nhật 12 bước):
+
+5. lns/fn6-tinh-lns.html
+   QUAN TRỌNG: File này đã được cập nhật với cấu trúc mới.
+   Lấy nội dung từ file MPHG_LuongSanPham_Full.html (phiên bản đã cập nhật),
+   cụ thể là tab-panel id="tab-fn6".
+
+   Kiểm tra bắt buộc sau khi tách:
+   ✓ Tab 1 "Công năng suất & Phân chia PV (CALC-01→07)" hoạt động
+   ✓ Tab 2 "NS tính lương – Output (CALC-08→12)" hoạt động
+   ✓ Bảng tổng hợp Bàn/Ka Tab 1:
+       - Bàn 1 CNS_Ban = 64.20
+       - Bàn 2 CNS_Ban = 62.40
+       - Ka Sáng CNS_PV_Ka = 48.40, CNS_Ka = 126.60
+       - Bàn 1 GiamPV = 24.53, SauGiamPV = 39.67
+       - Bàn 2 GiamPV = 23.87, SauGiamPV = 38.53
+   ✓ Bảng tổng hợp Bàn/Ka Tab 2:
+       - Bàn 1 NSTT = 500, HSLD = 7.79, NS_SauChiaPV = 156.65
+       - Bàn 2 NSTT = 420, HSLD = 6.73, NS_SauChiaPV = 127.81
+       - Ka Sáng NS_PV = 635.54
+   ✓ Collapsible 12 bước: tất cả CALC-01 đến CALC-12 có đủ
+   ✓ Bảng kết quả cuối (6 NV):
+       - NV A: 53.65 Kg
+       - NV B: 43.89 Kg
+       - NV C (PV): 9.23 Kg
+       - NV D: 45.00 Kg
+       - NV E: 33.14 Kg
+       - NV F (PV): 9.24 Kg
+       - Tổng: 194.15 Kg
+   ✓ Cards: Tổng NV:6 | NV SX:4 | NV PV:2 | Tổng NS TL:194.15 Kg | Đã khóa:0
+   ✓ Nút "Tính lương NS" hiển thị alert success
+
+CHECKLIST SAU BATCH 1:
+□ Mở index.html, click từng item trong nav, confirm iframe load đúng page
+□ pg1: Nhập tháng 07/2026, confirm auto-fill mã kỳ = LSP_202607
+□ pg2 Tab 1: Confirm collapsible 10 bước mở ra, số liệu ví dụ hiển thị
+□ pg2 Tab 2: Switch tab thành công, 2 grid hiển thị dữ liệu
+□ pg3: Click "Mở khóa" khi chưa chọn dòng → alert warning
+□ pg3: Chọn dòng → click Mở khóa → modal xuất hiện
+□ pg3: Bỏ trống lý do → click Xác nhận → báo lỗi
+□ pg4: Nhập mã NV → click "..." → auto-fill thông tin NV
+□ fn6 Tab 1: Grid 6 dòng với CNS_NV đúng (NV A=22.00, NV C=24.20)
+□ fn6 Tab 2: Grid 6 dòng với NS_TL đúng (NV A=53.65, NV C=9.23)
+□ fn6 Collapsible: Đủ 12 dòng CALC-01 đến CALC-12
+
+================================================================================
+SESSION 4: TÁCH FILE HTML – BATCH 2, 3, 4
+================================================================================
+[Ưu tiên: SHOULD HAVE | Thực hiện sau Session 3 hoàn tất và test ok]
+
+MỤC TIÊU SESSION 4:
+Tách toàn bộ các file còn lại.
+Dùng template chuẩn từ Session 3.
+Relative path: ../shared/ cho LSP, ../shared/ cho LNS.
+
+────────────────────────────────────────────────────────────────────────────────
+BATCH 2 – LSP Setup (lsp/)
+────────────────────────────────────────────────────────────────────────────────
+
+lsp/pg5-don-gia.html (từ id="pg5")
+  - Filter: Tháng, Công đoạn dropdown (từ MOCK.congDoan)
+  - Buttons: Tìm Kiếm, Làm mới, Thêm mới, Xóa, Xuất, Nhập
+  - Grid: Checkbox, Sửa(✎), STT, Tháng, Mã CĐ, Tên CĐ, Đơn giá, ĐVT, Ghi chú
+  - Modal Thêm/Sửa: Tháng (bắt buộc), CĐ dropdown (bắt buộc), Đơn giá (bắt buộc), Ghi chú
+  - Validation: Đơn giá ≤ 0 → warning confirm; thiếu field → blocking alert
+  - Modal Import: rules + file upload + link template
+  - Data từ MOCK.lsp.donGia
+
+lsp/pg6-ho-tro-he-so.html (từ id="pg6" – page có 3 internal tabs)
+  - Tab 1: % Hỗ trợ BP → giống pg7 nhưng nhúng trong tab
+  - Tab 2: % Hỗ trợ CĐ/TT → giống pg8 nhưng nhúng trong tab
+  - Tab 3: Hệ số HS1/HS2/HS3 → form + grid
+  - Mỗi tab có buttons riêng
+  - Validation Tab 3: HS âm → blocking; HS > 200% → confirm warning; HS = 0 → confirm warning
+
+lsp/pg7-ho-tro-bp.html (từ id="pg7")
+  - Form: Tháng, Công ty, ĐV cấp 1–6, Bộ phận tính lương, % Hỗ trợ, Ghi chú
+  - Buttons: Tìm Kiếm, Làm mới, Thêm mới, Lưu, Xóa, Xuất, Nhập
+  - Grid + Modal Import (công thức HoTroBP = LSP_HS3_Amt × %HoTroBP)
+  - Upsert khi trùng Tháng + Bộ phận
+  - Data từ MOCK.lsp.hoTroBP
+
+lsp/pg8-ho-tro-cd.html (từ id="pg8")
+  - Form: Tháng, radio Loại (CĐ/TT), dropdown Đối tượng, % Hỗ trợ (text, không phải number),
+          Ghi chú
+  - Note đặc biệt: % Hỗ trợ CĐ có thể là "10% tiền lương theo bậc" (không phải số đơn thuần)
+  - Grid + Buttons
+  - Data từ MOCK.lsp.hoTroCD
+
+lsp/pg9-he-so-hs123.html (từ id="pg9")
+  - Form: Tháng, Công ty, ĐV cấp 1–6, Bộ phận, HS1(%), HS2(%), HS3(%), Ghi chú
+  - Validation: HS âm → blocking; > 200% → confirm; = 0 → confirm
+  - Trùng Tháng + Bộ phận → confirm ghi đè
+  - Grid + Modal Import
+  - Data từ MOCK.lsp.heSoHS
+
+────────────────────────────────────────────────────────────────────────────────
+BATCH 3 – LNS System & Master Data (lns/)
+────────────────────────────────────────────────────────────────────────────────
+
+LƯU Ý: Các file LNS nằm trong lns/, relative path đến shared/ là ../shared/
+
+lns/sys1-tieu-chi-tim-kiem.html (từ tab-sys1 trong pg10)
+  - Form: Mã tiêu chí, Tên EN, Tên VN, Thứ tự, Fn table, Công thức (SQL textarea),
+          Kiểu dữ liệu, Ghi chú
+  - Buttons + Grid
+  - Data từ MOCK.sys.tieuChiTimKiem
+
+lns/sys2-tieu-chi-he-thong.html (từ tab-sys2)
+  - Tương tự sys1 với cấu trúc tiêu chí hệ thống
+  - Data từ MOCK.sys.tieuChiHeThong
+
+lns/sys3-tieu-chi-tinh-toan.html (từ tab-sys3)
+  - Form có thêm Rank field (thứ tự ưu tiên tính toán)
+  - Data từ MOCK.sys.tieuChiTinhToan
+
+lns/sys4-cong-thuc-luong.html (từ tab-sys4)
+  - Giao diện cấu hình công thức động 4 lớp
+  - Giữ nguyên hoàn toàn UI hiện tại
+
+lns/dm1-tien-trinh.html (từ tab-dm1)
+  - Grid: Mã TT, Tên VN, Tên EN, Ghi chú, Sử dụng
+  - Import/Export
+  - Data từ MOCK.tienTrinh
+
+lns/dm2-cong-doan.html (từ tab-dm2)
+  - Grid: Checkbox, Sửa, STT, Mã CĐ, Tên VN, Tên EN, Tiến trình, ĐVT, Ghi chú, Sử dụng
+  - Import có rule BR-CD-01:
+      ĐV cấp 3 tồn tại + Mã CĐ tồn tại → UPDATE
+      ĐV cấp 3 tồn tại + Mã CĐ chưa tồn tại → INSERT
+      ĐV cấp 3 KHÔNG tồn tại → DỪNG TOÀN BỘ file (hiển thị lỗi đỏ)
+  - Data từ MOCK.congDoan
+
+lns/tl1-bp-theo-cd.html (từ tab-tl1)
+  - Form: Ngày hiệu lực, Công ty, ĐV cấp 1–7, Bộ phận, Công đoạn,
+          radio Loại (Làm chính / Làm dùm)
+  - Khi chọn "Làm dùm": enable dropdown "Bộ phận làm dùm cho"
+  - Khi chọn "Làm chính": disable dropdown trên
+  - Grid: Ngày HLực, Công ty, Bộ phận, Công đoạn, Loại, BP làm dùm cho
+
+────────────────────────────────────────────────────────────────────────────────
+BATCH 4 – LNS Functions (lns/)
+────────────────────────────────────────────────────────────────────────────────
+
+lns/fn1-tao-ky-lns.html (từ tab-fn1)
+  - Form: Tháng tính (MM/yyyy), Từ ngày (auto-fill), Đến ngày (auto-fill), Ghi chú
+  - Ràng buộc: Kỳ LNS phải tạo TRƯỚC khi nhập bất kỳ dữ liệu nào
+  - Grid: Checkbox, Sửa, STT, Tháng, Từ ngày, Đến ngày, Ghi chú, Người tạo, Thời gian
+  - Data từ MOCK.lns.kyLuong
+
+lns/fn2-cong-thuc-te.html (từ tab-fn2)
+  - Button: "Cập nhật dữ liệu chấm công" (sync từ Tổng hợp Chấm công)
+  - Grid: STT, Mã NV/Họ tên, BP/Ka/Bàn, Ngày công thực tế, Nguồn dữ liệu
+  - Data từ MOCK.lns.congThucTe
+
+lns/fn3-he-so-thang.html (từ tab-fn3)
+  - Filter 6 cột + Tình trạng làm việc + Kỳ tháng
+  - Buttons: Tìm, Làm mới, Thêm mới, Xóa, Nhập (Import Excel), Xuất
+  - Modal Thêm/Sửa: Tháng (bắt buộc), Mã NV (bắt buộc), Tên NV (auto-load khi blur),
+                    % Hệ số (0–200%, để trống = 100%), Ghi chú
+  - Import: Upsert theo Mã NV + Kỳ; % để trống → không ghi đè
+  - Data từ MOCK.lns.heSoThang
+
+lns/fn4-bo-sung-pv.html (từ tab-fn4)
+  - Form: Tháng (kỳ NS), ĐV cấp 1–7, Bộ phận, % Bổ sung PV,
+          radio Loại NV (Chỉ PV / Cả SX và PV), Ghi chú
+  - Grid: STT, Tháng, ĐV1-7, Bộ phận, % PV, Loại NV áp dụng, Ghi chú
+  - Data từ MOCK.lns.boSungPV
+
+lns/fn5-nhap-ns-thuc-te.html (từ tab-fn5)
+  - Nhập NSTT theo từng CĐ, từng ngày, theo BP/Ka/Bàn
+  - Fields chi tiết: Ngày làm việc, Công đoạn (auto từ thiết lập CĐ theo BP),
+                     NS Trong ca, NS Ca đêm, NS Tăng ca, NS Tăng ca đêm, Tổng NS (auto)
+  - Validation: NS < 0 → blocking; ngày ngoài kỳ → blocking; đã khóa → blocking
+  - Import: Template bắt buộc Tháng + Bộ phận/Ka/Bàn + Ngày + Mã CĐ + NS Trong ca
+  - Data từ MOCK.lns.nsThucTe
+
+lns/fn6-tinh-lns.html
+  ĐÃ TẠO Ở SESSION 3, BATCH 1B.
+  KHÔNG tạo lại. Chỉ kiểm tra lần cuối theo checklist Session 3.
+
+lns/fn8-mo-khoa-lns.html (từ tab-fn8)
+  - Filter đầy đủ: Mã NV, Tên NV, Công ty, ĐV cấp 1–7, Bộ phận, Vị trí CV,
+                   Tình trạng, Tháng/Năm, Danh sách mã NV (textarea), Khóa phiếu lương
+  - Buttons: Tìm, Làm mới, Mở khóa, Xuất + checkbox "Mở khóa tất cả theo điều kiện lọc"
+  - Grid: Checkbox, STT, Trạng thái, Tháng, Mã NV, Tên NV, Vị trí CV, ĐV cấp 1–3
+  - Modal xác nhận: textarea lý do bắt buộc + warning "Kỳ này đã được LSP sử dụng"
+  - Data từ MOCK.lns.moKhoa
+
+CHECKLIST BATCH 2–4:
+□ pg6 Tab 3: Nhập HS1 = -5 → blocking error; HS1 = 250 → confirm warning
+□ pg8: Nhập % Hỗ trợ dạng "10% tiền lương theo bậc" → lưu được (text field)
+□ dm2: Click Import → modal hiển thị rule BR-CD-01 với dòng ĐỎ về dừng toàn bộ
+□ tl1: Chọn "Làm dùm" → dropdown "Bộ phận làm dùm cho" enable
+□ tl1: Chọn "Làm chính" → dropdown đó disable trở lại
+□ fn3: Nhập mã NV → blur → auto-fill tên NV
+□ fn3: % Hệ số để trống → hiển thị "(mặc định 100%)" hoặc tooltip
+□ fn8: Chọn 0 dòng + bỏ check "Mở khóa tất cả" → click Mở khóa → warning
+□ fn8: Điền lý do mở khóa → confirm → audit log hiển thị trong alert
+
+================================================================================
+SESSION 5: QA TỔNG THỂ & UX ENHANCEMENTS
+================================================================================
+[Ưu tiên: SHOULD HAVE | Thực hiện sau Session 4 hoàn tất]
+
+MỤC TIÊU SESSION 5:
+1. Kiểm tra toàn bộ prototype
+2. Fix các lỗi phát hiện
+3. Bổ sung UX features phục vụ thẩm định khách hàng
+
+────────────────────────────────────────────────────────────────────────────────
+TASK 5.1 – QA Checklist tổng thể
+────────────────────────────────────────────────────────────────────────────────
+
+Mở từng file trong danh sách sau và kiểm tra theo checklist:
+
+VISUAL CONSISTENCY (kiểm tra bằng mắt):
+□ Font chữ: tất cả pages dùng Arial 12–13px
+□ Table header: tất cả #f4d03f (vàng đồng)
+□ Button màu sắc khớp design token
+□ Badge: Locked=#dc3545, Draft=#6c757d, Preview=#007bff
+□ Row locked: bg #d1d1d1, italic, color #777
+□ Alert box: tự ẩn sau 4 giây (success/warning), không tự ẩn (error)
+□ Modal: border-radius, shadow, header color nhất quán
+
+FUNCTIONAL (test từng case):
+□ Filter: nhập text → click Tìm Kiếm → grid giả lập filter
+□ Thêm mới: click → modal mở → điền form → Lưu → row xuất hiện trong grid
+□ Sửa: click ✎ → modal mở với data đúng dòng → sửa → Lưu → grid cập nhật
+□ Xóa: chọn 0 dòng → click Xóa → alert error "Vui lòng chọn..."
+□ Xóa: chọn dòng đã khóa → alert blocking "Dữ liệu đang được khóa"
+□ Xóa: chọn dòng chưa khóa → confirm → xóa thành công
+□ Import modal: file upload present, template link present, rules hiển thị
+□ Xuất dữ liệu: click → alert success (giả lập)
+□ Validation month format: nhập "13/2026" → báo lỗi format
+□ Validation month format: nhập "06-2026" → báo lỗi format
+□ Validation month format: nhập "06/2026" → pass
+
+NAVIGATION:
+□ Click tất cả 23 nav items → iframe load đúng page
+□ Active state hiển thị đúng sau mỗi click
+□ Topbar title cập nhật đúng
+□ F5 → khôi phục về page cuối đang xem (sessionStorage)
+
+fn6 FINAL VERIFICATION (số liệu phải chính xác):
+□ Mở lns/fn6-tinh-lns.html
+□ Tab 1 grid dòng 1 (NV001 Nguyễn Văn An): CTT=22, HST=100%, BSPV=—, CNS=22.00
+□ Tab 1 grid dòng 3 (NV003 Lê Quốc Dũng, PV): CTT=22, HST=100%, BSPV=10%, CNS=24.20
+□ Tab 1 bảng tổng hợp: Bàn 1 GiamPV=24.53, SauGiamPV=39.67
+□ Tab 2 grid dòng 1 (NV001): NSTT=500, HSLD=7.79, NS_TL=53.65
+□ Tab 2 grid dòng 3 (NV003 PV): NS_TL=9.23
+□ Collapsible row CALC-06: công thức "CNS_Ban × (CNS_PV_Ka / CNS_Ka)"
+□ Collapsible row CALC-12: công thức "(GiamPV / CNS_Ban) × CNS_NV"
+□ Bảng kết quả cuối: NV A=53.65, NV B=43.89, NV C=9.23, Tổng=194.15
+
+────────────────────────────────────────────────────────────────────────────────
+TASK 5.2 – UX Enhancements cho thẩm định khách hàng
+────────────────────────────────────────────────────────────────────────────────
+
+Sau khi QA pass, bổ sung các tính năng sau:
+
+ENHANCEMENT 1: Demo badge
+Thêm vào shared/style.css:
+  .demo-badge { position:fixed; top:8px; right:12px; z-index:9999;
+    background:#e74c3c; color:#fff; font-size:10px; font-weight:bold;
+    padding:2px 8px; border-radius:10px; letter-spacing:1px; }
+Thêm vào template chuẩn của mỗi page:
+  <div class="demo-badge">DEMO</div>
+
+ENHANCEMENT 2: Panel ghi chú nghiệp vụ
+Thêm vào cuối mỗi page (trước </div><!-- container -->):
+  <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+    <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+      📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+    </div>
+    <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;
+      font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;"
+      placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+  </div>
+
+ENHANCEMENT 3: Nút Print màn hình
+Thêm vào topbar trong index.html:
+  <button onclick="document.getElementById('main-frame').contentWindow.print()"
+    style="background:#6c757d;color:#fff;border:none;padding:4px 12px;
+    border-radius:3px;cursor:pointer;font-size:11px;font-weight:bold;">
+    🖨 In màn hình
+  </button>
+
+ENHANCEMENT 4: Tooltip "Need Confirm" cho fn6
+Thêm badge đỏ cạnh các bước CALC-06, CALC-08 trong collapsible:
+  <span style="background:#dc3545;color:#fff;font-size:9px;padding:1px 5px;
+    border-radius:8px;margin-left:6px;">Need Confirm</span>
+Cụ thể:
+  - CALC-06: "Need Confirm OP-03: % BSPV áp dụng theo Bàn, Ka, hay Bộ phận?"
+  - CALC-08: "Need Confirm OP-08: NSTT nhập theo ngày hay tổng tháng?"
+
+ENHANCEMENT 5: Popup "Ví dụ A đầy đủ" cho fn6
+Thêm nút cạnh bảng kết quả cuối trong collapsible:
+  <button onclick="showModal('fn6-vidu-modal')" style="...">
+    📊 Xem Ví dụ A đầy đủ (Ka Sáng, BP PTO, CD001)
+  </button>
+Modal hiển thị 3 bảng:
+  Bảng 1 – Input CNS theo NV (6 NV A–F)
+  Bảng 2 – Tính trung gian Bàn/Ka (GiamPV, SauGiamPV, NS_SauChiaPV, NS_PV)
+  Bảng 3 – Output NS tính lương (NS_TL theo từng NV, tổng 194.15 Kg)
+
+================================================================================
+CẤU TRÚC THƯ MỤC CUỐI CÙNG
+================================================================================
+
+prototype-mphg/
+│
+├── index.html                        ← Shell: sidebar + iframe
+├── nav-config.js                     ← Navigation configuration
+│
+├── shared/
+│   ├── style.css                     ← CSS dùng chung (tất cả pages)
+│   ├── utils.js                      ← JS helper functions
+│   └── mockdata.js                   ← Tất cả dữ liệu mẫu (window.MOCK)
+│
+├── lsp/                              ← Module Lương Sản Phẩm
+│   ├── pg1-tao-ky.html               ← Tạo kỳ LSP
+│   ├── pg2-tinh-lsp.html             ← Tính LSP (2 tab)
+│   ├── pg3-mo-khoa.html              ← Mở khóa LSP
+│   ├── pg4-xem-ca-nhan.html          ← Xem LSP cá nhân + Trace
+│   ├── pg5-don-gia.html              ← Thiết lập đơn giá CĐ
+│   ├── pg6-ho-tro-he-so.html         ← % Hỗ trợ & Hệ số (3 tab)
+│   ├── pg7-ho-tro-bp.html            ← % Hỗ trợ theo Bộ phận
+│   ├── pg8-ho-tro-cd.html            ← % Hỗ trợ theo CĐ/TT
+│   └── pg9-he-so-hs123.html          ← Hệ số HS1/HS2/HS3
+│
+└── lns/                              ← Module Lương Năng Suất
+    ├── sys1-tieu-chi-tim-kiem.html
+    ├── sys2-tieu-chi-he-thong.html
+    ├── sys3-tieu-chi-tinh-toan.html
+    ├── sys4-cong-thuc-luong.html
+    ├── dm1-tien-trinh.html
+    ├── dm2-cong-doan.html
+    ├── tl1-bp-theo-cd.html
+    ├── fn1-tao-ky-lns.html
+    ├── fn2-cong-thuc-te.html
+    ├── fn3-he-so-thang.html
+    ├── fn4-bo-sung-pv.html
+    ├── fn5-nhap-ns-thuc-te.html
+    ├── fn6-tinh-lns.html             ← 12 bước CALC đầy đủ, 2 sub-tabs
+    └── fn8-mo-khoa-lns.html
+
+Tổng: 1 shell + 3 shared files + 9 LSP pages + 14 LNS pages = 27 files
+
+================================================================================
+THỨ TỰ ƯU TIÊN NẾU THỜI GIAN CÓ HẠN
+================================================================================
+
+TUẦN 1 – Must Have (đủ để thẩm định khách hàng):
+  ✅ SESSION 1: Extract shared/style.css + utils.js + mockdata.js
+  ✅ SESSION 2: index.html + nav-config.js
+  ✅ SESSION 3 Batch 1A: pg1, pg2, pg3, pg4
+  ✅ SESSION 3 Batch 1B: fn6 (màn hình 12 bước đã cập nhật)
+
+TUẦN 2 – Should Have:
+  ⬜ SESSION 4 Batch 2: pg5 → pg9 (LSP Setup)
+  ⬜ SESSION 4 Batch 4: fn1 → fn5, fn8 (LNS Functions)
+
+TUẦN 3 – Nice to Have:
+  ⬜ SESSION 4 Batch 3: sys1–sys4, dm1–dm2, tl1 (LNS System & Master Data)
+  ⬜ SESSION 5: QA tổng thể + UX enhancements
+
+================================================================================
+LƯU Ý KỸ THUẬT QUAN TRỌNG
+================================================================================
+
+1. CONTEXT WINDOW:
+   File gốc 3,683 dòng có thể vượt context. Cách xử lý:
+   - Không paste cả file vào 1 lần
+   - Chỉ paste đoạn <script id="pgX">...</script> cần tách
+   - Paste Ground Rules + shared files ở đầu mỗi session mới
+
+2. RELATIVE PATHS:
+   - Pages trong lsp/ → ../shared/style.css, ../shared/utils.js, ../shared/mockdata.js
+   - Pages trong lns/ → ../shared/style.css, ../shared/utils.js, ../shared/mockdata.js
+   - index.html (root) → shared/style.css, shared/utils.js, shared/mockdata.js
+
+3. IFRAME vs SRCDOC:
+   - index.html mới dùng iframe.src = "lsp/pg1-tao-ky.html" (file thật)
+   - KHÔNG dùng srcdoc nữa
+   - Mỗi page load đầy đủ shared assets qua <link> và <script src>
+
+4. MOCKDATA SCOPE:
+   - mockdata.js khai báo window.MOCK = {...}
+   - Mỗi page gọi MOCK.lsp.donGia, MOCK.lns.nhanVien, v.v.
+   - Kiểm tra mockdata.js load trước page script (thứ tự trong <body>)
+
+5. KHÔNG CÓ BUILD STEP:
+   - Prototype này chạy bằng Live Server (VSCode) hoặc double-click
+   - Không dùng import/export ES modules (browser không hỗ trợ file://)
+   - Tất cả JS dùng var/function globals hoặc window.NAMESPACE
+
+6. TEST SAU MỖI BATCH:
+   - Mở index.html bằng Live Server
+   - Click từng nav item
+   - Kiểm tra không có lỗi console (F12 → Console tab)
+   - Kiểm tra UI khớp với file gốc
+
+================================================================================
+KẾT THÚC PROMPT
+================================================================================
+Version: 1.0
+Dự án: MPHG iHRP Prototype Lương SP & NS
+Người tạo prompt: BA Team
+File gốc: MPHG_LuongSanPham_Full.html (3,683 dòng)
+File tham khảo nghiệp vụ: HRIS_LuongNangSuat_v4_1_FINAL.docx
+================================================================================

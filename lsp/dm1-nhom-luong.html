@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Sản Phẩm</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương sản phẩm › Nhóm lương</div>
+  <div class="page-title">DANH MỤC NHÓM LƯƠNG</div>
+  <div id="dmnl-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Ngày hiệu lực</label>
+      <div class="input-wrap"><input type="text" id="dmnl_ngayhl" maxlength="10" placeholder="DD/MM/YYYY"><div class="input-note">Bắt buộc nhập dạng DD/MM/YYYY</div></div>
+      <label class="lbl-red">Mã nhóm lương</label>
+      <div class="input-wrap"><input type="text" id="dmnl_ma" maxlength="50" placeholder="Nhập mã..."><div class="input-note">Unique. Không dấu, không khoảng trắng.</div></div>
+      <label class="lbl-red">Tên tiếng Việt</label>
+      <div class="input-wrap"><input type="text" id="dmnl_tenVI" maxlength="255" placeholder="Tên tiếng Việt..."></div>
+      <label class="lbl-red">Tên tiếng Anh</label>
+      <div class="input-wrap"><input type="text" id="dmnl_tenEN" maxlength="255" placeholder="Tên tiếng Anh..."></div>
+      <label>Ghi chú</label>
+      <div class="input-wrap"><textarea id="dmnl_note" maxlength="1000" style="height:55px;"></textarea></div>
+      <label></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dmnl_use" checked> Sử dụng</label>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dmnlClear()">Làm mới</button>
+    <button class="btn-save2" onclick="dmnlSave()">Lưu</button><button class="btn-delete" onclick="dmnlDelete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dmnl-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Ngày hiệu lực</th><th>Mã nhóm lương</th><th>Tên tiếng Việt</th><th>Tên tiếng Anh</th><th>Ghi chú</th><th>Sử dụng</th></tr></thead>
+    <tbody id="dmnl-tbody">
+      <tr data-ma="NL_CHE_BIEN"><td><input type="checkbox" class="dmnl-chk"></td><td><span class="edit-icon" onclick="dmnlEdit(this)">✎</span></td><td>1</td><td style="text-align:center;">01/01/2026</td><td><b>NL_CHE_BIEN</b></td><td>Nhóm lương Chế biến</td><td>Processing Salary Group</td><td>Áp dụng cho công nhân trực tiếp chế biến</td><td style="color:green;font-weight:bold">✔</td></tr>
+      <tr data-ma="NL_PHUC_VU"><td><input type="checkbox" class="dmnl-chk"></td><td><span class="edit-icon" onclick="dmnlEdit(this)">✎</span></td><td>2</td><td style="text-align:center;">01/01/2026</td><td><b>NL_PHUC_VU</b></td><td>Nhóm lương Phục vụ</td><td>Service Salary Group</td><td></td><td style="color:green;font-weight:bold">✔</td></tr>
+      <tr data-ma="NL_VE_SINH"><td><input type="checkbox" class="dmnl-chk"></td><td><span class="edit-icon" onclick="dmnlEdit(this)">✎</span></td><td>3</td><td style="text-align:center;">01/01/2026</td><td><b>NL_VE_SINH</b></td><td>Nhóm lương Vệ sinh</td><td>Sanitation Salary Group</td><td>Nhóm tính lương vệ sinh công nghiệp</td><td style="color:#ccc;font-weight:bold">✘</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<div class="modal-overlay" id="dmnl-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC NHÓM LƯƠNG</span><button class="x" onclick="hideModal('dmnl-imp')">✕</button></div>
+  <div class="modal-body"><p style="font-size:11px;color:#555;margin-bottom:10px;"><strong style="color:red">Lưu ý:</strong> Cột bắt buộc: <b>Mã nhóm lương</b> và <b>Tên tiếng Việt</b>.</p><input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a></div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('dmnl-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('dmnl-imp');showAlert2('dmnl-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+
+const dmnlExisting = ['NL_CHE_BIEN','NL_PHUC_VU','NL_VE_SINH'];
+function dmnlClear() {
+  document.getElementById('dmnl_ngayhl').value = '';
+  document.getElementById('dmnl_ma').value = '';
+  document.getElementById('dmnl_ma').readOnly = false;
+  document.getElementById('dmnl_tenVI').value = '';
+  document.getElementById('dmnl_tenEN').value = '';
+  document.getElementById('dmnl_note').value = '';
+  document.getElementById('dmnl_use').checked = true;
+  document.getElementById('dmnl-alert').style.display = 'none';
+}
+function dmnlEdit(el) {
+  const row = el.closest('tr');
+  document.getElementById('dmnl_ngayhl').value = row.cells[3].innerText.trim();
+  document.getElementById('dmnl_ma').value = row.cells[4].innerText.trim();
+  document.getElementById('dmnl_ma').readOnly = true;
+  document.getElementById('dmnl_tenVI').value = row.cells[5].innerText;
+  document.getElementById('dmnl_tenEN').value = row.cells[6].innerText;
+  document.getElementById('dmnl_note').value = row.cells[7].innerText;
+  document.getElementById('dmnl_use').checked = row.cells[8].innerText.includes('✔');
+  window.scrollTo(0,0);
+}
+function dmnlSave() {
+  const ngayhl = document.getElementById('dmnl_ngayhl').value.trim();
+  const ma = document.getElementById('dmnl_ma').value.trim();
+  const vi = document.getElementById('dmnl_tenVI').value.trim();
+  const en = document.getElementById('dmnl_tenEN').value.trim();
+  const isEdit = document.getElementById('dmnl_ma').readOnly;
+  if (!ngayhl || !ma || !vi || !en) return showAlert2('dmnl-alert','Vui lòng nhập đầy đủ các trường bắt buộc (màu đỏ).','error');
+  if (!/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/\d{4}$/.test(ngayhl)) return showAlert2('dmnl-alert','Ngày hiệu lực phải đúng định dạng DD/MM/YYYY.','error');
+  if (!/^[a-zA-Z0-9_]+$/.test(ma)) return showAlert2('dmnl-alert','Mã nhóm lương không hợp lệ. Phải viết liền không dấu, không khoảng trắng.','error');
+  if (!isEdit && dmnlExisting.includes(ma.toUpperCase())) return showAlert2('dmnl-alert','<b>Lỗi (Blocking):</b> Mã nhóm lương ['+ma.toUpperCase()+'] đã tồn tại.','error');
+  showAlert2('dmnl-alert','Lưu Nhóm lương thành công!','success');
+  dmnlClear();
+}
+function dmnlDelete() {
+  const chks = document.querySelectorAll('.dmnl-chk:checked');
+  if (!chks.length) return showAlert2('dmnl-alert','Vui lòng chọn nhóm lương cần xóa.','error');
+  let blocked = false;
+  chks.forEach(c => { if (c.closest('tr').getAttribute('data-ma') === 'NL_CHE_BIEN') { showAlert2('dmnl-alert','<b>Lỗi (Blocking):</b> Nhóm lương [NL_CHE_BIEN] đang được sử dụng. Không thể xóa.','error'); blocked = true; } });
+  if (!blocked && confirm('Bạn có chắc muốn xóa?')) showAlert2('dmnl-alert','Đã xóa nhóm lương thành công.','success');
+}
+
+  </script>
+</body>
+</html>

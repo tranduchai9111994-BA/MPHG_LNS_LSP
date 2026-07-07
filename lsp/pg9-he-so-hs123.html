@@ -1,0 +1,455 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập hệ số điều chỉnh lần 1</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+        input[type="radio"] { width: 14px; height: 14px; margin: 0 4px 0 0; vertical-align: middle; }
+        .pg9-sdd{position:relative;display:inline-block;width:100%}
+        .pg9-sdd input.pg9-sdd-input{width:100%;box-sizing:border-box;padding:6px 28px 6px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px}
+        .pg9-sdd .pg9-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:10px;color:#666}
+        .pg9-sdd .pg9-list{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #ccc;border-top:none;max-height:200px;overflow-y:auto;z-index:100;border-radius:0 0 4px 4px;box-shadow:0 4px 8px rgba(0,0,0,.15)}
+        .pg9-sdd .pg9-list.show{display:block}
+        .pg9-sdd .pg9-item{padding:6px 10px;cursor:pointer;font-size:12px}
+        .pg9-sdd .pg9-item:hover{background:#e3f2fd}
+        .pg9-sdd .pg9-item.selected{background:#bbdefb;font-weight:bold}
+    </style>
+</head>
+<body>
+<div class="top-header">
+    <div class="logo"><span style="font-size: 24px; color: #e74c3c;">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+        <span>🇻🇳 VN ⌄</span>
+        <span>🔔 <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">6</span></span>
+        <span>✉ <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">45</span></span>
+        <span style="font-size: 11px; text-align: right; line-height: 1.2;">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+</div>
+<div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a><a href="#">Bảo hiểm</a>
+    <a href="#" class="active">Lương</a><a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+</div>
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rsaquo; Thiết lập &rsaquo; Hệ số điều chỉnh lần 1</div>
+    <div class="page-title">THIẾT LẬP HỆ SỐ ĐIỀU CHỈNH LẦN 1</div>
+    <div class="info-bar">
+        <strong>❓ Need Confirm OP-16:</strong> TongHS = HS1 × HS2 × HS3 × (1 + %HoTroBP). MPHG có muốn %HoTroBP nhân vào TongHS (và từ đó nhân lên HoTroCĐ) không? Hay HoTroCĐ chỉ dùng HS1 × HS2 × HS3 thuần? Có nguy cơ double-count. Đây là OP BLOCKING – không code formula engine khi chưa confirm.
+    </div>
+    <div id="alertBox" class="alert-box"></div>
+    <div class="form-panel">
+        <div class="form-body">
+            <div>
+                <input type="hidden" id="txtEditId">
+                <div class="field-row"><label class="text-red">Từ tháng</label><input type="text" id="txtThang" placeholder="MM/yyyy" value="06/2026"></div>
+                <div class="field-row"><label class="text-red">Công ty</label>
+                    <div class="pg9-sdd" id="ddCongTy"><input type="text" class="pg9-sdd-input" id="txtCongTy" value="Công Ty CP Thủy Sản MPHG" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listCongTy"></div></div>
+                    <input type="hidden" id="cboCongTy" value="MPHG">
+                </div>
+                <div class="field-row"><label>Đơn vị cấp 1</label>
+                    <div class="pg9-sdd" id="ddDv1"><input type="text" class="pg9-sdd-input" id="txtDv1" placeholder="-- Tất cả --" value="Khối Sản Xuất" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listDv1"></div></div>
+                    <input type="hidden" id="cboDv1" value="Khối Sản Xuất">
+                </div>
+                <div class="field-row"><label>Đơn vị cấp 3</label>
+                    <div class="pg9-sdd" id="ddDv3"><input type="text" class="pg9-sdd-input" id="txtDv3" placeholder="-- Tất cả --" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listDv3"></div></div>
+                    <input type="hidden" id="cboDv3">
+                </div>
+                <div class="field-row"><label>Đơn vị cấp 5</label>
+                    <div class="pg9-sdd" id="ddDv5"><input type="text" class="pg9-sdd-input" id="txtDv5" placeholder="-- Tất cả --" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listDv5"></div></div>
+                    <input type="hidden" id="cboDv5">
+                </div>
+            </div>
+            <div>
+                <div class="field-row"><label>Đến tháng</label><input type="text" id="txtDenThang" placeholder="MM/yyyy" value=""></div>
+                <div class="field-row"><label>&nbsp;</label><span></span></div>
+                <div class="field-row"><label>Đơn vị cấp 2</label>
+                    <div class="pg9-sdd" id="ddDv2"><input type="text" class="pg9-sdd-input" id="txtDv2" placeholder="-- Tất cả --" value="Nhà máy 1" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listDv2"></div></div>
+                    <input type="hidden" id="cboDv2" value="Nhà máy 1">
+                </div>
+                <div class="field-row"><label>Đơn vị cấp 4</label>
+                    <div class="pg9-sdd" id="ddDv4"><input type="text" class="pg9-sdd-input" id="txtDv4" placeholder="-- Tất cả --" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listDv4"></div></div>
+                    <input type="hidden" id="cboDv4">
+                </div>
+                <div class="field-row"><label>Đơn vị cấp 6</label>
+                    <div class="pg9-sdd" id="ddDv6"><input type="text" class="pg9-sdd-input" id="txtDv6" placeholder="-- Tất cả --" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listDv6"></div></div>
+                    <input type="hidden" id="cboDv6">
+                </div>
+                <div class="field-row">
+                    <label>Nhóm tính lương</label>
+                    <div class="pg9-sdd" id="ddBoPhan"><input type="text" class="pg9-sdd-input" id="txtBoPhan" placeholder="-- Chọn Nhóm tính lương --" autocomplete="off"><span class="pg9-arrow">&#9660;</span><div class="pg9-list" id="listBoPhan"></div></div>
+                    <input type="hidden" id="cboBoPhan">
+                </div>
+            </div>
+            <div class="hs-row" style="flex-wrap: wrap;">
+                <div class="hs-field">
+                    <label>Loại ĐC</label>
+                    <div style="display:inline-flex; align-items:center; gap: 10px;">
+                        <label style="width:auto; font-weight:normal;"><input type="radio" name="loaiHS1" value="%" checked onchange="calcHS()"> %</label>
+                        <label style="width:auto; font-weight:normal;"><input type="radio" name="loaiHS1" value="$" onchange="calcHS()"> Tiền</label>
+                    </div>
+                </div>
+                <div class="hs-field">
+                    <label>Hướng</label>
+                    <div style="display:inline-flex; align-items:center; gap: 10px;">
+                        <label style="width:auto; font-weight:normal;"><input type="radio" name="huongHS1" value="Tăng" checked onchange="calcHS()"> Tăng (+)</label>
+                        <label id="lblHuongGiam" style="width:auto; font-weight:normal; color:#ccc;"><input type="radio" name="huongHS1" id="radHuongGiam" value="Giảm" onchange="calcHS()" disabled> Giảm (–)</label>
+                    </div>
+                </div>
+                <div class="hs-field">
+                    <label>Giá trị điều chỉnh</label>
+                    <input type="number" id="txtHS1" value="0" min="0" step="any" title="Chỉ nhập số (số thập phân dùng dấu chấm)" style="width: 100px;" onkeyup="calcHS()" onchange="calcHS()" oninput="this.value=this.value.replace(/[^0-9.]/g,'')">
+                </div>
+                <div class="hs-field" style="min-width: 100px;">
+                    <label>Hệ số quy đổi:</label>
+                    <span id="lblHsQuyDoi" style="font-weight: bold; color: #2e7d32; margin-left: 5px;">0%</span>
+                </div>
+                <div class="hs-field" style="flex: 2;">
+                    <label style="width: 60px;">Ghi chú</label>
+                    <input type="text" id="txtGhiChu" placeholder="Nhập ghi chú...">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions-bar">
+        <button class="btn-calc" style="background-color: #007bff; color: white;" onclick="timKiem()">Tìm kiếm</button>
+        <button class="btn-refresh" onclick="clearForm()">Làm mới</button>
+        <button class="btn-save" onclick="saveData()">Lưu dữ liệu</button>
+        <button class="btn-delete" onclick="deleteData()">Xóa</button>
+        <button class="btn-export">Xuất dữ liệu</button>
+        <button class="btn-import">Nhập dữ liệu</button>
+    </div>
+
+
+
+    <!-- VÍ DỤ MẪU pg9 -->
+    <div style="margin-top:18px;background:#fff8f0;border:1px solid #ffcc80;border-radius:6px;padding:14px 16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead>
+                <tr style="background:#ffe0b2;">
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #ffcc80;width:30px;"><input type="checkbox" id="chkAll" onchange="toggleAll(this)"></th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #ffcc80;width:36px;">Sửa</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #ffcc80;width:36px;">STT</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #ffcc80;width:70px;">Từ tháng</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #ffcc80;width:70px;">Đến tháng</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #ffcc80;">Công ty / Đơn vị</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #ffcc80;">Nhóm tính lương</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #ffcc80;">Loại</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #ffcc80;">Hướng</th>
+                    <th style="padding:5px 8px;text-align:right;border:1px solid #ffcc80;">Giá trị điều chỉnh</th>
+                    <th style="padding:5px 8px;text-align:right;border:1px solid #ffcc80;">HS quy đổi</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #ffcc80;">Ghi chú / Lý do điều chỉnh</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<script src="../shared/mockdata.js"></script>
+
+<script src="../shared/utils.js"></script>
+<script>
+    window.onerror = function(message, source, lineno, colno, error) {
+        alert("Lỗi phần mềm: " + message + " (Dòng " + lineno + ")");
+        return false;
+    };
+    let mockData = [];
+    const tbody = document.getElementById('tableBody');
+    function renderTable() {
+        if (!tbody) {
+            alert("Lỗi: Không tìm thấy tableBody");
+            return;
+        }
+        let html = '';
+        mockData.forEach((row, index) => {
+            html += `
+                <tr>
+                    <td style="text-align:center;"><input type="checkbox" class="chk-row" data-id="${row.id}"></td>
+                    <td style="text-align:center;"><span class="edit-icon" onclick="editRow(${row.id})" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td>
+                    <td style="text-align:center;">${index + 1}</td>
+                    <td style="text-align:center;">${row.thang}</td>
+                    <td style="text-align:center;">${row.denThang || ''}</td>
+                    <td style="text-align:left;">${row.dv}</td>
+                    <td style="text-align:left; font-weight:bold;">${row.tenBp}</td>
+                    <td style="text-align:center;">${row.loai === '$' ? 'Tiền' : '%'}</td>
+                    <td style="text-align:center; color:${row.huong === 'Tăng' ? '#2e7d32' : '#d32f2f'}; font-weight:bold;">${row.huong}</td>
+                    <td style="text-align:right;">${row.giaTri.toLocaleString()}</td>
+                    <td style="text-align:right; font-weight:bold; color:${row.huong === 'Tăng' ? '#2e7d32' : '#d32f2f'};">${row.hsQuyDoi}</td>
+                    <td style="text-align:left;">${row.note}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+    function calcHS() {
+        const loai = document.querySelector('input[name="loaiHS1"]:checked').value;
+        const huong = document.querySelector('input[name="huongHS1"]:checked').value;
+        const val = parseFloat(document.getElementById('txtHS1').value) || 0;
+        let hsText = "";
+        if (loai === "%") {
+            hsText = (huong === "Tăng" ? "" : "-") + val + "%";
+        } else {
+            hsText = huong === "Tăng" ? "(+) " + val.toLocaleString() + " đ" : "(-) " + val.toLocaleString() + " đ";
+        }
+        let lbl = document.getElementById('lblHsQuyDoi');
+        lbl.innerText = hsText;
+        lbl.style.color = (huong === "Tăng") ? "#2e7d32" : "#d32f2f";
+    }
+    // Searchable dropdown data
+    const PG9_CONGTY = [{value:'MPHG',label:'MPHG - Công Ty CP Thủy Sản MPHG'}];
+    const PG9_DV1 = [{value:'Khối Sản Xuất',label:'KSX - Khối Sản Xuất'},{value:'Khối Văn Phòng',label:'KVP - Khối Văn Phòng'}];
+    const PG9_DV2 = [{value:'Nhà máy 1',label:'NM1 - Nhà máy 1'},{value:'Nhà máy 2',label:'NM2 - Nhà máy 2'},{value:'Nhà máy 3',label:'NM3 - Nhà máy 3'}];
+    const PG9_DV3 = [{value:'Phân xưởng A',label:'PXA - Phân xưởng A'},{value:'Phân xưởng B',label:'PXB - Phân xưởng B'}];
+    const PG9_DV4 = [{value:'Tổ 1',label:'T1 - Tổ 1'},{value:'Tổ 2',label:'T2 - Tổ 2'}];
+    const PG9_DV5 = [{value:'Bộ phận PTO',label:'BP_PTO - Bộ phận PTO'},{value:'Bộ phận Tẩm bột',label:'BP_TB - Bộ phận Tẩm bột'},{value:'Tổ Sơ chế chung',label:'BP_SOCHE - Tổ Sơ chế chung'}];
+    const PG9_DV6 = [{value:'Nhóm A',label:'NA - Nhóm A'},{value:'Nhóm B',label:'NB - Nhóm B'}];
+    const PG9_NHOM_TL = [{value:'Hệ số',label:'HS - Hệ số'},{value:'Bình quân',label:'BQ - Bình quân'},{value:'Năng suất',label:'NS - Năng suất'}];
+
+    function pg9InitDD(wrapperId, listId, hiddenId, inputId, items, allowEmpty) {
+        var wrapper = document.getElementById(wrapperId);
+        var listEl = document.getElementById(listId);
+        var hiddenEl = document.getElementById(hiddenId);
+        var inputEl = document.getElementById(inputId);
+        function render(filter) {
+            var f = (filter||'').toLowerCase();
+            listEl.innerHTML = '';
+            if (allowEmpty) {
+                var d0 = document.createElement('div');
+                d0.className = 'pg9-item' + (!hiddenEl.value ? ' selected' : '');
+                d0.textContent = '-- Tất cả --';
+                d0.onclick = function(){ hiddenEl.value=''; inputEl.value=''; listEl.classList.remove('show'); };
+                listEl.appendChild(d0);
+            }
+            items.filter(function(it){return !f || it.label.toLowerCase().indexOf(f)>=0 || it.value.toLowerCase().indexOf(f)>=0;}).forEach(function(it){
+                var div = document.createElement('div');
+                div.className = 'pg9-item' + (hiddenEl.value===it.value?' selected':'');
+                div.textContent = it.label;
+                div.onclick = function(){ hiddenEl.value=it.value; inputEl.value=it.label; listEl.classList.remove('show'); };
+                listEl.appendChild(div);
+            });
+        }
+        inputEl.addEventListener('focus', function(){ render(inputEl.value); listEl.classList.add('show'); });
+        inputEl.addEventListener('input', function(){ render(inputEl.value); listEl.classList.add('show'); });
+        document.addEventListener('click', function(e){ if(!wrapper.contains(e.target)) listEl.classList.remove('show'); });
+    }
+
+    // Init all dropdowns on load
+    setTimeout(function(){
+        pg9InitDD('ddCongTy','listCongTy','cboCongTy','txtCongTy',PG9_CONGTY,false);
+        pg9InitDD('ddDv1','listDv1','cboDv1','txtDv1',PG9_DV1,true);
+        pg9InitDD('ddDv2','listDv2','cboDv2','txtDv2',PG9_DV2,true);
+        pg9InitDD('ddDv3','listDv3','cboDv3','txtDv3',PG9_DV3,true);
+        pg9InitDD('ddDv4','listDv4','cboDv4','txtDv4',PG9_DV4,true);
+        pg9InitDD('ddDv5','listDv5','cboDv5','txtDv5',PG9_DV5,true);
+        pg9InitDD('ddDv6','listDv6','cboDv6','txtDv6',PG9_DV6,true);
+        pg9InitDD('ddBoPhan','listBoPhan','cboBoPhan','txtBoPhan',PG9_NHOM_TL,false);
+    },50);
+
+    let href = window.location.href;
+    let currentLan = '1';
+    if (href.includes('lan=2')) currentLan = '2';
+    else if (href.includes('lan=3')) currentLan = '3';
+    else if (href.includes('lan=4')) currentLan = '4';
+    
+    function timKiem() {
+        var tuThang = document.getElementById('txtThang').value.trim();
+        var denThang = document.getElementById('txtDenThang').value.trim();
+        if (!tuThang && !denThang) { renderTable(); showAlert("Đã tìm thấy " + mockData.length + " kết quả.", "success"); return; }
+        var filtered = mockData.filter(function(r) {
+            var t = r.thang || '';
+            if (tuThang && t < tuThang) return false;
+            if (denThang && t > denThang) return false;
+            return true;
+        });
+        var html = '';
+        filtered.forEach(function(row, index) {
+            html += '<tr>'
+                + '<td style="text-align:center;"><input type="checkbox" class="chk-row" data-id="' + row.id + '"></td>'
+                + '<td style="text-align:center;"><span class="edit-icon" onclick="editRow(' + row.id + ')" style="cursor:pointer; color:#007bff; font-weight:bold;">&#9998;</span></td>'
+                + '<td style="text-align:center;">' + (index + 1) + '</td>'
+                + '<td style="text-align:center;">' + row.thang + '</td>'
+                + '<td style="text-align:center;">' + (row.denThang || '') + '</td>'
+                + '<td style="text-align:left;">' + row.dv + '</td>'
+                + '<td style="text-align:left; font-weight:bold;">' + row.tenBp + '</td>'
+                + '<td style="text-align:center;">' + (row.loai === '$' ? 'Tiền' : '%') + '</td>'
+                + '<td style="text-align:center; color:' + (row.huong === 'Tăng' ? '#2e7d32' : '#d32f2f') + '; font-weight:bold;">' + row.huong + '</td>'
+                + '<td style="text-align:right;">' + row.giaTri.toLocaleString() + '</td>'
+                + '<td style="text-align:right; font-weight:bold; color:' + (row.huong === 'Tăng' ? '#2e7d32' : '#d32f2f') + ';">' + row.hsQuyDoi + '</td>'
+                + '<td style="text-align:left;">' + row.note + '</td>'
+                + '</tr>';
+        });
+        tbody.innerHTML = html;
+        showAlert("Tìm thấy " + filtered.length + " kết quả" + (tuThang ? " từ " + tuThang : "") + (denThang ? " đến " + denThang : ""), "success");
+    }
+
+    // Execute immediately since script is at the end of body
+    document.title = `Thiết lập hệ số điều chỉnh lần ${currentLan}`;
+    document.querySelector('.breadcrumb').innerHTML = `Lương sản phẩm &rsaquo; Thiết lập &rsaquo; Hệ số điều chỉnh lần ${currentLan}`;
+    document.querySelector('.page-title').innerText = `THIẾT LẬP HỆ SỐ ĐIỀU CHỈNH LẦN ${currentLan}`;
+    if (currentLan === '1') {
+        mockData = [
+            { id: 1, thang: "06/2026", denThang: "12/2026", dv: "Khối Sản Xuất", bp: "Hệ số", tenBp: "Tổ Phile 1", loai: "%", huong: "Tăng", giaTri: 15, hsQuyDoi: "15%", note: "Đạt năng suất vượt mức (Tăng %)" },
+            { id: 2, thang: "06/2026", denThang: "", dv: "Khối Sản Xuất", bp: "Bình quân", tenBp: "Tổ Phile 2", loai: "%", huong: "Giảm", giaTri: 5, hsQuyDoi: "-5%", note: "Nghỉ ca nhiều (Giảm %)" },
+            { id: 3, thang: "06/2026", denThang: "09/2026", dv: "Nhà máy 1", bp: "Khác", tenBp: "Kho Lạnh", loai: "$", huong: "Tăng", giaTri: 500000, hsQuyDoi: "(+) 500,000 đ", note: "Thưởng làm thêm giờ (Tăng tiền)" },
+            { id: 4, thang: "06/2026", denThang: "", dv: "Khối Sản Xuất", bp: "Bình quân", tenBp: "Tổ Đóng Gói 2", loai: "$", huong: "Giảm", giaTri: 1000000, hsQuyDoi: "(-) 1,000,000 đ", note: "Trừ tiền do làm hỏng hàng (Giảm tiền)" }
+        ];
+    } else if (currentLan === '2') {
+        mockData = [
+            { id: 1, thang: "06/2026", dv: "Khối Sản Xuất", bp: "Hệ số", tenBp: "Tổ Sơ chế", loai: "%", huong: "Tăng", giaTri: 10, hsQuyDoi: "10%", note: "Chất lượng ca làm việc tốt, chuyên cần (Tăng %)" },
+            { id: 2, thang: "06/2026", dv: "Khối Sản Xuất", bp: "Bình quân", tenBp: "Tổ Đóng Gói 1", loai: "%", huong: "Giảm", giaTri: 5, hsQuyDoi: "-5%", note: "Nghỉ ca nhiều (Giảm %)" },
+            { id: 3, thang: "06/2026", dv: "Nhà máy 1", bp: "Khác", tenBp: "Tổ Kho", loai: "$", huong: "Tăng", giaTri: 300000, hsQuyDoi: "(+) 300,000 đ", note: "Thưởng làm thêm giờ (Tăng tiền)" },
+            { id: 4, thang: "06/2026", dv: "Khối Sản Xuất", bp: "Bình quân", tenBp: "Tổ Phile 2", loai: "$", huong: "Giảm", giaTri: 500000, hsQuyDoi: "(-) 500,000 đ", note: "Trừ tiền do vi phạm quy định (Giảm tiền)" }
+        ];
+    } else if (currentLan === '3') {
+        mockData = [
+            { id: 1, thang: "06/2026", dv: "Khối Sản Xuất", bp: "Hệ số", tenBp: "Tổ Phile 1", loai: "%", huong: "Tăng", giaTri: 8, hsQuyDoi: "8%", note: "Đạt chuẩn an toàn vệ sinh (Tăng %)" },
+            { id: 3, thang: "06/2026", dv: "Nhà máy 1", bp: "Khác", tenBp: "Vận chuyển", loai: "$", huong: "Tăng", giaTri: 400000, hsQuyDoi: "(+) 400,000 đ", note: "Thưởng chạy vượt chuyến (Tăng tiền)" }
+        ];
+    } else {
+        mockData = [
+            { id: 1, thang: "06/2026", dv: "Khối Sản Xuất", bp: "Hệ số", tenBp: "Tổ Sơ chế", loai: "%", huong: "Tăng", giaTri: 5, hsQuyDoi: "5%", note: "Tăng do thời tiết khó khăn (Tăng %)" },
+            { id: 3, thang: "06/2026", dv: "Nhà máy 1", bp: "Khác", tenBp: "Tổ Kho", loai: "$", huong: "Tăng", giaTri: 150000, hsQuyDoi: "(+) 150,000 đ", note: "Thưởng lễ (Tăng tiền)" }
+        ];
+    }
+    
+    // Đảm bảo DOM load xong mới render để an toàn
+    setTimeout(() => {
+        if (currentLan === '4') {
+            document.getElementById('radHuongGiam').disabled = true;
+            document.getElementById('lblHuongGiam').style.color = '#ccc';
+            document.getElementById('noteHuongGiam').style.display = 'block';
+        } else {
+            document.getElementById('radHuongGiam').disabled = false;
+            document.getElementById('lblHuongGiam').style.color = 'inherit';
+            document.getElementById('noteHuongGiam').style.display = 'none';
+        }
+        renderTable();
+        // Cố tình show thông báo để kiểm tra xem script có chạy thành công không
+        showAlert("Hệ thống đã nạp " + mockData.length + " dòng dữ liệu mẫu.", "success");
+    }, 100);
+    function toggleAll(source) {
+        let checkboxes = document.querySelectorAll('.chk-row');
+        for(let i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = source.checked; }
+    }
+    function showAlert(msg, type) {
+        const box = document.getElementById('alertBox');
+        box.style.display = 'block';
+        box.className = `alert-box alert-${type}`;
+        box.innerHTML = msg;
+        setTimeout(() => { box.style.display = 'none'; }, 5000);
+    }
+    function prepareAdd() {
+        clearForm();
+        showAlert("Vui lòng nhập thông tin và bấm 'Lưu dữ liệu' để thêm mới.", "success");
+        document.getElementById('txtThang').focus();
+    }
+    function clearForm() {
+        document.getElementById('txtEditId').value = '';
+        document.getElementById('txtThang').value = '06/2026';
+        document.getElementById('cboBoPhan').value = '';
+        document.getElementById('txtBoPhan').value = '';
+        document.getElementById('txtHS1').value = '0';
+        document.querySelector('input[name="loaiHS1"][value="%"]').checked = true;
+        document.querySelector('input[name="huongHS1"][value="Tăng"]').checked = true;
+        document.getElementById('lblHsQuyDoi').innerText = '100%';
+        document.getElementById('txtGhiChu').value = '';
+        document.getElementById('alertBox').style.display = 'none';
+    }
+    function editRow(id) {
+        const row = mockData.find(x => x.id === id);
+        if(row) {
+            document.getElementById('txtEditId').value = row.id;
+            document.getElementById('txtThang').value = row.thang;
+            document.getElementById('cboBoPhan').value = row.bp;
+            var matchBp = PG9_NHOM_TL.find(function(x){return x.value===row.bp;});
+            document.getElementById('txtBoPhan').value = matchBp ? matchBp.label : row.bp;
+            document.getElementById('txtHS1').value = row.giaTri;
+            if (row.loai === '$') {
+                document.querySelector('input[name="loaiHS1"][value="$"]').checked = true;
+            } else {
+                document.querySelector('input[name="loaiHS1"][value="%"]').checked = true;
+            }
+            if (row.huong === 'Giảm') {
+                document.querySelector('input[name="huongHS1"][value="Giảm"]').checked = true;
+            } else {
+                document.querySelector('input[name="huongHS1"][value="Tăng"]').checked = true;
+            }
+            document.getElementById('txtGhiChu').value = row.note;
+            calcHS();
+            window.scrollTo(0, 0);
+            showAlert("Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu dữ liệu'.", "success");
+        }
+    }
+    function saveData() {
+        const id = document.getElementById('txtEditId').value;
+        const thang = document.getElementById('txtThang').value.trim();
+        const bp = document.getElementById('cboBoPhan').value;
+        const tenBp = document.getElementById('txtBoPhan').value || bp;
+        const giaTriStr = document.getElementById('txtHS1').value.trim();
+        const loai = document.querySelector('input[name="loaiHS1"]:checked').value;
+        const huong = document.querySelector('input[name="huongHS1"]:checked').value;
+        const giaTri = parseFloat(giaTriStr) || 0;
+        const hsQuyDoi = document.getElementById('lblHsQuyDoi').innerText;
+        const note = document.getElementById('txtGhiChu').value.trim();
+
+        const dv5 = document.getElementById('cboDv5').value;
+        if (!thang) { showAlert("Vui lòng nhập đầy đủ trường bắt buộc: Tháng tính.", "error"); return; }
+        if (giaTri < 0) { showAlert("Lỗi (Blocking): Giá trị không thể âm.", "error"); return; }
+        if (loai === "%" && huong === "Giảm" && giaTri > 100) {
+            showAlert("Lỗi (Blocking): Điều chỉnh giảm vượt 100% sẽ tạo ra lương âm. Vui lòng kiểm tra.", "error"); return;
+        }
+        if (giaTri === 0) {
+            if(!confirm("Cảnh báo: Giá trị = 0 không tạo ra điều chỉnh. Hệ số sẽ = 100%. Tiếp tục lưu?")) { showAlert("Đã hủy thao tác lưu.", "warning"); return; }
+        }
+        
+        if (id) {
+            const item = mockData.find(x => x.id == id);
+            if(item) {
+                item.thang = thang; item.bp = bp; item.tenBp = tenBp; item.loai = loai; item.huong = huong; item.giaTri = giaTri; item.hsQuyDoi = hsQuyDoi; item.note = note;
+                showAlert("Đã cập nhật hệ số thành công!", "success");
+            }
+        } else {
+            const exists = mockData.find(x => x.bp === bp && x.thang === thang);
+            if(exists) {
+                if(confirm(`Đã có hệ số điều chỉnh lần ${currentLan} cho nhóm này trong tháng ${thang}. Cập nhật?`)) {
+                    exists.loai = loai; exists.huong = huong; exists.giaTri = giaTri; exists.hsQuyDoi = hsQuyDoi; exists.note = note;
+                    showAlert("Đã cập nhật đè thiết lập thành công.", "success");
+                } else { return; }
+            } else {
+                const newId = mockData.length > 0 ? Math.max(...mockData.map(d => d.id)) + 1 : 1;
+                mockData.push({ id: newId, thang: thang, dv: "Khối Sản Xuất", bp: bp, tenBp: tenBp, loai: loai, huong: huong, giaTri: giaTri, hsQuyDoi: hsQuyDoi, note: note });
+                showAlert("Đã thêm mới thiết lập thành công!", "success");
+            }
+        }
+        renderTable();
+        clearForm();
+    }
+    function deleteData() {
+        const checkboxes = document.querySelectorAll('.chk-row:checked');
+        if (checkboxes.length === 0) { showAlert("Vui lòng chọn dòng cần xóa.", "warning"); return; }
+        if (confirm(`Bạn có chắc chắn muốn xóa ${checkboxes.length} dòng thiết lập hệ số này?`)) {
+            let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-id')));
+            mockData = mockData.filter(x => !selectedIds.includes(x.id));
+            renderTable();
+            document.getElementById('chkAll').checked = false;
+            showAlert("Đã xóa thiết lập thành công!", "success");
+        }
+    }
+</script>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div id="noteHuongGiam" style="margin-top: 5px; color: #d32f2f; font-size: 11px; font-style: italic;">
+        * Lưu ý: Hiện tại Minh Phú chỉ nhập các điều chỉnh Hướng "Tăng (+)". Chiều "Giảm" đang được tạm khóa trên giao diện.
+      </div>
+    </div>
+</body>
+</html>

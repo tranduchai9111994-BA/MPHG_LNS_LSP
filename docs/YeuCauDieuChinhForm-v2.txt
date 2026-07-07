@@ -1,0 +1,92 @@
+YÊU CẦU ĐIỀU CHỈNH VÀ BỔ SUNG CÁC FORM NHẬP LIỆU THEO EXCEL (MINH PHÚ HẬU GIANG - MPHG)
+=========================================================================================
+Phiên bản: v2.0 (Cập nhật bổ sung chức năng nhập năng suất theo nhân viên)
+Ngày cập nhật: 2026-06-24
+=========================================================================================
+
+MỤC 1: FORM ĐIỀU CHỈNH THEO FILE HÌNH (GIAO DIỆN CHUNG)
+-----------------------------------------------------------------------------------------
+I. Tổng quan điều chỉnh:
+1. Bổ sung mới 2 trường quan trọng: "Mã nội bộ" và "Đơn vị tính".
+2. Cấu hình Validation nghiêm ngặt cho trường "Đơn vị tính": Hệ thống tự động kiểm tra với 
+   đơn vị tính đã định nghĩa tại cấu hình Công đoạn. Nếu sai lệch (ví dụ: công đoạn là 'kg' 
+   nhưng nhập là 'con'), hệ thống bắt buộc phải hiển thị Error thông báo và CHẶN KHÔNG CHO LƯU.
+3. Chuyển đổi trường "NS Làm" thành Dropdown list hoặc Radio buttons với 4 giá trị fix cứng:
+   - 1: Trong ca
+   - 2: Ca đêm
+   - 3: Tăng ca
+   - 4: Tăng ca đêm
+
+II. Chi tiết danh sách 21 trường trên form:
+[STT] | [Tên trường] | [Định dạng / UI] | [Yêu cầu nghiệp vụ / Ghi chú] | [Dữ liệu mẫu]
+1 | STT | Text | Số thứ tự dòng | 1
+2 | Mã BP | Text | Phải tương ứng với Nhóm tính Lương | CB101 + CB102 + CB103
+3 | Ka LV | Text | Ca làm việc | 1
+4 | Ngày NL | Date Picker | Ngày nguyên liệu | 2026-05-30
+5 | Lô | Text | Mã lô sản xuất | P0
+6 | Nhóm KS | Text | Nhóm kiểm soát | N1
+7 | KL Bơ | Float | Khối lượng bơ | 222
+8 | Quy cách SX | Text | Quy cách sản xuất | LX PTO hấp vỏ
+9 | Mã nội bộ | Text | [BỔ SUNG MỚI] | (Trống)
+10 | Size nội bộ | Text | Kích cỡ nội bộ | VM 13/15 CPTO HV MTR79
+11 | Quy cách tính lương | Text | Dùng để map giá tính lương | WTHLXPTOHV0015
+12 | Ngày LV | Date Picker | Ngày làm việc | 2026-06-01
+13 | TG bắt đầu | Time Picker | Thời gian bắt đầu | 13:00:00
+14 | Ngày cân | Date Picker | Ngày thực hiện cân | 2026-06-01
+15 | Giờ cân | Time Picker | Giờ thực hiện cân | 13:24:41
+16 | gr/con | Float | Định mức gram/con | (Nhập số)
+17 | con/khay | Float | Định mức con/khay | (Nhập số)
+18 | KL | Float | Khối lượng thực tế | 14.41
+19 | Đơn vị tính | Dropdown/Text | [BỔ SUNG MỚI] Chặn lưu nếu sai đơn vị định mức | kg
+20 | NS Làm | Dropdown/Radio | Chọn 1 trong 4 ca cố định | 1
+21 | Line.Bơ | Text | Mã định danh line bơ | 2226029.15015
+
+
+MỤC 2: FORM MỚI - "NHẬP NĂNG SUẤT THỰC TẾ THEO NHÂN VIÊN"
+-----------------------------------------------------------------------------------------
+I. Tổng quan yêu cầu & Quy tắc ràng buộc logic (Validation):
+1. Tích hợp Định danh Nhân viên: Thêm "Mã NV" và "Họ và Tên". Khi nhập/chọn Mã NV, hệ thống 
+   tự động lấy lên (Read-only) Họ và Tên nhân viên tương ứng từ Master Data để tránh sai sót.
+2. Logic Cảnh báo lỗi Đơn giá (MỚI): Khi người dùng nhập Khối lượng sản phẩm thực tế lớn 
+   hơn 0 (Trường 'KL (kg)' > 0) mẻ cân đó, VÀ hệ thống kiểm tra thấy 'Đơn giá' trong danh mục 
+   cấu hình tương ứng cho quy cách/công đoạn đó đang bị TRỐNG (Null/Empty) -> Hệ thống phải 
+   bật nhãn/popup Cảnh báo (Warning) màu vàng: "Khối lượng > 0 nhưng Đơn giá danh mục đang 
+   trống. Vui lòng kiểm tra lại cấu hình đơn giá!". (Lưu ý: Chỉ cảnh báo, vẫn cho phép lưu).
+3. Logic Chặn lưu Đơn vị tính: Áp dụng tương tự Mục 1, nếu 'Đơn vị tính' nhập vào khác với 
+   định nghĩa ở Công đoạn -> Báo lỗi đỏ và CHẶN LƯU (Lock Save).
+4. Quy định trường NS Làm: Đổi thành Dropdown/Radio chọn 1 trong 4 giá trị: 1: Trong ca, 
+   2: Ca đêm, 3: Tăng ca, 4. Tăng ca đêm.
+
+II. Chi tiết danh sách 24 trường trên form chức năng theo nhân viên:
+[STT] | [Mã trường dự kiến] | [Tên giao diện] | [Kiểu dữ liệu] | [Mô tả nghiệp vụ / Mẫu dữ liệu]
+1 | stt | STT | Text/Số | Số thứ tự dòng
+2 | ma_nv | Mã NV | Text (Autocomplete) | Mã số định danh nhân viên | 1022909958
+3 | ho_ten | Họ và Tên | Text (Read-only) | Tự động hiển thị theo Mã NV | Phạm Thị Trúc Ly
+4 | ma_bp | Mã BP | Text | Đơn vị cấp 5 (Mã bộ phận tính lương) | PTO101
+5 | ten_bp | Bộ phận | Text (Read-only) | Tên bộ phận/Tổ thao tác | PTO tải 01 ka 1
+6 | ca_lv | Ka LV | Text/Số | Ca làm việc thực tế | 1
+7 | ngay_nl | Ngày NL | Date Picker | Ngày nguyên liệu | 2026-05-31
+8 | ma_lo | Lô | Text | Mã lô sản xuất | XHA2-AD thẻ
+9 | nhom_ks | Nhóm KS | Text | Nhóm kiểm soát | N1
+10 | kl_bo | KL Bơ | Float | Khối lượng bơ | 276
+11 | quycach_sx | Quy cách SX | Text | Mô tả quy cách sản xuất | Lột NO, RT, BNĐ, BK
+12 | ma_noibo | Mã nội bộ | Text | [BỔ SUNG MỚI] Phục vụ mã hóa nội bộ | (Trống)
+13 | size_noibo | Size nội bộ | Text | Kích cỡ bóc tách nội bộ | 30VTBKYD1
+14 | qc_tinhluong | QC tính lương | Combobox | Quy cách tính lương để map đơn giá | WTHLONORTL825
+15 | ngay_lv | Ngày LV | Date Picker | Ngày làm việc thực tế | 2026-06-01
+16 | tg_batdau | TG bắt đầu | Time Picker | Thời gian bắt đầu làm việc | 13:00:00
+17 | ngay_can | Ngày cân | Date Picker | Ngày tiến hành cân | 2026-06-01
+18 | gio_can | Giờ cân | Time Picker | Giờ tiến hành cân | 13:42:51
+19 | gr_con | gr/con | Float | Định mức gram/con | (Nhập số)
+20 | con_khay | con/khay | Float | Định mức con/khay | (Nhập số)
+21 | kl_kg | KL (kg) | Float | [ĐỐI CHIẾU CẢNH BÁO] Khối lượng thực tế | 2.42
+22 | dvt | Đơn vị tính | Dropdown/Text | [BỔ SUNG MỚI] Chặn lưu nếu sai đơn vị định mức | kg
+23 | ns_lam | NS Làm | Dropdown/Radio | Chọn 1 trong 4 ca cố định để map hệ số | 1
+24 | line_bo | Line.Bơ | Text | Mã định danh line bơ | 8
+
+=========================================================================================
+HƯỚNG DẪN TRIỂN KHAI CHO ĐỘI NGŨ DEV / QA:
+- Form 1 (Mục 1) dùng cho nhập liệu chung/tổng hợp theo line.
+- Form 2 (Mục 2) dùng cho màn hình Chức năng chi tiết: Nhập dữ liệu sản lượng gán trực tiếp đến từng cá nhân nhân viên.
+- Đảm bảo viết đầy đủ Listener kiểm tra Realtime cho cột KL (kg) và cột Đơn vị tính để thực hiện đúng hành vi Cảnh báo (Đơn giá trống) và Chặn lưu (Sai ĐVT).
+=========================================================================================

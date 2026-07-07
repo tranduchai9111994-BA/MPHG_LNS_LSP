@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập Đơn giá Công đoạn</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+        /* Custom styles for pg5 */
+    </style>
+</head>
+<body>
+<div class="top-header">
+    <div class="logo"><span style="font-size: 24px; color: #e74c3c;">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+        <span>🇻🇳 VN ⌄</span>
+        <span>🔔 <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">6</span></span>
+        <span>✉ <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">45</span></span>
+        <span style="font-size: 11px; text-align: right; line-height: 1.2;">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+</div>
+<div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a><a href="#">Bảo hiểm</a>
+    <a href="#" class="active">Lương</a><a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+</div>
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương &rsaquo; Thiết lập (System) &rsaquo; Thiết lập đơn giá công đoạn</div>
+    <div class="page-title">THIẾT LẬP ĐƠN GIÁ CÔNG ĐOẠN</div>
+    <div id="alertBox" class="alert-box"></div>
+    <div class="form-panel">
+
+        <div class="form-body">
+            <div>
+                <div class="field-row"><label>Tháng hiệu lực</label><input type="text" id="fltThang" placeholder="MM/yyyy" value="06/2026"></div>
+            </div>
+            <div>
+                <div class="field-row">
+                    <label>Công đoạn</label>
+                    <select id="fltCongDoan">
+                        <option value="">-- Tất cả --</option>
+                        <option value="CD001" selected>PTO Tôm Thường Size 2/4</option>
+                        <option value="CD002">PTO Tôm Thường Size 4/6</option>
+                        <option value="CD003">Tẩm bột</option>
+                        <option value="CD004">Chiên</option>
+                        <option value="CD005">Hàng virut</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VÍ DỤ MẪU -->
+    <div style="margin-top:18px;">
+        <div style="font-weight:bold;color:#856404;font-size:12px;margin-bottom:8px;">
+            📋 Dữ liệu đơn giá công đoạn minh họa
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;background:#fffbe6;border:1px solid #f0c040;">
+            <thead>
+                <tr style="background:#ffd600;color:#333;">
+                    <th style="padding:6px 10px;border:1px solid #e0b000;text-align:center;width:30px;">STT</th>
+                    <th style="padding:6px 10px;border:1px solid #e0b000;text-align:center;">Tháng</th>
+                    <th style="padding:6px 10px;border:1px solid #e0b000;text-align:center;">Mã CĐ</th>
+                    <th style="padding:6px 10px;border:1px solid #e0b000;text-align:left;">Tên Công đoạn</th>
+                    <th style="padding:6px 10px;border:1px solid #e0b000;text-align:right;">Đơn giá (VND)</th>
+                    <th style="padding:6px 10px;border:1px solid #e0b000;text-align:center;">Đơn vị</th>
+                    <th style="padding:6px 10px;border:1px solid #e0b000;text-align:left;">Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background:#fff;">
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">1</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">06/2026</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">CD001</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">PTO Tôm Thường Size 2/4</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:right;color:#c0392b;font-weight:bold;">12,500</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">Kg</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">Tôm size lớn, đơn giá cao hơn</td>
+                </tr>
+                <tr style="background:#fffef5;">
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">2</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">06/2026</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">CD002</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">PTO Tôm Thường Size 4/6</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:right;color:#c0392b;font-weight:bold;">10,800</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">Kg</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;"></td>
+                </tr>
+                <tr style="background:#fff;">
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">3</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">06/2026</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">CD003</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">Tẩm bột</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:right;color:#c0392b;font-weight:bold;">8,200</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">Kg</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">Bột mì chuẩn xuất khẩu</td>
+                </tr>
+                <tr style="background:#fffef5;">
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">4</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">06/2026</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">CD004</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">Chiên</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:right;color:#c0392b;font-weight:bold;">9,500</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">Kg</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;"></td>
+                </tr>
+                <tr style="background:#fff;">
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">5</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">06/2026</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">CD005</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">Hàng virut</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:right;color:#c0392b;font-weight:bold;">7,000</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;text-align:center;">Kg</td>
+                    <td style="padding:5px 10px;border:1px solid #f0c040;">Sản phẩm đặc thù</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="font-size:11px;color:#856404;margin-top:6px;">💡 <i>Đây là dữ liệu ví dụ minh họa. Dữ liệu thực tế được nhập hoặc import vào hệ thống.</i></div>
+    </div>
+</div>
+<div class="modal-overlay" id="addModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="modalTitle">THÊM MỚI ĐƠN GIÁ CÔNG ĐOẠN</span>
+            <button class="close-btn" onclick="closeAddModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="txtEditId">
+            <div class="field-row"><label class="text-red">Tháng hiệu lực</label><input type="text" id="txtThang" placeholder="MM/yyyy" value="01/2026"></div>
+            <div class="field-row">
+                <label class="text-red">Công đoạn</label>
+                <select id="cboCongDoan">
+                    <option value="">-- Chọn công đoạn --</option>
+                    <option value="CD001">PTO Tôm Thường Size 2/4</option>
+                    <option value="CD002">PTO Tôm Thường Size 4/6</option>
+                    <option value="CD003">Tẩm bột</option>
+                    <option value="CD004">Chiên</option>
+                    <option value="CD005">Hàng virut</option>
+                </select>
+            </div>
+            <div class="field-row"><label class="text-red">Đơn giá (VND)</label><input type="number" id="txtDonGia" placeholder="0"></div>
+            <div class="field-row"><label>Ghi chú</label><textarea id="txtGhiChu" placeholder="Nhập ghi chú (nếu có)..."></textarea></div>
+        </div>
+        <div class="modal-footer">
+            <button style="background: #e2e6ea; color: #333;" onclick="closeAddModal()">Hủy bỏ</button>
+            <button style="background: #28a745; color: white; border:none;" onclick="simulateSave()">Lưu dữ liệu</button>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="importModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>IMPORT ĐƠN GIÁ CÔNG ĐOẠN</span>
+            <button class="close-btn" onclick="closeImportModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p><strong>Quy tắc Import:</strong></p>
+            <ul style="padding-left: 20px; font-size: 11px; margin-bottom: 15px;">
+                <li>Template bắt buộc: Tháng hiệu lực, Mã công đoạn, Đơn giá. Optional: Ghi chú.</li>
+                <li>Lỗi import: Thiếu mã CĐ &rarr; lỗi dòng; Mã CĐ không tồn tại &rarr; lỗi dòng; Đơn giá không phải số &rarr; lỗi dòng.</li>
+                <li>Trùng &rarr; Ghi đè (Upsert).</li>
+            </ul>
+            <div style="margin-bottom: 15px;"><input type="file" accept=".xlsx, .xls" style="width: 100%; padding: 5px; border: 1px solid #ccc;"></div>
+            <a href="#" style="color: #0056b3; font-size: 11px; text-decoration: underline;">Tải Template Mẫu</a>
+        </div>
+        <div class="modal-footer">
+            <button style="background: #e2e6ea; color: #333;" onclick="closeImportModal()">Đóng</button>
+            <button style="background: #17a2b8; color: white; border:none;" onclick="simulateImport()">Thực hiện Import</button>
+        </div>
+    </div>
+</div>
+<script src="../shared/mockdata.js"></script>
+<script src="../shared/utils.js"></script>
+<script>
+    let sampleData = [];
+    const tbody = document.getElementById('tableBody');
+    function renderTable() {
+        tbody.innerHTML = '';
+        sampleData.forEach((row, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><input type="checkbox" class="chk-row" data-id="${row.id}"></td>
+                    <td>${index + 1}</td>
+                    <td><span class="edit-icon" onclick="editRow(${row.id})">✎</span></td>
+                    <td>${row.thang}</td>
+                    <td>${row.ma}</td>
+                    <td class="text-left">${row.ten}</td>
+                    <td class="text-right">${row.gia.toLocaleString()}</td>
+                    <td>${row.dv}</td>
+                    <td class="text-left">${row.note}</td>
+                </tr>
+            `;
+        });
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        if(window.MOCK && window.MOCK.lsp && window.MOCK.lsp.donGia) {
+            sampleData = [...window.MOCK.lsp.donGia];
+        }
+        renderTable();
+    });
+    function toggleAll(source) {
+        let checkboxes = document.querySelectorAll('.chk-row');
+        for(let i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = source.checked; }
+    }
+    function showAlert(msg, type) {
+        const box = document.getElementById('alertBox');
+        box.style.display = 'block';
+        box.className = `alert-box alert-${type}`;
+        box.innerHTML = msg;
+        window.scrollTo(0, 0);
+        setTimeout(() => { box.style.display = 'none'; }, 5000);
+    }
+    function clearFilter() {
+        document.getElementById('fltThang').value = '';
+        document.getElementById('fltCongDoan').value = '';
+    }
+    function openAddModal() {
+        document.getElementById('modalTitle').innerText = "THÊM MỚI ĐƠN GIÁ CÔNG ĐOẠN";
+        document.getElementById('txtEditId').value = "";
+        document.getElementById('txtThang').value = "01/2026";
+        document.getElementById('cboCongDoan').value = "";
+        document.getElementById('txtDonGia').value = "";
+        document.getElementById('txtGhiChu').value = "";
+        document.getElementById('addModal').style.display = 'flex';
+    }
+    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+    function editRow(id) {
+        const row = sampleData.find(x => x.id === id);
+        if(row) {
+            document.getElementById('modalTitle').innerText = "CẬP NHẬT ĐƠN GIÁ CÔNG ĐOẠN";
+            document.getElementById('txtEditId').value = row.id;
+            document.getElementById('txtThang').value = row.thang;
+            document.getElementById('cboCongDoan').value = row.ma;
+            document.getElementById('txtDonGia').value = row.gia;
+            document.getElementById('txtGhiChu').value = row.note;
+            document.getElementById('addModal').style.display = 'flex';
+        }
+    }
+    function simulateSave() {
+        const id = document.getElementById('txtEditId').value;
+        const thang = document.getElementById('txtThang').value.trim();
+        const cd = document.getElementById('cboCongDoan').value;
+        const giaStr = document.getElementById('txtDonGia').value;
+        const gia = parseFloat(giaStr);
+        const note = document.getElementById('txtGhiChu').value;
+        if(!thang || !cd || giaStr === "") { alert("Vui lòng điền đầy đủ thông tin bắt buộc: Tháng hiệu lực, Công đoạn, Đơn giá."); return; }
+        if(gia <= 0) { alert("Warning: Đơn giá bằng 0 hoặc âm. Kết quả tính lương có thể không chính xác."); }
+        if (id) {
+            const row = sampleData.find(x => x.id == id);
+            if(row) {
+                if (row.ma !== cd || row.thang !== thang) {
+                    const exists = sampleData.find(x => x.ma === cd && x.thang === thang && x.id != id);
+                    if(exists) { alert(`Đã có đơn giá cho công đoạn [${cd}] tháng [${thang}].`); return; }
+                }
+                row.thang = thang;
+                row.ma = cd;
+                row.ten = document.getElementById('cboCongDoan').options[document.getElementById('cboCongDoan').selectedIndex].text;
+                row.gia = gia;
+                row.note = note;
+                showAlert("Đã cập nhật đơn giá thành công.", "success");
+            }
+        } else {
+            const exists = sampleData.find(x => x.ma === cd && x.thang === thang);
+            if(exists) {
+                if(confirm(`Đã có đơn giá cho công đoạn [${cd}] tháng [${thang}]. Bạn có muốn cập nhật dòng hiện tại không?`)) {
+                    exists.gia = gia;
+                    exists.note = note;
+                    showAlert("Đã cập nhật đơn giá thành công.", "success");
+                } else { return; }
+            } else {
+                let tenCD = document.getElementById('cboCongDoan').options[document.getElementById('cboCongDoan').selectedIndex].text;
+                sampleData.push({ id: sampleData.length > 0 ? Math.max(...sampleData.map(d => d.id)) + 1 : 1, thang: thang, ma: cd, ten: tenCD, gia: gia, dv: "Kg", note: note });
+                showAlert("Đã thêm mới đơn giá thành công.", "success");
+            }
+        }
+        renderTable();
+        closeAddModal();
+    }
+    function simulateDelete() {
+        const checkboxes = document.querySelectorAll('.chk-row:checked');
+        if(checkboxes.length === 0) { showAlert("Vui lòng chọn đơn giá cần xóa.", "warning"); return; }
+        const isLocked = Math.random() > 0.6;
+        if(isLocked) {
+            showAlert(`Blocking Error: Đơn giá đang được sử dụng trong kỳ đã khóa (LSP Locked). Không thể xóa.`, "error");
+        } else {
+            if(confirm(`Bạn có chắc chắn muốn xóa ${checkboxes.length} dòng đơn giá này?`)) {
+                let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-id')));
+                sampleData = sampleData.filter(x => !selectedIds.includes(x.id));
+                renderTable();
+                document.getElementById('chkAll').checked = false;
+                showAlert("Đã xóa đơn giá thành công.", "success");
+            }
+        }
+    }
+    function openImportModal() { document.getElementById('importModal').style.display = 'flex'; }
+    function closeImportModal() { document.getElementById('importModal').style.display = 'none'; }
+    function simulateImport() {
+        showAlert("Import dữ liệu đơn giá thành công (giả lập).", "success");
+        closeImportModal();
+    }
+<\/script>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+</body>
+</html>

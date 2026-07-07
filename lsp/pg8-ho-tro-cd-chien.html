@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập Hỗ trợ quy cách tính lương - Độc hại chiên</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+        .pg8-searchable-dropdown{position:relative;display:inline-block;width:100%}
+        .pg8-searchable-dropdown input{width:100%;box-sizing:border-box;padding:6px 28px 6px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px}
+        .pg8-searchable-dropdown .pg8-dd-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:10px;color:#666}
+        .pg8-searchable-dropdown .pg8-dd-list{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #ccc;border-top:none;max-height:180px;overflow-y:auto;z-index:100;border-radius:0 0 4px 4px;box-shadow:0 4px 8px rgba(0,0,0,.15)}
+        .pg8-searchable-dropdown .pg8-dd-list.show{display:block}
+        .pg8-searchable-dropdown .pg8-dd-item{padding:6px 10px;cursor:pointer;font-size:12px}
+        .pg8-searchable-dropdown .pg8-dd-item:hover,.pg8-searchable-dropdown .pg8-dd-item.active{background:#e3f2fd}
+        .pg8-searchable-dropdown .pg8-dd-item.selected{background:#bbdefb;font-weight:bold}
+        .pg8-pct-wrap{position:relative}
+        .pg8-pct-wrap input{padding-right:28px}
+        .pg8-pct-wrap .pg8-pct-symbol{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-weight:bold;color:#888;pointer-events:none}
+        .pg8-confirm-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:9000;justify-content:center;align-items:center}
+        .pg8-confirm-overlay.show{display:flex}
+        .pg8-confirm-box{background:#fff;border-radius:8px;padding:24px 28px;min-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.25);text-align:center}
+        .pg8-confirm-box h3{margin:0 0 12px;font-size:15px;color:#333}
+        .pg8-confirm-box p{margin:0 0 18px;font-size:13px;color:#555}
+        .pg8-confirm-box .pg8-confirm-btns{display:flex;gap:10px;justify-content:center}
+        .pg8-confirm-box .pg8-confirm-btns button{padding:7px 22px;border:none;border-radius:4px;cursor:pointer;font-size:13px}
+        .pg8-confirm-box .btn-yes{background:#28a745;color:#fff}
+        .pg8-confirm-box .btn-no{background:#dc3545;color:#fff}
+    </style>
+</head>
+<body>
+<div class="top-header">
+    <div class="logo"><span style="font-size: 24px; color: #e74c3c;">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+        <span>&#127483;&#127475; VN &#8964;</span>
+        <span>&#128276; <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">6</span></span>
+        <span>&#9993; <span style="background: red; color: white; border-radius: 50%; padding: 1px 4px; font-size: 9px;">45</span></span>
+        <span style="font-size: 11px; text-align: right; line-height: 1.2;">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+</div>
+<div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a><a href="#">Bảo hiểm</a>
+    <a href="#" class="active">Lương</a><a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+</div>
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rsaquo; Thiết lập &rsaquo; Hỗ trợ quy cách tính lương - Độc hại chiên</div>
+    <div class="page-title">THIẾT LẬP HỖ TRỢ QUY CÁCH TÍNH LƯƠNG - ĐỘC HẠI CHIÊN</div>
+    <div id="alertBox" class="alert-box"></div>
+    <div class="form-panel">
+        <div class="form-body">
+            <div>
+                <input type="hidden" id="txtEditId">
+                <div class="field-row">
+                    <label class="text-red">Tiến trình</label>
+                    <div class="pg8-searchable-dropdown" id="ddTienTrinh">
+                        <input type="text" id="txtTienTrinh" placeholder="-- Chọn hoặc tìm Tiến trình --" autocomplete="off">
+                        <span class="pg8-dd-arrow">&#9660;</span>
+                        <div class="pg8-dd-list" id="listTienTrinh"></div>
+                    </div>
+                    <input type="hidden" id="cboTienTrinh">
+                </div>
+                <div class="field-row">
+                    <label class="text-red">Mức hỗ trợ (%)</label>
+                    <div class="pg8-pct-wrap">
+                        <input type="text" id="txtMucHoTro" placeholder="VD: 15" value="15">
+                        <span class="pg8-pct-symbol">%</span>
+                    </div>
+                </div>
+                <div class="field-row"><label>Ghi chú</label><textarea id="txtGhiChu" placeholder="Nhập ghi chú..."></textarea></div>
+                <div class="field-row"><label class="text-red">Ngày hiệu lực</label><input type="text" id="txtNgayHL" placeholder="dd/mm/yyyy" value="01/06/2026"></div>
+                <div class="field-row"><label>File đính kèm (.doc,.xls,.jpg,.pdf)</label><input type="file" id="fileDinhKem" accept=".doc,.docx,.xls,.xlsx,.jpg,.jpeg,.pdf"></div>
+            </div>
+            <div>
+                <div class="field-row">
+                    <label class="text-red">Quy cách tính lương</label>
+                    <div class="pg8-searchable-dropdown" id="ddQuyCach">
+                        <input type="text" id="txtQuyCach" placeholder="-- Chọn hoặc tìm Quy cách --" autocomplete="off">
+                        <span class="pg8-dd-arrow">&#9660;</span>
+                        <div class="pg8-dd-list" id="listQuyCach"></div>
+                    </div>
+                    <input type="hidden" id="cboQuyCach">
+                </div>
+                <div class="field-row"><label>Số thông báo</label><input type="text" id="txtSoThongBao" placeholder="Nhập số thông báo..."></div>
+                <div class="field-row"><label>Ghi chú 2</label><textarea id="txtGhiChu2" placeholder="Nhập ghi chú 2..."></textarea></div>
+                <div class="field-row"><label>Ngày kết thúc</label><input type="text" id="txtNgayKT" placeholder="dd/mm/yyyy" value=""></div>
+                <div class="field-row" style="visibility:hidden"><label>&nbsp;</label><input type="text"></div>
+            </div>
+        </div>
+    </div>
+    <div class="actions-bar">
+        <button class="btn-refresh" onclick="clearForm()">Làm mới</button>
+        <button class="btn-save" onclick="pg8SaveWithConfirm()">Lưu</button>
+        <button class="btn-delete" onclick="deleteData()">Xóa</button>
+        <button class="btn-search" onclick="pg8Search()">Tìm kiếm</button>
+        <button class="btn-export">Xuất DL</button>
+        <button class="btn-import" onclick="pg8ImportExcel()">Import Excel</button>
+    </div>
+    <div style="margin-top:18px;background:#f3f0ff;border:1px solid #b39ddb;border-radius:6px;padding:14px 16px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead>
+                <tr style="background:#d1c4e9;">
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:30px;"><input type="checkbox" id="chkAll" onchange="toggleAll(this)"></th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:30px;">Sửa</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:36px;">STT</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:90px;">Ngày hiệu lực</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:90px;">Ngày kết thúc</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;width:150px;">Tiến trình</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;">Quy cách tính lương</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:100px;">Mức hỗ trợ (%)</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;">Ghi chú</th>
+                    <th style="padding:5px 8px;text-align:left;border:1px solid #b39ddb;">Ghi chú 2</th>
+                    <th style="padding:5px 8px;text-align:center;border:1px solid #b39ddb;width:110px;">File đính kèm</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Confirm edit popup -->
+<div class="pg8-confirm-overlay" id="pg8ConfirmEdit">
+    <div class="pg8-confirm-box">
+        <h3>Xác nhận chỉnh sửa</h3>
+        <p id="pg8ConfirmMsg">Bạn có chắc chắn muốn chỉnh sửa dòng này?</p>
+        <div class="pg8-confirm-btns">
+            <button class="btn-yes" onclick="pg8ConfirmEditYes()">Đồng ý</button>
+            <button class="btn-no" onclick="pg8CloseConfirm()">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm save popup -->
+<div class="pg8-confirm-overlay" id="pg8ConfirmSave">
+    <div class="pg8-confirm-box">
+        <h3>Xác nhận lưu</h3>
+        <p>Bạn có chắc chắn muốn lưu dữ liệu này?</p>
+        <div class="pg8-confirm-btns">
+            <button class="btn-yes" onclick="pg8ConfirmSaveYes()">Đồng ý</button>
+            <button class="btn-no" onclick="document.getElementById('pg8ConfirmSave').classList.remove('show')">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+    <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        &#128203; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+    </div>
+    <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+</div>
+
+<script src="../shared/mockdata.js"></script>
+<script src="../shared/utils.js"></script>
+<script>
+let mockData = [];
+let pg8PendingEditId = null;
+
+const PG8_TIEN_TRINH = [
+    {value:'TT01', label:'TT01 - Tẩm bột'},
+    {value:'TT02', label:'TT02 - Hấp - Xuất khẩu'},
+    {value:'TT03', label:'TT03 - Sơ chế – Đóng gói'},
+    {value:'TT04', label:'TT04 - PTO (lột vỏ tôm)'},
+    {value:'TT05', label:'TT05 - Cấp đông'}
+];
+const PG8_QUY_CACH = [
+    {value:'QC01', label:'QC01 - Quy cách tính lương 1'},
+    {value:'QC02', label:'QC02 - Quy cách tính lương 2'},
+    {value:'QC03', label:'QC03 - Quy cách tính lương 3'}
+];
+
+function pg8InitDropdown(wrapperId, listId, hiddenId, textInputId, items) {
+    const wrapper = document.getElementById(wrapperId);
+    const listEl = document.getElementById(listId);
+    const hiddenEl = document.getElementById(hiddenId);
+    const inputEl = document.getElementById(textInputId);
+
+    function render(filter) {
+        const f = (filter||'').toLowerCase();
+        listEl.innerHTML = '';
+        items.filter(it => !f || it.label.toLowerCase().includes(f)).forEach(it => {
+            const div = document.createElement('div');
+            div.className = 'pg8-dd-item' + (hiddenEl.value === it.value ? ' selected' : '');
+            div.textContent = it.label;
+            div.onclick = () => { hiddenEl.value = it.value; inputEl.value = it.label; listEl.classList.remove('show'); };
+            listEl.appendChild(div);
+        });
+    }
+
+    inputEl.addEventListener('focus', () => { render(inputEl.value); listEl.classList.add('show'); });
+    inputEl.addEventListener('input', () => { render(inputEl.value); listEl.classList.add('show'); });
+    document.addEventListener('click', (e) => { if (!wrapper.contains(e.target)) listEl.classList.remove('show'); });
+}
+
+function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    mockData.forEach((row, i) => {
+        const fileBtn = row.fileName
+            ? '<button style="font-size:10px;padding:2px 8px;border:1px solid #7e57c2;background:#ede7f6;border-radius:3px;cursor:pointer" onclick="pg8ViewFile(\'' + row.fileName + '\')">&#128206; ' + row.fileName + '</button>'
+            : '<span style="color:#aaa">—</span>';
+        const bg = i % 2 === 0 ? '#fff' : '#f5f2ff';
+        tbody.innerHTML += '<tr style="background:' + bg + '">'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center"><input type="checkbox" class="chk-row" data-id="' + row.id + '"></td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center"><span style="cursor:pointer;color:#1565c0" onclick="pg8AskEdit(' + row.id + ')">&#9998;</span></td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + (i+1) + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + row.ngayHL + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + (row.ngayKT||'') + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb"><span style="color:#0d47a1;font-weight:bold">' + row.tienTrinh + '</span></td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb">' + row.quyCach + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;font-weight:bold;color:#d32f2f">' + row.mucHT + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;color:#555">' + (row.note||'') + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;color:#555">' + (row.note2||'') + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + fileBtn + '</td>'
+            + '</tr>';
+    });
+}
+
+function pg8ViewFile(name) {
+    alert('Xem / Tải file: ' + name);
+}
+
+function pg8AskEdit(id) {
+    pg8PendingEditId = id;
+    var row = mockData.find(function(x){return x.id === id;});
+    document.getElementById('pg8ConfirmMsg').textContent = 'Bạn có chắc chắn muốn chỉnh sửa dòng "' + (row ? row.tienTrinh : '') + '"?';
+    document.getElementById('pg8ConfirmEdit').classList.add('show');
+}
+
+function pg8ConfirmEditYes() {
+    document.getElementById('pg8ConfirmEdit').classList.remove('show');
+    if (pg8PendingEditId != null) editRow(pg8PendingEditId);
+    pg8PendingEditId = null;
+}
+
+function pg8CloseConfirm() {
+    document.getElementById('pg8ConfirmEdit').classList.remove('show');
+    pg8PendingEditId = null;
+}
+
+function pg8SaveWithConfirm() {
+    var ngayHL = document.getElementById('txtNgayHL').value.trim();
+    var tienTrinh = document.getElementById('cboTienTrinh').value;
+    var quyCach = document.getElementById('cboQuyCach').value;
+    var mucHT = document.getElementById('txtMucHoTro').value.trim();
+    if (!ngayHL || !tienTrinh || !quyCach || !mucHT) { showAlert("Vui lòng nhập đầy đủ các trường bắt buộc (màu đỏ).", "error"); return; }
+    document.getElementById('pg8ConfirmSave').classList.add('show');
+}
+
+function pg8ConfirmSaveYes() {
+    document.getElementById('pg8ConfirmSave').classList.remove('show');
+    saveData();
+}
+
+function pg8Search() {
+    var kw = prompt('Nhập từ khóa tìm kiếm (Tiến trình, Quy cách, Ghi chú...):');
+    if (!kw) { renderTable(); return; }
+    var f = kw.toLowerCase();
+    var filtered = mockData.filter(function(r) {
+        return (r.tienTrinh||'').toLowerCase().indexOf(f) >= 0 ||
+            (r.quyCach||'').toLowerCase().indexOf(f) >= 0 ||
+            (r.note||'').toLowerCase().indexOf(f) >= 0 ||
+            (r.note2||'').toLowerCase().indexOf(f) >= 0 ||
+            (r.mucHT||'').toLowerCase().indexOf(f) >= 0;
+    });
+    var tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    filtered.forEach(function(row, i) {
+        var fileBtn = row.fileName
+            ? '<button style="font-size:10px;padding:2px 8px;border:1px solid #7e57c2;background:#ede7f6;border-radius:3px;cursor:pointer" onclick="pg8ViewFile(\'' + row.fileName + '\')">&#128206; ' + row.fileName + '</button>'
+            : '<span style="color:#aaa">—</span>';
+        var bg = i % 2 === 0 ? '#fff' : '#f5f2ff';
+        tbody.innerHTML += '<tr style="background:' + bg + '">'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center"><input type="checkbox" class="chk-row" data-id="' + row.id + '"></td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center"><span style="cursor:pointer;color:#1565c0" onclick="pg8AskEdit(' + row.id + ')">&#9998;</span></td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + (i+1) + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + row.ngayHL + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + (row.ngayKT||'') + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb"><span style="color:#0d47a1;font-weight:bold">' + row.tienTrinh + '</span></td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb">' + row.quyCach + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center;font-weight:bold;color:#d32f2f">' + row.mucHT + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;color:#555">' + (row.note||'') + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;color:#555">' + (row.note2||'') + '</td>'
+            + '<td style="padding:4px 8px;border:1px solid #b39ddb;text-align:center">' + fileBtn + '</td>'
+            + '</tr>';
+    });
+    showAlert('Tìm thấy ' + filtered.length + ' kết quả cho "' + kw + '"', 'success');
+}
+
+function pg8ImportExcel() {
+    alert('Chức năng Import Excel (demo). Vui lòng chọn file Excel để nhập dữ liệu.');
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var raw = (window.MOCK && window.MOCK.lsp && window.MOCK.lsp.hoTroCD) ? window.MOCK.lsp.hoTroCD : [];
+    if (raw.length > 0 && !raw[0].ngayHL) {
+        mockData = raw.map(function(r) {
+            return {id:r.id, ngayHL:'01/'+r.thang, ngayKT:'', tienTrinh:r.doiTuong||'', quyCach:r.loaiText||r.loai||'', mucHT:r.mucHT||'', note:r.note||'', note2:'', fileName:''};
+        });
+    } else if (raw.length > 0) {
+        mockData = [].concat(raw);
+    } else {
+        mockData = [
+            {id:1, ngayHL:'01/06/2026', ngayKT:'30/06/2026', tienTrinh:'TT01 - Tẩm bột', quyCach:'QC01 - Quy cách tính lương 1', mucHT:'15%', note:'Nặng nhọc, nhiều bụi bột', note2:'Duyệt bởi GĐ', fileName:'QD_2026_001.pdf'},
+            {id:2, ngayHL:'15/06/2026', ngayKT:'', tienTrinh:'TT02 - PTO (lột vỏ tôm)', quyCach:'QC02 - Quy cách tính lương 2', mucHT:'8%', note:'Lạnh tay, tốc độ cao', note2:'', fileName:''}
+        ];
+    }
+    renderTable();
+    pg8InitDropdown('ddTienTrinh','listTienTrinh','cboTienTrinh','txtTienTrinh', PG8_TIEN_TRINH);
+    pg8InitDropdown('ddQuyCach','listQuyCach','cboQuyCach','txtQuyCach', PG8_QUY_CACH);
+});
+
+function toggleAll(source) {
+    var cbs = document.querySelectorAll('.chk-row');
+    for (var i = 0; i < cbs.length; i++) cbs[i].checked = source.checked;
+}
+function showAlert(msg, type) {
+    var box = document.getElementById('alertBox');
+    box.style.display = 'block';
+    box.className = 'alert-box alert-' + type;
+    box.innerHTML = msg;
+    setTimeout(function() { box.style.display = 'none'; }, 4000);
+}
+function clearForm() {
+    document.getElementById('txtEditId').value = '';
+    document.getElementById('txtNgayHL').value = '01/06/2026';
+    document.getElementById('txtNgayKT').value = '';
+    document.getElementById('cboTienTrinh').value = '';
+    document.getElementById('txtTienTrinh').value = '';
+    document.getElementById('cboQuyCach').value = '';
+    document.getElementById('txtQuyCach').value = '';
+    document.getElementById('txtMucHoTro').value = '';
+    document.getElementById('txtGhiChu').value = '';
+    document.getElementById('txtGhiChu2').value = '';
+    document.getElementById('alertBox').style.display = 'none';
+}
+function editRow(id) {
+    var row = mockData.find(function(x){return x.id === id;});
+    if (row) {
+        document.getElementById('txtEditId').value = row.id;
+        document.getElementById('txtNgayHL').value = row.ngayHL || '';
+        document.getElementById('txtNgayKT').value = row.ngayKT || '';
+        var tt = PG8_TIEN_TRINH.find(function(t){return row.tienTrinh.indexOf(t.value) === 0;});
+        document.getElementById('cboTienTrinh').value = tt ? tt.value : '';
+        document.getElementById('txtTienTrinh').value = tt ? tt.label : row.tienTrinh;
+        var qc = PG8_QUY_CACH.find(function(q){return row.quyCach.indexOf(q.value) === 0;});
+        document.getElementById('cboQuyCach').value = qc ? qc.value : '';
+        document.getElementById('txtQuyCach').value = qc ? qc.label : row.quyCach;
+        document.getElementById('txtMucHoTro').value = (row.mucHT||'').replace('%','');
+        document.getElementById('txtGhiChu').value = row.note || '';
+        document.getElementById('txtGhiChu2').value = row.note2 || '';
+        window.scrollTo(0, 0);
+        showAlert("Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", "success");
+    }
+}
+function saveData() {
+    var id = document.getElementById('txtEditId').value;
+    var ngayHL = document.getElementById('txtNgayHL').value.trim();
+    var ngayKT = document.getElementById('txtNgayKT').value.trim();
+    var tienTrinh = document.getElementById('txtTienTrinh').value.trim();
+    var quyCach = document.getElementById('txtQuyCach').value.trim();
+    var mucHT = document.getElementById('txtMucHoTro').value.trim();
+    if (!mucHT.match(/%$/)) mucHT += '%';
+    var note = document.getElementById('txtGhiChu').value.trim();
+    var note2 = document.getElementById('txtGhiChu2').value.trim();
+    var fileInput = document.getElementById('fileDinhKem');
+    var fileName = fileInput.files.length > 0 ? fileInput.files[0].name : '';
+
+    if (id) {
+        var item = mockData.find(function(x){return x.id == id;});
+        if (item) {
+            item.ngayHL = ngayHL; item.ngayKT = ngayKT; item.tienTrinh = tienTrinh; item.quyCach = quyCach; item.mucHT = mucHT; item.note = note; item.note2 = note2;
+            if (fileName) item.fileName = fileName;
+            showAlert("Đã cập nhật thiết lập thành công!", "success");
+        }
+    } else {
+        var newId = mockData.length > 0 ? Math.max.apply(null, mockData.map(function(d){return d.id;})) + 1 : 1;
+        mockData.push({ id: newId, ngayHL: ngayHL, ngayKT: ngayKT, tienTrinh: tienTrinh, quyCach: quyCach, mucHT: mucHT, note: note, note2: note2, fileName: fileName });
+        showAlert("Đã thêm mới thiết lập thành công!", "success");
+    }
+    renderTable();
+    clearForm();
+}
+function deleteData() {
+    var checkboxes = document.querySelectorAll('.chk-row:checked');
+    if (checkboxes.length === 0) { showAlert("Vui lòng chọn dòng cần xóa.", "warning"); return; }
+    if (confirm('Bạn có chắc chắn muốn xóa ' + checkboxes.length + ' dòng thiết lập này?')) {
+        var selectedIds = [];
+        for (var i = 0; i < checkboxes.length; i++) selectedIds.push(parseInt(checkboxes[i].getAttribute('data-id')));
+        mockData = mockData.filter(function(x){return selectedIds.indexOf(x.id) < 0;});
+        renderTable();
+        document.getElementById('chkAll').checked = false;
+        showAlert("Đã xóa thiết lập thành công!", "success");
+    }
+}
+</script>
+</body>
+</html>

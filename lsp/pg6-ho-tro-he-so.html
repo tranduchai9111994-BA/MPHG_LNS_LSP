@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập % Hỗ trợ và Hệ số</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+        /* Tab navigation – pg6 */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e4e8;
+            margin-bottom: 0;
+        }
+        .tab-btn {
+            padding: 8px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            color: #555;
+            background: #f0f2f5;
+            border: 1px solid #e1e4e8;
+            border-bottom: none;
+            margin-right: 3px;
+            border-radius: 4px 4px 0 0;
+            transition: background 0.15s, color 0.15s;
+            user-select: none;
+        }
+        .tab-btn:hover {
+            background: #e3e7ed;
+            color: #333;
+        }
+        .tab-btn.active {
+            background: #fff;
+            color: #d32f2f;
+            border-color: #e1e4e8;
+            border-bottom: 2px solid #fff;
+            margin-bottom: -2px;
+        }
+        .tab-content {
+            display: none;
+            padding-top: 15px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rarr; Thiết lập &rarr; Thiết lập hỗ trợ và hệ số</div>
+    <div class="page-title">THIẾT LẬP % HỖ TRỢ VÀ HỆ SỐ ĐIỀU CHỈNH</div>
+    <div id="alertBox" class="alert-box"></div>
+    <div class="tabs">
+        <div class="tab-btn active" onclick="switchTab(1)">1. % Hỗ trợ Bộ phận</div>
+        <div class="tab-btn" onclick="switchTab(2)">2. % Hỗ trợ Công đoạn / TT</div>
+        <div class="tab-btn" onclick="switchTab(3)">3. Hệ số HS1/HS2/HS3</div>
+    </div>
+    <div id="tab1" class="tab-content active">
+        <div class="form-section">
+            <div>
+                <div class="field-group"><label>Tháng hiệu lực <span class="required">*</span></label><input type="text" placeholder="MM/yyyy" value="06/2026"></div>
+                <div class="field-group"><label>Đơn vị / Bộ phận <span class="required">*</span></label><select><option>-- Chọn bộ phận --</option><option>Phân xưởng 1</option><option>Bộ phận Chiên</option></select></div>
+            </div>
+            <div>
+                <div class="field-group"><label>% Hỗ trợ (0-100) <span class="required">*</span></label><input type="number" min="0" max="100" placeholder="0"></div>
+                <div class="field-group"><label>Ghi chú</label><input type="text" placeholder="Ghi chú..."></div>
+            </div>
+        </div>
+        <div class="actions-bar">
+            <button class="btn-search">Tìm Kiếm</button>
+            <button class="btn-refresh">Làm mới</button>
+            <button class="btn-save" onclick="showMsg('Đã lưu % Hỗ trợ Bộ phận', 'success')">Lưu</button>
+            <button class="btn-import">Nhập dữ liệu</button>
+        </div>
+        <table>
+            <thead><tr><th>STT</th><th>Tháng</th><th>Bộ phận</th><th>% Hỗ trợ</th><th class="text-left">Ghi chú</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>06/2026</td><td>Bộ phận Đóng gói</td><td style="color:#d32f2f;font-weight:bold;">5%</td><td class="text-left">Hỗ trợ độc hại</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+                <tr><td>2</td><td>06/2026</td><td>Bộ phận PTO</td><td style="color:#d32f2f;font-weight:bold;">8%</td><td class="text-left">Hỗ trợ nặng nhọc PTO</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+                <tr><td>3</td><td>06/2026</td><td>Bộ phận Tẩm bột</td><td style="color:#d32f2f;font-weight:bold;">5%</td><td class="text-left">Hỗ trợ ca đêm</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+                <tr><td>4</td><td>06/2026</td><td>Bộ phận Chiên</td><td style="color:#d32f2f;font-weight:bold;">10%</td><td class="text-left">Hỗ trợ nhiệt độ cao</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+                <tr><td>5</td><td>06/2026</td><td>Bộ phận Sơ chế</td><td style="color:#d32f2f;font-weight:bold;">3%</td><td class="text-left">Hỗ trợ tiêu chuẩn</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+                <tr><td>6</td><td>06/2026</td><td>Bộ phận Kho lạnh</td><td style="color:#d32f2f;font-weight:bold;">7%</td><td class="text-left">Hỗ trợ môi trường lạnh</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+                <tr><td>7</td><td>06/2026</td><td>Bộ phận Hấp</td><td style="color:#d32f2f;font-weight:bold;">6%</td><td class="text-left">Hỗ trợ hơi nước</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+                <tr><td>8</td><td>05/2026</td><td>Bộ phận Đóng gói</td><td style="color:#d32f2f;font-weight:bold;">5%</td><td class="text-left">Tháng trước – ổn định</td><td><span class="action-link">Sửa</span><span class="action-link delete">Xóa</span></td></tr>
+            </tbody>
+
+        </table>
+    </div>
+    <div id="tab2" class="tab-content">
+        <div class="form-section">
+            <div>
+                <div class="field-group"><label>Tháng hiệu lực <span class="required">*</span></label><input type="text" placeholder="MM/yyyy" value="06/2026"></div>
+                <div class="field-group">
+                    <label>Loại hỗ trợ <span class="required">*</span></label>
+                    <div class="radio-inline">
+                        <label><input type="radio" name="loai_ht" checked> Công đoạn</label>
+                        <label><input type="radio" name="loai_ht"> Tiến trình</label>
+                    </div>
+                </div>
+                <div class="field-group"><label>Mã CĐ/Tiến trình <span class="required">*</span></label><select><option>-- Chọn mã --</option></select></div>
+            </div>
+            <div>
+                <div class="field-group"><label>% Hỗ trợ <span class="required">*</span></label><input type="number" placeholder="0"></div>
+                <div class="field-group"><label>Ghi chú</label><input type="text" placeholder="Ghi chú..."></div>
+            </div>
+        </div>
+        <div class="actions-bar">
+            <button class="btn-search">Tìm Kiếm</button>
+            <button class="btn-refresh">Làm mới</button>
+            <button class="btn-save" onclick="showMsg('Đã lưu % Hỗ trợ Công đoạn/Tiến trình', 'success')">Lưu</button>
+            <button class="btn-import">Nhập dữ liệu</button>
+        </div>
+        <table>
+            <thead><tr><th>STT</th><th>Tháng</th><th>Loại</th><th>Mã CĐ/TT</th><th class="text-left">Tên CĐ/TT</th><th>% Hỗ trợ</th><th class="text-left">Ghi chú</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>06/2026</td><td>Công đoạn</td><td>CD_TB</td><td class="text-left">Tẩm bột</td><td>15%</td><td class="text-left"></td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>2</td><td>06/2026</td><td>Công đoạn</td><td>CD_VR</td><td class="text-left">Hàng virut (VR)</td><td>5%</td><td class="text-left"></td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>3</td><td>06/2026</td><td>Công đoạn</td><td>CD_LD</td><td class="text-left">Lặt đầu tôm (LĐ)</td><td>5%</td><td class="text-left"></td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>4</td><td>06/2026</td><td>Công đoạn</td><td>CD_SU</td><td class="text-left">Sushi (Su)</td><td>5%</td><td class="text-left"></td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>5</td><td>06/2026</td><td>Tiến trình</td><td>TT_TBC</td><td class="text-left">Tẩm bột chiên (TB), Nobashi (No)</td><td>5%</td><td class="text-left"></td><td><span class="action-link">Sửa</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- VÍ DỤ MẪU TAB 2 -->
+        <div style="margin-top:18px;background:#f0f7ff;border:1px solid #b3d1f5;border-radius:6px;padding:14px 16px;">
+            <div style="font-weight:bold;color:#1565c0;font-size:12px;margin-bottom:10px;">
+                💡 VÍ DỤ MẪU – % Hỗ trợ Công đoạn / Tiến trình (để tham khảo khi nhập liệu)
+            </div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                <!-- Bảng Công đoạn -->
+                <div style="flex:1;min-width:280px;">
+                    <div style="font-size:11px;font-weight:bold;color:#0d47a1;margin-bottom:6px;border-bottom:1px solid #90caf9;padding-bottom:4px;">
+                        🔹 Công đoạn (CĐ)
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                        <thead>
+                            <tr style="background:#bbdefb;">
+                                <th style="padding:5px 8px;text-align:left;border:1px solid #90caf9;">Mã CĐ</th>
+                                <th style="padding:5px 8px;text-align:left;border:1px solid #90caf9;">Tên công đoạn</th>
+                                <th style="padding:5px 8px;text-align:center;border:1px solid #90caf9;">% Hỗ trợ</th>
+                                <th style="padding:5px 8px;text-align:left;border:1px solid #90caf9;">Lý do</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background:#fff;">
+                                <td style="padding:4px 8px;border:1px solid #90caf9;font-family:monospace;color:#1565c0;">CD_TB</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;">Tẩm bột</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;text-align:center;font-weight:bold;color:#d32f2f;">15%</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;color:#555;">Nặng nhọc, bụi bột</td>
+                            </tr>
+                            <tr style="background:#f5f9ff;">
+                                <td style="padding:4px 8px;border:1px solid #90caf9;font-family:monospace;color:#1565c0;">CD_VR</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;">Hàng virut (VR)</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;text-align:center;font-weight:bold;color:#d32f2f;">5%</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;color:#555;">Yêu cầu tỉ mỉ, dễ hao hụt</td>
+                            </tr>
+                            <tr style="background:#fff;">
+                                <td style="padding:4px 8px;border:1px solid #90caf9;font-family:monospace;color:#1565c0;">CD_LD</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;">Lặt đầu tôm (LĐ)</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;text-align:center;font-weight:bold;color:#d32f2f;">5%</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;color:#555;">Thủ công, áp lực năng suất</td>
+                            </tr>
+                            <tr style="background:#f5f9ff;">
+                                <td style="padding:4px 8px;border:1px solid #90caf9;font-family:monospace;color:#1565c0;">CD_SU</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;">Sushi (Su)</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;text-align:center;font-weight:bold;color:#d32f2f;">5%</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;color:#555;">Kỹ thuật cao, tiêu chuẩn xuất khẩu</td>
+                            </tr>
+                            <tr style="background:#fff;">
+                                <td style="padding:4px 8px;border:1px solid #90caf9;font-family:monospace;color:#1565c0;">CD_PTO</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;">PTO (lột vỏ)</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;text-align:center;font-weight:bold;color:#d32f2f;">8%</td>
+                                <td style="padding:4px 8px;border:1px solid #90caf9;color:#555;">Lạnh tay, tốc độ cao</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Bảng Tiến trình -->
+                <div style="flex:1;min-width:280px;">
+                    <div style="font-size:11px;font-weight:bold;color:#6a1b9a;margin-bottom:6px;border-bottom:1px solid #ce93d8;padding-bottom:4px;">
+                        🔸 Tiến trình (TT)
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                        <thead>
+                            <tr style="background:#e1bee7;">
+                                <th style="padding:5px 8px;text-align:left;border:1px solid #ce93d8;">Mã TT</th>
+                                <th style="padding:5px 8px;text-align:left;border:1px solid #ce93d8;">Tên tiến trình</th>
+                                <th style="padding:5px 8px;text-align:center;border:1px solid #ce93d8;">% Hỗ trợ</th>
+                                <th style="padding:5px 8px;text-align:left;border:1px solid #ce93d8;">Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background:#fff;">
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;font-family:monospace;color:#6a1b9a;">TT_TBC</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;">Tẩm bột chiên, Nobashi (No)</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;text-align:center;font-weight:bold;color:#d32f2f;">5%</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;color:#555;">Nhiều bước, nhiệt độ cao</td>
+                            </tr>
+                            <tr style="background:#fdf5ff;">
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;font-family:monospace;color:#6a1b9a;">TT_PTO</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;">PTO lột vỏ – sushi</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;text-align:center;font-weight:bold;color:#d32f2f;">7%</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;color:#555;">Liên tiến trình xuất Nhật</td>
+                            </tr>
+                            <tr style="background:#fff;">
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;font-family:monospace;color:#6a1b9a;">TT_SC</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;">Sơ chế – Đóng gói</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;text-align:center;font-weight:bold;color:#d32f2f;">3%</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;color:#555;">Tiêu chuẩn nội địa</td>
+                            </tr>
+                            <tr style="background:#fdf5ff;">
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;font-family:monospace;color:#6a1b9a;">TT_HAPX</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;">Hấp – Xuất khẩu</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;text-align:center;font-weight:bold;color:#d32f2f;">6%</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;color:#555;">Hơi nước, yêu cầu kiểm tra kỹ</td>
+                            </tr>
+                            <tr style="background:#fff;">
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;font-family:monospace;color:#6a1b9a;">TT_VR</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;">VR – Tẩm bột</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;text-align:center;font-weight:bold;color:#d32f2f;">10%</td>
+                                <td style="padding:4px 8px;border:1px solid #ce93d8;color:#555;">Phức tạp, dễ lỗi nhất</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Ghi chú nghiệp vụ -->
+            <div style="margin-top:12px;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:8px 12px;font-size:11px;color:#795548;">
+                <strong>⚠️ Lưu ý nghiệp vụ:</strong>
+                <ul style="margin:4px 0 0 16px;padding:0;">
+                    <li><strong>Công đoạn (CĐ)</strong>: Áp dụng % hỗ trợ cho <em>từng bước sản xuất đơn lẻ</em> (VD: chỉ công đoạn Tẩm bột).</li>
+                    <li><strong>Tiến trình (TT)</strong>: Áp dụng cho <em>nhóm công đoạn kết hợp</em> trong một quy trình liên hoàn (VD: Tẩm bột → Chiên → Đóng gói).</li>
+                    <li>% hỗ trợ nhập vào <strong>không vượt quá 100%</strong>. Nếu vượt, hệ thống sẽ cảnh báo trước khi lưu.</li>
+                    <li>Mỗi mã CĐ/TT chỉ được thiết lập <strong>một mức % duy nhất</strong> cho mỗi tháng hiệu lực.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="tab3" class="tab-content">
+        <div class="form-section">
+            <div>
+                <div class="field-group"><label>Tháng hiệu lực <span class="required">*</span></label><input type="text" placeholder="MM/yyyy" value="06/2026"></div>
+                <div class="field-group"><label>Công ty / Bộ phận <span class="required">*</span></label><select><option>-- Chọn bộ phận --</option><option>Khối Sản Xuất</option></select></div>
+                <div class="field-group"><label>HS1 (%)</label><input type="number" id="hs1" placeholder="100"></div>
+            </div>
+            <div>
+                <div class="field-group"><label>HS2 (%)</label><input type="number" id="hs2" placeholder="100"></div>
+                <div class="field-group"><label>HS3 (%)</label><input type="number" id="hs3" placeholder="100"></div>
+                <div class="field-group"><label>Ghi chú</label><input type="text" placeholder="Ghi chú..."></div>
+            </div>
+        </div>
+        <div class="actions-bar">
+            <button class="btn-search">Tìm Kiếm</button>
+            <button class="btn-refresh">Làm mới</button>
+            <button class="btn-save" onclick="validateAndSaveHS()">Lưu Hệ Số</button>
+            <button class="btn-import">Nhập dữ liệu</button>
+        </div>
+        <table>
+            <thead><tr><th>STT</th><th>Tháng</th><th>Bộ phận</th><th>HS1 (%)</th><th>HS2 (%)</th><th>HS3 (%)</th><th class="text-left">Ghi chú</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>06/2026</td><td>Bộ phận Đóng gói</td><td>100%</td><td>100%</td><td style="color:#d32f2f;font-weight:bold;">95%</td><td class="text-left">Giảm HS3 do tỉ lệ lỗi cao</td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>2</td><td>06/2026</td><td>Bộ phận PTO</td><td>100%</td><td>100%</td><td>100%</td><td class="text-left">Mặc định</td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>3</td><td>06/2026</td><td>Bộ phận Chiên</td><td>100%</td><td style="color:#d32f2f;font-weight:bold;">90%</td><td>100%</td><td class="text-left">Điều chỉnh HS2 ca đêm</td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>4</td><td>06/2026</td><td>Bộ phận Tẩm bột</td><td>100%</td><td>100%</td><td>100%</td><td class="text-left">Mặc định</td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>5</td><td>06/2026</td><td>Bộ phận Sơ chế</td><td style="color:#d32f2f;font-weight:bold;">110%</td><td>100%</td><td>100%</td><td class="text-left">Tăng HS1 tháng cao điểm</td><td><span class="action-link">Sửa</span></td></tr>
+                <tr><td>6</td><td>06/2026</td><td>Bộ phận Kho lạnh</td><td>100%</td><td>100%</td><td>100%</td><td class="text-left">Mặc định</td><td><span class="action-link">Sửa</span></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function switchTab(tabIndex) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab' + tabIndex).classList.add('active');
+        document.querySelectorAll('.tab-btn')[tabIndex - 1].classList.add('active');
+        document.getElementById('alertBox').style.display = 'none';
+    }
+    function showMsg(msg, type) {
+        const box = document.getElementById('alertBox');
+        box.style.display = 'block';
+        box.className = `alert-box alert-${type}`;
+        box.innerHTML = msg;
+        setTimeout(() => { box.style.display = 'none'; }, 6000);
+    }
+    function validateAndSaveHS() {
+        let hs1_val = document.getElementById('hs1').value;
+        let hs2_val = document.getElementById('hs2').value;
+        let hs3_val = document.getElementById('hs3').value;
+        let hs1 = hs1_val === "" ? 100 : parseFloat(hs1_val);
+        let hs2 = hs2_val === "" ? 100 : parseFloat(hs2_val);
+        let hs3 = hs3_val === "" ? 100 : parseFloat(hs3_val);
+        let arr = [hs1, hs2, hs3];
+        if (arr.some(v => v < 0)) { showMsg("Lỗi: Hệ số không thể âm. Vui lòng kiểm tra lại.", "error"); return; }
+        if (arr.some(v => v > 200)) {
+            if(!confirm("Warning: Hệ số vượt quá 200%. Bạn có chắc chắn muốn lưu mức hệ số này?")) { showMsg("Đã hủy thao tác lưu hệ số.", "warning"); return; }
+        }
+        if (arr.some(v => v === 0)) {
+            if(!confirm("Warning: Hệ số = 0 sẽ dẫn đến lương sản phẩm = 0. Vui lòng kiểm tra kỹ. Chắc chắn lưu?")) { showMsg("Đã hủy thao tác lưu hệ số.", "warning"); return; }
+        }
+        showMsg("Đã lưu thiết lập Hệ số HS1/HS2/HS3 thành công.", "success");
+    }
+</script>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+    <script src="../shared/mockdata.js"></script>
+    <script src="../shared/utils.js"></script>
+</body>
+</html>

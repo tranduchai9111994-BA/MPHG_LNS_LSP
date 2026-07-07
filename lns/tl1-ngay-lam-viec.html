@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Thiết lập công đoạn theo bộ phận</div>
+  <div class="page-title">THIẾT LẬP CÔNG ĐOẠN THEO BỘ PHẬN</div>
+  <div class="desc-box"><strong>Mục đích:</strong> Xác định Công đoạn nào thuộc Bộ phận nào; loại làm chính hay làm dùm. Khi nhập NSTT, hệ thống chỉ hiển thị CĐ đã gán cho bộ phận đó.</div>
+  <div id="tl1-alert" class="alert-box"></div>
+
+  <!-- ============ MODAL THÊM / SỬA ============ -->
+  <div class="modal-overlay" id="tl1-modal-add" style="display:none;">
+    <div class="modal-box" style="max-width:600px;">
+      <div class="modal-hdr" id="tl1-modal-hdr" style="background:#0056b3;">
+        <span id="tl1-modal-title">➕ THÊM THIẾT LẬP CÔNG ĐOẠN THEO BỘ PHẬN</span>
+        <button class="x" onclick="tl1CloseModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid-2col">
+          <label class="lbl-red">Ngày hiệu lực</label><input type="date" id="tl1_ngay" value="2026-06-01">
+          <label></label><div></div>
+          <label class="lbl-red">Công ty</label>
+          <select id="tl1_cty"><option value="MPHG">Công Ty CP Thủy Sản Minh Phú Hậu Giang</option></select>
+          <label>Đơn vị cấp 1</label><select><option value="">– Chọn –</option></select>
+          <label>Đơn vị cấp 2</label><select><option value="">– Chọn –</option></select>
+          <label>Đơn vị cấp 3</label><select><option value="">– Chọn –</option></select>
+          <label>Đơn vị cấp 4-7</label><select><option value="">– Chọn –</option></select>
+          <label>Bộ phận tính lương</label>
+          <select id="tl1_bp"><option value="">– Chọn bộ phận –</option><option value="BP_PTO">Bộ phận PTO</option><option value="BP_TB">Bộ phận Tẩm bột</option></select>
+          <label class="lbl-red">Công đoạn</label>
+          <select id="tl1_cd"><option value="">– Chọn công đoạn –</option><option value="CD_PTO">Lặt đầu tôm (PTO)</option><option value="CD_NOBASHI">Lột vỏ (Nobashi)</option><option value="CD_VIRUS">Kiểm tra Virut</option></select>
+          <label class="lbl-red">Loại</label>
+          <div class="radio-group">
+            <label><input type="radio" name="tl1_loai" value="chinh" checked onchange="tl1ToggleDum()"> Làm chính</label>
+            <label><input type="radio" name="tl1_loai" value="dum" onchange="tl1ToggleDum()"> Làm dùm</label>
+          </div>
+          <label id="tl1_lbldum">Bộ phận làm dùm cho</label>
+          <select id="tl1_dumfor" disabled style="background:#e9ecef">
+            <option value="">– Chọn bộ phận đích –</option>
+            <option value="BP_PTO">Bộ phận PTO</option>
+            <option value="BP_TB">Bộ phận Tẩm bột</option>
+            <option value="BP_CHIEN">Bộ phận Chiên</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="tl1CloseModal()">Hủy</button>
+        <button class="btn-ok" onclick="tl1Save()">💾 Lưu thiết lập</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button>
+    <button class="btn-refresh" onclick="tl1Clear()">Làm mới</button>
+    <button class="btn-add" onclick="tl1OpenModal(null)">➕ Thêm mới</button>
+    <button class="btn-delete" onclick="tl1Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('tl1-imp')">Nhập dữ liệu</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Ngày hiệu lực</th><th>Công ty</th><th>Bộ phận tính lương</th><th>Công đoạn</th><th>Loại</th><th>BP làm dùm cho</th></tr></thead>
+    <tbody id="tl1-tbody">
+      <tr data-id="1"><td><input type="checkbox" class="tl1-chk"></td><td><span class="edit-icon" onclick="tl1Edit(this)">✎</span></td><td>1</td><td>01/06/2026</td><td class="tl">Minh Phú Hậu Giang</td><td class="tl">Bộ phận PTO</td><td class="tl"><b>Lặt đầu tôm (PTO)</b></td><td>Làm chính</td><td>-</td></tr>
+      <tr data-id="2"><td><input type="checkbox" class="tl1-chk"></td><td><span class="edit-icon" onclick="tl1Edit(this)">✎</span></td><td>2</td><td>01/06/2026</td><td class="tl">Minh Phú Hậu Giang</td><td class="tl">Bộ phận PTO</td><td class="tl"><b>Lột vỏ (Nobashi)</b></td><td>Làm chính</td><td>-</td></tr>
+      <tr data-id="3"><td><input type="checkbox" class="tl1-chk"></td><td><span class="edit-icon" onclick="tl1Edit(this)">✎</span></td><td>3</td><td>15/06/2026</td><td class="tl">Minh Phú Hậu Giang</td><td class="tl">Bộ phận PTO</td><td class="tl"><b>Kiểm tra Virut</b></td><td style="color:#d32f2f;font-weight:bold">Làm dùm</td><td>Bộ phận Tẩm bột</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<div class="modal-overlay" id="tl1-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT THIẾT LẬP CÔNG ĐOẠN THEO BỘ PHẬN</span><button class="x" onclick="hideModal('tl1-imp')">✕</button></div>
+  <div class="modal-body"><p style="font-size:11px;color:#555;margin-bottom:10px;"><span style="color:red;font-weight:bold">Lưu ý:</span> Vui lòng tải file mẫu và nhập đúng định dạng trước khi import.</p><input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải file template mẫu</a></div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('tl1-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('tl1-imp');showAlert2('tl1-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+function tl1ToggleDum() {
+  const isDum = document.querySelector('input[name="tl1_loai"]:checked').value === 'dum';
+  const sel = document.getElementById('tl1_dumfor');
+  const lbl = document.getElementById('tl1_lbldum');
+  sel.disabled = !isDum;
+  sel.style.background = isDum ? '#fff' : '#e9ecef';
+  if (!isDum) sel.value = '';
+  lbl.className = isDum ? 'lbl-red' : '';
+}
+function tl1Clear() {
+  document.getElementById('tl1_ngay').value = '2026-06-01';
+  document.getElementById('tl1_bp').selectedIndex = 0;
+  document.getElementById('tl1_cd').selectedIndex = 0;
+  document.querySelector('input[name="tl1_loai"][value="chinh"]').checked = true;
+  tl1ToggleDum();
+  document.getElementById('tl1-alert').style.display = 'none';
+}
+function tl1OpenModal(idx) {
+  const modal = document.getElementById('tl1-modal-add');
+  const hdr   = document.getElementById('tl1-modal-hdr');
+  const title = document.getElementById('tl1-modal-title');
+  if (idx === null) {
+    hdr.style.background = '#0056b3';
+    title.textContent = '➕ THÊM THIẾT LẬP CÔNG ĐOẠN THEO BỘ PHẪN';
+    tl1Clear();
+  } else {
+    hdr.style.background = '#495057';
+    title.textContent = '✎ SỬA THIẾT LẬP';
+  }
+  modal.style.display = 'flex';
+}
+function tl1CloseModal() {
+  document.getElementById('tl1-modal-add').style.display = 'none';
+}
+function tl1Edit(el) {
+  const row = el.closest('tr');
+  const loai = row.cells[7].innerText;
+  if (loai === 'Làm chính') document.querySelector('input[name="tl1_loai"][value="chinh"]').checked = true;
+  else { document.querySelector('input[name="tl1_loai"][value="dum"]').checked = true; document.getElementById('tl1_dumfor').value = 'BP_TB'; }
+  document.getElementById('tl1_cd').selectedIndex = 1;
+  document.getElementById('tl1_bp').value = 'BP_PTO';
+  tl1ToggleDum();
+  tl1OpenModal('edit');
+}
+function tl1Save() {
+  const ngay = document.getElementById('tl1_ngay').value;
+  const cty = document.getElementById('tl1_cty').value;
+  const cd = document.getElementById('tl1_cd').value;
+  const isDum = document.querySelector('input[name="tl1_loai"]:checked').value === 'dum';
+  const bpDum = document.getElementById('tl1_dumfor').value;
+  if (!ngay || !cty || !cd) return showAlert2('tl1-alert','Vui lòng điền đầy đủ các thông tin bắt buộc.','error');
+  if (isDum && !bpDum) return showAlert2('tl1-alert','<b>Lỗi (Blocking):</b> Vui lòng chọn bộ phận được làm dùm.','error');
+  showAlert2('tl1-alert','Lưu thiết lập thành công!','success');
+  tl1Clear();
+}
+function tl1Delete() {
+  const chks = document.querySelectorAll('.tl1-chk:checked');
+  if (!chks.length) return showAlert2('tl1-alert','Vui lòng chọn thiết lập cần xóa.','error');
+  let blocked = false;
+  chks.forEach(c => { if (c.closest('tr').getAttribute('data-id') === '1') { showAlert2('tl1-alert','<b>Lỗi (Blocking):</b> Dữ liệu sản lượng tồn tại trong kỳ. Không thể xóa.','error'); blocked = true; } });
+  if (!blocked && confirm('Bạn có chắc muốn xóa?')) showAlert2('tl1-alert','Đã xóa thiết lập thành công.','success');
+}
+
+  </script>
+</body>
+</html>

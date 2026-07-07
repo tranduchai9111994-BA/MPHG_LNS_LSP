@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xem Lương Sản Phẩm Cá Nhân</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* PAGE-SPECIFIC: pg4-xem-ca-nhan */
+    .preview-banner { display: none; background-color: #fff3cd; color: #856404; padding: 10px; text-align: center; font-weight: bold; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 20px; font-size: 13px; }
+    .preview-banner span.tag { background: #ffc107; color: #000; padding: 2px 6px; border-radius: 3px; margin-right: 5px; }
+    .emp-info-grid { display: grid; grid-template-columns: 110px 220px 30px 110px 220px 30px 110px 1fr; gap: 12px 10px; align-items: center; margin-bottom: 20px; }
+    .emp-info-grid label { color: #333; font-weight: bold; }
+    .emp-info-grid .info-val { font-weight: bold; color: #111; }
+    .input-group { display: flex; align-items: center; }
+    .input-group input { width: 100%; padding: 4px 6px; border: 1px solid #ccc; height: 24px; box-sizing: border-box; outline: none; }
+    .input-group button { height: 24px; padding: 0 10px; background: #eee; border: 1px solid #ccc; border-left: none; cursor: pointer; color: #555; font-weight: bold; }
+    .filter-mid { text-align: center; padding: 15px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; gap: 12px; background-color: #fafafa; }
+    .month-filter { display: flex; align-items: center; gap: 15px; }
+    .month-filter span { color: #d32f2f; font-size: 13px; font-weight: bold; }
+    .month-filter select { padding: 4px; border: 1px solid #ccc; width: 150px; text-align: center; height: 26px; outline: none;}
+    .action-btns { display: flex; gap: 10px; }
+    .btn-xem { background-color: #ffc107; border: 1px solid #e0a800; color: #333; padding: 6px 30px; font-weight: bold; cursor: pointer; border-radius: 3px; transition: 0.2s; }
+    .btn-xem:hover { background-color: #e0a800; }
+    .btn-trace { background-color: #17a2b8; border: 1px solid #138496; color: #fff; padding: 6px 20px; font-weight: bold; cursor: pointer; border-radius: 3px; transition: 0.2s; display: none; }
+    .btn-trace:hover { background-color: #138496; }
+    .btn-export { background-color: #fd7e14; border: 1px solid #e67e22; color: #fff; padding: 6px 20px; font-weight: bold; cursor: pointer; border-radius: 3px; transition: 0.2s; display: none; }
+    .btn-export:hover { background-color: #e67e22; }
+    .formula-info { margin-bottom: 10px; font-size: 12px; color: #333; }
+    .formula-info span { color: red; font-weight: bold; }
+    
+    .trace-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+    .trace-table th { background: #e9ecef; color: #333; border: 1px solid #ccc; padding: 6px; }
+    .trace-table td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương &rsaquo; Chức năng &rsaquo; Tính Lương &rsaquo; Xem lương sản phẩm từng cá nhân</div>
+    <div class="page-title">XEM LƯƠNG SẢN PHẨM TỪNG CÁ NHÂN</div>
+    <div id="previewBanner" class="preview-banner">
+        <span class="tag">[PREVIEW]</span> Dữ liệu đang hiển thị là dữ liệu tạm tính (Kỳ LNS hoặc LSP chưa được khóa chính thức).
+    </div>
+    <div class="emp-info-grid">
+        <label>Mã nhân viên</label>
+        <div class="input-group"><input type="text" value="1029919302"></div>
+        <div><button style="height: 24px; cursor: pointer;">...</button></div>
+        <label>Họ và tên</label>
+        <div class="input-group"><input type="text" value="FPT Admin"></div>
+        <div><button style="height: 24px; cursor: pointer;">...</button></div>
+        <label>Công ty</label>
+        <div class="info-val">Công Ty Cổ Phần Thủy Sản Minh Phú Hậu Giang</div>
+        <label>Đơn vị cấp 1</label><div class="info-val">Sản xuất</div><div></div>
+        <label>Đơn vị cấp 2</label><div class="info-val">Sản xuất MPHG</div><div></div>
+        <label>Đơn vị cấp 3</label><div class="info-val">Nguyên liệu</div>
+        <label>Đơn vị cấp 4</label><div class="info-val">Nguyên liệu ka 1</div><div></div>
+        <label>Đơn vị cấp 5</label><div class="info-val">Nguyên liệu thống kê ka 1</div><div></div>
+        <label>Đơn vị cấp 6</label><div class="info-val"></div>
+        <label>Bộ phận tính lương</label>
+        <div class="info-val" style="grid-column: 2 / 4;">Bộ phận Tẩm bột</div>
+        <label>Vị trí công việc</label>
+        <div class="info-val" style="grid-column: 5 / 7;">Công nhân Sơ chế</div>
+        <label>Loại hợp đồng</label>
+        <div class="info-val" style="grid-column: 2 / 4;">Hợp đồng công nhân 12 tháng</div>
+    </div>
+    <div class="filter-mid">
+        <div class="month-filter">
+            <span>Kỳ LSP</span>
+            <select id="cboKyLSP">
+                <option value="LSP_06_2026_PREVIEW">Tháng 06/2026 (Đang tính)</option>
+                <option value="LSP_05_2026_LOCKED">Tháng 05/2026 (Đã khóa)</option>
+            </select>
+        </div>
+        <div class="action-btns">
+            <button class="btn-xem" onclick="loadSalaryDetails()">Xem</button>
+            <button class="btn-trace" id="btnTrace" onclick="openTraceModal()">Truy vết LNS</button>
+            <button class="btn-export" id="btnExport">Xuất dữ liệu</button>
+        </div>
+    </div>
+    <div class="formula-info">Công thức lương: <span>Lương Năng Suất & Sản Phẩm (LSP)</span></div>
+    <div class="grid-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">STT</th>
+                    <th style="width: 15%;">Mã tiêu chí</th>
+                    <th style="width: 25%;">Tên tiêu chí</th>
+                    <th style="width: 40%;">Công thức / Diễn giải</th>
+                    <th>Giá trị</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="5" class="empty-msg text-center" style="padding:10px;color:#555;font-style:italic;">No records to display.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="traceModal">
+    <div class="modal-content" style="background:#fff; width:700px; border-radius:4px; border:1px solid #999;">
+        <div class="modal-header" style="background:#17a2b8; color:white; padding:10px 15px; display:flex; justify-content:space-between;">
+            <span>TRUY VẾT DỮ LIỆU NĂNG SUẤT (LNS) NGUỒN</span>
+            <button class="close-btn" onclick="closeTraceModal()" style="background:transparent; border:none; color:white; cursor:pointer;">✕</button>
+        </div>
+        <div class="modal-body" style="padding:15px;">
+            <div style="font-size: 12px; margin-bottom: 10px;">
+                <strong>Nhân viên:</strong> 1029919302 - FPT Admin<br>
+                <strong>Công đoạn:</strong> Tẩm bột<br>
+                <strong>Kỳ LNS Nguồn:</strong> LNS_06_2026 <span id="lblLNSStatus" style="background: #ffc107; padding: 2px 5px; border-radius: 3px; font-weight: bold; font-size: 10px; margin-left: 5px;">Chưa Khóa</span>
+            </div>
+            <table class="trace-table">
+                <thead>
+                    <tr>
+                        <th>Nguồn Dữ Liệu</th><th>Công thực tế</th><th>Hệ số / BS PV</th>
+                        <th>NS Tổng Bàn</th><th>Tỷ lệ phân bổ</th>
+                        <th style="background: #e8f5e9; color: #28a745;">NS Tính Lương</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Chấm công -> LNS</td><td>24.00 Ngày</td><td>100% / 0%</td>
+                        <td>4,500 Kg</td><td>1.19%</td>
+                        <td style="font-weight: bold; color: #28a745;">53.65 Kg</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 15px; font-style: italic; color: #666; font-size: 11px;">
+                * Bảng này lấy từ bảng liên kết LNS→LSP (Theo UPG-05.2). Dữ liệu NS Tính Lương được đẩy thẳng vào tiêu chí LSP_NangSuat.
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function loadSalaryDetails() {
+        const cboKyLSP = document.getElementById('cboKyLSP').value;
+        const banner = document.getElementById('previewBanner');
+        const btnTrace = document.getElementById('btnTrace');
+        const btnExport = document.getElementById('btnExport');
+        const tbody = document.getElementById('tableBody');
+        btnTrace.style.display = 'inline-block';
+        btnExport.style.display = 'inline-block';
+        if(cboKyLSP.includes('PREVIEW')) {
+            banner.style.display = 'block';
+            document.getElementById('lblLNSStatus').innerText = 'Chưa Khóa (Preview)';
+            document.getElementById('lblLNSStatus').style.background = '#ffc107';
+        } else {
+            banner.style.display = 'none';
+            document.getElementById('lblLNSStatus').innerText = 'Đã Khóa';
+            document.getElementById('lblLNSStatus').style.background = '#28a745';
+            document.getElementById('lblLNSStatus').style.color = '#fff';
+        }
+        
+        let mockData = [];
+        if(window.MOCK && window.MOCK.lsp && window.MOCK.lsp.ketQua && window.MOCK.lsp.ketQua.length > 0) {
+            // Demo data based on actual LSP values
+            let val = window.MOCK.lsp.ketQua[0].tongLSP; // getting first element just for demonstration
+            mockData = [
+                { code: 'LSP_NangSuat', name: 'NS tính lương (từ LNS)', formula: 'productivity_salary từ LNS', val: '53.65 Kg' },
+                { code: 'LSP_DonGia', name: 'Đơn giá CĐ (Tẩm bột)', formula: 'UnitPrice từ Danh mục Đơn giá', val: '350 ₫/Kg' },
+                { code: 'LSP_Base', name: 'Lương SP Gốc', formula: 'LSP_NangSuat × LSP_DonGia', val: '18,778 ₫' },
+                { code: 'HS1', name: 'Hệ số điều chỉnh 1', formula: 'Thiết lập HS1', val: '100%' },
+                { code: 'HS2', name: 'Hệ số điều chỉnh 2', formula: 'Thiết lập HS2', val: '100%' },
+                { code: 'HS3', name: 'Hệ số điều chỉnh 3', formula: 'Thiết lập HS3', val: '95%' },
+                { code: 'LSP_HS3_Amt', name: 'Lương sau Hệ số 1,2,3', formula: 'LSP_Base × HS1 × HS2 × HS3', val: '17,839 ₫' },
+                { code: 'LSP_HoTroBP', name: 'Hỗ trợ Bộ phận (5%)', formula: 'LSP_HS3_Amt × %HoTroBP', val: '892 ₫' },
+                { code: 'LSP_HoTroCD', name: 'Hỗ trợ Công đoạn (15%)', formula: 'LSP_Base × 15% × (TongHS)', val: '2,811 ₫' },
+                { code: 'LSP_DocHai', name: 'Phụ cấp độc hại', formula: 'Từ khoản thêm ADD01', val: '0 ₫' },
+                { code: 'LSP_Total', name: 'TỔNG LƯƠNG SẢN PHẨM', formula: 'LSP_HS3_Amt + LSP_HoTroBP + LSP_HoTroCD + LSP_DocHai', val: '21,542 ₫' }
+            ];
+        } else {
+            mockData = [
+                { code: 'LSP_NangSuat', name: 'NS tính lương (từ LNS)', formula: 'productivity_salary từ LNS', val: '53.65 Kg' },
+                { code: 'LSP_DonGia', name: 'Đơn giá CĐ (Tẩm bột)', formula: 'UnitPrice từ Danh mục Đơn giá', val: '350 ₫/Kg' },
+                { code: 'LSP_Base', name: 'Lương SP Gốc', formula: 'LSP_NangSuat × LSP_DonGia', val: '18,778 ₫' },
+                { code: 'HS1', name: 'Hệ số điều chỉnh 1', formula: 'Thiết lập HS1', val: '100%' },
+                { code: 'HS2', name: 'Hệ số điều chỉnh 2', formula: 'Thiết lập HS2', val: '100%' },
+                { code: 'HS3', name: 'Hệ số điều chỉnh 3', formula: 'Thiết lập HS3', val: '95%' },
+                { code: 'LSP_HS3_Amt', name: 'Lương sau Hệ số 1,2,3', formula: 'LSP_Base × HS1 × HS2 × HS3', val: '17,839 ₫' },
+                { code: 'LSP_HoTroBP', name: 'Hỗ trợ Bộ phận (5%)', formula: 'LSP_HS3_Amt × %HoTroBP', val: '892 ₫' },
+                { code: 'LSP_HoTroCD', name: 'Hỗ trợ Công đoạn (15%)', formula: 'LSP_Base × 15% × (TongHS)', val: '2,811 ₫' },
+                { code: 'LSP_DocHai', name: 'Phụ cấp độc hại', formula: 'Từ khoản thêm ADD01', val: '0 ₫' },
+                { code: 'LSP_Total', name: 'TỔNG LƯƠNG SẢN PHẨM', formula: 'LSP_HS3_Amt + LSP_HoTroBP + LSP_HoTroCD + LSP_DocHai', val: '21,542 ₫' }
+            ];
+        }
+
+        tbody.innerHTML = '';
+        mockData.forEach((item, index) => {
+            let isTotal = item.code === 'LSP_Total';
+            let valClass = isTotal ? 'text-right' : 'text-right';
+            let rowStyle = isTotal ? 'background-color: #e8f5e9; font-weight: bold; color: #28a745;' : '';
+            tbody.innerHTML += `
+                <tr style="${rowStyle}">
+                    <td class="text-center">${index + 1}</td>
+                    <td style="font-weight: bold;">${item.code}</td>
+                    <td>${item.name}</td>
+                    <td style="font-family: Consolas, monospace; font-size: 11px;">${item.formula}</td>
+                    <td class="${valClass}">${item.val}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function openTraceModal() { document.getElementById('traceModal').style.display = 'flex'; }
+    function closeTraceModal() { document.getElementById('traceModal').style.display = 'none'; }
+  </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Thiết lập đơn giá - Quy cách tính lương</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Danh mục › Quy cách</div>
+  <div class="page-title">THIẾT LẬP ĐƠN GIÁ - QUY CÁCH TÍNH LƯƠNG</div>
+  <div id="dm7-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Tiến trình</label>
+      <select id="dm7_tt">
+        <option value="">-- Chọn Tiến trình --</option>
+        <option value="TT_TOM_SU">TT_TOM_SU - Tiến trình Tôm Sú</option>
+        <option value="TT_TOM_THE">TT_TOM_THE - Tiến trình Tôm Thẻ</option>
+        <option value="TT_DONG_GOI">TT_DONG_GOI - Tiến trình Đóng gói</option>
+      </select>
+      <label class="lbl-red">Quy cách tính lương</label>
+      <div class="input-wrap"><input type="text" id="dm7_ma" maxlength="20" placeholder="Nhập mã..." oninput="this.value = this.value.replace(/\s/g, '')"><div class="input-note">Bắt buộc. Viết liền không có khoảng trắng. VD: LXPTO, NBN</div></div>
+      <label class="lbl-red">Tên quy cách</label>
+      <input type="text" id="dm7_ten" placeholder="Nhập tên quy cách...">
+      <label class="lbl-red">Đơn vị tính</label>
+      <select id="dm7_dvt">
+        <option value="">-- Chọn ĐVT --</option>
+        <option value="Kg">Kg</option>
+        <option value="Gam">Gam</option>
+        <option value="Lbs">Lbs</option>
+        <option value="Block">Block</option>
+        <option value="Khay">Khay</option>
+        <option value="Thùng">Thùng</option>
+      </select>
+      
+      <label>Đơn giá trong giờ (1)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_tronggio" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Đơn giá ca đêm (2)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_cadem" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Đơn giá tăng ca (3)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_ngoaigio" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Đơn giá tăng ca đêm (4)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_tangcadem" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Đơn giá ngày nghỉ (5)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_ngaynghi" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Đơn giá tăng ca đêm ngày nghỉ (6)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_demngaynghi" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Đơn giá ngày lễ (7)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_ngayle" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Đơn giá tăng ca đêm ngày lễ (8)</label>
+      <div class="input-wrap"><input type="text" id="dm7_dg_tc_dem_ngayle" placeholder="0" oninput="formatCurrency(this)"><div class="input-note">Không bắt buộc nhập (VNĐ)</div></div>
+      <label>Ghi chú</label>
+      <textarea id="dm7_note" maxlength="500" style="height:50px;" placeholder="Nhập ghi chú..."></textarea>
+      <label>Ghi chú 2</label>
+      <textarea id="dm7_note2" maxlength="500" style="height:50px;" placeholder="Nhập ghi chú 2..."></textarea>
+      
+      <label class="lbl-red">Ngày hiệu lực</label>
+      <div class="input-wrap"><input type="text" id="dm7_ngayhl" maxlength="10" placeholder="DD/MM/YYYY"><div class="input-note">Bắt buộc nhập dạng DD/MM/YYYY</div></div>
+      <label>Ngày kết thúc</label>
+      <div class="input-wrap"><input type="text" id="dm7_ngaykt" maxlength="10" placeholder="DD/MM/YYYY"><div class="input-note">Không bắt buộc nhập</div></div>
+      <label>Rank</label>
+      <div class="input-wrap"><input type="text" id="dm7_rank" maxlength="10" placeholder="Nhập rank..."></div>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dm7Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm7Save()">Lưu</button><button class="btn-delete" onclick="dm7Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm7-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox" id="dm7-chkAll" onchange="toggleAll('dm7-chkAll','.dm7-chk')"></th><th>Sửa</th><th>STT</th><th>Ngày hiệu lực</th><th>Ngày kết thúc</th><th>Tiến trình</th><th>Quy cách tính lương</th><th>Tên quy cách</th><th>Đơn vị tính</th><th>ĐG trong giờ</th><th>ĐG ca đêm</th><th>ĐG tăng ca</th><th>ĐG T.ca đêm</th><th>ĐG ngày nghỉ</th><th>ĐG T.ca đêm N.nghỉ</th><th>ĐG ngày lễ</th><th>ĐG T.ca đêm N.lễ</th><th>Ghi chú</th><th>Ghi chú 2</th><th>Rank</th></tr></thead>
+    <tbody id="dm7-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-overlay" id="dm7-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT THIẾT LẬP ĐƠN GIÁ - QUY CÁCH TÍNH LƯƠNG</span><button class="x" onclick="hideModal('dm7-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;"><strong>Rule Import:</strong><br>
+      1. Mã NL tồn tại → UPDATE Quy cách<br>
+      2. Mã NL chưa tồn tại → INSERT mới<br>
+      <span style="color:red">3. Mã trùng trong file → DỪNG, báo lỗi dòng đầu tiên trùng.</span>
+    </div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('dm7-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('dm7-imp');showAlert2('dm7-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+<!-- VÍ DỤ MẪU dm7 -->
+
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    
+    function formatCurrency(input) {
+      let val = input.value.replace(/\D/g, '');
+      input.value = val ? Number(val).toLocaleString('en-US') : '';
+    }
+
+    let dm7Data = [
+      { id:1, ngayhl:'01/01/2026', ngaykt:'', ma:'LXPTO', ten:'Lặt xẻ PTO', tt:'TT_TOM_SU', dvt:'Kg', dg_tronggio:1200, dg_cadem:1500, dg_ngoaigio:1800, dg_tangcadem:2000, dg_ngaynghi:2400, dg_demngaynghi:3000, dg_ngayle:4000, dg_tc_dem_ngayle:5000, rank:'1', note:'Lặt xẻ PTO', note2:'' },
+      { id:2, ngayhl:'01/01/2026', ngaykt:'', ma:'NBN',   ten:'Nobashi N', tt:'TT_TOM_THE', dvt:'Kg', dg_tronggio:'', dg_cadem:'', dg_ngoaigio:'', dg_tangcadem:'', dg_ngaynghi:'', dg_demngaynghi:'', dg_ngayle:'', dg_tc_dem_ngayle:'', rank:'2', note:'Nobashi N',  note2:'' },
+      { id:3, ngayhl:'01/01/2026', ngaykt:'', ma:'SUSH',  ten:'Sushi', tt:'TT_TOM_THE', dvt:'Khay', dg_tronggio:1500, dg_cadem:1800, dg_ngoaigio:2200, dg_tangcadem:2500, dg_ngaynghi:3000, dg_demngaynghi:3600, dg_ngayle:4500, dg_tc_dem_ngayle:5500, rank:'3', note:'Sushi',      note2:'' },
+      { id:4, ngayhl:'01/01/2026', ngaykt:'', ma:'PD',    ten:'Peeled Deveined (Lột vỏ, rút chỉ)', tt:'TT_TOM_SU', dvt:'Lbs', dg_tronggio:1000, dg_cadem:1200, dg_ngoaigio:1500, dg_tangcadem:1700, dg_ngaynghi:2000, dg_demngaynghi:2500, dg_ngayle:3000, dg_tc_dem_ngayle:3500, rank:'4', note:'Peeled Deveined (Lột vỏ, rút chỉ)', note2:'' },
+      { id:5, ngayhl:'01/01/2026', ngaykt:'', ma:'HLSO',  ten:'Headless Shell-on (Bỏ đầu, còn vỏ)', tt:'TT_TOM_SU', dvt:'Kg', dg_tronggio:'', dg_cadem:'', dg_ngoaigio:'', dg_tangcadem:'', dg_ngaynghi:'', dg_demngaynghi:'', dg_ngayle:'', dg_tc_dem_ngayle:'', rank:'5', note:'Headless Shell-on (Bỏ đầu, còn vỏ)', note2:'' },
+      { id:6, ngayhl:'01/01/2026', ngaykt:'31/12/2026', ma:'CPTO',  ten:'Cooked Peeled Tail-on (Luộc, lột vỏ, chừa đuôi)', tt:'TT_TOM_SU', dvt:'Lbs', dg_tronggio:1800, dg_cadem:2200, dg_ngoaigio:2700, dg_tangcadem:3100, dg_ngaynghi:3600, dg_demngaynghi:4500, dg_ngayle:5000, dg_tc_dem_ngayle:6000, rank:'6', note:'Cooked Peeled Tail-on (Luộc, lột vỏ, chừa đuôi)', note2:'' }
+    ];
+    let dm7NextId = 7;
+    const ttMap = {
+      "TT_TOM_SU": "TT_TOM_SU - Tiến trình Tôm Sú",
+      "TT_TOM_THE": "TT_TOM_THE - Tiến trình Tôm Thẻ",
+      "TT_DONG_GOI": "TT_DONG_GOI - Tiến trình Đóng gói"
+    };
+
+    function dm7Render() {
+      const tbody = document.getElementById('dm7-tbody');
+      tbody.innerHTML = '';
+      dm7Data.forEach((r, i) => {
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="dm7-chk" value="${r.id}"></td>
+          <td><button class="btn-edit-row" onclick="dm7EditById(${r.id})">✎</button></td>
+          <td>${i+1}</td>
+          <td style="text-align:center;">${r.ngayhl}</td>
+          <td style="text-align:center;">${r.ngaykt || ''}</td>
+          <td>${ttMap[r.tt] || r.tt || ''}</td>
+          <td style="font-weight:bold;color:#0056b3">${r.ma}</td>
+          <td>${r.ten}</td>
+          <td>${r.dvt || ''}</td>
+          <td style="text-align:right;">${r.dg_tronggio ? Number(r.dg_tronggio).toLocaleString() : ''}</td>
+          <td style="text-align:right;">${r.dg_cadem ? Number(r.dg_cadem).toLocaleString() : ''}</td>
+          <td style="text-align:right;">${r.dg_ngoaigio ? Number(r.dg_ngoaigio).toLocaleString() : ''}</td>
+          <td style="text-align:right;">${r.dg_tangcadem ? Number(r.dg_tangcadem).toLocaleString() : ''}</td>
+          <td style="text-align:right;">${r.dg_ngaynghi ? Number(r.dg_ngaynghi).toLocaleString() : ''}</td>
+          <td style="text-align:right;">${r.dg_demngaynghi ? Number(r.dg_demngaynghi).toLocaleString() : ''}</td>
+          <td style="text-align:right;">${r.dg_ngayle ? Number(r.dg_ngayle).toLocaleString() : ''}</td>
+          <td style="text-align:right;">${r.dg_tc_dem_ngayle ? Number(r.dg_tc_dem_ngayle).toLocaleString() : ''}</td>
+          <td class="tl">${r.note}</td>
+          <td class="tl">${r.note2 || ''}</td>
+          <td style="text-align:center;">${r.rank || ''}</td>
+        </tr>`;
+      });
+    }
+
+    function dm7Clear() {
+      document.getElementById('dm7_ngayhl').value = '';
+      document.getElementById('dm7_ngaykt').value = '';
+      document.getElementById('dm7_ma').value = '';
+      document.getElementById('dm7_ten').value = '';
+      document.getElementById('dm7_tt').value = '';
+      document.getElementById('dm7_dvt').value = '';
+      document.getElementById('dm7_ma').readOnly = false;
+      document.getElementById('dm7_dg_tronggio').value = '';
+      document.getElementById('dm7_dg_cadem').value = '';
+      document.getElementById('dm7_dg_ngoaigio').value = '';
+      document.getElementById('dm7_dg_tangcadem').value = '';
+      document.getElementById('dm7_dg_ngaynghi').value = '';
+      document.getElementById('dm7_dg_demngaynghi').value = '';
+      document.getElementById('dm7_dg_ngayle').value = '';
+      document.getElementById('dm7_dg_tc_dem_ngayle').value = '';
+      document.getElementById('dm7_rank').value = '';
+      document.getElementById('dm7_note').value = '';
+      document.getElementById('dm7_note2').value = '';
+      document.getElementById('dm7-alert').style.display = 'none';
+    }
+
+    function dm7EditById(id) {
+      const r = dm7Data.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('dm7_ngayhl').value = r.ngayhl || '';
+      document.getElementById('dm7_ngaykt').value = r.ngaykt || '';
+      document.getElementById('dm7_ma').value = r.ma;
+      document.getElementById('dm7_ten').value = r.ten;
+      document.getElementById('dm7_tt').value = r.tt || '';
+      document.getElementById('dm7_dvt').value = r.dvt || '';
+      document.getElementById('dm7_ma').readOnly = true;
+      document.getElementById('dm7_dg_tronggio').value = r.dg_tronggio ? Number(r.dg_tronggio).toLocaleString('en-US') : '';
+      document.getElementById('dm7_dg_cadem').value = r.dg_cadem ? Number(r.dg_cadem).toLocaleString('en-US') : '';
+      document.getElementById('dm7_dg_ngoaigio').value = r.dg_ngoaigio ? Number(r.dg_ngoaigio).toLocaleString('en-US') : '';
+      document.getElementById('dm7_dg_tangcadem').value = r.dg_tangcadem ? Number(r.dg_tangcadem).toLocaleString('en-US') : '';
+      document.getElementById('dm7_dg_ngaynghi').value = r.dg_ngaynghi ? Number(r.dg_ngaynghi).toLocaleString('en-US') : '';
+      document.getElementById('dm7_dg_demngaynghi').value = r.dg_demngaynghi ? Number(r.dg_demngaynghi).toLocaleString('en-US') : '';
+      document.getElementById('dm7_dg_ngayle').value = r.dg_ngayle ? Number(r.dg_ngayle).toLocaleString('en-US') : '';
+      document.getElementById('dm7_dg_tc_dem_ngayle').value = r.dg_tc_dem_ngayle ? Number(r.dg_tc_dem_ngayle).toLocaleString('en-US') : '';
+      document.getElementById('dm7_rank').value = r.rank || '';
+      document.getElementById('dm7_note').value = r.note;
+      document.getElementById('dm7_note2').value = r.note2 || '';
+      window.scrollTo(0, 0);
+      showAlert2('dm7-alert', "Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", 'success');
+    }
+
+    function dm7Save() {
+      const ngayhl = document.getElementById('dm7_ngayhl').value.trim();
+      const ngaykt = document.getElementById('dm7_ngaykt').value.trim();
+      const ma = document.getElementById('dm7_ma').value.trim().toUpperCase();
+      const ten = document.getElementById('dm7_ten').value.trim();
+      const tt = document.getElementById('dm7_tt').value;
+      const dvt = document.getElementById('dm7_dvt').value;
+      const dg_tronggio = document.getElementById('dm7_dg_tronggio').value.replace(/,/g, '');
+      const dg_cadem = document.getElementById('dm7_dg_cadem').value.replace(/,/g, '');
+      const dg_ngoaigio = document.getElementById('dm7_dg_ngoaigio').value.replace(/,/g, '');
+      const dg_tangcadem = document.getElementById('dm7_dg_tangcadem').value.replace(/,/g, '');
+      const dg_ngaynghi = document.getElementById('dm7_dg_ngaynghi').value.replace(/,/g, '');
+      const dg_demngaynghi = document.getElementById('dm7_dg_demngaynghi').value.replace(/,/g, '');
+      const dg_ngayle = document.getElementById('dm7_dg_ngayle').value.replace(/,/g, '');
+      const dg_tc_dem_ngayle = document.getElementById('dm7_dg_tc_dem_ngayle').value.replace(/,/g, '');
+      const rank = document.getElementById('dm7_rank').value.trim();
+      const note = document.getElementById('dm7_note').value.trim();
+      const note2 = document.getElementById('dm7_note2').value.trim();
+      const isEdit = document.getElementById('dm7_ma').readOnly;
+      if (!ngayhl) return showAlert2('dm7-alert', 'Vui lòng nhập Ngày hiệu lực.', 'error');
+      if (!/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/\d{4}$/.test(ngayhl)) return showAlert2('dm7-alert', 'Ngày hiệu lực phải đúng định dạng DD/MM/YYYY.', 'error');
+      if (ngaykt && !/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/\d{4}$/.test(ngaykt)) return showAlert2('dm7-alert', 'Ngày kết thúc phải đúng định dạng DD/MM/YYYY.', 'error');
+      if (!ma) return showAlert2('dm7-alert', 'Vui lòng nhập Quy cách tính lương.', 'error');
+      if (!ten) return showAlert2('dm7-alert', 'Vui lòng nhập Tên quy cách.', 'error');
+      if (!tt) return showAlert2('dm7-alert', 'Vui lòng chọn Tiến trình.', 'error');
+      if (!dvt) return showAlert2('dm7-alert', 'Vui lòng chọn Đơn vị tính.', 'error');
+      if (!/^[a-zA-Z0-9]+$/.test(ma)) return showAlert2('dm7-alert', 'Quy cách tính lương không hợp lệ (chỉ chữ/số, không dấu).', 'error');
+      if (!isEdit && dm7Data.find(x => x.ma === ma)) return showAlert2('dm7-alert', '<b>Lỗi:</b> Mã [' + ma + '] đã tồn tại.', 'error');
+      if (isEdit) {
+        const r = dm7Data.find(x => x.ma === ma);
+        if (r) { r.ngayhl = ngayhl; r.ngaykt = ngaykt; r.ten = ten; r.tt = tt; r.dvt = dvt; r.dg_tronggio = dg_tronggio; r.dg_cadem = dg_cadem; r.dg_ngoaigio = dg_ngoaigio; r.dg_tangcadem = dg_tangcadem; r.dg_ngaynghi = dg_ngaynghi; r.dg_demngaynghi = dg_demngaynghi; r.dg_ngayle = dg_ngayle; r.dg_tc_dem_ngayle = dg_tc_dem_ngayle; r.rank = rank; r.note = note; r.note2 = note2; }
+        showAlert2('dm7-alert', 'Cập nhật Quy cách thành công!', 'success');
+      } else {
+        dm7Data.push({ id: dm7NextId++, ngayhl, ngaykt, ma, ten, tt, dvt, dg_tronggio, dg_cadem, dg_ngoaigio, dg_tangcadem, dg_ngaynghi, dg_demngaynghi, dg_ngayle, dg_tc_dem_ngayle, rank, note, note2 });
+        showAlert2('dm7-alert', 'Thêm mới Quy cách thành công!', 'success');
+      }
+      dm7Render();
+      dm7Clear();
+    }
+
+    function dm7Delete() {
+      const chks = document.querySelectorAll('.dm7-chk:checked');
+      if (!chks.length) return showAlert2('dm7-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} loại NL đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        dm7Data = dm7Data.filter(x => !ids.includes(x.id));
+        dm7Render();
+        showAlert2('dm7-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    dm7Render();
+  </script>
+</body>
+</html>

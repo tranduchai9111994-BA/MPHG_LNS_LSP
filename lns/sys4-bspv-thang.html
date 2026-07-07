@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Thiết lập (System) › Tạo công thức lương</div>
+  <div class="page-title">TẠO CÔNG THỨC LƯƠNG</div>
+  <div class="desc-box"><strong>Mục đích:</strong> Ghép tiêu chí thành công thức lương cuối cùng ghi vào kết quả tính lương.</div>
+  <div class="form-panel">
+    <div style="display:grid;grid-template-columns:150px 1fr 150px 1fr;gap:10px 15px;align-items:center;">
+      <label class="lbl-red">Mã công thức</label><input type="text" id="txtMa" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label>Tên tiếng Anh</label><input type="text" id="txtTenEN" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label class="lbl-red">Tên tiếng Việt</label><input type="text" id="txtTenVN" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label class="lbl-red">Tiêu chí kết quả</label><input type="text" id="txtTieuChi" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label class="lbl-red">Ghi vào</label><input type="text" id="txtGhiVao" style="padding:5px;border:1px solid #ccc;width:100%;">
+      <label>Kiểu dữ liệu</label><input type="text" id="txtKieu" style="padding:5px;border:1px solid #ccc;width:100px;">
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-top:8px;">
+      <label class="lbl-red" style="width:150px;padding-top:4px">Công thức (SQL)</label>
+      <textarea id="txtCongThuc" style="flex:1;padding:5px;border:1px solid #ccc;min-height:40px;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-top:8px;">
+      <label style="width:150px;padding-top:4px">Điều kiện khóa</label>
+      <textarea id="txtDieuKien" style="flex:1;padding:5px;border:1px solid #ccc;min-height:40px;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+      <label style="width:150px">LSP đọc lại qua</label><input type="text" id="txtDocLai" style="flex:1;padding:5px;border:1px solid #ccc;">
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+      <label style="width:150px">Sử dụng?</label><input type="checkbox" checked>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm kiếm</button><button class="btn-refresh">Làm mới</button>
+    <button class="btn-add">Thêm mới</button><button class="btn-save">Lưu</button>
+    <button class="btn-delete">Xóa</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap">
+    <table>
+      <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Mã công thức</th><th>Tên tiếng Anh</th><th>Tên tiếng Việt</th><th>Tiêu chí KQ</th><th>Công thức</th><th>Ghi vào</th><th>Điều kiện khóa</th><th>LSP đọc lại</th><th>Sử dụng</th></tr></thead>
+      <tbody>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" onclick="editRow()" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>1</td><td>CT_LNS_NangSuatTinhLuong</td><td>LNS_Productivity_Salary</td><td>Năng suất tính lương (kết quả LNS)</td><td>TT_NS_TinhLuong</td><td class="tl">= TT_NS_TinhLuong</td><td class="tl">NS_Result.productivity_salary</td><td class="tl">Chỉ ghi chính thức khi is_locked = 1; nếu chưa khóa → IsPreview = 1</td><td>HT_PR_NangSuatTinhLuong</td><td>X</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function editRow() {
+      document.getElementById('txtMa').value = 'CT_LNS_NangSuatTinhLuong';
+      document.getElementById('txtTenEN').value = 'LNS_Productivity_Salary';
+      document.getElementById('txtTenVN').value = 'Năng suất tính lương (kết quả LNS)';
+      document.getElementById('txtTieuChi').value = 'TT_NS_TinhLuong';
+      document.getElementById('txtGhiVao').value = 'NS_Result.productivity_salary';
+      document.getElementById('txtKieu').value = 'float';
+      document.getElementById('txtCongThuc').value = '= TT_NS_TinhLuong';
+      document.getElementById('txtDieuKien').value = 'Chỉ ghi chính thức khi is_locked = 1; nếu chưa khóa → IsPreview = 1';
+      document.getElementById('txtDocLai').value = 'HT_PR_NangSuatTinhLuong';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+
+  </script>
+</body>
+</html>

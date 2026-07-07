@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Nhập dữ liệu › % Hệ số</div>
+  <div class="page-title">NHẬP DỮ LIỆU – % HỆ SỐ THEO THÁNG</div>
+  <div id="fn3-alert" class="alert-box"></div>
+
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh">Làm mới</button>
+    <button class="btn-add" onclick="fn3OpenAdd()">Thêm mới</button><button class="btn-delete" onclick="fn3Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('fn3-imp')">Nhập dữ liệu (Import Excel)</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox" id="fn3-chkAll" onchange="toggleAll('fn3-chkAll','.fn3-chk')"></th><th>Sửa</th><th>STT</th><th>Tháng (Kỳ NS)</th><th>Mã NV</th><th class="tl">Tên nhân viên</th><th class="tl">Bộ phận</th><th>% Hệ số</th><th class="tl">Ghi chú</th></tr></thead>
+    <tbody id="fn3-tbody"></tbody>
+  </table></div>
+</div>
+<div class="modal-overlay" id="fn3-add"><div class="modal-box">
+  <div class="modal-hdr"><span id="fn3-title">THÊM MỚI % HỆ SỐ NHÂN VIÊN</span><button class="x" onclick="hideModal('fn3-add')">✕</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="fn3-eid">
+    <div class="form-row"><label>Tháng (Kỳ NS) <span class="req">*</span></label><input type="text" id="fn3-thang" placeholder="MM/yyyy"></div>
+    <div class="form-row"><label>Mã nhân viên <span class="req">*</span></label><input type="text" id="fn3-ma" placeholder="Nhập mã NV..." onblur="fn3LoadName()"></div>
+    <div class="form-row"><label>Tên nhân viên</label><input type="text" id="fn3-ten" disabled style="background:#f4f4f4"></div>
+    <div class="form-row"><label>% Hệ số</label><input type="number" id="fn3-heso" placeholder="0 - 200"></div>
+    <div class="fn-note">0–200%. Để trống hệ thống dùng default 100%.</div>
+    <div class="form-row"><label>Ghi chú</label><textarea id="fn3-note" placeholder="Nhập ghi chú..."></textarea></div>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('fn3-add')">Hủy bỏ</button><button class="btn-ok" onclick="fn3Save()">Lưu dữ liệu</button></div>
+</div></div>
+<div class="modal-overlay" id="fn3-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT % HỆ SỐ TỪ EXCEL</span><button class="x" onclick="hideModal('fn3-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#fdfdfe;padding:8px;border:1px dashed #ccc;margin-bottom:10px;font-size:11px;"><strong>Rule Import:</strong><ul style="margin:5px 0 0 0;padding-left:18px;"><li>Cột bắt buộc: <span style="color:red">Mã NV, Tháng (MM/yyyy)</span>.</li><li>% Hệ số để trống sẽ bỏ qua (không ghi đè NULL).</li><li>Cơ chế: Upsert theo Mã NV + Kỳ.</li></ul></div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải Template mẫu</a>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('fn3-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('fn3-imp');showAlert2('fn3-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+let fn3Data = [
+  {id:1, thang:'06/2026', ma:'NV1001', ten:'Nguyễn Văn An',   bp:'Tẩm bột',         heso:120, note:'Năng suất vượt mức KPI tháng 6'},
+  {id:2, thang:'06/2026', ma:'NV1002', ten:'Trần Minh Hải',  bp:'Hàng Virut (VR)', heso:100, note:''},
+  {id:3, thang:'06/2026', ma:'NV1005', ten:'Đặng Hoàng Nam', bp:'Sushi (Su)',       heso:80,  note:'Nghỉ phép 5 ngày trong tháng'}
+];
+let fn3NextId = 4;
+function fn3Render() {
+  const tbody = document.getElementById('fn3-tbody');
+  tbody.innerHTML = '';
+  fn3Data.forEach((r,i) => {
+    const clr = r.heso===100?'#333':(r.heso>100?'#28a745':'#dc3545');
+    const fw = r.heso!==100?'font-weight:bold;':'';
+    tbody.innerHTML += `<tr>
+      <td><input type="checkbox" class="fn3-chk" value="${r.id}"></td>
+      <td><span class="edit-icon" onclick="fn3OpenEdit(${r.id})">✎</span></td>
+      <td>${i+1}</td><td>${r.thang}</td>
+      <td style="font-weight:bold">${r.ma}</td>
+      <td class="tl">${r.ten}</td><td class="tl">${r.bp}</td>
+      <td style="color:${clr};${fw}">${r.heso}%</td>
+      <td class="tl">${r.note}</td></tr>`;
+  });
+}
+function fn3OpenAdd() {
+  document.getElementById('fn3-title').innerText = 'THÊM MỚI % HỆ SỐ NHÂN VIÊN';
+  document.getElementById('fn3-eid').value = '';
+  ['fn3-thang','fn3-ma','fn3-ten','fn3-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fn3-heso').value = '';
+  showModal('fn3-add');
+}
+function fn3OpenEdit(id) {
+  const r = fn3Data.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('fn3-title').innerText = 'SỬA % HỆ SỐ NHÂN VIÊN';
+  document.getElementById('fn3-eid').value = r.id;
+  document.getElementById('fn3-thang').value = r.thang;
+  document.getElementById('fn3-ma').value = r.ma;
+  document.getElementById('fn3-ten').value = r.ten;
+  document.getElementById('fn3-heso').value = r.heso;
+  document.getElementById('fn3-note').value = r.note;
+  showModal('fn3-add');
+}
+function fn3LoadName() {
+  const ma = document.getElementById('fn3-ma').value.trim().toUpperCase();
+  const names = {NV1001:'Nguyễn Văn An',NV1002:'Trần Minh Hải',NV1005:'Đặng Hoàng Nam'};
+  document.getElementById('fn3-ten').value = names[ma] || (ma ? 'Nhân viên Demo '+ma : '');
+}
+function fn3Save() {
+  const eid = document.getElementById('fn3-eid').value;
+  const t = document.getElementById('fn3-thang').value.trim();
+  const ma = document.getElementById('fn3-ma').value.trim().toUpperCase();
+  const ten = document.getElementById('fn3-ten').value || 'Nhân viên '+ma;
+  const hesoStr = document.getElementById('fn3-heso').value.trim();
+  const note = document.getElementById('fn3-note').value.trim();
+  if (!t || !ma) return alert('Vui lòng nhập Tháng và Mã nhân viên.');
+  if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(t)) return alert('Định dạng tháng không hợp lệ (MM/yyyy).');
+  let heso = hesoStr === '' ? 100 : parseFloat(hesoStr);
+  if (heso<0||heso>200) { if (!confirm(`% Hệ số ${heso}% ngoài khoảng 0-200%. Vẫn muốn lưu?`)) return; }
+  if (eid) {
+    const r = fn3Data.find(x => x.id == eid);
+    Object.assign(r, {thang:t,ma,ten,heso,note});
+    showAlert2('fn3-alert','Cập nhật thành công!','success');
+  } else {
+    fn3Data.push({id:fn3NextId++,thang:t,ma,ten,bp:'Bộ phận (Auto)',heso,note});
+    showAlert2('fn3-alert','Thêm mới thành công!','success');
+  }
+  fn3Render();
+  hideModal('fn3-add');
+}
+function fn3Delete() {
+  const chks = document.querySelectorAll('.fn3-chk:checked');
+  if (!chks.length) return showAlert2('fn3-alert','Vui lòng chọn dữ liệu cần xóa.','warning');
+  if (confirm(`Xóa ${chks.length} dòng đã chọn?`)) {
+    const ids = Array.from(chks).map(c => parseInt(c.value));
+    fn3Data = fn3Data.filter(x => !ids.includes(x.id));
+    fn3Render();
+    showAlert2('fn3-alert','Đã xóa thành công.','success');
+  }
+}
+
+fn3Render();
+  </script>
+</body>
+</html>

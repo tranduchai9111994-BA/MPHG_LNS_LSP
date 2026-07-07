@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Báo cáo công năng suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 20px 0; letter-spacing: 1px; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+      
+      .table-header th { background: #1e3a5f; color: white; padding: 8px; text-align: center; font-size: 12px; border: 1px solid #cfd8dc; }
+      .table-row td { padding: 8px; font-size: 12px; border: 1px solid #cfd8dc; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương › Báo cáo › Báo cáo công năng suất</div>
+      <div class="bc-title">BÁO CÁO CÔNG NĂNG SUẤT</div>
+      <div id="bc0-alert" class="alert-box"></div>
+      
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label>Mã nhân viên</label>
+          <input type="text" id="bc0_manv">
+          
+          <label>Tên nhân viên</label>
+          <div style="display:flex;gap:4px;">
+            <input type="text" id="bc0_tennv" style="flex:1;">
+            <button style="padding:2px 8px;cursor:pointer;">...</button>
+          </div>
+          
+          <label>Công ty</label>
+          <select id="bc0_congty">
+            <option value="">-- Chọn --</option>
+            <option value="CT1">Công Ty Cổ Phần Thủy Sản Minh Phú Hậu Giang</option>
+          </select>
+
+          <label>Đơn vị cấp 1</label>
+          <select id="bc0_dv1">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất">Sản xuất</option>
+          </select>
+          
+          <label>Đơn vị cấp 2</label>
+          <select id="bc0_dv2">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất MPHG">Sản xuất MPHG</option>
+          </select>
+          
+          <label>Đơn vị cấp 3</label>
+          <select id="bc0_dv3">
+            <option value="">-- Chọn --</option>
+            <option value="PTO">PTO</option>
+          </select>
+          
+          <label>Đơn vị cấp 4</label>
+          <select id="bc0_dv4"><option value="">-- Chọn --</option></select>
+          
+          <label>Đơn vị cấp 5</label>
+          <select id="bc0_dv5"><option value="">-- Chọn --</option></select>
+
+          <label>Đơn vị cấp 6</label>
+          <select id="bc0_dv6"><option value="">-- Chọn --</option></select>
+
+          <label>Bộ phận tính lương</label>
+          <select id="bc0_bptl"><option value="">-- Chọn --</option></select>
+
+          <label>Vị trí công việc</label>
+          <select id="bc0_vtcv"><option value="">-- Chọn --</option></select>
+
+          <label>Nơi làm việc</label>
+          <select id="bc0_nlv"><option value="">-- Chọn --</option></select>
+
+          <label>Nhóm tính lương</label>
+          <select id="bc0_ntl"><option value="">-- Chọn --</option></select>
+          
+          <label class="lbl-red">Tháng (*)</label>
+          <input type="text" id="bc0_thang" placeholder="MM/YYYY" maxlength="7" value="06/2026">
+          
+          <label></label><div></div>
+
+          <label>Từ ngày</label>
+          <input type="date" id="bc0_tungay">
+
+          <label>Đến ngày</label>
+          <input type="date" id="bc0_denngay">
+
+          <label></label><div></div>
+        </div>
+        <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
+            <label style="font-size:12px; margin-right:20px;">Tình trạng</label>
+            <label style="font-size:12px; margin-right:15px;"><input type="radio" name="tinhtrang" checked> Đang làm việc</label>
+            <label style="font-size:12px; margin-right:15px;"><input type="radio" name="tinhtrang"> Thôi việc</label>
+            <label style="font-size:12px;"><input type="radio" name="tinhtrang"> Tất cả</label>
+        </div>
+      </div>
+      
+      <div class="form-panel" style="background:#f0f4ff; border:1px solid #b3c6e0; padding:12px 15px; margin-bottom:15px;">
+        <div style="font-weight:bold;color:#003366;font-size:12px;margin-bottom:8px;">Sắp xếp tiến trình / quy cách khi xuất báo cáo</div>
+        <div style="display:grid; grid-template-columns:140px 1fr 140px 1fr; gap:8px 12px; align-items:center; font-size:12px;">
+          <label class="lbl-red" style="font-size:12px;">Nguyên tắc sắp xếp (*)</label>
+          <select id="bc0_sort_rule" style="padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">
+            <option value="REPORT_TEMPLATE_ORDER" selected>Theo thứ tự cấu hình báo cáo</option>
+            <option value="PROCESS_NAME">Theo tên tiến trình/công đoạn</option>
+            <option value="PRODUCT_SPEC_GROUP">Theo nhóm sản phẩm/quy cách</option>
+            <option value="SHIFT_TYPE">Theo loại ca</option>
+            <option value="UOM">Theo đơn vị tính</option>
+            <option value="SAP_INTERNAL_CODE">Theo mã SAP / mã nội bộ</option>
+            <option value="QUANTITY_DESC">Theo sản lượng phát sinh giảm dần</option>
+            <option value="HAS_DATA_FIRST">Có phát sinh trước, không phát sinh sau</option>
+            <option value="PROCESS_CODE">Theo mã tiến trình</option>
+            <option value="USER_CUSTOM">Theo cấu hình cá nhân</option>
+          </select>
+          <label class="lbl-red" style="font-size:12px;">Chiều sắp xếp (*)</label>
+          <div style="display:flex;gap:15px;align-items:center;">
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc0_sort_dir" value="ASC" checked> Tăng dần</label>
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc0_sort_dir" value="DESC"> Giảm dần</label>
+          </div>
+          <label style="font-size:12px;">Ẩn QCTL không phát sinh</label>
+          <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="checkbox" id="bc0_hide_empty" checked> Chỉ xuất QCTL có năng suất phát sinh</label>
+        </div>
+      </div>
+
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc0Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="showAlert2('bc0-alert', 'Tính năng xuất Excel đang hoàn thiện.', 'info')">Xuất Excel</button>
+      </div>
+
+      <div class="grid-wrap" style="height:400px; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr class="table-header">
+              <th style="min-width:40px;">STT</th>
+              <th style="min-width:60px;">Đơn vị</th>
+              <th style="min-width:120px;">Bộ phận</th>
+              <th style="min-width:140px;">Nhóm tính lương</th>
+              <th style="min-width:60px;">MÃ NV</th>
+              <th style="min-width:120px;">Họ và tên</th>
+              <th style="min-width:40px;">%</th>
+              <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
+              <th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th>
+              <th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th>
+              <th style="min-width:80px;">T.C N.Suất</th>
+              <th style="min-width:80px;">TC T.Tế</th>
+            </tr>
+          </thead>
+          <tbody id="bc0-tbody">
+            <tr class="table-row"><td colspan="40" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Auto-populate data on load
+      bc0Search();
+    });
+
+    function bc0Search() {
+      const thang = document.getElementById('bc0_thang').value.trim();
+      if (!thang) {
+        showAlert2('bc0-alert', 'Vui lòng nhập Tháng tính lương (bắt buộc nhập).', 'error');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) {
+        showAlert2('bc0-alert', 'Định dạng tháng không hợp lệ. Vui lòng nhập MM/YYYY (Ví dụ: 06/2026).', 'error');
+        return;
+      }
+      const tbody = document.getElementById('bc0-tbody');
+      
+      // Generate some days data
+      const daysRow1 = Array(31).fill('1.1').map(v => `<td style="text-align:center;">${v}</td>`).join('');
+      const daysRow2 = Array(31).fill('1').map((v, i) => `<td style="text-align:center;">${i%2 === 0 ? '1' : '0.5'}</td>`).join('');
+      const daysRow3 = Array(31).fill('1').map((v, i) => `<td style="text-align:center;">${i%3 === 0 ? '0.8' : '1'}</td>`).join('');
+      
+      tbody.innerHTML = `
+        <tr class="table-row" style="background:#fff;">
+          <td style="text-align:center;">1</td>
+          <td style="text-align:center;">NO101</td>
+          <td>Nobashi tài 01 ka</td>
+          <td>NSC - Tách cho PV</td>
+          <td style="text-align:center;font-weight:bold;">NV01</td>
+          <td>Nguyễn Văn A</td>
+          <td style="text-align:center;">110</td>
+          ${daysRow1}
+          <td style="text-align:right;font-weight:bold;">29.70</td>
+          <td style="text-align:right;font-weight:bold;">29.70</td>
+        </tr>
+        <tr class="table-row" style="background:#fafafa;">
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">NO101</td>
+          <td>Nobashi tài 01 ka</td>
+          <td>NSC - Tách cho PV</td>
+          <td style="text-align:center;font-weight:bold;">NV02</td>
+          <td>Trần Thị B</td>
+          <td style="text-align:center;"></td>
+          ${daysRow2}
+          <td style="text-align:right;font-weight:bold;">22.60</td>
+          <td style="text-align:right;font-weight:bold;">22.60</td>
+        </tr>
+        <tr class="table-row" style="background:#fff;">
+          <td style="text-align:center;">3</td>
+          <td style="text-align:center;">NO101</td>
+          <td>Nobashi tài 01 ka</td>
+          <td>NSC - Tách cho PV</td>
+          <td style="text-align:center;font-weight:bold;">NV03</td>
+          <td>Lê Văn C</td>
+          <td style="text-align:center;">85</td>
+          ${daysRow3}
+          <td style="text-align:right;font-weight:bold;">23.50</td>
+          <td style="text-align:right;font-weight:bold;">23.50</td>
+        </tr>
+        <tr class="table-row" style="background:#e8f5e9; font-weight:bold;">
+          <td colspan="7" style="text-align:center;">Tổng B1</td>
+          ${Array(31).fill('<td style="text-align:center;">11.92</td>').join('')}
+          <td style="text-align:right;">297.25</td>
+          <td style="text-align:right;">297.25</td>
+        </tr>
+      `;
+    }
+  </script>
+</body>
+</html>

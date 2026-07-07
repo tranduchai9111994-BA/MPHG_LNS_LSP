@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Mở khóa năng suất</div>
+  <div class="page-title">MỞ KHÓA LƯƠNG NĂNG SUẤT</div>
+  <div id="fn8-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-3col">
+      <label>Mã nhân viên</label><input type="text">
+      <label>Tên nhân viên</label><input type="text">
+      <label>Công ty</label><select><option>Công Ty Cổ Phần Thủy Sản Minh Phú</option></select>
+      <label>Đơn vị cấp 1</label><select><option></option></select>
+      <label>Đơn vị cấp 2</label><select><option></option></select>
+      <label>Đơn vị cấp 3</label><select><option></option></select>
+      <label>Đơn vị cấp 4</label><select><option></option></select>
+      <label>Đơn vị cấp 5</label><select><option></option></select>
+      <label>Đơn vị cấp 6</label><select><option></option></select>
+      <label>Đơn vị cấp 7</label><select><option></option></select>
+      <label>Bộ phận tính lương</label><select><option></option></select>
+      <label>Vị trí công việc</label><select><option></option></select>
+    </div>
+    <div class="status-row">
+      <strong>Tình trạng</strong>
+      <label><input type="radio" name="fn8_ws"> Đang làm việc</label>
+      <label><input type="radio" name="fn8_ws"> Thôi việc</label>
+      <label><input type="radio" name="fn8_ws" checked> Tất cả</label>
+    </div>
+    <div style="margin-top:10px;display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center;">
+      <label style="color:red;font-weight:bold">Tháng / Năm</label>
+      <select style="width:180px;padding:4px;border:1px solid #ccc;"><option>09/2025</option></select>
+      <label>Danh sách mã NV</label>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <textarea style="flex:1;height:45px;border:1px solid #ccc;padding:5px;resize:none;" placeholder="Nhập danh sách mã NV cách nhau bởi dấu phẩy..."></textarea>
+        <button style="background:#dc3545;color:#fff;border:none;width:30px;height:30px;cursor:pointer;border-radius:3px;font-size:14px;">🗑</button>
+      </div>
+      <label>Khóa phiếu lương</label>
+      <div class="radio-group">
+        <label><input type="radio" name="fn8_lock"> Chưa khóa</label>
+        <label><input type="radio" name="fn8_lock" checked> Đã khóa</label>
+        <label><input type="radio" name="fn8_lock"> Tất cả</label>
+      </div>
+    </div>
+  </div>
+  <div class="actions-rel">
+    <button class="btn-search">Tìm Kiếm</button>
+    <button class="btn-refresh">Làm mới</button>
+    <button class="btn-unlock" onclick="fn8OpenUnlock()">Mở khóa</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+    <div class="lock-all-wrap"><input type="checkbox" id="fn8-lockAll"> <label for="fn8-lockAll">Mở khóa tất cả theo điều kiện lọc</label></div>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox" id="fn8-chkAll" onchange="toggleAll('fn8-chkAll','.fn8-chk')"></th><th>STT</th><th>Trạng thái</th><th>Tháng</th><th>Mã NV</th><th>Tên NV</th><th>Vị trí công việc</th><th>ĐV cấp 1</th><th>ĐV cấp 2</th><th>ĐV cấp 3</th></tr></thead>
+    <tbody id="fn8-tbody"></tbody>
+  </table></div>
+</div>
+<div class="modal-overlay" id="fn8-modal"><div class="modal-box">
+  <div class="modal-hdr"><span>XÁC NHẬN MỞ KHÓA</span><button class="x" onclick="hideModal('fn8-modal')">✕</button></div>
+  <div class="modal-body">
+    <div class="form-row"><label>Lý do mở khóa <span class="req">*</span></label><textarea id="fn8-reason" placeholder="Nhập lý do bắt buộc để ghi nhận log..."></textarea></div>
+    <div class="error-msg" id="fn8-err">Trường lý do là bắt buộc nhập!</div>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('fn8-modal')">Hủy bỏ</button><button class="btn-ok" onclick="fn8ConfirmUnlock()">Xác nhận Mở khóa</button></div>
+</div>
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+function fn8OpenUnlock() {
+  const lockAll = document.getElementById('fn8-lockAll').checked;
+  const sel = document.querySelectorAll('.fn8-chk:checked');
+  if (!lockAll && !sel.length) return showAlert2('fn8-alert','Vui lòng chọn nhân viên cần mở khóa hoặc chọn "Mở khóa tất cả".','error');
+  if (!lockAll) {
+    let valid = 0;
+    sel.forEach(c => { if (c.closest('tr').getAttribute('data-locked')==='true') valid++; });
+    if (!valid) return showAlert2('fn8-alert','Không có dòng nào được mở khóa (dữ liệu đã ở trạng thái Chưa khóa).','warning');
+  }
+  document.getElementById('fn8-reason').value = '';
+  document.getElementById('fn8-err').style.display = 'none';
+  showModal('fn8-modal');
+}
+function fn8ConfirmUnlock() {
+  const reason = document.getElementById('fn8-reason').value.trim();
+  if (!reason) { document.getElementById('fn8-err').style.display = 'block'; return; }
+  if (confirm('Warning: Kỳ này đã được LSP sử dụng. Mở khóa sẽ ảnh hưởng kết quả LSP. Bạn có chắc chắn?')) {
+    document.querySelectorAll('.fn8-chk:checked').forEach(c => {
+      const row = c.closest('tr');
+      if (row.getAttribute('data-locked')==='true') {
+        row.setAttribute('data-locked','false');
+        row.classList.remove('row-locked');
+        row.querySelector('.status-cell').innerText = 'Chưa khóa';
+        c.checked = false;
+      }
+    });
+    hideModal('fn8-modal');
+    showAlert2('fn8-alert','Đã mở khóa dữ liệu thành công!','warning');
+  }
+}
+
+(function() {
+  const names = ['Nguyễn Văn An','Trần Minh Hải','Lê Quốc Dũng','Phạm Thị Lan','Đặng Hoàng Nam'];
+  const pos = ['Công nhân','Tổ trưởng','KCS','Nhân viên kho'];
+  const tbody = document.getElementById('fn8-tbody');
+  for (let i=1; i<=10; i++) {
+    const locked = (i!==3 && i!==7);
+    tbody.innerHTML += `<tr class="${locked?'row-locked':''}" data-locked="${locked}">
+      <td><input type="checkbox" class="fn8-chk"></td>
+      <td>${i}</td><td class="status-cell">${locked?'Đã khóa (✔)':'Chưa khóa'}</td>
+      <td>09/2025</td><td>NV100${i}</td><td>${names[i%names.length]}</td>
+      <td>${pos[i%pos.length]}</td><td>Khối Sản Xuất</td><td>NM Thủy Sản</td><td>Phân xưởng 1</td></tr>`;
+  }
+})();
+  </script>
+</body>
+</html>

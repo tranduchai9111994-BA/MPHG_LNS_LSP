@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Thiết lập (System) › Tiêu chí tính toán</div>
+  <div class="page-title">ĐỊNH NGHĨA TIÊU CHÍ TÍNH TOÁN</div>
+  <div class="form-panel" style="max-width:750px;margin:0 auto 15px;">
+    <div class="form-row"><label class="lbl-red">Mã</label><input type="text"></div>
+    <div class="form-row"><label>Tên tiếng Anh</label><input type="text"></div>
+    <div class="form-row"><label class="lbl-red">Tên tiếng Việt</label><input type="text"></div>
+    <div class="form-row"><label class="lbl-red">Thứ tự sắp xếp</label><input type="text" style="width:120px;flex:none;"></div>
+    <div class="form-row"><label>Ghi chú</label><textarea></textarea></div>
+    <div class="form-row"><label>Mã hóa dữ liệu</label><input type="checkbox" style="width:auto;flex:none;"></div>
+    <div class="form-row"><label>Sử dụng</label><input type="checkbox" checked style="width:auto;flex:none;"></div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh">Làm mới</button>
+    <button class="btn-save2">Lưu</button><button class="btn-delete">Xóa</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap">
+    <table>
+      <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Mã tiêu chí</th><th>Tên tiếng Anh</th><th>Tên tiếng Việt</th><th>Ghi chú</th><th>Thứ tự</th><th>Công thức SQL</th><th>Used</th></tr></thead>
+      <tbody>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>1</td><td>TT_NS_CongThucTe</td><td>TT_NS_CongThucTe</td><td>Công thực tế NV</td><td></td><td>1</td><td class="tl">= HT_TS_CongThucTe</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>2</td><td>TT_NS_HeSoThang</td><td>TT_NS_HeSoThang</td><td>Hệ số tháng sau xử lý NULL</td><td></td><td>2</td><td class="tl">= ISNULL(HT_PR_HeSoNangSuatThang, 1.0)</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>3</td><td>TT_NS_BoSungPV</td><td>TT_NS_BoSungPV</td><td>% bổ sung PV sau xử lý NULL</td><td></td><td>3</td><td class="tl">= ISNULL(HT_PR_PhanTramBoSungPhucVu, 0)</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>4</td><td>TT_NS_NSTT_Ban</td><td>TT_NS_NSTT_Ban</td><td>NSTT Bàn × CĐ</td><td></td><td>4</td><td class="tl">= HT_PR_NangSuatThucTe</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>5</td><td>TT_NS_CNS_SanXuat</td><td>TT_NS_CNS_SanXuat</td><td>CNS NV Sản xuất</td><td></td><td>5</td><td class="tl">= TT_NS_CongThucTe * TT_NS_HeSoThang</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>6</td><td>TT_NS_CNS_PhucVu</td><td>TT_NS_CNS_PhucVu</td><td>CNS NV Phục vụ</td><td></td><td>6</td><td class="tl">= TT_NS_CongThucTe * TT_NS_HeSoThang * (1 + TT_NS_BoSungPV)</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>7</td><td>TT_NS_CNS_NhanVien</td><td>TT_NS_CNS_NhanVien</td><td>CNS 1 NV (tự chọn nhánh SX/PV)</td><td></td><td>7</td><td class="tl">= CASE WHEN PRT.TK_HR_LoaiNhanVien = 'SX' THEN TT_NS_CNS_SanXuat ELSE TT_NS_CNS_PhucVu END</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>8</td><td>TT_NS_CNS_Ban</td><td>TT_NS_CNS_Ban</td><td>Tổng CNS Bàn/Nhóm gom</td><td></td><td>8</td><td class="tl">= HT_PR_CNS_Ban</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>9</td><td>TT_NS_CNS_PV_Scope</td><td>TT_NS_CNS_PV_Scope</td><td>Tổng CNS PV trong scope</td><td></td><td>9</td><td class="tl">= HT_PR_CNS_PV_Scope</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>10</td><td>TT_NS_CNS_TongScope</td><td>TT_NS_CNS_TongScope</td><td>Tổng CNS toàn scope</td><td></td><td>10</td><td class="tl">= HT_PR_CNS_TongScope</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>11</td><td>TT_NS_GiamChoPhucVu</td><td>TT_NS_GiamChoPhucVu</td><td>Phần CNS Bàn bị giảm cho PV</td><td></td><td>11</td><td class="tl">= CASE WHEN TT_NS_CNS_TongScope = 0 THEN 0 ELSE TT_NS_CNS_Ban * (TT_NS_CNS_PV_Scope / TT_NS_CNS_TongScope) END</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>12</td><td>TT_NS_SauGiamPV</td><td>TT_NS_SauGiamPV</td><td>CNS Bàn sau khi giảm PV</td><td></td><td>12</td><td class="tl">= TT_NS_CNS_Ban - TT_NS_GiamChoPhucVu</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>13</td><td>TT_NS_SauChiaPV</td><td>TT_NS_SauChiaPV</td><td>NS Bàn sau chia PV</td><td></td><td>13</td><td class="tl">= CASE WHEN TT_NS_CNS_TongScope = 0 THEN 0 ELSE TT_NS_NSTT_Ban * (TT_NS_SauGiamPV / TT_NS_CNS_TongScope) END</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>14</td><td>TT_NS_KetQuaPhucVu</td><td>TT_NS_KetQuaPhucVu</td><td>NS quy về cho PV</td><td></td><td>14</td><td class="tl">= CASE WHEN PRT.TK_PR_NhomTinhNangSuat = 'NSC_NHIEU_DV' THEN 0 ELSE HT_PR_NSTT_Scope - HT_PR_NS_SauChiaPV_Scope END</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>15</td><td>TT_NS_TinhLuong_SX</td><td>TT_NS_TinhLuong_SX</td><td>NS tính lương NV SX</td><td></td><td>15</td><td class="tl">= CASE WHEN TT_NS_CNS_Ban = 0 THEN 0 ELSE (TT_NS_SauChiaPV / TT_NS_CNS_Ban) * TT_NS_CNS_NhanVien END</td><td>X</td></tr>
+        <tr><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>16</td><td>TT_NS_TinhLuong_PV</td><td>TT_NS_TinhLuong_PV</td><td>NS tính lương NV PV</td><td></td><td>16</td><td class="tl">= CASE WHEN TT_NS_CNS_Ban = 0 THEN 0 ELSE (TT_NS_GiamChoPhucVu / TT_NS_CNS_Ban) * TT_NS_CNS_NhanVien END</td><td>X</td></tr>
+        <tr style="background:#fff8f0;font-weight:bold;"><td><input type="checkbox"></td><td><span class="edit-icon" style="cursor:pointer; color:#007bff; font-weight:bold;">✎</span></td><td>17</td><td>TT_NS_TinhLuong</td><td>TT_NS_TinhLuong</td><td>KẾT QUẢ CUỐI LNS (OUTPUT)</td><td></td><td>17</td><td class="tl">= CASE WHEN PRT.TK_HR_LoaiNhanVien = 'SX' THEN TT_NS_TinhLuong_SX ELSE TT_NS_TinhLuong_PV END</td><td>X</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <div class="page-controls"><button>|&lt;</button><button>&lt;</button><button>1</button><button>&gt;</button><button>&gt;|</button></div>
+    <div>Page: <input type="text" value="1" style="width:20px;border:1px solid #ccc;"> of 1 &nbsp; Page size: <input type="text" value="166" style="width:35px;border:1px solid #ccc;"></div>
+    <div>Item 1 to 166 of 166</div>
+  </div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tính Bình Quân Lương Sản Phẩm</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* PAGE-SPECIFIC: pg10-bq-tlsp */
+    .btn-calc { background-color: #28a745; }
+    .btn-lock-bq { background-color: #dc3545; }
+    .btn-refresh { background-color: #007bff; }
+    .btn-export { background-color: #fd7e14; }
+    .section-divider { border: none; border-top: 2px dashed #b8daff; margin: 25px 0 15px 0; }
+    .section-title {
+        font-weight: bold; font-size: 14px; color: #0056b3;
+        border-left: 4px solid #0056b3; padding-left: 10px;
+        margin: 15px 0 10px 0; text-transform: uppercase;
+    }
+    .btn-step { position: relative; padding-left: 36px !important; }
+    .btn-step .step-num {
+        position: absolute; left: 0; top: 0; bottom: 0; width: 28px;
+        background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+        font-size: 13px; border-radius: 3px 0 0 3px;
+    }
+    .filter-row-inline { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .filter-row-inline label { font-weight: bold; white-space: nowrap; }
+    .source-check {
+        display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+        border: 1px solid #c3e6cb; background: #d4edda; border-radius: 4px;
+        font-size: 12px; margin-bottom: 10px;
+    }
+    .row-nhom-bq td { background-color: #fff8e1 !important; font-weight: bold; }
+    .badge-nhom {
+        display:inline-block; background:#0056b3; color:#fff; border-radius: 10px;
+        font-size: 10px; padding: 2px 8px; font-weight: bold; white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin ch&agrave;o,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nh&acirc;n s&#7921;</a><a href="#">Th&ocirc;i vi&#7879;c</a><a href="#">Ch&#7845;m c&ocirc;ng</a>
+    <a href="#">B&#7843;o hi&#7875;m</a><a href="#" class="active">L&#432;&#417;ng</a>
+    <a href="#">Th&#432;&#7903;ng</a><a href="#">Thu&#7871;</a><a href="#">H&#7879; th&#7889;ng</a><a href="#">DV c&aacute; nh&acirc;n</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">L&#432;&#417;ng &rsaquo; Ch&#7913;c n&#259;ng &rsaquo; T&iacute;nh b&igrave;nh qu&acirc;n l&#432;&#417;ng s&#7843;n ph&#7849;m</div>
+    <div class="page-title">T&Iacute;NH B&Igrave;NH QU&Acirc;N L&#431;&#416;NG S&#7842;N PH&#7848;M (BQTL)</div>
+
+    <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+
+    <!-- ========== VALIDATE NGUỒN (BQ-00) ========== -->
+    <div class="source-check" id="source-check">
+        <span style="font-size:16px;">&#9989;</span>
+        <span>
+            <b>Ki&#7875;m tra ngu&#7891;n (BQ-00):</b>
+            B&#7843;ng t&iacute;nh TLSP (Report1) k&#7923; <b>LSP_01_2026</b> &#273;&atilde; t&iacute;nh xong v&agrave; <b>&#273;&atilde; kh&oacute;a</b> to&agrave;n b&#7897; b&#7897; ph&#7853;n s&#7843;n xu&#7845;t.
+            &#272;&#7911; &#273;i&#7873;u ki&#7879;n t&iacute;nh b&igrave;nh qu&acirc;n.
+        </span>
+    </div>
+
+    <!-- ========== PERIOD + PARAMS ========== -->
+    <div class="period-bar" style="flex-wrap: wrap; gap: 10px;">
+        <div class="filter-row-inline">
+            <label style="color:#d32f2f;">K&#7923; / Th&aacute;ng l&#432;&#417;ng</label>
+            <select style="width:140px;"><option>LSP_01_2026</option></select>
+        </div>
+        <div class="filter-row-inline" style="border-left: 2px solid #dee2e6; padding-left: 15px;">
+            <label>Ph&#7841;m vi b&igrave;nh qu&acirc;n</label>
+            <div class="radio-inline">
+                <label><input type="radio" name="pvbq" value="ALL" checked> T&#7845;t c&#7843; NV</label>
+                <label><input type="radio" name="pvbq" value="3T"> Ch&#7881; NV th&acirc;m ni&ecirc;n &gt; 3 th&aacute;ng</label>
+            </div>
+        </div>
+        <div class="filter-row-inline" style="border-left: 2px solid #dee2e6; padding-left: 15px;">
+            <label>C&ocirc;ng &#273;&#7911; K1 / K2</label>
+            <input type="number" value="27" style="width:50px; background-color:#fff3cd; font-weight:bold;" readonly>
+            <input type="number" value="26" style="width:50px; background-color:#fff3cd; font-weight:bold;" readonly>
+        </div>
+    </div>
+
+    <!-- ========== ACTION BUTTONS ========== -->
+    <div class="actions-bar" style="display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button class="btn-calc btn-step" onclick="clickTinhBQ()">
+            <span class="step-num">1</span>T&iacute;nh b&igrave;nh qu&acirc;n
+        </button>
+        <button class="btn-lock-bq btn-step" id="btn-khoa-bq" onclick="clickKhoaBQ()" disabled style="opacity:0.5; cursor:not-allowed;">
+            <span class="step-num">2</span>Kh&oacute;a B&igrave;nh qu&acirc;n
+        </button>
+        <span style="border-left:2px solid #dee2e6; height:24px;"></span>
+        <button class="btn-refresh" onclick="location.reload()">L&agrave;m m&#7899;i</button>
+        <button class="btn-export">Xu&#7845;t Excel</button>
+    </div>
+
+    <!-- ========== COLLAPSIBLE: Steps ========== -->
+    <div class="collapsible" onclick="toggleCollapse('stepsBQ')"><span>&#9660; Xem c&aacute;c b&#432;&#7899;c t&iacute;nh to&aacute;n (BQ-00 &rarr; BQ-06)</span></div>
+    <div id="stepsBQ" class="content">
+        <table class="steps-table">
+            <tr><th>B&#432;&#7899;c</th><th>M&atilde;</th><th>T&ecirc;n</th><th>Input</th><th>Output / C&ocirc;ng th&#7913;c</th><th>Exception</th></tr>
+            <tr><td>0</td><td>BQ-00</td><td>Validate ngu&#7891;n</td><td>K&#7923; LSP</td><td>To&agrave;n b&#7897; TLSP (Report1) c&#7911;a k&#7923; &#273;&atilde; t&iacute;nh &amp; kh&oacute;a</td><td>C&ograve;n BP ch&#432;a kh&oacute;a &rarr; d&#7915;ng, b&aacute;o danh s&aacute;ch</td></tr>
+            <tr><td>1</td><td>BQ-01</td><td>Gom qu&#7929; l&#432;&#417;ng theo BP&times;Ka</td><td>K&#7871;t qu&#7843; TLSP</td><td>QTL_bp = SUM(T&#7893;ng TLSP c&#7911;a NV thu&#7897;c BP&times;Ka)</td><td></td></tr>
+            <tr><td>2</td><td>BQ-02</td><td>Gom c&ocirc;ng &amp; lao &#273;&#7897;ng</td><td>B&#7843;ng c&ocirc;ng</td><td>T&#7893;ngC&ocirc;ng_bp, T&#7893;ngL&#272;_bp, L&#272;M&#7899;i&lt;3T_bp</td><td></td></tr>
+            <tr><td>3</td><td>BQ-03</td><td>BQ theo c&ocirc;ng t&#7915;ng BP</td><td>BQ-01, BQ-02</td><td>BQ_bp = QTL_bp / T&#7893;ngC&ocirc;ng_bp &times; C&ocirc;ng&#273;&#7911;_Ka</td><td>C&ocirc;ng = 0 &rarr; BQ = 0</td></tr>
+            <tr><td>4</td><td>BQ-04</td><td>BQ &gt;3 th&aacute;ng</td><td>BQ-03, L&#272; m&#7899;i</td><td>Lo&#7841;i QTL &amp; c&ocirc;ng c&#7911;a L&#272; m&#7899;i &lt;3T kh&#7887;i t&#7917; s&#7889; &amp; m&#7851;u s&#7889;</td><td></td></tr>
+            <tr><td>5</td><td>BQ-05</td><td>BQ c&ocirc;ng &#273;&#7911; gia quy&#7873;n</td><td>C&ocirc;ng &#273;&#7911;, SL b&agrave;n</td><td>BQC&ocirc;ng&#272;&#7911; = SUMPRODUCT(C&ocirc;ng&#273;&#7911; &times; SLb&agrave;n) / SUM(SLb&agrave;n)</td><td></td></tr>
+            <tr><td>6</td><td>BQ-06</td><td>T&iacute;nh c&aacute;c NH&Oacute;M b&igrave;nh qu&acirc;n</td><td>C&#7845;u h&igrave;nh nh&oacute;m BQ</td><td>BQ_nh&oacute;m = SUM(QTL) / SUM(C&ocirc;ng) &times; BQC&ocirc;ng&#272;&#7911; &rarr; l&agrave; &#273;&#417;n gi&aacute; tr&#7843; l&#432;&#417;ng nh&oacute;m ph&#7909; tr&#7907; (VS, B&#7889;c x&#7871;p, Gi&#7863;t &#273;&#7891;...)</td><td>Nh&oacute;m ch&#432;a c&#7845;u h&igrave;nh &rarr; WARNING</td></tr>
+        </table>
+    </div>
+
+    <!-- ========== GRID 1: CHI TIET BP x KA ========== -->
+    <div class="section-title">L&#431;&#7898;I 1 &mdash; B&Igrave;NH QU&Acirc;N TI&#7872;N L&#431;&#416;NG THEO B&#7896; PH&#7852;N &times; KA</div>
+    <div class="grid-container" style="max-height:420px;">
+        <table class="data-table">
+            <thead><tr>
+                <th>TT</th><th class="text-left">B&#7897; ph&#7853;n</th><th>Ka</th>
+                <th>C&ocirc;ng &#273;&#7911;</th><th>T&#7893;ng c&ocirc;ng</th><th>T&#7893;ng L&#272;</th>
+                <th>L&#272; m&#7899;i &lt;3T</th>
+                <th class="col-money">QTL theo b&#7843;ng t&iacute;nh (VND)</th>
+                <th>SL b&agrave;n</th>
+                <th class="col-money" style="background-color:#fff3cd;">BQ theo c&ocirc;ng (VND)</th>
+                <th class="col-money" style="background-color:#d4edda;">BQ theo c&ocirc;ng &gt;3T (VND)</th>
+            </tr></thead>
+            <tbody id="tbBQ"></tbody>
+            <tfoot id="tfBQ"></tfoot>
+        </table>
+    </div>
+    <div style="color:#856404; font-size:11px; margin-top:5px;">
+        <i>* BQ theo c&ocirc;ng = QTL / T&#7893;ng c&ocirc;ng &times; C&ocirc;ng &#273;&#7911; c&#7911;a Ka. C&#7897;t &gt;3T lo&#7841;i lao &#273;&#7897;ng m&#7899;i v&agrave;o d&#432;&#7899;i 3 th&aacute;ng kh&#7887;i c&#7843; t&#7917; s&#7889; v&agrave; m&#7851;u s&#7889;.</i>
+    </div>
+
+    <!-- ========== GRID 2: NHOM BINH QUAN ========== -->
+    <hr class="section-divider">
+    <div class="section-title">L&#431;&#7898;I 2 &mdash; C&Aacute;C NH&Oacute;M B&Igrave;NH QU&Acirc;N T&#7892;NG H&#7906;P (ngu&#7891;n &#273;&#417;n gi&aacute; tr&#7843; l&#432;&#417;ng ph&#7909; tr&#7907;)</div>
+    <div class="info-bar-blue info-bar" style="font-size:11px; padding:8px 12px; margin-bottom:10px;">
+        <b>C&ocirc;ng th&#7913;c:</b> BQ nh&oacute;m = SUM(QTL c&aacute;c BP th&agrave;nh vi&ecirc;n) / SUM(C&ocirc;ng c&aacute;c BP th&agrave;nh vi&ecirc;n) &times; BQ c&ocirc;ng &#273;&#7911; (gia quy&#7873;n theo SL b&agrave;n).
+        K&#7871;t qu&#7843; nh&oacute;m <b>BQ (CB, XQ, PTO, BCtb, CBTB, TB)</b> l&agrave; &#273;&#7847;u v&agrave;o b&#7855;t bu&#7897;c c&#7911;a ch&#7913;c n&#259;ng <b>B&#7843;ng t&iacute;nh l&#432;&#417;ng V&#7879; sinh</b>.
+    </div>
+    <div class="grid-container" style="max-height:250px;">
+        <table class="data-table">
+            <thead><tr>
+                <th>TT</th><th class="text-left">Nh&oacute;m b&igrave;nh qu&acirc;n</th>
+                <th class="text-left">Th&agrave;nh ph&#7847;n (BP&times;Ka)</th>
+                <th>BQ c&ocirc;ng &#273;&#7911;</th>
+                <th class="col-money">T&#7893;ng QTL (VND)</th>
+                <th>T&#7893;ng c&ocirc;ng</th>
+                <th class="col-money" style="background-color:#ffcccc;">BQ th&aacute;ng (VND)</th>
+                <th class="text-left">D&ugrave;ng tr&#7843; l&#432;&#417;ng cho</th>
+            </tr></thead>
+            <tbody id="tbNhom"></tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            &#128203; GHI CH&Uacute; NGHI&#7878;P V&#7908; (d&agrave;nh cho th&#7849;m &#273;&#7883;nh)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+
+  </div><!-- end container -->
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    var _daTinh = false;
+    var _daKhoa = false;
+
+    function getPhamVi() {
+        var r = document.querySelector('input[name="pvbq"]:checked');
+        return r ? r.value : 'ALL';
+    }
+
+    /* ============================
+       BƯỚC 1: TÍNH BÌNH QUÂN
+    ============================ */
+    function clickTinhBQ() {
+        var rows = window.MOCK.lsp.bqBoPhan;
+        var tbody = document.getElementById('tbBQ');
+        var tfoot = document.getElementById('tfBQ');
+        tbody.innerHTML = '';
+
+        var tongQTL = 0, tongCong = 0, tongLD = 0, tongLDMoi = 0, sumBanCong = 0, sumBan = 0;
+
+        rows.forEach(function (r, idx) {
+            var bq = r.tongCong > 0 ? r.qtl / r.tongCong * r.congDu : 0;
+            var cong3T = r.tongCong - (r.congMoi || 0);
+            var qtl3T = r.qtl - (r.qtlMoi || 0);
+            var bq3T = cong3T > 0 ? qtl3T / cong3T * r.congDu : 0;
+
+            tongQTL += r.qtl; tongCong += r.tongCong; tongLD += r.tongLD; tongLDMoi += r.ldMoi;
+            sumBanCong += r.congDu * r.slBan; sumBan += r.slBan;
+
+            tbody.innerHTML += '<tr>' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td class="text-left" style="font-weight:bold;">' + r.boPhan + '</td>' +
+                '<td>' + r.ka + '</td>' +
+                '<td>' + r.congDu + '</td>' +
+                '<td>' + formatNumber(r.tongCong, 1) + '</td>' +
+                '<td>' + r.tongLD + '</td>' +
+                '<td>' + (r.ldMoi > 0 ? '<span class="text-danger font-weight-bold">' + r.ldMoi + '</span>' : '-') + '</td>' +
+                '<td class="col-money">' + formatNumber(r.qtl) + '</td>' +
+                '<td>' + r.slBan + '</td>' +
+                '<td class="col-money" style="background-color:#fffdf0;">' + formatNumber(Math.round(bq)) + '</td>' +
+                '<td class="col-money" style="background-color:#f4fff6;">' + formatNumber(Math.round(bq3T)) + '</td></tr>';
+        });
+
+        var bqCongDuAll = sumBan > 0 ? sumBanCong / sumBan : 0;
+        var bqAll = tongCong > 0 ? tongQTL / tongCong * bqCongDuAll : 0;
+        tfoot.innerHTML = '<tr style="background-color:#e8ecef; font-weight:bold;">' +
+            '<td colspan="3" class="text-right" style="padding-right:10px;">BQ T&#7844;T C&#7842;:</td>' +
+            '<td>' + formatNumber(bqCongDuAll, 2) + '</td>' +
+            '<td>' + formatNumber(tongCong, 1) + '</td>' +
+            '<td>' + tongLD + '</td>' +
+            '<td class="text-danger">' + tongLDMoi + '</td>' +
+            '<td class="col-money">' + formatNumber(tongQTL) + '</td>' +
+            '<td>' + sumBan + '</td>' +
+            '<td class="col-money text-danger" colspan="2" style="font-size:13px;">' + formatNumber(Math.round(bqAll)) + ' &#273;</td></tr>';
+
+        renderNhomBQ();
+
+        _daTinh = true;
+        var b = document.getElementById('btn-khoa-bq');
+        b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
+        showAlert('alertBox', 'Đã tính bình quân cho ' + rows.length + ' Bộ phận × Ka và ' + window.MOCK.lsp.nhomBQ.length + ' nhóm BQ tổng hợp.', 'success');
+    }
+
+    /* ============================
+       LƯỚI 2: NHÓM BÌNH QUÂN (BQ-06)
+    ============================ */
+    function renderNhomBQ() {
+        var phamVi = getPhamVi();
+        var tbody = document.getElementById('tbNhom');
+        tbody.innerHTML = '';
+        window.MOCK.lsp.nhomBQ.forEach(function (n, idx) {
+            var kq = computeBQNhomLSP(n.ma, phamVi);
+            if (!kq) return;
+            var thanhPhan = n.members.join(', ');
+            tbody.innerHTML += '<tr class="row-nhom-bq">' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td class="text-left">' + n.ten + '<br><small style="font-weight:normal;color:#888;">' + n.excelRef + '</small></td>' +
+                '<td class="text-left" style="font-weight:normal; font-size:10px; max-width:220px;">' + thanhPhan + '</td>' +
+                '<td>' + formatNumber(kq.bqCongDu, 2) + '</td>' +
+                '<td class="col-money">' + formatNumber(kq.tongQTL) + '</td>' +
+                '<td>' + formatNumber(kq.tongCong, 1) + '</td>' +
+                '<td class="col-money text-danger" style="font-size:13px;">' + formatNumber(kq.bqThang) + '</td>' +
+                '<td class="text-left"><span class="badge-nhom">' + n.nhomHuong + '</span></td></tr>';
+        });
+    }
+
+    /* ============================
+       BƯỚC 2: KHÓA BÌNH QUÂN
+    ============================ */
+    function clickKhoaBQ() {
+        if (!_daTinh) {
+            showAlert('alertBox', 'Vui lòng bấm "Tính bình quân" trước khi khóa!', 'warning');
+            return;
+        }
+        if (_daKhoa) return;
+        confirmAction('Khóa kết quả Bình quân kỳ LSP_01_2026?\n\nSau khi khóa, đơn giá BQ của các nhóm sẽ được chốt làm đầu vào cho Bảng tính lương Vệ sinh / Bốc xếp / Giặt đồ. Muốn tính lại phải Mở khóa (ảnh hưởng dây chuyền tới các bảng phụ trợ đã tính).', function () {
+            _daKhoa = true;
+            var b = document.getElementById('btn-khoa-bq');
+            b.disabled = true; b.style.opacity = '0.5'; b.style.cursor = 'not-allowed'; b.innerHTML = '<span class="step-num">2</span>Đã khóa BQ';
+            window.MOCK.lsp.bqRun.trangThai = 'Locked';
+            showAlert('alertBox', 'Đã khóa Bình quân kỳ LSP_01_2026. Có thể chạy tiếp "Bảng tính lương Vệ sinh".', 'success');
+        });
+    }
+
+    /* ============================
+       INIT
+    ============================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        // Đổi phạm vi → tính lại nếu đã bấm tính
+        document.querySelectorAll('input[name="pvbq"]').forEach(function (r) {
+            r.addEventListener('change', function () { if (_daTinh) clickTinhBQ(); });
+        });
+    });
+  </script>
+</body>
+</html>

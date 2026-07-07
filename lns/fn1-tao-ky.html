@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Tạo kỳ tính năng suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Tạo kỳ tính năng suất</div>
+  <div class="page-title">TẠO KỲ TÍNH NĂNG SUẤT</div>
+  <div class="note-alert"><span style="font-size:18px">⚠️</span><span><strong>RÀNG BUỘC:</strong> Kỳ LNS phải tạo TRƯỚC khi nhập bất kỳ dữ liệu đầu vào nào.</span></div>
+  <div id="fn1-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Tháng tính</label>
+      <div class="input-wrap"><input type="text" id="fn1_thang" placeholder="MM/yyyy" oninput="fn1AutoFill()" onchange="fn1AutoFill()"></div>
+      <label></label><div></div>
+      <label class="lbl-red">Từ ngày</label>
+      <div class="input-wrap"><input type="date" id="fn1_tuNgay"><div class="input-note">Mặc định = ngày 1 của tháng (tự động fill).</div></div>
+      <label class="lbl-red">Đến ngày</label>
+      <div class="input-wrap"><input type="date" id="fn1_denNgay"><div class="input-note">Phải ≥ Từ ngày. Thường = ngày cuối tháng.</div></div>
+      <label class="lbl-red">Nhóm tính lương</label>
+      <div class="input-wrap">
+        <select id="fn1_nhomTL">
+          <option value="NANG_SUAT" selected>Năng suất</option>
+          <option value="THOI_GIAN">Thời gian</option>
+          <option value="BQLSP">BQLSP</option>
+        </select>
+      </div>
+      <label>Ghi chú</label>
+      <div class="input-wrap"><input type="text" id="fn1_note" placeholder="Nhập ghi chú (nếu có)..."></div>
+      <label></label><div></div>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="fn1Clear()">Làm mới</button>
+    <button class="btn-save" onclick="fn1Save()">Tạo kỳ</button><button class="btn-delete" onclick="fn1Delete()">Xóa</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Tháng</th><th>Từ ngày</th><th>Đến ngày</th><th>Nhóm tính lương</th><th>Ghi chú</th><th>Người tạo/sửa</th><th>Thời gian</th></tr></thead>
+    <tbody id="fn1-tbody">
+      <tr><td><input type="checkbox" class="fn1-chk"></td><td><span class="edit-icon" onclick="fn1EditRow(this)">✎</span></td><td>1</td><td style="font-weight:bold;color:#0056b3">01/2026</td><td>01/01/2026</td><td>31/01/2026</td><td>Năng suất</td><td>Kỳ lương tháng 01/2026</td><td>admin</td><td>15/01/2026 09:30</td></tr>
+      <tr><td><input type="checkbox" class="fn1-chk"></td><td><span class="edit-icon" onclick="fn1EditRow(this)">✎</span></td><td>2</td><td style="font-weight:bold;color:#0056b3">12/2025</td><td>01/12/2025</td><td>31/12/2025</td><td>Thời gian</td><td>Kỳ cuối năm 2025</td><td>fptadmin</td><td>10/12/2025 14:15</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right; margin-top:5px;">
+        <button style="background:#ffc107; color:#000; border:none; padding:5px 10px; font-weight:bold; cursor:pointer; border-radius:3px;" onclick="fn1Alert('Lưu ghi chú thành công!', 'success')">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+function fn1AutoFill() {
+  const s = document.getElementById('fn1_thang').value.trim();
+  if (/^(0[1-9]|1[0-2])\/\d{4}$/.test(s)) {
+    const [m,y] = s.split('/');
+    const mm = m.padStart(2,'0');
+    const last = new Date(+y, +m, 0).getDate();
+    document.getElementById('fn1_tuNgay').value = `${y}-${mm}-01`;
+    document.getElementById('fn1_denNgay').value = `${y}-${mm}-${String(last).padStart(2,'0')}`;
+  }
+}
+function fn1Clear() {
+  ['fn1_thang','fn1_tuNgay','fn1_denNgay','fn1_note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fn1_thang').readOnly = false;
+  document.getElementById('fn1_nhomTL').selectedIndex = 0;
+  document.getElementById('fn1-alert').style.display = 'none';
+}
+function fn1EditRow(el) {
+  const row = el.closest('tr');
+  document.getElementById('fn1_thang').value = row.cells[3].innerText;
+  document.getElementById('fn1_thang').readOnly = true;
+  document.getElementById('fn1_nhomTL').value = { 'Thời gian':'THOI_GIAN', 'Năng suất':'NANG_SUAT', 'BQLSP':'BQLSP' }[row.cells[6].innerText] || 'THOI_GIAN';
+  document.getElementById('fn1_note').value = row.cells[7].innerText;
+  fn1AutoFill();
+  window.scrollTo(0,0);
+}
+function fn1Save() {
+  const t = document.getElementById('fn1_thang').value.trim();
+  const d1 = document.getElementById('fn1_tuNgay').value;
+  const d2 = document.getElementById('fn1_denNgay').value;
+  const nhomTL = document.getElementById('fn1_nhomTL').value;
+  if (!t || !d1 || !d2 || !nhomTL) return showAlert2('fn1-alert','Vui lòng nhập đầy đủ Tháng tính, Từ ngày, Đến ngày và Nhóm tính lương.','error');
+  if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(t)) return showAlert2('fn1-alert','Tháng tính không hợp lệ (MM/yyyy).','error');
+  if (new Date(d1) > new Date(d2)) return showAlert2('fn1-alert','<b>Lỗi:</b> Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.','error');
+  showAlert2('fn1-alert','Lưu (Tạo kỳ) Lương Năng Suất thành công!','success');
+  fn1Clear();
+}
+function fn1Delete() {
+  const chks = document.querySelectorAll('.fn1-chk:checked');
+  if (!chks.length) return showAlert2('fn1-alert','Vui lòng chọn kỳ cần xóa.','error');
+  if (confirm('Bạn có chắc chắn muốn xóa? Dữ liệu tính toán cũng sẽ bị xóa.')) showAlert2('fn1-alert','Đã xóa kỳ thành công.','success');
+}
+
+  window.onload = function() {
+    const d = new Date();
+    document.getElementById('fn1_thang').value = String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+    fn1AutoFill();
+  };
+  function fn1Alert(msg, type) {
+    showAlert2('fn1-alert', msg, type);
+  }
+  </script>
+</body>
+</html>

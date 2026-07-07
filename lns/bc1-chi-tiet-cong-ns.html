@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Báo cáo chi tiết 1 công năng suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 20px 0; letter-spacing: 1px; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+      
+      .table-header th { background: #1e3a5f; color: white; padding: 8px; text-align: center; font-size: 12px; border: 1px solid #cfd8dc; }
+      .table-row td { padding: 8px; font-size: 12px; border: 1px solid #cfd8dc; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương › Báo cáo lương chi tiết › Bảng lương thời gian</div>
+      <div class="bc-title">BÁO CÁO CHI TIẾT 1 CÔNG NĂNG SUẤT</div>
+      <div id="bc1-alert" class="alert-box"></div>
+      
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label class="lbl-red">Đơn vị cấp 3 (*)</label>
+          <select id="bc1_dv3">
+            <option value="">-- Chọn Đơn vị --</option>
+            <option value="DV3_1">Nhà máy chế biến 1</option>
+            <option value="DV3_2">Nhà máy chế biến 2</option>
+          </select>
+          
+          <label>Đơn vị cấp 4</label>
+          <select id="bc1_dv4">
+            <option value="">-- Chọn Đơn vị --</option>
+            <option value="DV4_1">Phân xưởng A</option>
+            <option value="DV4_2">Phân xưởng B</option>
+          </select>
+          
+          <label>Đơn vị cấp 5</label>
+          <select id="bc1_dv5">
+            <option value="">-- Chọn Đơn vị --</option>
+            <option value="DV5_1">Tổ Sơ chế 1</option>
+            <option value="DV5_2">Tổ Đóng gói 1</option>
+          </select>
+
+          <label></label><div></div>
+
+          <label></label><div></div>
+          <label></label><div></div>
+        </div>
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
+            <div style="display: flex; flex-direction: column; gap: 10px; width: 33%;">
+                <div style="display: flex; align-items: center;">
+                    <label class="lbl-red" style="font-size:12px; width: 120px; font-weight: bold;">Tháng (*)</label>
+                    <input type="text" id="bc1_thang" placeholder="MM/YYYY" value="06/2026" maxlength="7" style="padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; flex: 1; box-sizing: border-box;">
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <label style="font-size:12px; color:#333; width: 120px;">Từ ngày</label>
+                    <input type="date" id="bc1_tungay" style="padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; flex: 1; box-sizing: border-box;">
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <label style="font-size:12px; color:#333; width: 120px;">Đến ngày</label>
+                    <input type="date" id="bc1_denngay" style="padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; flex: 1; box-sizing: border-box;">
+                </div>
+            </div>
+        </div>
+      </div>
+      
+      <div class="form-panel" style="background:#f0f4ff; border:1px solid #b3c6e0; padding:12px 15px; margin-bottom:15px;">
+        <div style="font-weight:bold;color:#003366;font-size:12px;margin-bottom:8px;">Sắp xếp tiến trình / quy cách khi xuất báo cáo</div>
+        <div style="display:grid; grid-template-columns:140px 1fr 140px 1fr; gap:8px 12px; align-items:center; font-size:12px;">
+          <label class="lbl-red" style="font-size:12px;">Nguyên tắc sắp xếp (*)</label>
+          <select id="bc1_sort_rule" style="padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">
+            <option value="REPORT_TEMPLATE_ORDER" selected>Theo thứ tự cấu hình báo cáo</option>
+            <option value="PROCESS_NAME">Theo tên tiến trình/công đoạn</option>
+            <option value="PRODUCT_SPEC_GROUP">Theo nhóm sản phẩm/quy cách</option>
+            <option value="SHIFT_TYPE">Theo loại ca</option>
+            <option value="UOM">Theo đơn vị tính</option>
+            <option value="SAP_INTERNAL_CODE">Theo mã SAP / mã nội bộ</option>
+            <option value="QUANTITY_DESC">Theo sản lượng phát sinh giảm dần</option>
+            <option value="HAS_DATA_FIRST">Có phát sinh trước, không phát sinh sau</option>
+            <option value="PROCESS_CODE">Theo mã tiến trình</option>
+            <option value="USER_CUSTOM">Theo cấu hình cá nhân</option>
+          </select>
+          <label class="lbl-red" style="font-size:12px;">Chiều sắp xếp (*)</label>
+          <div style="display:flex;gap:15px;align-items:center;">
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc1_sort_dir" value="ASC" checked> Tăng dần</label>
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc1_sort_dir" value="DESC"> Giảm dần</label>
+          </div>
+          <label style="font-size:12px;">Mã tiến trình ưu tiên</label>
+          <select id="bc1_tt" style="padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">
+            <option value="">-- Chọn Tiến trình --</option>
+          </select>
+          <label style="font-size:12px;">Ẩn QCTL không phát sinh</label>
+          <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="checkbox" id="bc1_hide_empty" checked> Chỉ xuất QCTL có năng suất phát sinh</label>
+        </div>
+      </div>
+
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc1Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="showAlert2('bc1-alert', 'Tính năng xuất Excel đang hoàn thiện.', 'info')">Xuất Excel</button>
+      </div>
+
+      <div class="grid-wrap" style="height:400px; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse;">
+          <thead id="bc1-thead">
+            <tr class="table-header">
+              <th rowspan="4" style="min-width:40px;">STT</th>
+              <th rowspan="4" style="min-width:80px;">Mã BP</th>
+              <th rowspan="4" style="min-width:120px;">Nhóm tính lương</th>
+              <th rowspan="4" style="min-width:90px;">Ngày LV</th>
+              <th rowspan="2" style="min-width:80px;">Tổng</th>
+              <th colspan="4">Năng suất</th>
+              <th colspan="2">CB</th>
+              <th>PTO</th>
+              <th>PTO</th>
+              <th>PTO</th>
+              <th>PTO</th>
+              <th>PTO</th>
+              <th>CB</th>
+              <th>BEN</th>
+              <th>PTO</th>
+              <th>NO</th>
+              <th>NO</th>
+              <th>PTO</th>
+              <th>BEN</th>
+            </tr>
+            <tr class="table-header">
+              <th style="min-width:80px;">Trong ca</th>
+              <th style="min-width:80px;">Ca đêm</th>
+              <th style="min-width:80px;">Tăng ca</th>
+              <th style="min-width:80px;">Tăng ca đêm</th>
+              <th style="min-width:100px;">Thưởng Phụ vụ</th>
+              <th style="min-width:100px;">Đóng Phụ vụ</th>
+              <th style="min-width:100px;">Chống Phụ vụ</th>
+              <th style="min-width:100px;">Đóng Phụ vụ CĐ</th>
+              <th style="min-width:100px;">TH*VCD</th>
+              <th style="min-width:100px;">Thưởng Cắt kềm</th>
+              <th style="min-width:100px;">Đóng lột vỏ rong</th>
+              <th style="min-width:100px;">Lột rong Mũi Lãnh</th>
+              <th style="min-width:100px;">Thưởng Khác</th>
+              <th style="min-width:120px;">Đóng PV Rút chỉ lưng</th>
+              <th style="min-width:100px;">Lột vỏ rút chỉ</th>
+              <th style="min-width:120px;">Rút chỉ màng bụng</th>
+              <th style="min-width:130px;">Lột vỏ rong Tưng xé</th>
+              <th style="min-width:100px;">Thưởng Khác</th>
+            </tr>
+            <tr class="table-header">
+              <th>(1+2+3+4)</th>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+              <th>1</th>
+            </tr>
+            <tr class="table-header">
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>kg</th>
+              <th>Con</th>
+              <th>Con</th>
+              <th>con</th>
+              <th>kg</th>
+            </tr>
+          </thead>
+          <tbody id="bc1-tbody">
+            <tr class="table-row"><td colspan="23" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const ttSelect = document.getElementById('bc1_tt');
+      
+      const tienTrinhData = (window.mockData && window.mockData.tienTrinh) ? window.mockData.tienTrinh : [
+        { ma: "TT_TOM_SU", tenVN: "Sơ chế Tôm Sú" },
+        { ma: "TT_TOM_THE", tenVN: "Sơ chế Tôm Thẻ" },
+        { ma: "TT_DONG_GOI", tenVN: "Đóng gói" }
+      ];
+      
+      tienTrinhData.forEach(tt => {
+        ttSelect.innerHTML += `<option value="${tt.ma}">${tt.ma} - ${tt.tenVN || tt.ten}</option>`;
+      });
+
+      // Auto load data
+      bc1Search();
+    });
+
+    function bc1Search() {
+      const dv3 = document.getElementById('bc1_dv3').value;
+      if (!dv3) {
+        showAlert2('bc1-alert', 'Vui lòng chọn Đơn vị cấp 3 (bắt buộc nhập).', 'error');
+        return;
+      }
+      
+      const thang = document.getElementById('bc1_thang').value.trim();
+      if (!thang) {
+        showAlert2('bc1-alert', 'Vui lòng nhập Tháng tính lương (bắt buộc nhập).', 'error');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) {
+        showAlert2('bc1-alert', 'Định dạng tháng không hợp lệ. Vui lòng nhập MM/YYYY (Ví dụ: 06/2026).', 'error');
+        return;
+      }
+      
+      const tbody = document.getElementById('bc1-tbody');
+      
+      tbody.innerHTML = `
+        <tr class="table-row" style="background:#fff;">
+          <td style="text-align:center;">1</td>
+          <td style="text-align:center;">PTO101</td>
+          <td style="text-align:center;">NSR</td>
+          <td style="text-align:center;">5/1/2026</td>
+          <td style="text-align:right; font-weight:bold;">1,474.71</td>
+          <td style="text-align:right;">1,099.34</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">375.37</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">15.50</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">120.00</td>
+          <td style="text-align:right;">50.50</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">25.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">10.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">5.50</td>
+          <td style="text-align:right;">7.50</td>
+        </tr>
+        <tr class="table-row" style="background:#fafafa;">
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">PTO101</td>
+          <td style="text-align:center;">NSR</td>
+          <td style="text-align:center;">5/2/2026</td>
+          <td style="text-align:right; font-weight:bold;">1,323.01</td>
+          <td style="text-align:right;">857.60</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">465.41</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">20.20</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">45.00</td>
+          <td style="text-align:right;">12.50</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">150.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">25.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">10.00</td>
+          <td style="text-align:right;">12.40</td>
+        </tr>
+        <tr class="table-row" style="background:#fff;">
+          <td style="text-align:center;">3</td>
+          <td style="text-align:center;">PTO101</td>
+          <td style="text-align:center;">NSR</td>
+          <td style="text-align:center;">5/3/2026</td>
+          <td style="text-align:right; font-weight:bold;">1,053.04</td>
+          <td style="text-align:right;">807.04</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">246.00</td>
+          <td style="text-align:right;">10.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">30.50</td>
+          <td style="text-align:right;">40.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">100.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">50.00</td>
+          <td style="text-align:right;">11.20</td>
+          <td style="text-align:center;">-</td>
+        </tr>
+        <tr class="table-row" style="background:#fafafa;">
+          <td style="text-align:center;">4</td>
+          <td style="text-align:center;">PTO101</td>
+          <td style="text-align:center;">NSR</td>
+          <td style="text-align:center;">5/4/2026</td>
+          <td style="text-align:right; font-weight:bold;">1,189.27</td>
+          <td style="text-align:right;">948.79</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">240.48</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">200.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">15.00</td>
+          <td style="text-align:right;">35.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">12.00</td>
+          <td style="text-align:right;">18.00</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:center;">-</td>
+          <td style="text-align:right;">15.80</td>
+        </tr>
+      `;
+    }
+  </script>
+</body>
+</html>

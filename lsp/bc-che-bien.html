@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Báo cáo công năng suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 20px 0; letter-spacing: 1px; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+      
+      .table-header th { background: #1e3a5f; color: white; padding: 8px; text-align: center; font-size: 12px; border: 1px solid #cfd8dc; }
+      .table-row td { padding: 8px; font-size: 12px; border: 1px solid #cfd8dc; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương Sản Phẩm › Báo cáo › Bảng tính lương chế biến</div>
+      <div class="bc-title">BẢNG TÍNH LƯƠNG CHẾ BIẾN THÁNG</div>
+      <div id="bc0-alert" class="alert-box"></div>
+      
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label>Mã nhân viên</label>
+          <input type="text" id="bc0_manv">
+          
+          <label>Tên nhân viên</label>
+          <div style="display:flex;gap:4px;">
+            <input type="text" id="bc0_tennv" style="flex:1;">
+            <button style="padding:2px 8px;cursor:pointer;">...</button>
+          </div>
+          
+          <label>Công ty</label>
+          <select id="bc0_congty">
+            <option value="">-- Chọn --</option>
+            <option value="CT1">Công Ty Cổ Phần Thủy Sản Minh Phú Hậu Giang</option>
+          </select>
+
+          <label>Đơn vị cấp 1</label>
+          <select id="bc0_dv1">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất">Sản xuất</option>
+          </select>
+          
+          <label>Đơn vị cấp 2</label>
+          <select id="bc0_dv2">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất MPHG">Sản xuất MPHG</option>
+          </select>
+          
+          <label>Đơn vị cấp 3</label>
+          <select id="bc0_dv3">
+            <option value="">-- Chọn --</option>
+            <option value="PTO">PTO</option>
+          </select>
+          
+          <label>Đơn vị cấp 4</label>
+          <select id="bc0_dv4"><option value="">-- Chọn --</option></select>
+          
+          <label>Đơn vị cấp 5</label>
+          <select id="bc0_dv5"><option value="">-- Chọn --</option></select>
+
+          <label>Đơn vị cấp 6</label>
+          <select id="bc0_dv6"><option value="">-- Chọn --</option></select>
+
+          <label>Bộ phận tính lương</label>
+          <select id="bc0_bptl"><option value="">-- Chọn --</option></select>
+
+          <label>Vị trí công việc</label>
+          <select id="bc0_vtcv"><option value="">-- Chọn --</option></select>
+
+          <label>Nơi làm việc</label>
+          <select id="bc0_nlv"><option value="">-- Chọn --</option></select>
+
+          <label>Nhóm tính lương</label>
+          <select id="bc0_ntl"><option value="">-- Chọn --</option></select>
+          
+          <label class="lbl-red">Tháng (*)</label>
+          <input type="text" id="bc0_thang" placeholder="MM/YYYY" maxlength="7" value="06/2026">
+          
+          <label></label><div></div>
+
+          <label>Từ ngày</label>
+          <input type="date" id="bc0_tungay">
+
+          <label>Đến ngày</label>
+          <input type="date" id="bc0_denngay">
+
+          <label></label><div></div>
+        </div>
+        <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
+            <label style="font-size:12px; margin-right:20px;">Tình trạng</label>
+            <label style="font-size:12px; margin-right:15px;"><input type="radio" name="tinhtrang" checked> Đang làm việc</label>
+            <label style="font-size:12px; margin-right:15px;"><input type="radio" name="tinhtrang"> Thôi việc</label>
+            <label style="font-size:12px;"><input type="radio" name="tinhtrang"> Tất cả</label>
+        </div>
+      </div>
+      
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc0Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="showAlert2('bc0-alert', 'Tính năng xuất Excel đang hoàn thiện.', 'info')">Xuất Excel</button>
+      </div>
+
+      <div class="grid-wrap" style="height:400px; overflow-x: auto; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse; min-width: 1500px;">
+          <thead>
+            <tr class="table-header">
+              <th rowspan="3">TT</th>
+              <th rowspan="3">MÃ SỐ</th>
+              <th rowspan="3">HỌ TÊN</th>
+              <th rowspan="3">Ngày<br>Công</th>
+              <th colspan="12" style="color:red; background:#ffe6e6;">Sản lượng x đơn giá</th>
+              <th rowspan="3">Hệ Số<br>T.Lương</th>
+              <th rowspan="3" style="background:#c6e0b4;color:#000;">TỔNG<br>TẤT CẢ<br>LƯƠNG SP</th>
+              <th rowspan="3">Hỗ trợ<br>Lương SP</th>
+              <th rowspan="3" style="background:#c6e0b4;color:#000;">TỔNG<br>TẤT CẢ<br>LƯƠNG SP</th>
+            </tr>
+            <tr class="table-header" style="background:#f4b084; color:#000;">
+              <th>TL Tôm<br>Sống Lắc</th>
+              <th>TL Tôm<br>Trong Lap</th>
+              <th>TL Tôm<br>Tách vỏ</th>
+              <th>TL Tôm<br>Tách Vỏ lưng</th>
+              <th>TL Tôm<br>Trong gói VIP</th>
+              <th>TL Tôm<br>Trong gói Thường</th>
+              <th>TL Tôm<br>4 Ka</th>
+              <th>TL Tôm<br>Tầng 100%</th>
+              <th>TL Tôm<br>Tầng 50%</th>
+              <th>TL Tôm<br>Ka 1</th>
+              <th>TL Tôm<br>Ka 2</th>
+              <th>TL Tôm<br>Khoán</th>
+            </tr>
+            <tr class="table-header" style="background:#e2efda; color:#000;">
+              <th>1</th><th>2</th><th>3</th><th>4</th><th>1</th><th>2</th><th>3</th><th>4</th><th>1</th><th>2</th><th>3</th><th>4</th>
+            </tr>
+          </thead>
+          <tbody id="bc0-tbody">
+            <tr class="table-row"><td colspan="20" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Auto-populate data on load
+      bc0Search();
+    });
+
+    function bc0Search() {
+      const thang = document.getElementById('bc0_thang').value.trim();
+      if (!thang) {
+        showAlert2('bc0-alert', 'Vui lòng nhập Tháng tính lương (bắt buộc nhập).', 'error');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) {
+        showAlert2('bc0-alert', 'Định dạng tháng không hợp lệ. Vui lòng nhập MM/YYYY (Ví dụ: 06/2026).', 'error');
+        return;
+      }
+      const tbody = document.getElementById('bc0-tbody');
+      
+      tbody.innerHTML = `
+        <tr class="table-row" style="background:#eee; font-weight:bold;">
+          <td colspan="4" style="text-align:center;">C.BIỂN 1 - KA1</td>
+          <td colspan="16"></td>
+        </tr>
+        <tr class="table-row" style="background:#fff;">
+          <td style="text-align:center;">1</td>
+          <td style="text-align:center;">1022908420</td>
+          <td>Huỳnh Thị Nuôi</td>
+          <td style="text-align:center;">23.0</td>
+          <td style="text-align:right;">87.6</td>
+          <td style="text-align:right;">1,105,200</td>
+          <td style="text-align:right;">4,741,207</td>
+          <td style="text-align:right;">1,335,510</td>
+          <td style="text-align:right;">1,327,758</td>
+          <td style="text-align:right;">4,889,449</td>
+          <td style="text-align:right;">4,889,449</td>
+          <td style="text-align:right;">850,000</td>
+          <td style="text-align:right;">1,075,575</td>
+          <td style="text-align:right;">5,287,135</td>
+          <td style="text-align:right;">920,400</td>
+          <td style="text-align:right;">1,453,654</td>
+          <td style="text-align:right;">1,475,043</td>
+          <td style="text-align:right; font-weight:bold;">8,225,932</td>
+          <td style="text-align:right; color:blue;">378,556</td>
+          <td style="text-align:right; font-weight:bold;">8,604,388</td>
+        </tr>
+        <tr class="table-row" style="background:#fafafa;">
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">1022904000</td>
+          <td>Bùi Thị Mỹ</td>
+          <td style="text-align:center;">26.0</td>
+          <td style="text-align:right;">37.7</td>
+          <td style="text-align:right;">2,305,500</td>
+          <td style="text-align:right;">6,104,545</td>
+          <td style="text-align:right;">1,025,747</td>
+          <td style="text-align:right;">1,400,004</td>
+          <td style="text-align:right;">6,207,602</td>
+          <td style="text-align:right;">6,207,602</td>
+          <td style="text-align:right;">1,200,000</td>
+          <td style="text-align:right;">1,014,830</td>
+          <td style="text-align:right;">6,701,705</td>
+          <td style="text-align:right;">1,550,200</td>
+          <td style="text-align:right;">2,020,272</td>
+          <td style="text-align:right;">1,622,047</td>
+          <td style="text-align:right; font-weight:bold;">10,432,524</td>
+          <td style="text-align:right; color:blue;">491,948</td>
+          <td style="text-align:right; font-weight:bold;">10,924,472</td>
+        </tr>
+        <tr class="table-row" style="background:#fff;">
+          <td style="text-align:center;">3</td>
+          <td style="text-align:center;">1022907741</td>
+          <td>Võ Mộng Thúy</td>
+          <td style="text-align:center;">23.2</td>
+          <td style="text-align:right;">88.6</td>
+          <td style="text-align:right;">3,400,100</td>
+          <td style="text-align:right;">4,874,528</td>
+          <td style="text-align:right;">1,403,266</td>
+          <td style="text-align:right;">1,327,758</td>
+          <td style="text-align:right;">5,023,762</td>
+          <td style="text-align:right;">5,023,762</td>
+          <td style="text-align:right;">950,500</td>
+          <td style="text-align:right;">1,148,106</td>
+          <td style="text-align:right;">5,526,335</td>
+          <td style="text-align:right;">2,100,000</td>
+          <td style="text-align:right;">1,565,737</td>
+          <td style="text-align:right;">1,541,508</td>
+          <td style="text-align:right; font-weight:bold;">8,426,981</td>
+          <td style="text-align:right; color:blue;">394,368</td>
+          <td style="text-align:right; font-weight:bold;">8,821,349</td>
+        </tr>
+        <tr class="table-row" style="background:#d9ead3; font-weight:bold;">
+          <td colspan="3" style="text-align:center;">TỔNG CB1 - KA1</td>
+          <td style="text-align:center;">278.2</td>
+          <td style="text-align:right;">380.5</td>
+          <td style="text-align:right;">6,810,800</td>
+          <td style="text-align:right;">59,514,754</td>
+          <td style="text-align:right;">17,632,207</td>
+          <td style="text-align:right;">14,607,510</td>
+          <td style="text-align:right;">61,300,197</td>
+          <td style="text-align:right;">61,300,197</td>
+          <td style="text-align:right;">3,000,500</td>
+          <td style="text-align:right;">15,045,735</td>
+          <td style="text-align:right;">66,116,554</td>
+          <td style="text-align:right;">4,570,600</td>
+          <td style="text-align:right;">18,554,770</td>
+          <td style="text-align:right;">16,227,879</td>
+          <td style="text-align:right;">101,899,203</td>
+          <td style="text-align:right; color:blue;">4,746,488</td>
+          <td style="text-align:right;">106,645,691</td>
+        </tr>
+      `;
+    }
+  </script>
+</body>
+</html>

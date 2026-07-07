@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Danh mục Loại Tôm</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Danh mục › Loại Tôm</div>
+  <div class="page-title">DANH MỤC LOẠI TÔM</div>
+  <div id="dm3-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Mã Tôm</label>
+      <div class="input-wrap"><input type="text" id="dm3_ma" maxlength="20" placeholder="Nhập mã..."><div class="input-note">Unique. Không dấu, không khoảng trắng. VD: T, W, C</div></div>
+      <label class="lbl-red">Loại Tôm</label>
+      <input type="text" id="dm3_loai" maxlength="100" placeholder="Tên loại tôm... VD: Sú, Wct, Sắt">
+      <label>Ghi chú</label>
+      <textarea id="dm3_note" maxlength="500" style="height:50px;" placeholder="Nhập ghi chú..."></textarea>
+      <label></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dm3_use" checked> Sử dụng?</label>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dm3Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm3Save()">Lưu</button><button class="btn-delete" onclick="dm3Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm3-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox" id="dm3-chkAll" onchange="toggleAll('dm3-chkAll','.dm3-chk')"></th><th>Sửa</th><th>STT</th><th>Mã Tôm</th><th>Loại Tôm</th><th>Ghi chú</th><th>Sử dụng</th></tr></thead>
+    <tbody id="dm3-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-overlay" id="dm3-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC LOẠI TÔM</span><button class="x" onclick="hideModal('dm3-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;"><strong>Rule Import:</strong><br>
+      1. Mã Tôm tồn tại → UPDATE Loại Tôm<br>
+      2. Mã Tôm chưa tồn tại → INSERT mới<br>
+      <span style="color:red">3. Mã trùng trong file → DỪNG, báo lỗi dòng đầu tiên trùng.</span>
+    </div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('dm3-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('dm3-imp');showAlert2('dm3-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+
+    let dm3Data = [
+      { id:1, ma:'T', loai:'Sú',  note:'Tôm sú – loại phổ biến nhất',      use:true },
+      { id:2, ma:'W', loai:'Wct', note:'Tôm thẻ chân trắng (White Leg)',   use:true },
+      { id:3, ma:'C', loai:'Sắt', note:'Tôm sắt – kích cỡ lớn, cứng vỏ', use:true }
+    ];
+    let dm3NextId = 4;
+
+    function dm3Render() {
+      const tbody = document.getElementById('dm3-tbody');
+      tbody.innerHTML = '';
+      dm3Data.forEach((r, i) => {
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="dm3-chk" value="${r.id}"></td>
+          <td><span class="edit-icon" onclick="dm3EditById(${r.id})">✎</span></td>
+          <td>${i+1}</td>
+          <td><b>${r.ma}</b></td>
+          <td>${r.loai}</td>
+          <td>${r.note}</td>
+          <td style="color:${r.use?'green':'#aaa'};font-weight:bold">${r.use?'✔':'✘'}</td>
+        </tr>`;
+      });
+    }
+
+    function dm3Clear() {
+      document.getElementById('dm3_ma').value = '';
+      document.getElementById('dm3_ma').readOnly = false;
+      document.getElementById('dm3_loai').value = '';
+      document.getElementById('dm3_note').value = '';
+      document.getElementById('dm3_use').checked = true;
+      document.getElementById('dm3-alert').style.display = 'none';
+    }
+
+    function dm3EditById(id) {
+      const r = dm3Data.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('dm3_ma').value = r.ma;
+      document.getElementById('dm3_ma').readOnly = true;
+      document.getElementById('dm3_loai').value = r.loai;
+      document.getElementById('dm3_note').value = r.note;
+      document.getElementById('dm3_use').checked = r.use;
+      window.scrollTo(0, 0);
+      showAlert2('dm3-alert', "Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", 'success');
+    }
+
+    function dm3Save() {
+      const ma = document.getElementById('dm3_ma').value.trim().toUpperCase();
+      const loai = document.getElementById('dm3_loai').value.trim();
+      const note = document.getElementById('dm3_note').value.trim();
+      const use = document.getElementById('dm3_use').checked;
+      const isEdit = document.getElementById('dm3_ma').readOnly;
+      if (!ma || !loai) return showAlert2('dm3-alert', 'Vui lòng nhập đầy đủ Mã Tôm và Loại Tôm.', 'error');
+      if (!/^[a-zA-Z0-9]+$/.test(ma)) return showAlert2('dm3-alert', 'Mã Tôm không hợp lệ (chỉ chữ/số, không dấu).', 'error');
+      if (!isEdit && dm3Data.find(x => x.ma === ma)) return showAlert2('dm3-alert', '<b>Lỗi:</b> Mã [' + ma + '] đã tồn tại.', 'error');
+      if (isEdit) {
+        const r = dm3Data.find(x => x.ma === ma);
+        if (r) { r.loai = loai; r.note = note; r.use = use; }
+        showAlert2('dm3-alert', 'Cập nhật Loại Tôm thành công!', 'success');
+      } else {
+        dm3Data.push({ id: dm3NextId++, ma, loai, note, use });
+        showAlert2('dm3-alert', 'Thêm mới Loại Tôm thành công!', 'success');
+      }
+      dm3Render();
+      dm3Clear();
+    }
+
+    function dm3Delete() {
+      const chks = document.querySelectorAll('.dm3-chk:checked');
+      if (!chks.length) return showAlert2('dm3-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} loại tôm đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        dm3Data = dm3Data.filter(x => !ids.includes(x.id));
+        dm3Render();
+        showAlert2('dm3-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    dm3Render();
+  </script>
+</body>
+</html>

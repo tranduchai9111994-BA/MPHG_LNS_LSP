@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mở Khóa Lương Sản Phẩm</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* PAGE-SPECIFIC: pg3-mo-khoa */
+    .bottom-filter { display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; }
+    .bottom-filter .red-label { color: #d32f2f; font-weight: bold; }
+    .actions-center button { padding: 7px 20px; margin: 0 4px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; color: white; transition: opacity 0.2s; font-size: 12px; }
+    .actions-center button:hover { opacity: 0.8; }
+    .btn-search { background-color: #ffc107; color: #333 !important; }
+    .btn-refresh { background-color: #007bff; }
+    .btn-unlock { background-color: #dc3545; }
+    .btn-delete { background-color: #6c757d; }
+    .btn-export { background-color: #fd7e14; }
+    .lock-all-check { position: absolute; right: 0; display: flex; align-items: center; gap: 5px; font-weight: normal; }
+    .audit-log-text { font-family: 'Courier New', Courier, monospace; background: #fff; padding: 8px; border: 1px dashed #c3e6cb; margin-top: 10px; font-weight: normal; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rsaquo; Chức năng &rsaquo; Khóa/Mở khóa lương sản phẩm</div>
+    <div class="page-title">MỞ KHÓA LƯƠNG SẢN PHẨM</div>
+    <div id="alertBox" class="alert-box"></div>
+    <div class="filter-panel">
+        <div class="form-grid">
+            <label class="red-label" style="color: #d32f2f;">Kỳ lương SP (*)</label>
+            <select id="cboKy"><option value="01/2026">Tháng 01/2026</option></select>
+            <label>Mã nhân viên</label> <input type="text" placeholder="NV...">
+            <label>Tên nhân viên</label> <input type="text">
+            <label>Công ty / ĐV Cấp 1</label> <select><option>Công Ty CP Thủy Sản MPHG</option></select>
+            <label>Bộ phận / Xưởng</label> <select><option>-- Tất cả --</option></select>
+            <label>Công đoạn</label> <select><option>-- Tất cả --</option></select>
+        </div>
+        <div class="bottom-filter">
+            <label class="red-label">Trạng thái khóa</label>
+            <div class="radio-group">
+                <label><input type="radio" name="lock_status"> Chưa khóa</label>
+                <label><input type="radio" name="lock_status" checked> Đã khóa</label>
+                <label><input type="radio" name="lock_status"> Tất cả</label>
+            </div>
+            <div style="grid-column: 1 / -1; margin-top: 5px; padding-top: 10px; border-top: 1px dashed #eee;">
+                <label style="color:#856404; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="chkSimulateLuongThangLocked" checked>
+                    <em>[Công cụ Test]: Mô phỏng "Lương Tháng kỳ này đã khóa"</em>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="actions-bar" style="display: flex; justify-content: center; align-items: center; margin: 15px 0 20px 0; position: relative;">
+        <div class="actions-center">
+            <button class="btn-search">Tìm Kiếm</button>
+            <button class="btn-refresh" onclick="clearFilter()">Làm mới</button>
+            <button class="btn-unlock" onclick="executeUnlock()">Mở khóa</button>
+            <button class="btn-delete" onclick="executeDelete()">Xóa dữ liệu</button>
+            <button class="btn-export">Xuất dữ liệu</button>
+        </div>
+        <div class="lock-all-check">
+            <label><input type="checkbox" id="chkLockAll"> Mở khóa tất cả theo điều kiện lọc</label>
+        </div>
+    </div>
+    <div class="grid-container">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th style="width: 30px;"><input type="checkbox" id="chkAll" onchange="toggleAllCheckboxes(this, '.chk-row')"></th>
+                    <th style="width: 40px;">STT</th><th>Trạng thái Khóa</th><th>Kỳ Lương</th><th>Mã NV</th>
+                    <th class="text-left">Họ tên</th><th class="text-left">Bộ phận</th><th class="text-left">Công đoạn</th>
+                    <th style="text-align: right;">Tổng Lương SP (VND)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="unlockModal">
+    <div class="modal-content" style="background:#fff; width:480px; border-radius:4px; border:1px solid #999;">
+        <div class="modal-header" style="background:#dc3545; color:white; padding:12px 15px; display:flex; justify-content:space-between;">
+            <span>XÁC NHẬN MỞ KHÓA LƯƠNG SẢN PHẨM</span>
+            <button class="close-btn" onclick="closeUnlockModal()" style="background:transparent; border:none; color:white; cursor:pointer;">✕</button>
+        </div>
+        <div class="modal-body" style="padding:20px;">
+            <div style="background-color: #fff3cd; color: #856404; padding: 10px; border-left: 4px solid #ffc107; margin-bottom: 15px; font-size: 11px;">
+                Cảnh báo: Hành động mở khóa sẽ ảnh hưởng đến dữ liệu đã chốt. Yêu cầu nhập lý do chính đáng để lưu vết (Audit Log).
+            </div>
+            <label style="font-weight:bold; display:block; margin-bottom:8px;">Lý do mở khóa <span style="color:red">*</span></label>
+            <textarea id="txtUnlockReason" style="width:100%; height:80px; padding:8px;" placeholder="Vui lòng nhập lý do (Bắt buộc)..."></textarea>
+            <div class="error-msg" id="reasonError" style="color:#dc3545; display:none; margin-top:5px; font-size:11px;">Trường lý do là bắt buộc nhập!</div>
+        </div>
+        <div class="modal-footer" style="padding:12px 15px; background:#f8f9fa; border-top:1px solid #eee; text-align:right;">
+            <button class="btn-cancel" onclick="closeUnlockModal()" style="padding:7px 18px; border:1px solid #ccc; cursor:pointer;">Hủy</button>
+            <button class="btn-confirm" onclick="confirmUnlock()" style="padding:7px 18px; background:#dc3545; color:white; border:none; cursor:pointer;">Xác nhận Mở khóa</button>
+        </div>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    const tbody = document.getElementById('tableBody');
+    let mockData = [];
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        if(window.MOCK && window.MOCK.lsp && window.MOCK.lsp.ketQua) {
+            mockData = window.MOCK.lsp.ketQua.map((x, idx) => {
+                const tongSL = x.ns_trong_gio + x.ns_ca_dem + x.ns_tang_ca + x.ns_tang_ca_dem;
+                const lspBase = tongSL * x.unit_price;
+                const lspHS3 = lspBase * (x.hs1/100) * (x.hs2/100) * (x.hs3/100);
+                const deptSup = lspHS3 * (x.dept_support_pct / 100);
+                const stageSup = lspBase * (x.stage_support_pct / 100) * ((x.hs1/100)*(x.hs2/100)*(x.hs3/100));
+                const total = Math.round(lspHS3 + deptSup + stageSup + x.hazard_amt);
+                return {
+                    id: idx + 1,
+                    isLocked: x.is_locked === 1,
+                    empCode: x.ma_nv,
+                    empName: x.ho_ten,
+                    dept: x.ten_bp,
+                    stage: x.ten_cd,
+                    total: total
+                };
+            });
+        } else {
+            const names = ["Nguyễn Văn An", "Trần Minh Hải", "Lê Quốc Dũng", "Phạm Thị Lan", "Đặng Hoàng Nam"];
+            for(let i = 1; i <= 5; i++) {
+                let isLocked = (i <= 3);
+                let total = Math.floor(Math.random() * 5000000) + 2000000;
+                mockData.push({ id: i, isLocked: isLocked, empCode: "NV100" + i, empName: names[i - 1], dept: "Bộ phận PTO", stage: "Tẩm bột", total: total });
+            }
+        }
+        renderTable();
+    });
+
+    function renderTable() {
+        tbody.innerHTML = '';
+        mockData.forEach((row) => {
+            let trClass = row.isLocked ? "row-locked" : "";
+            let lblLock = row.isLocked ? `<span class="status-badge badge-locked" style="background:#28a745;color:white;padding:3px 8px;border-radius:3px;font-size:10px;">Đã khóa (✔)</span>` : `<span class="status-badge badge-unlocked" style="background:#ffc107;padding:3px 8px;border-radius:3px;font-size:10px;">Chưa khóa</span>`;
+            let chk = `<input type="checkbox" class="chk-row" data-id="${row.id}">`;
+            tbody.innerHTML += `
+                <tr class="${trClass}">
+                    <td>${chk}</td>
+                    <td>${row.id}</td>
+                    <td>${lblLock}</td>
+                    <td>01/2026</td>
+                    <td>${row.empCode}</td>
+                    <td class="text-left">${row.empName}</td>
+                    <td class="text-left">${row.dept}</td>
+                    <td class="text-left">${row.stage}</td>
+                    <td class="col-money">${row.total.toLocaleString()} ₫</td>
+                </tr>
+            `;
+        });
+    }
+
+    function clearFilter() {
+        document.getElementById('alertBox').style.display = 'none';
+        document.querySelectorAll('input[type="text"]').forEach(el => el.value = '');
+        document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+        document.getElementById('chkLockAll').checked = false;
+        document.getElementById('chkAll').checked = false;
+        toggleAllCheckboxes(document.getElementById('chkAll'), '.chk-row');
+    }
+
+    function executeDelete() {
+        const checkboxes = document.querySelectorAll('.chk-row:checked');
+        if(checkboxes.length === 0) { showAlert("alertBox", "Vui lòng chọn dữ liệu cần xóa.", "warning"); return; }
+        let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-id')));
+        let rowsToDelete = mockData.filter(x => selectedIds.includes(x.id));
+        let lockedRows = rowsToDelete.filter(x => x.isLocked);
+        if(lockedRows.length > 0) { showAlert("alertBox", `<strong>[Lỗi Blocking]:</strong> Dữ liệu đang được khóa. Không thể thực hiện thao tác xóa.`, "error"); return; }
+        
+        confirmAction(`Bạn có chắc chắn muốn xóa ${rowsToDelete.length} dòng dữ liệu chưa khóa?`, function() {
+            mockData = mockData.filter(x => !selectedIds.includes(x.id));
+            renderTable();
+            document.getElementById('chkAll').checked = false;
+            showAlert("alertBox", "Đã xóa dữ liệu thành công.", "success");
+        });
+    }
+
+    function executeUnlock() {
+        const checkboxes = document.querySelectorAll('.chk-row:checked');
+        const chkLockAll = document.getElementById('chkLockAll').checked;
+        if(!chkLockAll && checkboxes.length === 0) { showAlert("alertBox", "Vui lòng chọn dữ liệu cần mở khóa hoặc chọn 'Mở khóa tất cả'.", "warning"); return; }
+        let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-id')));
+        let rowsToUnlock = chkLockAll ? mockData : mockData.filter(x => selectedIds.includes(x.id));
+        let lockedRows = rowsToUnlock.filter(x => x.isLocked);
+        if(lockedRows.length === 0) { showAlert("alertBox", "<strong>[Warning]:</strong> Không có dòng dữ liệu nào được mở khóa (Dữ liệu đang ở trạng thái chưa khóa).", "warning"); return; }
+        document.getElementById('txtUnlockReason').value = '';
+        document.getElementById('reasonError').style.display = 'none';
+        document.getElementById('unlockModal').style.display = 'flex';
+    }
+
+    function closeUnlockModal() { document.getElementById('unlockModal').style.display = 'none'; }
+
+    function confirmUnlock() {
+        const reason = document.getElementById('txtUnlockReason').value.trim();
+        if(reason.length === 0) { document.getElementById('reasonError').style.display = 'block'; document.getElementById('txtUnlockReason').focus(); return; }
+        else { document.getElementById('reasonError').style.display = 'none'; }
+        
+        const isMonthlyLocked = document.getElementById('chkSimulateLuongThangLocked').checked;
+        const kyLSP = document.getElementById('cboKy').value;
+        if (isMonthlyLocked) {
+            let confirmMsg = `Lương tháng kỳ [${kyLSP}] đã được khóa. Mở khóa LSP sẽ làm lệch dữ liệu. Vui lòng mở khóa Lương tháng trước.\n\nBạn có CHẮC CHẮN muốn cố tình mở khóa LSP?`;
+            if(!confirm(confirmMsg)) { return; }
+        }
+        
+        const checkboxes = document.querySelectorAll('.chk-row:checked');
+        const chkLockAll = document.getElementById('chkLockAll').checked;
+        let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-id')));
+        let unlockedCount = 0;
+        let empIds = [];
+        
+        mockData.forEach(row => {
+            if ((chkLockAll || selectedIds.includes(row.id)) && row.isLocked) {
+                empIds.push(row.empCode);
+                row.isLocked = false;
+                unlockedCount++;
+            }
+        });
+        
+        renderTable();
+        document.getElementById('chkAll').checked = false;
+        closeUnlockModal();
+        
+        let uniqueEmpIds = [...new Set(empIds)].join(',');
+        let timeNow = new Date().toLocaleString('vi-VN');
+        let auditLogStr = `Audit: Action=UNLOCK_LSP, user=admin, time=${timeNow}, period=${kyLSP}, EmpID=[${uniqueEmpIds}], PrevStatus=Locked, NewStatus=Unlocked, Reason=${reason}`;
+        let msg = `<strong>Thành công:</strong> Đã mở khóa ${unlockedCount} dòng dữ liệu. <br><div class="audit-log-text">${auditLogStr}</div>`;
+        showAlert("alertBox", msg, "success");
+    }
+  </script>
+</body>
+</html>

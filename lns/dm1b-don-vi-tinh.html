@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Danh mục Đơn vị tính</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Danh mục › Tên ĐVT</div>
+  <div class="page-title">DANH MỤC ĐƠN VỊ TÍNH</div>
+  <div id="dm1b-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Mã ĐVT</label>
+      <div class="input-wrap"><input type="text" id="dm1b_ma" maxlength="20" placeholder="Nhập mã..."><div class="input-note">Unique. Không dấu, không khoảng trắng. VD: KG, CON</div></div>
+      <label class="lbl-red">Tên ĐVT</label>
+      <input type="text" id="dm1b_loai" maxlength="100" placeholder="Tên đơn vị tính... VD: Kg, Con, Thùng">
+      <label>Ghi chú</label>
+      <textarea id="dm1b_note" maxlength="500" style="height:50px;" placeholder="Nhập ghi chú..."></textarea>
+      <label></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dm1b_use" checked> Sử dụng?</label>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dm1bClear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm1bSave()">Lưu</button><button class="btn-delete" onclick="dm1bDelete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm1b-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox" id="dm1b-chkAll" onchange="toggleAll('dm1b-chkAll','.dm1b-chk')"></th><th>Sửa</th><th>STT</th><th>Mã ĐVT</th><th>Tên ĐVT</th><th>Ghi chú</th><th>Sử dụng</th></tr></thead>
+    <tbody id="dm1b-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-overlay" id="dm1b-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC ĐƠN VỊ TÍNH</span><button class="x" onclick="hideModal('dm1b-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;"><strong>Rule Import:</strong><br>
+      1. Mã ĐVT tồn tại → UPDATE Tên ĐVT<br>
+      2. Mã ĐVT chưa tồn tại → INSERT mới<br>
+      <span style="color:red">3. Mã trùng trong file → DỪNG, báo lỗi dòng đầu tiên trùng.</span>
+    </div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('dm1b-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('dm1b-imp');showAlert2('dm1b-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+
+    let dm1bData = [
+      { id:1, ma:'KG', loai:'Kg',  note:'Kilogram',      use:true },
+      { id:2, ma:'CON', loai:'Con', note:'Con',   use:true },
+      { id:3, ma:'THUNG', loai:'Thùng', note:'Thùng', use:true },
+      { id:4, ma:'LIT', loai:'Lít', note:'Lít', use:true },
+      { id:5, ma:'MIENG', loai:'Miếng', note:'Miếng', use:true },
+      { id:6, ma:'KHAY', loai:'Khay', note:'Khay', use:true }
+    ];
+    let dm1bNextId = 7;
+
+    function dm1bRender() {
+      const tbody = document.getElementById('dm1b-tbody');
+      tbody.innerHTML = '';
+      dm1bData.forEach((r, i) => {
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="dm1b-chk" value="${r.id}"></td>
+          <td><span class="edit-icon" onclick="dm1bEditById(${r.id})">✎</span></td>
+          <td>${i+1}</td>
+          <td><b>${r.ma}</b></td>
+          <td>${r.loai}</td>
+          <td>${r.note}</td>
+          <td style="color:${r.use?'green':'#aaa'};font-weight:bold">${r.use?'✔':'✘'}</td>
+        </tr>`;
+      });
+    }
+
+    function dm1bClear() {
+      document.getElementById('dm1b_ma').value = '';
+      document.getElementById('dm1b_ma').readOnly = false;
+      document.getElementById('dm1b_loai').value = '';
+      document.getElementById('dm1b_note').value = '';
+      document.getElementById('dm1b_use').checked = true;
+      document.getElementById('dm1b-alert').style.display = 'none';
+    }
+
+    function dm1bEditById(id) {
+      const r = dm1bData.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('dm1b_ma').value = r.ma;
+      document.getElementById('dm1b_ma').readOnly = true;
+      document.getElementById('dm1b_loai').value = r.loai;
+      document.getElementById('dm1b_note').value = r.note;
+      document.getElementById('dm1b_use').checked = r.use;
+      window.scrollTo(0, 0);
+      showAlert2('dm1b-alert', "Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", 'success');
+    }
+
+    function dm1bSave() {
+      const ma = document.getElementById('dm1b_ma').value.trim().toUpperCase();
+      const loai = document.getElementById('dm1b_loai').value.trim();
+      const note = document.getElementById('dm1b_note').value.trim();
+      const use = document.getElementById('dm1b_use').checked;
+      const isEdit = document.getElementById('dm1b_ma').readOnly;
+      if (!ma || !loai) return showAlert2('dm1b-alert', 'Vui lòng nhập đầy đủ Mã ĐVT và Tên ĐVT.', 'error');
+      if (!/^[a-zA-Z0-9]+$/.test(ma)) return showAlert2('dm1b-alert', 'Mã ĐVT không hợp lệ (chỉ chữ/số, không dấu).', 'error');
+      if (!isEdit && dm1bData.find(x => x.ma === ma)) return showAlert2('dm1b-alert', '<b>Lỗi:</b> Mã [' + ma + '] đã tồn tại.', 'error');
+      if (isEdit) {
+        const r = dm1bData.find(x => x.ma === ma);
+        if (r) { r.loai = loai; r.note = note; r.use = use; }
+        showAlert2('dm1b-alert', 'Cập nhật Tên ĐVT thành công!', 'success');
+      } else {
+        dm1bData.push({ id: dm1bNextId++, ma, loai, note, use });
+        showAlert2('dm1b-alert', 'Thêm mới Tên ĐVT thành công!', 'success');
+      }
+      dm1bRender();
+      dm1bClear();
+    }
+
+    function dm1bDelete() {
+      const chks = document.querySelectorAll('.dm1b-chk:checked');
+      if (!chks.length) return showAlert2('dm1b-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} loại tôm đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        dm1bData = dm1bData.filter(x => !ids.includes(x.id));
+        dm1bRender();
+        showAlert2('dm1b-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    dm1bRender();
+  </script>
+</body>
+</html>

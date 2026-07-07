@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tính Lương Sản Phẩm</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .btn-calc { background-color: #5c9b00; }
+    .btn-calc-dept { background-color: #28a745; }
+    .btn-calc-emp { background-color: #6f42c1; }
+    .btn-view { background-color: #f39c12; }
+    .btn-refresh { background-color: #007bff; }
+    .btn-lock { background-color: #dc3545; }
+    .btn-export { background-color: #e67e22; }
+    .section-divider {
+        border: none;
+        border-top: 2px dashed #b8daff;
+        margin: 25px 0 15px 0;
+    }
+    .section-title {
+        font-weight: bold; font-size: 14px; color: #0056b3;
+        border-left: 4px solid #0056b3; padding-left: 10px;
+        margin: 15px 0 10px 0; text-transform: uppercase;
+    }
+    .btn-step {
+        position: relative; padding-left: 36px !important;
+    }
+    .btn-step .step-num {
+        position: absolute; left: 0; top: 0; bottom: 0; width: 28px;
+        background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+        font-size: 13px; border-radius: 3px 0 0 3px;
+    }
+    .filter-row-inline {
+        display: flex; align-items: center; gap: 15px; flex-wrap: wrap;
+    }
+    .filter-row-inline label { font-weight: bold; white-space: nowrap; }
+    .filter-row-inline select, .filter-row-inline input[type="number"] {
+        padding: 4px 6px; border: 1px solid #ccc; height: 26px;
+    }
+    .multi-combo { position: relative; display: inline-block; min-width: 180px; }
+    .multi-combo-toggle {
+        padding: 4px 28px 4px 8px; border: 1px solid #ccc; background: #fff; cursor: pointer;
+        font-size: 12px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        min-height: 26px; line-height: 18px; user-select: none; position: relative;
+    }
+    .multi-combo-toggle::after {
+        content: "\25BC"; position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+        font-size: 9px; color: #666; pointer-events: none;
+    }
+    .multi-combo-dropdown {
+        display: none; position: absolute; top: 100%; left: 0; min-width: 100%; z-index: 100;
+        background: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 3px 3px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.12); max-height: 200px; overflow-y: auto;
+    }
+    .multi-combo.open .multi-combo-dropdown { display: block; }
+    .multi-combo-dropdown label {
+        display: flex; align-items: center; gap: 6px; padding: 5px 10px; cursor: pointer;
+        font-weight: normal !important; font-size: 12px; white-space: nowrap;
+    }
+    .multi-combo-dropdown label:hover { background: #e8f4ff; }
+    .multi-combo-dropdown label.all-option { border-bottom: 1px solid #eee; color: #0056b3; font-weight: bold !important; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin ch&agrave;o,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nh&acirc;n s&#7921;</a><a href="#">Th&ocirc;i vi&#7879;c</a><a href="#">Ch&#7845;m c&ocirc;ng</a>
+    <a href="#">B&#7843;o hi&#7875;m</a><a href="#" class="active">L&#432;&#417;ng</a>
+    <a href="#">Th&#432;&#7903;ng</a><a href="#">Thu&#7871;</a><a href="#">H&#7879; th&#7889;ng</a><a href="#">DV c&aacute; nh&acirc;n</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">L&#432;&#417;ng &rsaquo; Ch&#7913;c n&#259;ng &rsaquo; T&iacute;nh l&#432;&#417;ng s&#7843;n ph&#7849;m</div>
+    <div class="page-title">T&Iacute;NH L&#431;&#416;NG S&#7842;N PH&#7848;M</div>
+
+    <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+
+    <!-- ========== FILTER PANEL ========== -->
+    <div class="filter-panel">
+        <div class="filter-grid">
+            <label>M&atilde; nh&acirc;n vi&ecirc;n</label><div class="lookup-wrap"><input type="text"><button>...</button></div>
+            <label>T&ecirc;n nh&acirc;n vi&ecirc;n</label><div class="lookup-wrap"><input type="text"><button>...</button></div>
+            <label>C&ocirc;ng ty</label><select><option>C&ocirc;ng Ty CP Th&#7911;y S&#7843;n</option></select>
+            <label>&#272;&#417;n v&#7883; c&#7845;p 1</label> <select><option></option></select>
+            <label>&#272;&#417;n v&#7883; c&#7845;p 2</label> <select><option></option></select>
+            <label>&#272;&#417;n v&#7883; c&#7845;p 3</label> <select><option></option></select>
+            <label>&#272;&#417;n v&#7883; c&#7845;p 4</label> <select><option></option></select>
+            <label>&#272;&#417;n v&#7883; c&#7845;p 5</label> <select><option></option></select>
+            <label>&#272;&#417;n v&#7883; c&#7845;p 6</label> <select><option></option></select>
+        </div>
+        <div class="status-row">
+            <label style="font-weight: bold; margin-right: 10px;">T&igrave;nh tr&#7841;ng:</label>
+            <div class="radio-inline">
+                <label><input type="radio" name="tt_lv"> Hi&#7879;n di&#7879;n</label>
+                <label><input type="radio" name="tt_lv"> Th&ocirc;i vi&#7879;c</label>
+                <label><input type="radio" name="tt_lv" checked> T&#7845;t c&#7843;</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PERIOD BAR ========== -->
+    <div class="period-bar" style="flex-wrap: wrap; gap: 10px;">
+        <div class="filter-row-inline">
+            <label style="color:#d32f2f;">Kỳ / Tháng lương</label>
+            <select style="width:140px;"><option>LSP_01_2026</option></select>
+        </div>
+        <div class="filter-row-inline">
+            <label>Khóa lương</label>
+            <div class="radio-inline">
+                <label><input type="radio" name="kl"> Đã khóa</label>
+                <label><input type="radio" name="kl" checked> Chưa khóa</label>
+                <label><input type="radio" name="kl"> Tất cả</label>
+            </div>
+        </div>
+        <div class="filter-row-inline" style="border-left:2px solid #dee2e6; padding-left:15px;">
+            <label>Nhóm lương</label>
+            <select style="min-width:200px;">
+                <option value="">-- Tất cả --</option>
+                <option>NL_CHE_BIEN - Nhóm lương Chế biến</option>
+                <option>NL_PHUC_VU - Nhóm lương Phục vụ</option>
+                <option>NL_VE_SINH - Nhóm lương Vệ sinh</option>
+            </select>
+        </div>
+        <div class="filter-row-inline">
+            <label>Nhóm tính lương</label>
+            <select style="min-width:220px;">
+                <option value="">-- Tất cả --</option>
+                <option>NTL01 - Hệ số</option>
+                <option>NTL02 - Năng suất</option>
+                <option>NTL03 - Bình quân lương sản phẩm</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ========== ACTION BUTTONS ========== -->
+    <div class="actions-bar" style="display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button class="btn-search">Tìm Kiếm</button>
+        <button class="btn-calc" onclick="clickTinhLuongCaNhan()">Tính</button>
+        <span style="border-left:2px solid #dee2e6; height:24px;"></span>
+        <button class="btn-refresh" onclick="location.reload()">Làm mới</button>
+        <button class="btn-delete" onclick="xoaDuLieu()">Xóa</button>
+        <button class="btn-lock" id="btn-khoa" onclick="khoaLuong()">Khóa</button>
+        <button class="btn-import" id="btn-mo-khoa" onclick="moKhoaLuong()">Mở khóa</button>
+        <button class="btn-export">Xuất Excel</button>
+    </div>
+
+
+    <!-- ========== GRID 1: LUONG SAN PHAM CA NHAN ========== -->
+    <div class="table-responsive-container" id="grid1-wrap" style="max-height:500px;">
+        <table class="data-table table-custom" id="table-grid1">
+            <thead>
+                <tr>
+                    <th class="freeze-col text-center" style="width:30px;"><input type="checkbox" id="chkAllGrid1" onchange="document.querySelectorAll('.chk-grid1').forEach(c=>c.checked=this.checked)"></th>
+                    <th class="freeze-col col-stt text-center">STT</th>
+                    <th class="freeze-col col-manv">Mã NV</th>
+                    <th class="freeze-col col-status text-center">Trạng thái</th>
+                    <th class="freeze-col col-hoten">Họ và Tên</th>
+                    <th class="text-center bg-group-input">Bộ phận</th>
+                    <th class="text-center" style="background:#6f42c1;color:white;">Chi tiết</th>
+                    <th class="text-center bg-group-input">C&ocirc;ng th&#7921;c t&#7871;</th>
+                    <th class="text-center bg-group-input">S&#7843;n l&#432;&#7907;ng</th>
+                    <th class="text-right bg-group-input">&#272;&#417;n gi&aacute;</th>
+                    <th class="text-right bg-milestone-yellow font-weight-bold">LSP Gốc</th>
+                    <th class="text-center bg-group-heso" title="Do phòng nhân sự nhập">HS1 (%)</th>
+                    <th class="text-right bg-group-heso">Tiền L1</th>
+                    <th class="text-center bg-group-heso" title="Do Phó TGĐ Sản xuất nhập">HS2 (%)</th>
+                    <th class="text-right bg-group-heso">Tiền L2</th>
+                    <th class="text-center bg-group-heso" title="Do Trưởng ca nhập">HS3 (%)</th>
+                    <th class="text-right bg-milestone-green font-weight-bold">Tiền L3</th>
+                    <th class="text-center bg-group-hotro text-info">% HT BP</th>
+                    <th class="text-right bg-group-hotro">HT B&#7897; ph&#7853;n (&#273;)</th>
+                    <th class="text-center bg-group-hotro text-info">% HT C&#272;</th>
+                    <th class="text-right bg-group-hotro">HT C&ocirc;ng &#273;o&#7841;n (&#273;)</th>
+                    <th class="text-right bg-group-hotro text-danger">&#272;&#7897;c h&#7841;i</th>
+                    <th class="text-right text-primary sticky-total-col font-weight-bold">Tổng LSP_total</th>
+                    <th class="text-center">Người tính</th>
+                    <th class="text-center">Ngày tính</th>
+                </tr>
+            </thead>
+            <tbody id="tbPersonal"></tbody>
+            <tfoot>
+                <tr style="background-color: #e8ecef;">
+                    <td colspan="22" class="text-right font-weight-bold freeze-col" style="z-index:3; background-color:#e8ecef; padding:10px 15px; left:0;">
+                        TỔNG CỘNG TOÀN NHÀ MÁY:
+                    </td>
+                    <td class="text-right font-weight-bold text-danger sticky-total-col" id="grand-total-lsp" style="font-size:15px;">0 đ</td>
+                    <td colspan="2" style="background-color:#e8ecef;"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+
+  </div><!-- end container -->
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    /* ============================
+       HELPERS
+    ============================ */
+    function groupByDept(data) {
+        const groups = {}, order = [];
+        data.forEach(row => {
+            if (!groups[row.ma_bp]) {
+                groups[row.ma_bp] = { ten_bp: row.ten_bp, rows: [] };
+                order.push(row.ma_bp);
+            }
+            groups[row.ma_bp].rows.push(row);
+        });
+        return { groups, order };
+    }
+
+    function enableBtn(id) {
+        const b = document.getElementById(id);
+        b.disabled = false; b.style.opacity = "1"; b.style.cursor = "pointer";
+    }
+    function disableBtn(id) {
+        const b = document.getElementById(id);
+        b.disabled = true; b.style.opacity = "0.5"; b.style.cursor = "not-allowed";
+    }
+
+    function getSelectedDepts() {
+        var combo = document.getElementById('comboBoPhan');
+        var checks = combo.querySelectorAll('.multi-combo-dropdown input[type="checkbox"]');
+        var allChk = checks[0];
+        if (allChk.checked) {
+            return [...new Set(window.MOCK.lsp.ketQua.map(r => r.ma_bp))];
+        }
+        var selected = [];
+        for (var i = 1; i < checks.length; i++) {
+            if (checks[i].checked) selected.push(checks[i].value);
+        }
+        if (selected.length === 0) {
+            return [...new Set(window.MOCK.lsp.ketQua.map(r => r.ma_bp))];
+        }
+        return selected;
+    }
+
+    function toggleCombo() {
+        document.getElementById('comboBoPhan').classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        var combo = document.getElementById('comboBoPhan');
+        if (!combo.contains(e.target)) combo.classList.remove('open');
+    });
+    function onComboAllChange(allChk) {
+        var combo = document.getElementById('comboBoPhan');
+        var items = combo.querySelectorAll('.multi-combo-dropdown input[type="checkbox"]');
+        for (var i = 1; i < items.length; i++) {
+            items[i].checked = false;
+        }
+        allChk.checked = true;
+        updateComboLabel();
+    }
+    function onComboItemChange() {
+        var combo = document.getElementById('comboBoPhan');
+        var items = combo.querySelectorAll('.multi-combo-dropdown input[type="checkbox"]');
+        var anyChecked = false;
+        for (var i = 1; i < items.length; i++) {
+            if (items[i].checked) anyChecked = true;
+        }
+        items[0].checked = !anyChecked;
+        updateComboLabel();
+    }
+    function updateComboLabel() {
+        var combo = document.getElementById('comboBoPhan');
+        var toggle = combo.querySelector('.multi-combo-toggle');
+        var items = combo.querySelectorAll('.multi-combo-dropdown input[type="checkbox"]');
+        if (items[0].checked) { toggle.textContent = '-- Tất cả --'; return; }
+        var names = [];
+        for (var i = 1; i < items.length; i++) {
+            if (items[i].checked) names.push(items[i].parentElement.textContent.trim());
+        }
+        toggle.textContent = names.length > 0 ? names.join(', ') : '-- Tất cả --';
+    }
+
+    /* ============================
+       RENDER GRID 1
+    ============================ */
+    function renderGrid1(data) {
+        const tbody = document.getElementById("tbPersonal");
+        tbody.innerHTML = "";
+        const { groups, order } = groupByDept(data);
+        let globalIdx = 0;
+
+        order.forEach(maBp => {
+            const grp = groups[maBp];
+            grp.rows.forEach(row => {
+                globalIdx++;
+                const tr = document.createElement("tr");
+                const lamGiumHtml = row.lam_gium ? '<div class="badge-lam-gium">Làm giùm</div>' : "";
+                const btnView = '<button onclick="moModal4Ca(\'' + row.id + '\')" style="background:none;border:none;cursor:pointer;font-size:16px;" title="Xem chi tiết 4 ca">👁️</button>';
+                const tongSL = row.ns_trong_gio + row.ns_ca_dem + row.ns_tang_ca + row.ns_tang_ca_dem;
+                const hazard = row.hazard_amt > 0 ? '<span class="text-danger font-weight-bold">+' + formatNumber(row.hazard_amt) + '</span>' : "0";
+
+                tr.innerHTML =
+                    '<td class="freeze-col text-center" style="width:30px;"><input type="checkbox" class="chk-grid1"></td>' +
+                    '<td class="freeze-col col-stt text-center">' + globalIdx + '</td>' +
+                    '<td class="freeze-col col-manv font-weight-bold">' + row.ma_nv + '</td>' +
+                    '<td class="freeze-col col-status" style="left:140px;"><span class="badge bg-success">🔒 Đã khóa</span></td>' +
+                    '<td class="freeze-col col-hoten" style="left:240px;">' + row.ho_ten + '</td>' +
+                    '<td class="text-center">' + row.ten_bp + '<br><small>' + row.ten_cd + '</small> ' + lamGiumHtml + '</td>' +
+                    '<td class="text-center"><button onclick="showChiTiet(\'' + row.id + '\')" style="background:#6f42c1;border:none;padding:3px 10px;border-radius:3px;color:white;cursor:pointer;font-size:11px;font-weight:bold;">🔍 Xem</button></td>' +
+                    '<td class="text-center font-weight-bold text-secondary">' + row.ngay_cong + ' công</td>' +
+                    '<td class="text-center bg-light">' + formatNumber(tongSL) + ' ' + btnView + '</td>' +
+                    '<td class="text-right">' + formatNumber(row.unit_price) + '</td>' +
+                    '<td class="text-right bg-light-yellow" id="base-' + row.id + '">0</td>' +
+                    '<td class="text-center" id="hs1-' + row.id + '">' + row.hs1 + '</td>' +
+                    '<td class="text-right" id="tien-l1-' + row.id + '">0</td>' +
+                    '<td class="text-center" id="hs2-' + row.id + '">' + row.hs2 + '</td>' +
+                    '<td class="text-right" id="tien-l2-' + row.id + '">0</td>' +
+                    '<td class="text-center" id="hs3-' + row.id + '">' + row.hs3 + '</td>' +
+                    '<td class="text-right bg-light-green" id="hs3-amt-' + row.id + '">0</td>' +
+                    '<td class="text-center text-info font-weight-bold">' + row.dept_support_pct + '%</td>' +
+                    '<td class="text-right" id="dept-sup-' + row.id + '">0</td>' +
+                    '<td class="text-center text-info font-weight-bold">' + row.stage_support_pct + '%</td>' +
+                    '<td class="text-right" id="stage-sup-' + row.id + '">0</td>' +
+                    '<td class="text-right">' + hazard + '</td>' +
+                    '<td class="text-right font-weight-bold text-primary sticky-total-col" id="total-' + row.id + '">0</td>' +
+                    '<td class="text-center" id="nguoi-tinh-' + row.id + '"></td>' +
+                    '<td class="text-center" id="ngay-tinh-' + row.id + '"></td>';
+                tbody.appendChild(tr);
+                enableInlineEdit(row.id);
+            });
+
+            var subTr = document.createElement("tr");
+            subTr.className = "row-subtotal";
+            subTr.id = "subtotal-" + maBp;
+            subTr.innerHTML =
+                '<td colspan="4" class="freeze-col text-right font-weight-bold" style="left:0;background-color:#e8f4f8!important;color:#0056b3;padding-right:10px;">Cộng ' + grp.ten_bp + ' (' + grp.rows.length + ' dòng)</td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td class="text-center font-weight-bold" style="background-color:#e8f4f8!important;" id="sub-cong-' + maBp + '">0</td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td class="text-right font-weight-bold" style="background-color:#fff3cd!important;" id="sub-base-' + maBp + '">0</td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td class="text-right font-weight-bold" style="background-color:#e8f4f8!important;" id="sub-tien-l1-' + maBp + '">0</td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td class="text-right font-weight-bold" style="background-color:#e8f4f8!important;" id="sub-tien-l2-' + maBp + '">0</td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td class="text-right font-weight-bold" style="background-color:#d4edda!important;" id="sub-hs3-' + maBp + '">0</td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td class="text-right font-weight-bold" style="background-color:#e8f4f8!important;" id="sub-dept-' + maBp + '">0</td>' +
+                '<td style="background-color:#e8f4f8!important;"></td>' +
+                '<td class="text-right font-weight-bold" style="background-color:#e8f4f8!important;" id="sub-stage-' + maBp + '">0</td>' +
+                '<td class="text-right font-weight-bold" style="background-color:#e8f4f8!important;" id="sub-hazard-' + maBp + '">0</td>' +
+                '<td class="text-right font-weight-bold sticky-total-col" style="background-color:#dbeafe!important;color:#d32f2f;font-size:13px;" id="sub-total-' + maBp + '">0</td>';
+            tbody.appendChild(subTr);
+        });
+    }
+
+    /* ============================
+       STEP 1: TINH LUONG CA NHAN
+    ============================ */
+    function clickTinhLuongCaNhan() {
+        var data = window.MOCK.lsp.ketQua;
+        var ref = groupByDept(data);
+        var grandTotal = 0;
+
+        ref.order.forEach(function(maBp) {
+            var subBase=0, subTienL1=0, subTienL2=0, subHs3=0, subDept=0, subStage=0, subHazard=0, subTotal=0, subCong=0;
+            ref.groups[maBp].rows.forEach(function(row) {
+                var tongSL = row.ns_trong_gio + row.ns_ca_dem + row.ns_tang_ca + row.ns_tang_ca_dem;
+                var lspBase = tongSL * row.unit_price;
+                var tienL1 = lspBase * (row.hs1/100);
+                var tienL2 = tienL1 * (row.hs2/100);
+                var lspHS3 = tienL2 * (row.hs3/100); // Tiền L3
+                
+                var tongHS = (row.hs1/100) * (row.hs2/100) * (row.hs3/100);
+                var deptSup = lspHS3 * (row.dept_support_pct / 100);
+                // GHI CHÚ (OP-03): Tạm thời nhân với TongHS theo như yêu cầu chưa confirm trong tài liệu
+                var stageSup = lspHS3 * tongHS * (row.stage_support_pct / 100);
+                var lspTotal = lspHS3 + deptSup + stageSup + row.hazard_amt;
+
+                row.lsp_total = lspTotal;
+                grandTotal += lspTotal;
+                subBase += lspBase; subTienL1 += tienL1; subTienL2 += tienL2; subHs3 += lspHS3; subDept += deptSup;
+                subStage += stageSup; subHazard += row.hazard_amt; subTotal += lspTotal; subCong += row.ngay_cong;
+
+                document.getElementById('base-' + row.id).innerText = formatNumber(lspBase);
+                document.getElementById('tien-l1-' + row.id).innerText = formatNumber(Math.round(tienL1));
+                document.getElementById('tien-l2-' + row.id).innerText = formatNumber(Math.round(tienL2));
+                document.getElementById('hs3-amt-' + row.id).innerText = formatNumber(Math.round(lspHS3));
+                document.getElementById('dept-sup-' + row.id).innerText = formatNumber(Math.round(deptSup));
+                document.getElementById('stage-sup-' + row.id).innerText = formatNumber(Math.round(stageSup));
+                document.getElementById('total-' + row.id).innerText = formatNumber(Math.round(lspTotal)) + ' đ';
+                document.getElementById('nguoi-tinh-' + row.id).innerText = 'FPT Admin';
+                document.getElementById('ngay-tinh-' + row.id).innerText = nowStr();
+            });
+
+            document.getElementById('sub-cong-' + maBp).innerText = subCong + ' công';
+            document.getElementById('sub-base-' + maBp).innerText = formatNumber(Math.round(subBase));
+            document.getElementById('sub-tien-l1-' + maBp).innerText = formatNumber(Math.round(subTienL1));
+            document.getElementById('sub-tien-l2-' + maBp).innerText = formatNumber(Math.round(subTienL2));
+            document.getElementById('sub-hs3-' + maBp).innerText = formatNumber(Math.round(subHs3));
+            document.getElementById('sub-dept-' + maBp).innerText = formatNumber(Math.round(subDept));
+            document.getElementById('sub-stage-' + maBp).innerText = formatNumber(Math.round(subStage));
+            document.getElementById('sub-hazard-' + maBp).innerText = formatNumber(Math.round(subHazard));
+            document.getElementById('sub-total-' + maBp).innerText = formatNumber(Math.round(subTotal)) + ' đ';
+        });
+
+        document.getElementById('grand-total-lsp').innerText = formatNumber(Math.round(grandTotal)) + ' đ';
+
+        // Reset grid 2+3 and enable step 2
+        _deptBQCache = null;
+        document.getElementById('tbDept').innerHTML = '';
+        document.getElementById('tbEmp').innerHTML = '';
+        ['txt-tong-tien-bp','txt-tong-cong-bp','txt-luong-bq-ngay','txt-luong-bq-thang'].forEach(function(id) {
+            document.getElementById(id).innerText = '—';
+        });
+        enableBtn('btn-step2');
+        disableBtn('btn-step3');
+
+        showAlert('alertBox', 'Bước 1 hoàn tất: Đã tính lương cá nhân cho ' + data.length + ' dòng. Tiếp tục bấm nút 2.', 'success');
+    }
+
+    /* ============================
+       STEP 2: TINH BINH QUAN BP
+    ============================ */
+    var _deptBQCache = null;
+    var _deptListCache = null;
+
+    function clickTinhBQBoPhan() {
+        var depts = getSelectedDepts();
+        var allRows = window.MOCK.lsp.ketQua;
+        var congChuan = parseFloat(document.getElementById('txtCongChuan').value) || 26;
+
+        var tongTienAll = 0, tongCongAll = 0;
+        var tbDeptHtml = '';
+        var deptBQ = {};
+        var stt = 0;
+
+        depts.forEach(function(maBp) {
+            var rowsBp = allRows.filter(function(r) { return r.ma_bp === maBp; });
+            var tongTien = rowsBp.reduce(function(s,r) { return s + (r.lsp_total || 0); }, 0);
+            var tongCong = rowsBp.reduce(function(s,r) { return s + (r.ngay_cong || 0); }, 0);
+            if (tongTien === 0) return;
+
+            stt++;
+            var bqNgay = tongCong > 0 ? tongTien / tongCong : 0;
+            var bqThang = Math.round(bqNgay * congChuan);
+            var tenBp = rowsBp.length > 0 ? rowsBp[0].ten_bp : maBp;
+
+            tongTienAll += tongTien;
+            tongCongAll += tongCong;
+            deptBQ[maBp] = bqThang;
+
+            tbDeptHtml += '<tr>' +
+                '<td>' + stt + '</td>' +
+                '<td class="text-left" style="font-weight:bold;">' + tenBp + '</td>' +
+                '<td class="col-money">' + formatNumber(tongTien) + '</td>' +
+                '<td>' + formatNumber(tongCong) + '</td>' +
+                '<td class="col-money">' + formatNumber(Math.round(bqNgay)) + '</td>' +
+                '<td>' + congChuan + '</td>' +
+                '<td class="col-money" style="background-color:#fffafb!important;">' + formatNumber(bqThang) + '</td></tr>';
+        });
+
+        if (tongTienAll === 0) {
+            showAlert('alertBox', 'Vui lòng bấm nút 1 "Tính lương cá nhân" trước!', 'warning');
+            return;
+        }
+
+        var bqNgayAll = tongCongAll > 0 ? tongTienAll / tongCongAll : 0;
+        var bqThangAll = Math.round(bqNgayAll * congChuan);
+
+        document.getElementById('txt-tong-tien-bp').innerText = formatNumber(tongTienAll) + ' đ';
+        document.getElementById('txt-tong-cong-bp').innerText = formatNumber(tongCongAll) + ' công';
+        document.getElementById('txt-luong-bq-ngay').innerText = formatNumber(Math.round(bqNgayAll)) + ' đ/ngày';
+        document.getElementById('txt-luong-bq-thang').innerText = formatNumber(bqThangAll) + ' đ';
+        document.getElementById('txt-cong-chuan-display').innerText = congChuan + ' ngày';
+        document.getElementById('tbDept').innerHTML = tbDeptHtml;
+
+        _deptBQCache = deptBQ;
+        _deptListCache = depts;
+        document.getElementById('tbEmp').innerHTML = '';
+        enableBtn('btn-step3');
+
+        showAlert('alertBox', 'Bước 2 hoàn tất: Đã tính bình quân cho ' + stt + ' bộ phận. Tiếp tục bấm nút 3.', 'success');
+    }
+
+    /* ============================
+       STEP 3: TINH LUONG PHU TRO
+    ============================ */
+    function clickTinhLuongPhuTro() {
+        if (!_deptBQCache) {
+            showAlert('alertBox', 'Vui lòng bấm nút 2 trước!', 'warning');
+            return;
+        }
+        var allPhuTro = window.MOCK.lsp.nhanVienPhuTro.filter(function(e) { return _deptListCache.indexOf(e.ma_bp) >= 0; });
+        var tbEmp = document.getElementById('tbEmp');
+        tbEmp.innerHTML = '';
+        allPhuTro.forEach(function(emp, idx) {
+            var bqThang = _deptBQCache[emp.ma_bp] || 0;
+            var finalSal = Math.round(emp.he_so_bac_luong * bqThang);
+            tbEmp.innerHTML +=
+                '<tr><td>' + (idx+1) + '</td>' +
+                '<td>' + emp.ma_nv + '</td>' +
+                '<td class="text-left">' + emp.ho_ten + '</td>' +
+                '<td class="text-left">' + emp.vi_tri + '</td>' +
+                '<td class="text-left" style="font-weight:bold;">' + emp.ten_bp + '</td>' +
+                '<td class="col-money">' + formatNumber(bqThang) + ' đ</td>' +
+                '<td class="text-center font-weight-bold">' + emp.he_so_bac_luong.toFixed(2) + '</td>' +
+                '<td class="col-total font-weight-bold text-success">' + formatNumber(finalSal) + ' đ</td></tr>';
+        });
+        showAlert('alertBox', 'Bước 3 hoàn tất: Đã tính lương cho ' + allPhuTro.length + ' NV phụ trợ (Kho/KCS)!', 'success');
+    }
+
+    /* ============================
+       INLINE EDIT & CHOT LUONG
+    ============================ */
+    function enableInlineEdit(rowId) {
+        ['hs1','hs2','hs3'].forEach(function(field) {
+            var cell = document.getElementById(field + '-' + rowId);
+            if (!cell) return;
+            cell.contentEditable = true;
+            cell.style.cursor = 'text';
+            cell.style.backgroundColor = '#fff';
+            cell.style.border = '1px dashed #ccc';
+            cell.onblur = function() {
+                var v = parseInt(this.innerText);
+                if (isNaN(v)) v = 0;
+                if (v > 100) v = 100;
+                if (v < 0) v = 0;
+                this.innerText = v;
+                var row = window.MOCK.lsp.ketQua.find(function(r) { return r.id === rowId; });
+                if (row) { row[field] = v; clickTinhLuongCaNhan(); }
+            };
+        });
+    }
+
+    const CURRENT_USER = 'FPT Admin';
+    function nowStr() {
+        const d = new Date(), pad = n => String(n).padStart(2,'0');
+        return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+    }
+    function showModal(id) { const e=document.getElementById(id); if(e) e.style.display='flex'; }
+    function hideModal(id) { const e=document.getElementById(id); if(e) e.style.display='none'; }
+
+    function showChiTiet(rowId) {
+        const row = window.MOCK.lsp.ketQua.find(r => r.id === rowId);
+        if (!row) return;
+        const fmt = n => formatNumber(Math.round(n));
+        const tongSL = row.ns_trong_gio + row.ns_ca_dem + row.ns_tang_ca + row.ns_tang_ca_dem;
+        const lspBase  = tongSL * row.unit_price;
+        const tienL1   = lspBase  * (row.hs1 / 100);
+        const tienL2   = tienL1   * (row.hs2 / 100);
+        const tienL3   = tienL2   * (row.hs3 / 100);
+        const tongHS   = (row.hs1/100) * (row.hs2/100) * (row.hs3/100);
+        const htBP     = tienL3 * (row.dept_support_pct / 100);
+        const htCD     = tienL3 * tongHS * (row.stage_support_pct / 100);
+        const lspTotal = tienL3 + htBP + htCD + row.hazard_amt;
+
+        const rows = [
+            ['CALC-03', 'LSP_Base = Sản lượng × Đơn giá',
+                tongSL + ' × ' + fmt(row.unit_price), fmt(lspBase)],
+            ['CALC-04', 'Tiền L1 = LSP_Base × HS1%',
+                fmt(lspBase) + ' × ' + row.hs1 + '%', fmt(tienL1)],
+            ['CALC-05', 'Tiền L2 = Tiền L1 × HS2%',
+                fmt(tienL1) + ' × ' + row.hs2 + '%', fmt(tienL2)],
+            ['CALC-06', 'Tiền L3 = Tiền L2 × HS3%',
+                fmt(tienL2) + ' × ' + row.hs3 + '%', fmt(tienL3)],
+            ['CALC-07', 'HT Bộ phận = Tiền L3 × %HT_BP',
+                fmt(tienL3) + ' × ' + row.dept_support_pct + '%', fmt(htBP)],
+            ['CALC-08', 'HT Công đoạn = Tiền L3 × TổngHS × %HT_CĐ',
+                fmt(tienL3) + ' × ' + (tongHS*100).toFixed(2) + '% × ' + row.stage_support_pct + '%', fmt(htCD)],
+            ['CALC-09', 'Phụ cấp độc hại', '', fmt(row.hazard_amt)],
+            ['CALC-10', 'LSP_Total = L3 + HT_BP + HT_CĐ + Độc hại',
+                fmt(tienL3) + ' + ' + fmt(htBP) + ' + ' + fmt(htCD) + ' + ' + fmt(row.hazard_amt),
+                '<b style="color:#d32f2f;">' + fmt(lspTotal) + ' đ</b>'],
+        ];
+
+        const html = `<div style="margin-bottom:10px;font-size:12px;">
+            <b>Nhân viên:</b> ${row.ma_nv} – ${row.ho_ten} &nbsp;|&nbsp;
+            <b>Bộ phận:</b> ${row.ten_bp} &nbsp;|&nbsp;
+            <b>Công thực tế:</b> ${row.ngay_cong} công
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:#6f42c1;color:white;">
+                <th style="padding:5px 8px;text-align:left;width:80px;">Bước</th>
+                <th style="padding:5px 8px;text-align:left;">Diễn giải</th>
+                <th style="padding:5px 8px;text-align:left;">Phép tính</th>
+                <th style="padding:5px 8px;text-align:right;">Kết quả (đ)</th>
+            </tr></thead>
+            <tbody>${rows.map((r,i) => `<tr style="background:${i%2===0?'#f8f9fa':'#fff'};">
+                <td style="padding:5px 8px;">${r[0]}</td>
+                <td style="padding:5px 8px;">${r[1]}</td>
+                <td style="padding:5px 8px;color:#555;">${r[2]}</td>
+                <td style="padding:5px 8px;text-align:right;">${r[3]}</td>
+            </tr>`).join('')}</tbody>
+        </table>`;
+
+        document.getElementById('modal-nguyen-tac-body').innerHTML = html;
+        showModal('modal-nguyen-tac');
+    }
+
+    function xoaDuLieu() {
+        const chks = document.querySelectorAll('.chk-grid1:checked');
+        if (!chks.length) { showAlert('alertBox','Vui lòng chọn dòng cần xóa.','error'); return; }
+        confirmAction('Bạn có chắc muốn xóa ' + chks.length + ' dòng đã chọn?', function() {
+            chks.forEach(c => c.closest('tr').remove());
+            showAlert('alertBox','Đã xóa thành công.','success');
+        });
+    }
+
+    function khoaLuong() {
+        confirmAction('Bạn có chắc muốn KHÓA kỳ lương này?', function() {
+            showAlert('alertBox','Đã khóa kỳ lương thành công!','success');
+            document.getElementById('btn-khoa').disabled = true;
+            document.getElementById('btn-khoa').style.opacity = '0.5';
+        });
+    }
+
+    function moKhoaLuong() {
+        confirmAction('Bạn có chắc muốn MỞ KHÓA kỳ lương này?', function() {
+            showAlert('alertBox','Đã mở khóa kỳ lương thành công!','success');
+            document.getElementById('btn-khoa').disabled = false;
+            document.getElementById('btn-khoa').style.opacity = '1';
+        });
+    }
+
+    function chotLuongThang() {
+        var allLocked = window.MOCK.lsp.ketQua.every(function(r) { return r.is_locked === 1; });
+        if (!allLocked) {
+            showAlert('alertBox', 'Cảnh báo: Dữ liệu chưa khóa 100%, không thể chuyển sang Lương tháng!', 'error');
+            return;
+        }
+        var total = window.MOCK.lsp.ketQua.reduce(function(s,r) { return s + (r.lsp_total||0); }, 0);
+        confirmAction('Bạn có chắc chắn muốn chốt ' + formatNumber(Math.round(total)) + ' đ sang phân hệ Lương tháng?', function() {
+            showAlert('alertBox', 'Đã đồng bộ thành công dữ liệu LSP sang bảng lương tháng PRM!', 'success');
+            var btn = document.getElementById('btn-chot-luong');
+            if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; btn.innerText = 'Đã Chốt'; }
+        });
+    }
+
+    /* ============================
+       INIT
+    ============================ */
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.MOCK && window.MOCK.lsp && window.MOCK.lsp.ketQua) {
+            renderGrid1(window.MOCK.lsp.ketQua);
+        }
+    });
+  </script>
+
+  <!-- Modal Nguyên tắc tính -->
+  <div id="modal-nguyen-tac" class="modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:700px;">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>NGUYÊN TẮC TÍNH LƯƠNG SẢN PHẨM</span>
+        <button class="x" onclick="hideModal('modal-nguyen-tac')">✕</button>
+      </div>
+      <div class="modal-body" id="modal-nguyen-tac-body" style="font-size:12px;line-height:1.8;"></div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="hideModal('modal-nguyen-tac')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-4-ca" class="modal-custom-overlay" style="display:none;">
+      <div class="modal-custom-box">
+          <div class="modal-custom-header">
+              <h5 style="margin:0;color:#0056b3;">Chi ti&#7871;t S&#7843;n l&#432;&#7907;ng &amp; Ti&#7873;n theo 4 Ca</h5>
+              <button onclick="dongModal4Ca()" style="background:none;border:none;font-size:20px;cursor:pointer;">&times;</button>
+          </div>
+          <div class="modal-custom-body" id="modal-4-ca-content"></div>
+      </div>
+  </div>
+</body>
+</html>

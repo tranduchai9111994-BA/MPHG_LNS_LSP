@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Công năng suất</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC: fn9-cong-nang-suat.html
+       Công năng suất = Công thực tế × %
+       ============================================================ */
+
+    /* --- Sync bar --- */
+    .sync-bar { display:flex; align-items:center; gap:10px; padding:8px 14px; background:#e8f4fd; border:1px solid #b8daff; border-radius:4px; margin-bottom:10px; font-size:11px; }
+    .sync-bar .sync-status { flex:1; color:#004085; }
+    .sync-bar .sync-time { font-size:10px; color:#666; }
+    .sync-ok { color:#28a745; font-weight:bold; }
+    .sync-warn { color:#e67e22; font-weight:bold; }
+
+    /* --- Tabs --- */
+    .cns-tabs { display:flex; gap:0; border-bottom:2px solid #ddd; margin-bottom:0; }
+    .cns-tab { padding:8px 18px; font-size:12px; font-weight:bold; color:#777; cursor:pointer; border:none; border-bottom:3px solid transparent; background:none; transition:all .15s; display:flex; align-items:center; gap:6px; }
+    .cns-tab:hover { color:#333; background:#f9f9f9; }
+    .cns-tab.active { color:#0056b3; border-bottom-color:#0056b3; }
+    .cns-tab .t-icon { font-size:14px; }
+
+    /* --- Grid container --- */
+    .cns-grid-wrap { width:100%; overflow-x:auto; overflow-y:auto; background:#fff; border:1px solid #ccc; max-height:calc(100vh - 380px); min-height:300px; position:relative; }
+    .cns-grid { width:max-content; min-width:100%; border-collapse:collapse; }
+    .cns-grid th { padding:4px 6px; border:1px solid #ddd; font-size:10px; font-weight:bold; text-align:center; white-space:nowrap; position:sticky; top:0; z-index:10; }
+    .cns-grid td { padding:3px 5px; border:1px solid #eee; font-size:11px; text-align:center; white-space:nowrap; }
+    .cns-grid tr:hover td { background:#f1f8ff; }
+
+    /* Header colors */
+    .th-info { background:#e9ecef; color:#333; }
+    .th-day { background:#ffd600; color:#333; min-width:38px; }
+    .th-day.disabled { background:#e0e0e0; color:#aaa; }
+    .th-total { background:#d4edda; color:#155724; font-weight:bold; }
+
+    /* Freeze columns */
+    .col-chk { position:sticky; left:0; z-index:5; background:#fff; width:26px; text-align:center; }
+    .col-f0 { position:sticky; left:26px; z-index:5; background:#fff; }
+    .col-f1 { position:sticky; left:56px; z-index:5; background:#fff; }
+    .col-f2 { position:sticky; left:131px; z-index:5; background:#fff; }
+    th.col-chk, th.col-f0, th.col-f1, th.col-f2 { z-index:15; background:#e9ecef; }
+
+    /* Row types */
+    .row-total td { background:#f0f7e6 !important; font-weight:bold; color:#155724; }
+    .row-level td { background:#e8f4fd !important; font-weight:bold; color:#004085; font-size:11px; }
+
+    /* Day cells */
+    .day-val { min-width:34px; }
+    .day-disabled { background:#f5f5f5; color:#ccc; }
+    .day-zero { color:#ccc; }
+    .day-full { color:#333; font-weight:bold; }
+    .day-partial { color:#e67e22; }
+
+    /* % input */
+    .pct-input { width:50px; height:20px; font-size:10px; text-align:center; border:1px solid #90c4f5; border-radius:3px; background:#e8f4fd; color:#004085; font-weight:bold; }
+    .pct-input:focus { outline:2px solid #007bff; }
+    .pct-readonly { background:#f0f0f0; color:#666; border-color:#ccc; }
+
+    /* Pager */
+    .cns-pager { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:11px; color:#555; border-top:1px solid #ddd; }
+    .pg-btns { display:flex; gap:3px; }
+    .pg-btns button { width:28px; height:28px; border:1px solid #ccc; border-radius:3px; background:#fff; font-size:11px; cursor:pointer; }
+    .pg-btns button.cur { background:#0056b3; color:#fff; border-color:#0056b3; }
+
+    /* Search NV */
+    .nv-search-wrap { position:relative; }
+    .nv-search-wrap input { width:220px; }
+    .nv-dropdown { position:absolute; top:100%; left:0; width:350px; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:0 0 4px 4px; box-shadow:0 4px 12px rgba(0,0,0,.15); z-index:100; display:none; }
+    .nv-dropdown.open { display:block; }
+    .nv-dropdown .nv-item { padding:6px 10px; font-size:11px; cursor:pointer; border-bottom:1px solid #f0f0f0; display:flex; gap:8px; }
+    .nv-dropdown .nv-item:hover { background:#e8f4fd; }
+    .nv-dropdown .nv-item .nv-code { font-family:monospace; color:#666; min-width:60px; }
+    .nv-dropdown .nv-item .nv-name { font-weight:bold; color:#333; }
+
+    /* Alert */
+    .alert-box { display:none; padding:10px 15px; border-radius:3px; margin-bottom:12px; font-size:12px; }
+    .alert-success { display:block; background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+    .alert-warning { display:block; background:#fff3cd; color:#856404; border:1px solid #ffeeba; }
+    .alert-error { display:block; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+
+    /* BA note */
+    .ba-note-area { margin-top:20px; border-top:2px dashed #ffd600; padding-top:12px; }
+    .ba-note-area .ba-label { font-weight:bold; color:#856404; margin-bottom:6px; font-size:12px; }
+    .ba-note-area textarea { width:100%; border:1px dashed #ffd600; padding:8px; font-size:12px; font-family:Arial; background:#fffef0; resize:vertical; }
+
+    /* Toolbar button */
+    .tb-btn { height:26px; padding:0 10px; border-radius:3px; font-size:10px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:4px; border:1px solid #ccc; background:#fff; color:#333; }
+    .tb-btn:hover { background:#e9ecef; }
+    .tb-btn.green { background:#28a745; color:#fff; border-color:#28a745; }
+    .tb-btn.blue { background:#007bff; color:#fff; border-color:#007bff; }
+    .tb-btn.purple { background:#6f42c1; color:#fff; border-color:#6f42c1; }
+    .tb-btn.orange { background:#e67e22; color:#fff; border-color:#e67e22; }
+    .tb-btn.danger { color:#dc3545; border-color:#dc3545; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>VN</span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương &rsaquo; Tính Lương năng suất &rsaquo; Công năng suất</div>
+    <div class="page-title">CÔNG NĂNG SUẤT</div>
+
+    <div class="note-alert">
+      <b>&#9432;</b>
+      <b>Công năng suất</b> = Công thực tế (từ chấm công) &times; % năng suất. Công thực tế đồng bộ tự động khi chấm công khóa, hoặc bấm <b>&#128260; Đồng bộ</b> thủ công. Cột % mặc định 100%, cho phép nhập hoặc import.
+    </div>
+
+    <div id="fn9-alert" class="alert-box"></div>
+
+    <!-- ============ FILTER ============ -->
+    <div class="form-panel" style="padding:10px 15px;">
+      <div class="form-grid-3col">
+        <label>Mã nhân viên</label>
+        <input type="text" id="fn9-manv" placeholder="Nhập mã NV...">
+
+        <label>Tên nhân viên</label>
+        <div class="nv-search-wrap" style="display:flex;gap:4px;">
+          <input type="text" id="fn9-nv-search" placeholder="Mã hoặc tên NV..." oninput="fn9SearchNV(this.value)" onfocus="fn9SearchNV(this.value)" style="flex:1;">
+          <button type="button" style="padding:2px 8px;cursor:pointer;">...</button>
+          <div class="nv-dropdown" id="fn9-nv-dropdown"></div>
+        </div>
+
+        <label>Công ty</label>
+        <select id="fn9-cty"><option>MPHG</option><option>MPCA</option></select>
+
+        <label>Đơn vị cấp 1</label>
+        <select id="fn9-l1"><option value="">-- Tất cả --</option><option>Bộ phận PTO</option><option>Bộ phận Semi-Block</option></select>
+
+        <label>Đơn vị cấp 2</label>
+        <select id="fn9-l2"><option value="">-- Tất cả --</option><option>Ka</option></select>
+
+        <label>Đơn vị cấp 3</label>
+        <select id="fn9-l3"><option value="">-- Tất cả --</option><option>Ka Sáng</option><option>Ka Chiều</option><option>Ka Đêm</option></select>
+
+        <label>Đơn vị cấp 4</label>
+        <select id="fn9-l4"><option value="">-- Tất cả --</option><option>Tổ 1</option><option>Tổ 2</option></select>
+
+        <label>Đơn vị cấp 5</label>
+        <select id="fn9-l5"><option value="">-- Tất cả --</option><option value="DVS_LAT_KS">Lặt đầu tôm Ka Sáng</option><option value="DVS_DONG_KS">Đóng gói Ka Sáng</option><option value="DVS_PHANC_KS">Phân cỡ tay Ka Sáng</option></select>
+
+        <label>Đơn vị cấp 6</label>
+        <select id="fn9-l6"><option value="">-- Tất cả --</option></select>
+
+        <label>Vị trí công việc</label>
+        <select id="fn9-vtcv"><option value="">-- Tất cả --</option></select>
+
+        <label>Nhóm tính lương</label>
+        <select id="fn9-ntl"><option value="">-- Tất cả --</option></select>
+
+        <label></label>
+        <div></div>
+      </div>
+
+      <div class="radio-group">
+        <span>Tình trạng</span>
+        <label><input type="radio" name="fn9-tinhtrang"> Đang làm việc</label>
+        <label><input type="radio" name="fn9-tinhtrang"> Thôi việc</label>
+        <label><input type="radio" name="fn9-tinhtrang" checked> Tất cả</label>
+      </div>
+    </div>
+
+    <!-- ============ SYNC BAR ============ -->
+    <div class="sync-bar">
+      <span style="font-size:16px;">&#128260;</span>
+      <span class="sync-status">
+        <span class="sync-ok">&#9989; Đã đồng bộ</span> công thực tế từ phân hệ Chấm công
+      </span>
+      <span class="sync-time">Lần cuối: 28/06/2026 16:30 &mdash; Khóa CC tháng 07/2026</span>
+    </div>
+
+    <!-- ============ THÁNG ============ -->
+    <div style="margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+      <label style="font-weight:bold;font-size:11px;color:#d32f2f;">Tháng <span style="color:#d32f2f">*</span></label>
+      <input type="text" id="fn9-thang" value="07/2026" placeholder="MM/YYYY" maxlength="7" style="width:100px;height:26px;font-size:11px;padding:0 6px;border:1px solid #ccc;border-radius:3px;">
+    </div>
+
+    <!-- ============ ACTIONS ============ -->
+    <div class="actions-bar">
+      <button class="btn-search" onclick="fn9Search()">&#128269; Tìm kiếm</button>
+      <button class="btn-export" onclick="fn9ExportImportTemplate()">&#128229; Xuất DL import</button>
+      <button class="btn-export" style="background:#6f42c1;color:#fff;" onclick="fn9Import()">&#128228; Import %</button>
+      <button class="btn-export" onclick="fn9Export()">&#128229; Xuất Excel</button>
+      <button class="btn-add" onclick="fn9SavePct()">&#128190; Lưu %</button>
+    </div>
+
+    <!-- ============ TABS ============ -->
+    <div class="cns-tabs">
+      <button class="cns-tab active" data-tab="ctt" onclick="fn9SwitchTab('ctt')"><span class="t-icon">&#128197;</span> Công thực tế</button>
+      <button class="cns-tab" data-tab="cns" onclick="fn9SwitchTab('cns')"><span class="t-icon">&#128200;</span> Công năng suất</button>
+    </div>
+
+    <!-- ============ GRID: CÔNG THỰC TẾ ============ -->
+    <div id="fn9-tab-ctt">
+      <div style="padding:6px 0;font-size:10px;color:#004085;background:#e8f4fd;border:1px solid #b8daff;border-top:none;padding:6px 14px;margin-bottom:0;">
+        &#128274; <b>Chỉ đọc</b> &mdash; Dữ liệu từ phân hệ Chấm công. Cột <b>%</b> cho phép nhập (mặc định 100%).
+      </div>
+      <div class="cns-grid-wrap" id="fn9-grid-ctt-wrap">
+        <table class="cns-grid" id="fn9-grid-ctt">
+          <thead id="fn9-thead-ctt"></thead>
+          <tbody id="fn9-tbody-ctt"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ GRID: CÔNG NĂNG SUẤT ============ -->
+    <div id="fn9-tab-cns" style="display:none;">
+      <div style="padding:6px 0;font-size:10px;color:#155724;background:#d4edda;border:1px solid #c3e6cb;border-top:none;padding:6px 14px;margin-bottom:0;">
+        &#128200; <b>Công năng suất</b> = Công thực tế &times; % &mdash; Tự tính, chỉ đọc.
+      </div>
+      <div class="cns-grid-wrap" id="fn9-grid-cns-wrap">
+        <table class="cns-grid" id="fn9-grid-cns">
+          <thead id="fn9-thead-cns"></thead>
+          <tbody id="fn9-tbody-cns"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ PAGER ============ -->
+    <div class="cns-pager">
+      <div>Hiển thị <b id="fn9-pg-range">1&ndash;12</b> / <b id="fn9-pg-total">12</b> nhân viên | <a href="#" onclick="fn9SetPageSize(50);return false;" style="font-weight:bold;">50</a> &middot; <a href="#" onclick="fn9SetPageSize(100);return false;">100</a> &middot; <a href="#" onclick="fn9SetPageSize(200);return false;">200</a> dòng/trang</div>
+      <div class="pg-btns">
+        <button>&laquo;</button>
+        <button class="cur">1</button>
+        <button>&raquo;</button>
+      </div>
+    </div>
+
+    <!-- ============ BA NOTE ============ -->
+    <div class="ba-note-area">
+      <div class="ba-label">&#128203; GHI CHÚ NGHIỆP VỤ</div>
+      <textarea rows="3" placeholder="BA nhập ghi chú, open points..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button style="background:#333;color:#fff;border:none;padding:5px 16px;cursor:pointer;border-radius:3px;font-weight:bold;font-size:11px;">&#128190; Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ============================================================
+     MOCK DATA
+     ============================================================ */
+  const THANG = '07/2026';
+  const NAM = 2026, THANG_SO = 7;
+  const SO_NGAY = new Date(NAM, THANG_SO, 0).getDate(); // 31
+
+  const DV_CAP = { dv1:'Bộ phận PTO', dv2:'Ka', dv3:'Ka Sáng', dv4:'Tổ 1', dv5:'Lặt đầu tôm Ka Sáng' };
+
+  const NV_LIST = [
+    { ma:'NV01', ten:'Nguyễn Văn A',  pct:110 },
+    { ma:'NV02', ten:'Trần Thị B',    pct:null },
+    { ma:'NV03', ten:'Lê Văn C',      pct:null },
+    { ma:'NV04', ten:'Phạm Thị D',    pct:null },
+    { ma:'NV05', ten:'Hoàng Văn E',   pct:85 },
+    { ma:'NV06', ten:'Đỗ Thị F',      pct:90 },
+    { ma:'NV07', ten:'Bùi Văn G',     pct:105 },
+    { ma:'NV08', ten:'Vũ Thị H',      pct:null },
+    { ma:'NV09', ten:'Đinh Văn I',    pct:null },
+    { ma:'NV10', ten:'Ngô Thị K',     pct:null },
+    { ma:'NV11', ten:'Dương Văn L',   pct:102 },
+    { ma:'NV12', ten:'Trịnh Thị M',   pct:null },
+  ];
+
+  // Công thực tế: mỗi NV có mảng 31 ngày (0 = nghỉ, 1 = full, 0.5 = nửa ngày, 0.8...)
+  function genCTT() {
+    return NV_LIST.map(nv => {
+      const days = [];
+      for(let d=1; d<=31; d++) {
+        if(d > SO_NGAY) { days.push(null); continue; }
+        const r = Math.random();
+        if(r < 0.08) days.push(0);
+        else if(r < 0.15) days.push(0.5);
+        else if(r < 0.2) days.push(0.8);
+        else days.push(1);
+      }
+      return { ma:nv.ma, ten:nv.ten, pct:nv.pct, dv:DV_CAP, days };
+    });
+  }
+
+  let DATA = genCTT();
+  let currentTab = 'ctt';
+
+  /* ============================================================
+     RENDER
+     ============================================================ */
+  function fn9Render() {
+    fn9RenderHeader('fn9-thead-ctt');
+    fn9RenderHeader('fn9-thead-cns');
+    fn9RenderBody();
+  }
+
+  function fn9RenderHeader(theadId) {
+    const thead = document.getElementById(theadId);
+    const isCNS = theadId.includes('cns');
+    let h1 = '<tr>';
+    h1 += '<th class="th-info col-chk" rowspan="2">' + (isCNS ? '' : '<input type="checkbox" id="fn9-chk-all" onchange="fn9ToggleAll(this.checked)">') + '</th>';
+    h1 += '<th class="th-info col-f0" style="width:30px" rowspan="2">STT</th>';
+    h1 += '<th class="th-info col-f1" style="min-width:75px" rowspan="2">Mã NV</th>';
+    h1 += '<th class="th-info col-f2" style="min-width:135px;text-align:left;" rowspan="2">Họ tên</th>';
+    h1 += '<th class="th-info" style="min-width:100px" rowspan="2">Đơn vị cấp 1</th>';
+    h1 += '<th class="th-info" style="min-width:100px" rowspan="2">Đơn vị cấp 2</th>';
+    h1 += '<th class="th-info" style="min-width:100px" rowspan="2">Đơn vị cấp 3</th>';
+    h1 += '<th class="th-info" style="min-width:100px" rowspan="2">Đơn vị cấp 4</th>';
+    h1 += '<th class="th-info" style="min-width:130px" rowspan="2">Đơn vị cấp 5</th>';
+    h1 += '<th class="th-info" style="width:55px" rowspan="2">%</th>';
+    for(let d=1; d<=31; d++) {
+      const disabled = d > SO_NGAY;
+      h1 += '<th class="th-day'+(disabled?' disabled':'')+'" style="width:38px;">N'+String(d).padStart(2,'0')+'</th>';
+    }
+    h1 += '<th class="th-total" style="width:55px" rowspan="2">Tổng</th>';
+    h1 += '</tr>';
+    thead.innerHTML = h1;
+  }
+
+  function fn9RenderBody() {
+    fn9RenderBodyTab('fn9-tbody-ctt', false);
+    fn9RenderBodyTab('fn9-tbody-cns', true);
+  }
+
+  function fn9RenderBodyTab(tbodyId, isCNS) {
+    const tbody = document.getElementById(tbodyId);
+    let html = '';
+    let grandTotal = 0;
+
+    DATA.forEach((nv, idx) => {
+      const pct = (nv.pct !== null ? nv.pct : 100) / 100;
+      let rowTotal = 0;
+      let dayCells = '';
+
+      for(let d=1; d<=31; d++) {
+        const val = nv.days[d-1];
+        if(val === null) {
+          dayCells += '<td class="day-disabled"></td>';
+          continue;
+        }
+        let display = isCNS ? (val * pct) : val;
+        rowTotal += display;
+        let cls = 'day-val';
+        if(display === 0) cls += ' day-zero';
+        else if(display >= 1) cls += ' day-full';
+        else cls += ' day-partial';
+        const displayStr = display === 0 ? '' : (Number.isInteger(display) ? display : display.toFixed(display < 0.1 ? 3 : (display % 1 === 0 ? 0 : (Math.round(display*1000)%10 === 0 ? 2 : 3))));
+        const formatted = display === 0 ? '' : parseFloat(display.toFixed(3));
+        dayCells += '<td class="'+cls+'">'+formatted+'</td>';
+      }
+
+      grandTotal += rowTotal;
+      const pctDisplay = nv.pct !== null ? nv.pct : 100;
+      const pctShown = pctDisplay === 100 ? '' : pctDisplay;
+      const pendingPct = nv.pctPending !== undefined ? nv.pctPending : pctDisplay;
+      const pendingShown = pendingPct === 100 ? '' : pendingPct;
+      const pctCell = isCNS
+        ? '<td style="font-weight:bold;color:#6f42c1;">'+(pctShown === '' ? '' : pctShown+'%')+'</td>'
+        : '<td><input type="number" class="pct-input" value="'+pendingShown+'" min="0" max="200" step="1" onchange="fn9SetPct(\''+nv.ma+'\',this.value)"></td>';
+      const chkCell = isCNS ? '<td class="col-chk"></td>' : '<td class="col-chk"><input type="checkbox" class="fn9-row-chk" data-ma="'+nv.ma+'" '+(nv.selectedForSave?'checked':'')+' onchange="fn9ToggleRowChk(\''+nv.ma+'\',this.checked)"></td>';
+
+      html += '<tr>';
+      html += chkCell;
+      html += '<td class="col-f0">'+(idx+1)+'</td>';
+      html += '<td class="col-f1" style="font-family:monospace;font-size:10px;color:#666;">'+nv.ma+'</td>';
+      html += '<td class="col-f2" style="text-align:left;font-weight:bold;">'+nv.ten+'</td>';
+      html += '<td style="text-align:left;">'+nv.dv.dv1+'</td>';
+      html += '<td style="text-align:left;">'+nv.dv.dv2+'</td>';
+      html += '<td style="text-align:left;">'+nv.dv.dv3+'</td>';
+      html += '<td style="text-align:left;">'+nv.dv.dv4+'</td>';
+      html += '<td style="text-align:left;">'+nv.dv.dv5+'</td>';
+      html += pctCell;
+      html += dayCells;
+      html += '<td style="font-weight:bold;color:'+(isCNS?'#6f42c1':'#0056b3')+';">'+parseFloat(rowTotal.toFixed(3))+'</td>';
+      html += '</tr>';
+    });
+
+    // Total row
+    html += '<tr class="row-total">';
+    html += '<td class="col-chk"></td>';
+    html += '<td class="col-f0"></td>';
+    html += '<td class="col-f1" colspan="2" style="text-align:left;">Tổng Level 5</td>';
+    html += '<td colspan="5"></td>';
+    html += '<td></td>';
+    let dayTotals = [];
+    for(let d=1; d<=31; d++) {
+      if(d > SO_NGAY) { html += '<td class="day-disabled"></td>'; continue; }
+      let daySum = 0;
+      DATA.forEach(nv => {
+        const val = nv.days[d-1] || 0;
+        const pct = (nv.pct !== null ? nv.pct : 100) / 100;
+        daySum += isCNS ? val * pct : val;
+      });
+      html += '<td style="font-weight:bold;">'+parseFloat(daySum.toFixed(3))+'</td>';
+    }
+    html += '<td style="font-weight:bold;font-size:12px;color:'+(isCNS?'#6f42c1':'#0056b3')+';">'+parseFloat(grandTotal.toFixed(3))+'</td>';
+    html += '</tr>';
+
+    tbody.innerHTML = html;
+  }
+
+  /* ============================================================
+     TAB SWITCH
+     ============================================================ */
+  function fn9SwitchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.cns-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+    document.getElementById('fn9-tab-ctt').style.display = tab==='ctt' ? '' : 'none';
+    document.getElementById('fn9-tab-cns').style.display = tab==='cns' ? '' : 'none';
+  }
+
+  /* ============================================================
+     SET PCT
+     ============================================================ */
+  function fn9SetPct(ma, val) {
+    const nv = DATA.find(n => n.ma === ma);
+    if(nv) {
+      nv.pctPending = val === '' || val === null ? null : parseInt(val);
+    }
+  }
+
+  function fn9ToggleRowChk(ma, checked) {
+    const nv = DATA.find(n => n.ma === ma);
+    if(nv) nv.selectedForSave = checked;
+  }
+
+  function fn9ToggleAll(checked) {
+    DATA.forEach(nv => nv.selectedForSave = checked);
+    fn9RenderBody();
+  }
+
+  /* ============================================================
+     SEARCH NV
+     ============================================================ */
+  function fn9SearchNV(q) {
+    const dd = document.getElementById('fn9-nv-dropdown');
+    if(!q || q.length < 1) { dd.className='nv-dropdown'; return; }
+    q = q.toLowerCase();
+    const matches = NV_LIST.filter(nv => nv.ma.toLowerCase().includes(q) || nv.ten.toLowerCase().includes(q));
+    if(matches.length === 0) { dd.className='nv-dropdown'; return; }
+    dd.className = 'nv-dropdown open';
+    dd.innerHTML = matches.map(nv => '<div class="nv-item" onclick="fn9SelectNV(\''+nv.ma+'\')"><span class="nv-code">'+nv.ma+'</span><span class="nv-name">'+nv.ten+'</span></div>').join('');
+  }
+
+  function fn9SelectNV(ma) {
+    document.getElementById('fn9-nv-search').value = ma;
+    document.getElementById('fn9-nv-dropdown').className = 'nv-dropdown';
+    fn9Alert('success','&#128269; Đã lọc theo nhân viên <b>'+ma+'</b>');
+  }
+
+  document.addEventListener('click', e => {
+    if(!e.target.closest('.nv-search-wrap')) document.getElementById('fn9-nv-dropdown').className = 'nv-dropdown';
+  });
+
+  /* ============================================================
+     ACTIONS
+     ============================================================ */
+  function fn9Search() {
+    const thang = document.getElementById('fn9-thang').value.trim();
+    if (!thang) return fn9Alert('error', 'Vui lòng nhập Tháng (bắt buộc).');
+    if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) return fn9Alert('error', 'Tháng không hợp lệ. Vui lòng nhập MM/YYYY (VD: 07/2026).');
+    fn9Alert('success','&#128269; Tìm kiếm hoàn tất.');
+    fn9Render();
+  }
+  function fn9Import() { fn9Alert('success','&#128228; Import % hoàn tất: 12 nhân viên cập nhật.'); }
+  function fn9ExportImportTemplate() { fn9Alert('success','&#128229; Đang xuất file dữ liệu mẫu để import...'); }
+  function fn9Export() { fn9Alert('success','&#128229; Đang xuất Excel...'); }
+  function fn9SavePct() {
+    const selected = DATA.filter(nv => nv.selectedForSave);
+    if(!selected.length) return fn9Alert('error','Vui lòng chọn (tick chọn) ít nhất 1 nhân viên cần lưu %.');
+    selected.forEach(nv => {
+      if(nv.pctPending !== undefined) { nv.pct = nv.pctPending; delete nv.pctPending; }
+      nv.selectedForSave = false;
+    });
+    fn9Alert('success','&#128190; Đã lưu % năng suất cho '+selected.length+' nhân viên đã chọn!');
+    fn9Render();
+  }
+
+  function fn9SetPageSize(s) { fn9Alert('success','Đổi sang '+s+' dòng/trang.'); }
+
+  function fn9Alert(type, msg) {
+    const el = document.getElementById('fn9-alert');
+    el.className = 'alert-box alert-'+type;
+    el.innerHTML = msg;
+    el.style.display = 'block';
+    if(type!=='error') setTimeout(()=>{el.style.display='none';},4000);
+  }
+
+  /* ============================================================
+     INIT
+     ============================================================ */
+  document.addEventListener('DOMContentLoaded', fn9Render);
+  </script>
+</body>
+</html>

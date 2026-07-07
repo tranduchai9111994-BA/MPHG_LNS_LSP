@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Danh sách cảnh báo Năng suất riêng</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #0056b3; text-align: center; margin: 15px 0; letter-spacing: 1px; }
+      .bc-subtitle { text-align: center; font-size: 13px; color: #d32f2f; font-weight: bold; margin-bottom: 20px; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+      
+      .table-header th { background: #ffd54f; color: #333; padding: 8px; text-align: center; font-size: 12px; border: 1px solid #cfd8dc; }
+      .table-row td { padding: 8px; font-size: 12px; border: 1px solid #cfd8dc; }
+      
+      .radio-group { display: flex; justify-content: center; gap: 20px; margin: 15px 0; font-size: 12px; }
+      .radio-group label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+      
+      .section-header { font-weight: bold; font-size: 12px; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin: 15px 0 10px 0; display: flex; align-items: center; gap: 5px; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương › Năng suất › Danh sách cảnh báo năng suất riêng</div>
+      <div class="bc-title">DANH SÁCH CẢNH BÁO NĂNG SUẤT RIÊNG</div>
+      <div class="bc-subtitle">(CÓ NĂNG SUẤT MÀ KHÔNG CÓ CÔNG HOẶC CÓ CÔNG MÀ KHÔNG CÓ NĂNG SUẤT)</div>
+      
+      <div style="text-align: center; font-size: 13px; color: #856404; background-color: #fff3cd; padding: 10px; margin-bottom: 15px; border: 1px solid #ffeeba; border-radius: 4px;">
+        <b>Lưu ý:</b> Sẽ đưa ra danh sách cảnh báo sau khi bấm nút Tính năng suất
+      </div>
+      
+      <div class="form-panel" style="background:#f9f9f9; border:1px solid #e0e0e0; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label>Mã nhân viên</label><input type="text" placeholder="VD: 1022911385">
+          <label>Tên nhân viên</label><input type="text" placeholder="VD: Huỳnh Cẩm Oanh">
+          <label>Công ty</label><select><option>-- Tất cả --</option><option>Công ty CP Tập đoàn Thủy sản Minh Phú</option></select>
+          
+          <label>Đơn vị cấp 1</label><select><option>-- Tất cả --</option><option>Sản xuất</option></select>
+          <label>Đơn vị cấp 2</label><select><option>-- Tất cả --</option><option>Sản xuất MPHG</option></select>
+          <label>Đơn vị cấp 3</label><select><option>-- Tất cả --</option><option>Băng chuyền GTGT</option><option>Nobashi</option></select>
+          
+          <label>Đơn vị cấp 4</label><select><option>-- Tất cả --</option><option>Băng chuyền Sushi 1</option><option>Băng chuyền Sushi 2</option></select>
+          <label>Đơn vị cấp 5</label><select><option>-- Tất cả --</option><option>Tổ Sushi 1</option></select>
+          <label>Đơn vị cấp 6</label><select><option>-- Tất cả --</option><option>Nhóm 1</option></select>
+          
+          <label>Bộ phận tính lương</label><select><option>-- Tất cả --</option><option>BP Lương NS</option></select>
+          <label>Vị trí công việc</label><select><option>-- Tất cả --</option><option>Công nhân sơ chế</option></select>
+          <label>Nhóm tính lương</label><select><option>-- Tất cả --</option><option>N1</option><option>N2</option></select>
+        </div>
+        
+        <div class="radio-group">
+          Tình trạng: 
+          <label><input type="radio" name="status" checked> Đang làm việc</label>
+          <label><input type="radio" name="status"> Thôi việc</label>
+          <label><input type="radio" name="status"> Tất cả</label>
+        </div>
+        
+        <div style="text-align: center; color: #0056b3; font-size: 12px; cursor: pointer; margin-bottom: 10px;">Tìm kiếm nâng cao ⌄</div>
+        
+        <div class="section-header">☰ Thông tin tìm kiếm</div>
+        <div class="form-grid-3col">
+          <label>Từ ngày</label><input type="date" value="2026-06-01">
+          <label>Đến ngày</label><input type="date" value="2026-06-30">
+          <label>Loại hợp đồng</label><select><option>-- Tất cả --</option><option>Hợp đồng 12 tháng</option><option>Hợp đồng 36 tháng</option></select>
+        </div>
+      </div>
+      
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" style="margin-right: 10px; background: #ffc107; color: #333; border: 1px solid #ffb300;" onclick="cbSearch()">Tìm Kiếm</button>
+        <button class="btn-export" style="background: #e67e22; border-color: #d35400;">Xuất dữ liệu</button>
+      </div>
+
+      <div class="grid-wrap" style="height:400px; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse;">
+          <thead id="cb-thead">
+            <tr class="table-header">
+              <th style="min-width:40px;">STT</th>
+              <th style="min-width:80px;">Mã nhân viên</th>
+              <th style="min-width:140px;">Họ và tên</th>
+              <th style="min-width:120px;">Đơn vị cấp 1</th>
+              <th style="min-width:120px;">Đơn vị cấp 2</th>
+              <th style="min-width:120px;">Đơn vị cấp 3</th>
+              <th style="min-width:120px;">Đơn vị cấp 4</th>
+              <th style="min-width:120px;">Loại hợp đồng</th>
+              <th style="min-width:80px;">Từ ngày</th>
+              <th style="min-width:80px;">Đến ngày</th>
+              <th style="min-width:80px; background:#ffb74d;">Tổng công</th>
+              <th style="min-width:100px; background:#ffb74d;">Tổng NS (Kg/Con)</th>
+              <th style="min-width:150px; color:#d32f2f;">Chi tiết cảnh báo</th>
+            </tr>
+          </thead>
+          <tbody id="cb-tbody">
+            <tr class="table-row"><td colspan="13" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+  <script>
+    function cbSearch() {
+      const tbody = document.getElementById('cb-tbody');
+      tbody.innerHTML = `
+        <tr class="table-row">
+          <td style="text-align:center;">1</td>
+          <td style="text-align:center;">1022911385</td>
+          <td>Huỳnh Cẩm Oanh</td>
+          <td>Sản xuất</td>
+          <td>Sản xuất MPHG</td>
+          <td>Băng chuyền GTGT</td>
+          <td>Băng chuyền Sushi 1</td>
+          <td>Hợp đồng 12 tháng</td>
+          <td style="text-align:center;">01/06/2026</td>
+          <td style="text-align:center;">30/06/2026</td>
+          <td style="text-align:center; font-weight:bold; color:red;">0.0</td>
+          <td style="text-align:right; font-weight:bold; color:green;">1,250.5</td>
+          <td style="color:#d32f2f;">Có năng suất nhưng không có công</td>
+        </tr>
+        <tr class="table-row">
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">1022911387</td>
+          <td>Huỳnh Thị Đang Thanh</td>
+          <td>Sản xuất</td>
+          <td>Sản xuất MPHG</td>
+          <td>Băng chuyền GTGT</td>
+          <td>Băng chuyền Sushi 2</td>
+          <td>Hợp đồng 12 tháng</td>
+          <td style="text-align:center;">01/06/2026</td>
+          <td style="text-align:center;">30/06/2026</td>
+          <td style="text-align:center; font-weight:bold; color:green;">24.5</td>
+          <td style="text-align:right; font-weight:bold; color:red;">0.0</td>
+          <td style="color:#d32f2f;">Có công nhưng không có năng suất</td>
+        </tr>
+        <tr class="table-row">
+          <td style="text-align:center;">3</td>
+          <td style="text-align:center;">1022911389</td>
+          <td>Nguyễn Thị Miêu</td>
+          <td>Sản xuất</td>
+          <td>Sản xuất MPHG</td>
+          <td>Nobashi</td>
+          <td>Nobashi ca 1</td>
+          <td>Hợp đồng 12 tháng</td>
+          <td style="text-align:center;">01/06/2026</td>
+          <td style="text-align:center;">30/06/2026</td>
+          <td style="text-align:center; font-weight:bold; color:red;">0.0</td>
+          <td style="text-align:right; font-weight:bold; color:green;">850.0</td>
+          <td style="color:#d32f2f;">Có năng suất nhưng không có công</td>
+        </tr>
+      `;
+    }
+    
+    // Auto load data on init
+    window.onload = function() {
+      cbSearch();
+    };
+  </script>
+</body>
+</html>

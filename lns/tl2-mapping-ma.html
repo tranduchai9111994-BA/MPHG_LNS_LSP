@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Thiết lập Mapping Mã LNS</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .rule-box { background:#1a237e;color:#fff;border-radius:6px;padding:10px 14px;font-size:11px;margin-bottom:14px; }
+    .rule-box .rule-title { font-weight:bold;font-size:12px;color:#fff176;margin-bottom:8px;letter-spacing:.5px; }
+    .rule-row { display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap; }
+    .rule-tag { display:inline-block;border-radius:3px;padding:2px 8px;font-weight:bold;font-size:11px; }
+    .tag-tom  { background:#ef9a9a;color:#b71c1c; }
+    .tag-nl   { background:#a5d6a7;color:#1b5e20; }
+    .tag-cd   { background:#fff176;color:#f57f17; }
+    .tag-size { background:#90caf9;color:#0d47a1; }
+    .tag-out  { background:#ce93d8;color:#4a148c; }
+    .rule-arrow { color:#fff;font-size:14px;font-weight:bold; }
+    #tl2-preview-result { transition:all .2s; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Thiết lập › Mapping 4 Mã</div>
+  <div class="page-title">THIẾT LẬP MAPPING 4 MÃ – QUY TẮC TẠO MÃ LNS</div>
+  <div id="tl2-alert" class="alert-box"></div>
+  <input type="hidden" id="tl2_eid">
+
+  <!-- PANEL QUY TẮC -->
+  <div class="rule-box">
+    <div class="rule-title">⚙️ QUY TẮC TẠO MÃ – Kết hợp 4 thành phần:</div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
+      <div>
+        <div class="rule-row">
+          <span class="rule-tag tag-tom">(1) Mã Tôm</span>
+          <span style="color:#fff;">+</span>
+          <span class="rule-tag tag-nl">(2) Mã NL</span>
+          <span style="color:#fff;">+</span>
+          <span class="rule-tag tag-cd">(3) Mã Công đoạn</span>
+          <span style="color:#fff;">+</span>
+          <span class="rule-tag tag-size">(4) Mã Size</span>
+          <span class="rule-arrow">→</span>
+          <span class="rule-tag tag-out">Mã LNS (Output)</span>
+        </div>
+        <div style="margin-top:10px;font-size:11px;line-height:1.8;">
+          <div><span class="badge-n1">N1</span> &nbsp;Loại tôm + N.Liệu + C.Đoạn + Size &nbsp;→&nbsp; <span style="color:#fff176;">Full mã (đủ 4 thành phần)</span></div>
+          <div><span class="badge-n2">N2</span> &nbsp;Loại tôm = <b>W</b> + N.Liệu + C.Đoạn + Size &nbsp;→&nbsp; <span style="color:#fff176;">Mã riêng cho tôm Wct</span></div>
+          <div><span class="badge-n3">N3</span> &nbsp;N.Liệu + C.Đoạn <i>(nếu NL = Thường → bỏ NL)</i> &nbsp;→&nbsp; <span style="color:#fff176;">Mã rút gọn (không tôm, không size)</span></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:4px;padding:8px 14px;font-size:11px;min-width:230px;">
+        <div style="color:#fff176;font-weight:bold;margin-bottom:6px;">📐 Ví dụ sinh mã tự động:</div>
+        <div><span class="rule-tag tag-tom" style="font-size:10px;">T</span> + <span class="rule-tag tag-nl" style="font-size:10px;">TH</span> + <span class="rule-tag tag-cd" style="font-size:10px;">PTO</span> + <span class="rule-tag tag-size" style="font-size:10px;">N1</span> → <code style="color:#a5d6a7;">LXPTO</code></div>
+        <div style="margin-top:4px;"><span class="rule-tag tag-tom" style="font-size:10px;">W</span> + <span class="rule-tag tag-nl" style="font-size:10px;">VR</span> + <span class="rule-tag tag-cd" style="font-size:10px;">PTO</span> + <span class="rule-tag tag-size" style="font-size:10px;">N2</span> → <code style="color:#a5d6a7;">WVXPTO</code></div>
+        <div style="margin-top:4px;"><span class="rule-tag tag-nl" style="font-size:10px;">TH(bỏ)</span> + <span class="rule-tag tag-cd" style="font-size:10px;">PTO</span> → <code style="color:#a5d6a7;">LRTPTO</code></div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ACTION BAR -->
+  <div class="actions-bar">
+    <button class="btn-search" onclick="tl2Filter()">Tìm Kiếm</button>
+    <button class="btn-refresh" onclick="tl2Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="tl2Save()">Lưu</button>
+    <button class="btn-delete" onclick="tl2Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('tl2-imp')">Nhập dữ liệu</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid-wrap"><table>
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="tl2-chkAll" onchange="toggleAll('tl2-chkAll','.tl2-chk')"></th>
+        <th>Sửa</th>
+        <th>STT</th>
+        <th><span class="rule-tag tag-tom" style="font-size:10px;">(1)</span> Mã Tôm</th>
+        <th><span class="rule-tag tag-nl" style="font-size:10px;">(2)</span> Loại NL</th>
+        <th><span class="rule-tag tag-cd" style="font-size:10px;">(3)</span> Mã CĐ</th>
+        <th class="tl">Tên Công đoạn</th>
+        <th><span class="rule-tag tag-size" style="font-size:10px;">(4)</span> Size</th>
+        <th>Tiến trình</th>
+        <th>ĐVT</th>
+        <th>Mã nội bộ</th>
+        <th><span class="rule-tag tag-out" style="font-size:10px;">→</span> Mã LNS</th>
+        <th class="tl">Ghi chú</th>
+        <th>Sử dụng</th>
+      </tr>
+    </thead>
+    <tbody id="tl2-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-overlay" id="tl2-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT THIẾT LẬP MAPPING 4 MÃ</span><button class="x" onclick="hideModal('tl2-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;">
+      <strong>Rule Import:</strong><br>
+      1. Khoá chính: <b>Mã Tôm + Loại NL + Mã CĐ + Mã Size</b> – nếu tồn tại → UPDATE<br>
+      2. Chưa tồn tại → INSERT mới, hệ thống tự sinh Mã LNS<br>
+      <span style="color:red">3. Thiếu bất kỳ khoá nào → BỎ QUA dòng đó, ghi log lỗi.</span>
+    </div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;">
+    <a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr">
+    <button class="btn-cancel" onclick="hideModal('tl2-imp')">Đóng</button>
+    <button class="btn-ok" onclick="hideModal('tl2-imp');showAlert2('tl2-alert','Import thành công!','success')">Thực hiện Import</button>
+  </div>
+</div></div>
+
+
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+
+    // ---------- Dữ liệu mẫu ----------
+    const TEN_CD = { 'PTO':'Lặt đầu tôm', 'NOBASHI':'Lột vỏ chừa đuôi', 'VIRUS':'Kiểm tra hàng Virut' };
+
+    let tl2Data = [
+      { id:1, tom:'T', nl:'TH', cd:'PTO',     tt:'TT_TOM_SU',  dvt:'kg',  size:'N1', sap:'50524445', ma:'LXPTO',   note:'',                       use:true },
+      { id:2, tom:'T', nl:'TH', cd:'PTO',     tt:'TT_TOM_SU',  dvt:'kg',  size:'N1', sap:'50524445', ma:'LRTPTO',  note:'Rule N3 rút gọn',         use:true },
+      { id:3, tom:'W', nl:'VR', cd:'PTO',     tt:'TT_TOM_THE', dvt:'kg',  size:'N2', sap:'50524445', ma:'WVXPTO',  note:'Tôm Wct, Sạch virus',     use:true },
+      { id:4, tom:'T', nl:'TH', cd:'NOBASHI', tt:'TT_TOM_SU',  dvt:'kg',  size:'N1', sap:'50524492', ma:'LXPD',    note:'',                       use:true },
+      { id:5, tom:'T', nl:'VR', cd:'VIRUS',   tt:'TT_TOM_SU',  dvt:'con', size:'N1', sap:'50522172', ma:'TVXVIRUS',note:'Kiểm tra virut tôm sú',   use:true },
+    ];
+    let tl2NextId = 6;
+
+    // ---------- Sinh mã tự động ----------
+    function tl2GenMa(tom, nl, cd, size) {
+      if (!cd) return '';
+      const nlPart = (nl === 'TH' || nl === '') ? 'X' : nl;
+      const tomPart = tom || '';
+      if (!tom && !size) {
+        // N3: không tôm, không size
+        return (nl === 'TH' || nl === '') ? 'LRT' + cd : nl + cd;
+      }
+      if (tom === 'W') {
+        // N2: tôm W
+        return 'W' + nlPart + cd + (size && size !== 'N1' ? '_' + size : '');
+      }
+      // N1: đủ thành phần
+      return tomPart + nlPart + cd + (size && size !== 'N1' ? '_' + size : '');
+    }
+
+    function tl2RuleLabel(tom, nl, size) {
+      if (!tom && !size) return '<span class="badge-n3">N3</span>';
+      if (tom === 'W') return '<span class="badge-n2">N2</span>';
+      return '<span class="badge-n1">N1</span>';
+    }
+
+    function tl2Preview() {
+      // Preview đã được xóa theo yêu cầu người dùng
+    }
+
+    // ---------- Render bảng ----------
+    function tl2Render(data) {
+      const src = data || tl2Data;
+      const tbody = document.getElementById('tl2-tbody');
+      tbody.innerHTML = '';
+      src.forEach((r, i) => {
+        const tenCd = TEN_CD[r.cd] || r.cd;
+        const ruleHtml = (!r.tom && !r.size) ? '<span class="badge-n3">N3</span>'
+                        : (r.tom === 'W')     ? '<span class="badge-n2">N2</span>'
+                        : '<span class="badge-n1">N1</span>';
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="tl2-chk" value="${r.id}"></td>
+          <td><span class="edit-icon" onclick="tl2EditById(${r.id})">✎</span></td>
+          <td>${i+1}</td>
+          <td style="text-align:center;"><span class="rule-tag tag-tom" style="font-size:11px;">${r.tom||'–'}</span></td>
+          <td style="text-align:center;"><span class="rule-tag tag-nl" style="font-size:11px;">${r.nl||'–'}</span></td>
+          <td style="font-weight:bold;">${r.cd}</td>
+          <td class="tl">${tenCd}</td>
+          <td style="text-align:center;"><span class="rule-tag tag-size" style="font-size:11px;">${r.size||'–'}</span></td>
+          <td>${r.tt}</td>
+          <td>${r.dvt}</td>
+          <td style="font-family:monospace;font-size:10px;">${r.sap}</td>
+          <td style="font-family:monospace;font-weight:bold;color:#283593;font-size:13px;">${r.ma} ${ruleHtml}</td>
+          <td class="tl">${r.note}</td>
+          <td style="color:${r.use?'green':'#aaa'};font-weight:bold">${r.use?'✔':'✘'}</td>
+        </tr>`;
+      });
+    }
+
+    // ---------- Clear form ----------
+    function tl2Clear() {
+      document.getElementById('tl2-alert').style.display = 'none';
+    }
+
+    // ---------- Edit ----------
+    function tl2EditById(id) {
+      showAlert2('tl2-alert', "Tính năng sửa đã bị vô hiệu hóa vì form bị xóa.", 'warning');
+    }
+
+    // ---------- Save ----------
+    function tl2Save() {
+      showAlert2('tl2-alert', "Tính năng lưu đã bị vô hiệu hóa vì form bị xóa.", 'warning');
+    }
+
+    // ---------- Delete ----------
+    function tl2Delete() {
+      const chks = document.querySelectorAll('.tl2-chk:checked');
+      if (!chks.length) return showAlert2('tl2-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} mapping đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        tl2Data = tl2Data.filter(x => !ids.includes(x.id));
+        tl2Render();
+        showAlert2('tl2-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    // ---------- Filter ----------
+    function tl2Filter() {
+      showAlert2('tl2-alert', "Tính năng lọc đã bị vô hiệu hóa vì form bị xóa.", 'warning');
+    }
+
+    tl2Render();
+  </script>
+</body>
+</html>

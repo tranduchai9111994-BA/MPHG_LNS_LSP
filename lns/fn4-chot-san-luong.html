@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › % Bổ sung Phục vụ</div>
+  <div class="page-title">NHẬP % BỔ SUNG PHỤC VỤ</div>
+  <div id="fn4-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 50px;">
+      <div>
+        <div class="field">
+          <label class="lbl-red">Từ tháng (kỳ NS)</label><input id="fn4_thang" value="07/2025" style="flex:0 0 110px;">
+          <label style="width:90px;flex-shrink:0;margin-left:16px;font-weight:bold;">Đến tháng</label><input id="fn4_denthang" placeholder="MM/YYYY (không bắt buộc)" style="flex:1;">
+        </div>
+        <div class="field"><label class="lbl-red">Đơn vị cấp 1</label><select id="fn4_dv1"><option>Khối Kinh doanh</option><option>Khối Sản xuất</option></select></div>
+        <div class="field"><label>Đơn vị cấp 2</label><select id="fn4_dv2"><option>Miền Nam</option><option>Nhà máy 1</option></select></div>
+        <div class="field"><label>Đơn vị cấp 3</label><select id="fn4_dv3"><option>TP.HCM</option><option>Xưởng A</option></select></div>
+        <div class="field"><label>Đơn vị cấp 4</label><select id="fn4_dv4"><option>CN Quận 1</option><option>Tổ 01</option></select></div>
+        <div class="field"><label>Đơn vị cấp 5</label><select id="fn4_dv5"><option>Tổ bán hàng 1</option><option value="-">-</option></select></div>
+      </div>
+      <div>
+        <div class="field"><label>Nhóm tính lương</label><select id="fn4_nhomtl"><option>N1</option><option>N2</option></select></div>
+        <div class="field"><label>Bộ phận tính lương</label><select id="fn4_bptl"><option>Kinh doanh</option><option>Sản xuất</option></select></div>
+        <div class="field"><label class="lbl-red">% Bổ sung PV</label><input type="number" id="fn4_pv" value="10"></div>
+        <div class="field" style="align-items:flex-start"><label>Ghi chú</label><textarea id="fn4_ghichu">Áp dụng cho nhân viên phục vụ khu vực miền Nam.</textarea></div>
+      </div>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search" onclick="fn4Search()">Tìm kiếm</button><button class="btn-refresh" onclick="fn4Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="fn4Save()">Lưu</button>
+    <button class="btn-delete" onclick="fn4Delete()">Xóa</button><button class="btn-export">Xuất dữ liệu</button><button class="btn-import">Nhập dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table class="tbl-yellow">
+    <thead><tr><th><input type="checkbox" id="fn4-chkAll" onchange="toggleAll('fn4-chkAll','.fn4-chk')"></th><th>Sửa</th><th>STT</th><th>Từ tháng</th><th>Đến tháng</th><th>ĐV1</th><th>ĐV2</th><th>ĐV3</th><th>ĐV4</th><th>ĐV5</th><th>Nhóm tính lương</th><th>Bộ phận TL</th><th>% PV</th><th>Ghi chú</th></tr></thead>
+    <tbody id="fn4-tbody"></tbody>
+  </table></div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // ============ DATA ============
+    let fn4Data = [
+      { id:1, thang:'07/2025', denthang:'', dv1:'Khối Kinh doanh', dv2:'Miền Nam', dv3:'TP.HCM', dv4:'CN Quận 1', dv5:'Tổ bán hàng 1', nhomtl:'N1', bptl:'Kinh doanh', pv:10, ghichu:'Áp dụng khu vực miền Nam' },
+      { id:2, thang:'07/2025', denthang:'09/2025', dv1:'Khối Sản xuất', dv2:'Nhà máy 1', dv3:'Xưởng A', dv4:'Tổ 01', dv5:'-', nhomtl:'N2', bptl:'Sản xuất', pv:5, ghichu:'Áp dụng toàn bộ xưởng A' },
+    ];
+    let fn4NextId = 3;
+
+    function fn4Render() {
+      const tbody = document.getElementById('fn4-tbody');
+      tbody.innerHTML = '';
+      fn4Data.forEach((r, i) => {
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="fn4-chk" value="${r.id}"></td>
+          <td><span class="edit-icon" onclick="fn4EditById(${r.id})">✎</span></td>
+          <td>${i + 1}</td>
+          <td>${r.thang}</td>
+          <td>${r.denthang || ''}</td>
+          <td>${r.dv1}</td>
+          <td>${r.dv2}</td>
+          <td>${r.dv3}</td>
+          <td>${r.dv4}</td>
+          <td>${r.dv5}</td>
+          <td>${r.nhomtl}</td>
+          <td>${r.bptl}</td>
+          <td>${r.pv}%</td>
+          <td class="tl">${r.ghichu}</td>
+        </tr>`;
+      });
+    }
+
+    // ============ FORM ============
+    function fn4Clear() {
+      document.getElementById('fn4_thang').value = '';
+      document.getElementById('fn4_denthang').value = '';
+      document.getElementById('fn4_dv1').selectedIndex = 0;
+      document.getElementById('fn4_dv2').selectedIndex = 0;
+      document.getElementById('fn4_dv3').selectedIndex = 0;
+      document.getElementById('fn4_dv4').selectedIndex = 0;
+      document.getElementById('fn4_dv5').selectedIndex = 0;
+      document.getElementById('fn4_nhomtl').selectedIndex = 0;
+      document.getElementById('fn4_bptl').selectedIndex = 0;
+      document.getElementById('fn4_pv').value = '';
+      document.getElementById('fn4_ghichu').value = '';
+      document.getElementById('fn4_thang').dataset.editId = '';
+      document.getElementById('fn4-alert').style.display = 'none';
+    }
+
+    function fn4EditById(id) {
+      const r = fn4Data.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('fn4_thang').value = r.thang;
+      document.getElementById('fn4_denthang').value = r.denthang || '';
+      document.getElementById('fn4_dv1').value = r.dv1;
+      document.getElementById('fn4_dv2').value = r.dv2;
+      document.getElementById('fn4_dv3').value = r.dv3;
+      document.getElementById('fn4_dv4').value = r.dv4;
+      document.getElementById('fn4_dv5').value = r.dv5;
+      document.getElementById('fn4_nhomtl').value = r.nhomtl;
+      document.getElementById('fn4_bptl').value = r.bptl;
+      document.getElementById('fn4_pv').value = r.pv;
+      document.getElementById('fn4_ghichu').value = r.ghichu;
+      document.getElementById('fn4_thang').dataset.editId = id;
+      window.scrollTo(0, 0);
+      showAlert2('fn4-alert', "Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", 'success');
+    }
+
+    function fn4Save() {
+      const thang = document.getElementById('fn4_thang').value.trim();
+      const pv = document.getElementById('fn4_pv').value.trim();
+      if (!thang) return showAlert2('fn4-alert', 'Vui lòng nhập Từ tháng (kỳ NS).', 'error');
+      if (pv === '') return showAlert2('fn4-alert', 'Vui lòng nhập % Bổ sung PV.', 'error');
+
+      const data = {
+        thang,
+        denthang: document.getElementById('fn4_denthang').value.trim(),
+        dv1: document.getElementById('fn4_dv1').value,
+        dv2: document.getElementById('fn4_dv2').value,
+        dv3: document.getElementById('fn4_dv3').value,
+        dv4: document.getElementById('fn4_dv4').value,
+        dv5: document.getElementById('fn4_dv5').value,
+        nhomtl: document.getElementById('fn4_nhomtl').value,
+        bptl: document.getElementById('fn4_bptl').value,
+        pv: parseFloat(pv),
+        ghichu: document.getElementById('fn4_ghichu').value.trim(),
+      };
+
+      const editId = document.getElementById('fn4_thang').dataset.editId;
+      if (editId) {
+        const r = fn4Data.find(x => x.id === parseInt(editId));
+        if (r) Object.assign(r, data);
+        showAlert2('fn4-alert', 'Cập nhật % Bổ sung Phục vụ thành công!', 'success');
+      } else {
+        fn4Data.push({ id: fn4NextId++, ...data });
+        showAlert2('fn4-alert', 'Thêm mới % Bổ sung Phục vụ thành công!', 'success');
+      }
+      fn4Render();
+      fn4Clear();
+    }
+
+    function fn4Delete() {
+      const chks = document.querySelectorAll('.fn4-chk:checked');
+      if (!chks.length) return showAlert2('fn4-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} dòng đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        fn4Data = fn4Data.filter(x => !ids.includes(x.id));
+        fn4Render();
+        showAlert2('fn4-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    function fn4Search() { showAlert2('fn4-alert', 'Tìm kiếm hoàn tất.', 'success'); }
+
+    fn4Render();
+  </script>
+</body>
+</html>

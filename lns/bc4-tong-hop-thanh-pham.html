@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Báo cáo tổng hợp thành phẩm sản xuất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 20px 0; letter-spacing: 1px; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+      
+      .table-header th { background: #1e3a5f; color: white; padding: 8px; text-align: center; font-size: 12px; border: 1px solid #cfd8dc; }
+      .table-row td { padding: 8px; font-size: 12px; border: 1px solid #cfd8dc; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương › Báo cáo › Báo cáo tổng hợp thành phẩm sản xuất</div>
+      <div class="bc-title">BÁO CÁO TỔNG HỢP THÀNH PHẨM SẢN XUẤT</div>
+      <div id="bc4-alert" class="alert-box"></div>
+      
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label class="lbl-red">Tháng (*)</label>
+          <input type="text" id="bc4_thang" placeholder="MM/YYYY" value="06/2026" maxlength="7">
+          
+          <label>Tiến trình</label>
+          <select id="bc4_tt">
+            <option value="">-- Tất cả Tiến trình --</option>
+          </select>
+          
+          <label></label><div></div>
+
+          <label>Từ ngày</label>
+          <input type="date" id="bc4_tungay">
+
+          <label>Đến ngày</label>
+          <input type="date" id="bc4_denngay">
+
+          <label></label><div></div>
+        </div>
+      </div>
+      
+      <div class="form-panel" style="background:#f0f4ff; border:1px solid #b3c6e0; padding:12px 15px; margin-bottom:15px;">
+        <div style="font-weight:bold;color:#003366;font-size:12px;margin-bottom:8px;">Sắp xếp tiến trình / quy cách khi xuất báo cáo</div>
+        <div style="display:grid; grid-template-columns:140px 1fr 140px 1fr; gap:8px 12px; align-items:center; font-size:12px;">
+          <label class="lbl-red" style="font-size:12px;">Nguyên tắc sắp xếp (*)</label>
+          <select id="bc4_sort_rule" style="padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">
+            <option value="REPORT_TEMPLATE_ORDER" selected>Theo thứ tự cấu hình báo cáo</option>
+            <option value="PROCESS_NAME">Theo tên tiến trình/công đoạn</option>
+            <option value="PRODUCT_SPEC_GROUP">Theo nhóm sản phẩm/quy cách</option>
+            <option value="SHIFT_TYPE">Theo loại ca</option>
+            <option value="UOM">Theo đơn vị tính</option>
+            <option value="SAP_INTERNAL_CODE">Theo mã SAP / mã nội bộ</option>
+            <option value="QUANTITY_DESC">Theo sản lượng phát sinh giảm dần</option>
+            <option value="HAS_DATA_FIRST">Có phát sinh trước, không phát sinh sau</option>
+            <option value="PROCESS_CODE">Theo mã tiến trình</option>
+            <option value="USER_CUSTOM">Theo cấu hình cá nhân</option>
+          </select>
+          <label class="lbl-red" style="font-size:12px;">Chiều sắp xếp (*)</label>
+          <div style="display:flex;gap:15px;align-items:center;">
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc4_sort_dir" value="ASC" checked> Tăng dần</label>
+            <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc4_sort_dir" value="DESC"> Giảm dần</label>
+          </div>
+          <label style="font-size:12px;">Ẩn QCTL không phát sinh</label>
+          <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="checkbox" id="bc4_hide_empty" checked> Chỉ xuất QCTL có năng suất phát sinh</label>
+        </div>
+      </div>
+
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc4Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="showAlert2('bc4-alert', 'Tính năng xuất Excel đang hoàn thiện.', 'info')">Xuất Excel</button>
+      </div>
+
+      <div class="grid-wrap" style="height:400px; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse;">
+          <thead id="bc4-thead">
+            <tr class="table-header">
+              <th rowspan="2" style="min-width:40px;">STT</th>
+              <th rowspan="2" style="min-width:100px;">Mã tiến trình</th>
+              <th rowspan="2" style="min-width:120px;">QC tính lương</th>
+              <th rowspan="2" style="min-width:200px;">Tên QC tính lương</th>
+              <th rowspan="2" style="min-width:60px;">ĐVT</th>
+              <th style="min-width:80px;color:#fff;">TRONG CA</th>
+              <th style="min-width:80px;color:#64b5f6;">CA ĐÊM</th>
+              <th style="min-width:80px;color:#ef5350;">TĂNG CA</th>
+              <th style="min-width:80px;color:#81c784;">TĂNG CA ĐÊM</th>
+              <th rowspan="2" style="min-width:80px;">TỔNG</th>
+              <th rowspan="2" style="min-width:100px;">Ghi chú 1</th>
+              <th rowspan="2" style="min-width:100px;">Ghi chú 2</th>
+            </tr>
+            <tr class="table-header">
+              <th style="color:#fff;">1</th>
+              <th style="color:#64b5f6;">2</th>
+              <th style="color:#ef5350;">3</th>
+              <th style="color:#81c784;">4</th>
+            </tr>
+          </thead>
+          <tbody id="bc4-tbody">
+            <tr class="table-row"><td colspan="12" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const ttSelect = document.getElementById('bc4_tt');
+      
+      const tienTrinhData = (window.mockData && window.mockData.tienTrinh) ? window.mockData.tienTrinh : [
+        { ma: "TT_TOM_SU", tenVN: "Sơ chế Tôm Sú" },
+        { ma: "TT_TOM_THE", tenVN: "Sơ chế Tôm Thẻ" },
+        { ma: "TT_DONG_GOI", tenVN: "Đóng gói" }
+      ];
+      
+      tienTrinhData.forEach(tt => {
+        ttSelect.innerHTML += `<option value="${tt.ma}">${tt.ma} - ${tt.tenVN || tt.ten}</option>`;
+      });
+
+      // Auto load data
+      bc4Search();
+    });
+
+    function bc4Search() {
+      const thang = document.getElementById('bc4_thang').value.trim();
+      if (!thang) {
+        showAlert2('bc4-alert', 'Vui lòng nhập Tháng tính lương (bắt buộc nhập).', 'error');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) {
+        showAlert2('bc4-alert', 'Định dạng tháng không hợp lệ. Vui lòng nhập MM/YYYY (Ví dụ: 06/2026).', 'error');
+        return;
+      }
+      
+      const tt = document.getElementById('bc4_tt').value;
+      
+      const tbody = document.getElementById('bc4-tbody');
+      
+      const mockDataRows = [
+        { stt: 1, ma: "PTO", qc: "TTHLXPTO000", ten: "Sú Thường LX PTO 2/4", tc: 120.5, cd: 40.2, tca: 15.0, tcd: 0 },
+        { stt: 2, ma: "PTO", qc: "TTHLXPTO000", ten: "Sú Thường LX PTO 4/6", tc: 340.0, cd: 150.5, tca: 45.2, tcd: 10.0 },
+        { stt: 3, ma: "PTO", qc: "TTHLXPTO000", ten: "Sú Thường LX PTO 6/8", tc: 560.8, cd: 210.0, tca: 80.5, tcd: 25.4 },
+        { stt: 4, ma: "PTO", qc: "TTHLXPTO001", ten: "Sú Thường LX PTO 8/12", tc: 890.2, cd: 320.1, tca: 120.0, tcd: 50.5 },
+        { stt: 5, ma: "PTO", qc: "TTHLXPTO001", ten: "Sú Thường LX PTO 13/15", tc: 1050.4, cd: 450.8, tca: 180.2, tcd: 75.0 },
+        { stt: 6, ma: "PTO", qc: "TTHLXPTO002", ten: "Sú Thường LX PTO 16/20", tc: 1420.0, cd: 510.5, tca: 210.4, tcd: 90.2 },
+        { stt: 7, ma: "PTO", qc: "TTHLXPTO002", ten: "Sú Thường LX PTO 21/25", tc: 1150.6, cd: 480.0, tca: 195.5, tcd: 85.0 },
+        { stt: 8, ma: "PTO", qc: "TTHLXPTO003", ten: "Sú Thường LX PTO 26/30", tc: 980.5, cd: 390.2, tca: 160.0, tcd: 60.5 },
+        { stt: 9, ma: "PTO", qc: "TTHLXPTO004", ten: "Sú Thường LX PTO 31/40", tc: 750.0, cd: 280.5, tca: 110.8, tcd: 40.0 },
+        { stt: 10, ma: "PTO", qc: "TTHLXPTO005", ten: "Sú Thường LX PTO 41/50", tc: 540.2, cd: 190.0, tca: 85.0, tcd: 30.5 },
+        { stt: 11, ma: "PTO", qc: "TTHLXPTO006", ten: "Sú Thường LX PTO 51/60", tc: 320.8, cd: 110.5, tca: 45.2, tcd: 15.0 },
+        { stt: 12, ma: "PTO", qc: "TTHLXPTO007", ten: "Sú Thường LX PTO 61/70", tc: 210.0, cd: 85.0, tca: 30.5, tcd: 10.0 },
+        { stt: 13, ma: "PTO", qc: "TTHLXPTO009", ten: "Sú Thường LX PTO 71/90", tc: 150.5, cd: 60.2, tca: 20.0, tcd: 5.5 },
+        { stt: 14, ma: "PTO", qc: "TTHLXPTO012", ten: "Sú Thường LX PTO 91/120", tc: 85.0, cd: 30.0, tca: 10.5, tcd: 0 },
+        { stt: 15, ma: "PTO", qc: "TTHLXPTO020", ten: "Sú Thường LX PTO 121/20", tc: 45.5, cd: 15.0, tca: 5.0, tcd: 0 },
+        { stt: 16, ma: "PTO", qc: "TTHLXPTO030", ten: "Sú Thường LX PTO 201/30", tc: 20.0, cd: 5.5, tca: 0, tcd: 0 }
+      ];
+
+      let html = '';
+      mockDataRows.forEach(row => {
+        const tong = row.tc + row.cd + row.tca + row.tcd;
+        
+        const formatNum = (num) => num > 0 ? num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
+
+        html += `
+          <tr class="table-row" style="background:#fff;">
+            <td style="text-align:center; font-weight:bold;">${row.stt}</td>
+            <td style="text-align:center; font-weight:bold;">${row.ma}</td>
+            <td style="background-color:#ffff00; color:#000;">${row.qc}</td>
+            <td style="background-color:#ffff00; color:#000;">${row.ten}</td>
+            <td style="text-align:center;">kg</td>
+            <td style="text-align:right;">${formatNum(row.tc)}</td>
+            <td style="text-align:right;">${formatNum(row.cd)}</td>
+            <td style="text-align:right;">${formatNum(row.tca)}</td>
+            <td style="text-align:right;">${formatNum(row.tcd)}</td>
+            <td style="text-align:right; font-weight:bold;">${formatNum(tong)}</td>
+            <td>TPSX</td>
+            <td></td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+YÊU CẦU ĐIỀU CHỈNH FORM NHẬP LIỆU THEO EXCEL (NangCap.xlsx)
+===================================================================
+
+I. TỔNG QUAN YÊU CẦU ĐIỀU CHỈNH
+-------------------------------------------------------------------
+1. Các trường cần BỔ SUNG MỚI:
+- Mã nội bộ: Textbox (Thêm mới hoàn toàn).
+- Đơn vị tính: Dropdown/Text (Read-only). Bắt buộc có validation: Đối chiếu với đơn vị tính đã định nghĩa ở bước Công đoạn. Cảnh báo và chặn lưu nếu người dùng nhập sai (ví dụ: công đoạn tính theo 'kg' nhưng nhập 'con').
+
+2. Các trường cần ĐIỀU CHỈNH LOGIC / DANH MỤC:
+- NS Làm: Đổi thành Dropdown/Radio với 4 tùy chọn cố định: 1: Trong ca | 2: Ca đêm | 3: Tăng ca | 4: Tăng ca đêm.
+- Mã BP: Đảm bảo map chuẩn với "Nhóm tính Lương".
+
+II. CHI TIẾT DANH SÁCH 21 TRƯỜNG TRÊN FORM
+-------------------------------------------------------------------
+[STT] | [Tên trường] | [Định dạng / UI] | [Yêu cầu nghiệp vụ] | [Dữ liệu mẫu]
+
+1 | STT | Text | Số thứ tự dòng | 1
+2 | Mã BP | Text | Phải map (tương ứng) với Nhóm tính Lương | CB101 + CB102 + CB103
+3 | Ka LV | Text | Ca làm việc | 1
+4 | Ngày NL | Date Picker | Chọn ngày nguyên liệu | 2026-05-30
+5 | Lô | Text | Mã lô sản xuất | P0
+6 | Nhóm KS | Text | Nhóm kiểm soát | N1
+7 | KL Bơ | Float | Khối lượng bơ (nhập số thập phân) | 222
+8 | Quy cách SX | Text | Quy cách sản xuất | LX PTO hấp vỏ
+9 | Mã nội bộ | Text | [Bổ sung mới] | (Chưa có dữ liệu)
+10 | Size nội bộ | Text | Kích cỡ nội bộ | VM 13/15 CPTO HV MTR79
+11 | Quy cách tính lương | Text | Quy cách dùng để map giá tính lương | WTHLXPTOHV0015
+12 | Ngày LV | Date Picker | Ngày làm việc | 2026-06-01
+13 | TG bắt đầu | Time Picker | Thời gian bắt đầu | 13:00:00
+14 | Ngày cân | Date Picker | Ngày thực hiện cân | 2026-06-01
+15 | Giờ cân | Time Picker | Giờ thực hiện cân | 13:24:41
+16 | gr/con | Float | Định mức gram/con (nhập số thập phân) | (Nhập số)
+17 | con/khay | Float | Định mức con/khay (nhập số thập phân) | (Nhập số)
+18 | KL | Float | Khối lượng thực tế (nhập số thập phân) | 14.41
+19 | Đơn vị tính | Dropdown/Text | [Bổ sung mới] Chặn lưu nếu sai đơn vị định mức | kg
+20 | NS Làm | Dropdown/Radio | Phân ca (1: Trong ca, 2: Ca đêm, 3: Tăng ca, 4: Tăng ca đêm) | 1
+21 | Line.Bơ | Text | Mã định danh line bơ | 2226029.15015
+
+===================================================================
+TỔNG KẾT HÀNH ĐỘNG CHO DEV/UI:
+- Tạo mới 2 trường: Mã nội bộ, Đơn vị tính.
+- Cập nhật hàm chặn lưu cho Đơn vị tính.
+- Gắn dữ liệu cứng cho dropdown NS Làm.
+- Chuẩn hóa Date/Time/Float/Text cho tất cả các input tương ứng để chặn dữ liệu rác.

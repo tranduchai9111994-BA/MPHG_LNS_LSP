@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Nhập năng suất chung theo bộ phận</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .ns-val { background:#e3f2fd; color:#1565c0; font-weight:bold; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Nhập năng suất chung theo bộ phận</div>
+  <div class="page-title">NHẬP NĂNG SUẤT CHUNG THEO BỘ PHẬN</div>
+  <div class="form-panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 40px;">
+      <div class="field"><label class="lbl-red">Từ ngày</label><input type="date" value="2025-07-01"></div>
+      <div class="field"><label class="lbl-red">Đến ngày</label><input type="date" value="2025-07-31"></div>
+      <div class="field"><label>Bộ phận</label><select><option>Tất cả</option><option>May mặc</option><option>Hoàn thiện</option></select></div>
+      <div class="field"><label>Ka/Bàn</label><select><option>Tất cả</option><option>Ka A</option><option>Ka B</option></select></div>
+      <div class="field"><label>Công đoạn</label><select><option>Tất cả</option><option>May thân trước</option><option>May tay áo</option><option>Hoàn thiện</option></select></div>
+      <div class="field"><label>Quy cách tính lương</label><select><option>Tất cả</option><option>WTHLXPTOHV0015</option><option>WTHLXPTOHV0016</option><option>WTHLXPTOHV0017</option></select></div>
+      <div class="field"><label>Mã nội bộ</label><select><option>Tất cả</option><option>50524494 - VM 13/15</option><option>50524445 - VM 16/20</option><option>50524492 - VM 21/25</option></select></div>
+      <div class="field"><label>Đơn vị tính</label><select><option>Tất cả</option><option>kg</option><option>con</option></select></div>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm kiếm</button><button class="btn-refresh">Làm mới</button>
+    <button class="btn-add" onclick="fn5NewRow()">Thêm mới</button>
+    <button class="btn-import" onclick="showModal('fn5-imp')">Nhập dữ liệu</button>
+    <button class="btn-delete" onclick="fn5DeleteChecked()">Xóa</button>
+    <button class="btn-export">Xuất Excel</button>
+  </div>
+  <div class="grid-wrap" style="overflow-x:auto;"><table class="tbl-yellow">
+    <thead><tr>
+  <th style="width:30px"><input type="checkbox" id="fn5ChkAll" onchange="fn5ToggleAll(this)"></th>
+  <th>Sửa</th>
+  <th>STT</th>
+  <th>Mã bộ phận</th>
+  <th>Ka LV</th>
+  <th>Ngày NL</th>
+  <th>Lô</th>
+  <th>Nhóm KS</th>
+  <th>KL Bơ</th>
+  <th>Quy cách SX</th>
+  <th>Mã nội bộ</th>
+  <th>Size nội bộ</th>
+  <th>Quy cách tính lương</th>
+  <th>Ngày LV</th>
+  <th>TG bắt đầu</th>
+  <th>Ngày cân</th>
+  <th>Giờ cân</th>
+  <th>gr/con</th>
+  <th>con/khay</th>
+  <th>Trong giờ</th>
+  <th>Ca đêm</th>
+  <th>Tăng ca</th>
+  <th>Tăng ca đêm</th>
+  <th>Ngày nghỉ</th>
+  <th>Đêm ngày nghỉ</th>
+  <th>Ngày lễ</th>
+  <th>Đêm ngày lễ</th>
+  <th>Đơn vị tính</th>
+  <th>Line.Bơ</th>
+  <th>Ghi chú</th>
+</tr></thead>
+    <tbody>
+      <tr data-id="1">
+        <td><input type="checkbox" class="fn5-chk" data-id="1"></td>
+        <td><span class="edit-icon" onclick="fn5EditRow(this)">✎</span></td>
+        <td>1</td>
+        <td>CB101</td>
+        <td>1</td>
+        <td>30/05/2026</td>
+        <td>P0</td>
+        <td>N1</td>
+        <td>222</td>
+        <td>LX PTO</td>
+        <td style="font-family:monospace;font-weight:bold;">50524494</td>
+        <td>VM 13/15</td>
+        <td>WTHLXPTOHV0015</td>
+        <td>15/07/2025</td>
+        <td>13:00</td>
+        <td>15/07/2025</td>
+        <td>13:24</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td class="ns-val">520</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td style="color:#d32f2f;font-weight:bold;">kg</td>
+        <td>2226029.15</td>
+        <td style="text-align:left"></td>
+      </tr>
+      <tr data-id="2">
+        <td><input type="checkbox" class="fn5-chk" data-id="2"></td>
+        <td><span class="edit-icon" onclick="fn5EditRow(this)">✎</span></td>
+        <td>2</td>
+        <td>CB102</td>
+        <td>1</td>
+        <td>30/05/2026</td>
+        <td>P1</td>
+        <td>N2</td>
+        <td>100</td>
+        <td>Nobashi</td>
+        <td style="font-family:monospace;font-weight:bold;">50524445</td>
+        <td>VM 16/20</td>
+        <td>WTHLXPTOHV0016</td>
+        <td>15/07/2025</td>
+        <td>14:00</td>
+        <td>15/07/2025</td>
+        <td>14:30</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td class="ns-val">450</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td style="color:#d32f2f;font-weight:bold;">con</td>
+        <td>2226029.16</td>
+        <td style="text-align:left"></td>
+      </tr>
+      <tr data-id="3">
+        <td><input type="checkbox" class="fn5-chk" data-id="3"></td>
+        <td><span class="edit-icon" onclick="fn5EditRow(this)">✎</span></td>
+        <td>3</td>
+        <td>CB103</td>
+        <td>2</td>
+        <td>31/05/2026</td>
+        <td>P2</td>
+        <td>N3</td>
+        <td>150</td>
+        <td>Sushi</td>
+        <td style="font-family:monospace;font-weight:bold;">50524492</td>
+        <td>VM 21/25</td>
+        <td>WTHLXPTOHV0017</td>
+        <td>16/07/2025</td>
+        <td>08:00</td>
+        <td>16/07/2025</td>
+        <td>08:45</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td class="ns-val">390</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td>0.00</td>
+        <td style="color:#d32f2f;font-weight:bold;">kg</td>
+        <td>2226029.17</td>
+        <td style="text-align:left"></td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+<div class="modal-overlay" id="fn5-add"><div class="modal-box" style="width:98%;max-width:none;margin:10px;">
+  <div class="modal-hdr"><span id="fn5-modal-title">THÊM NĂNG SUẤT THEO CÔNG ĐOẠN</span><button class="x" onclick="hideModal('fn5-add')">✕</button></div>
+  <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;padding:15px;background:#f9f9f9;max-height:75vh;overflow-y:auto;">
+    <div class="form-row"><label>Mã bộ phận <span class="req">*</span></label><input type="text" id="fn5_mabp" placeholder="CB101..."></div>
+    <div class="form-row"><label>Ka LV <span class="req">*</span></label><input type="text" id="fn5_kalv" placeholder="1"></div>
+    <div class="form-row"><label>Ngày NL</label><input type="date" id="fn5_ngaynl"></div>
+    <div class="form-row"><label>Lô</label><input type="text" id="fn5_lo" placeholder="P0"></div>
+    <div class="form-row"><label>Nhóm KS</label><input type="text" id="fn5_nhomks" placeholder="N1"></div>
+    <div class="form-row"><label>KL Bơ</label><input type="number" step="0.01" id="fn5_klbo" placeholder="222"></div>
+    <div class="form-row"><label>Quy cách SX</label><input type="text" id="fn5_qcsx" placeholder="LX PTO hấp vỏ"></div>
+    <div class="form-row"><label>Mã nội bộ <span class="req">*</span></label><input type="text" id="fn5_manb" placeholder="50524494"></div>
+    <div class="form-row"><label>Size nội bộ</label><input type="text" id="fn5_sizenb" placeholder="VM 13/15"></div>
+    <div class="form-row"><label>Quy cách tính lương</label><input type="text" id="fn5_qctl" placeholder="WTHLXPTOHV0015"></div>
+    <div class="form-row"><label>Ngày LV <span class="req">*</span></label><input type="date" id="fn5_ngaylv"></div>
+    <div class="form-row"><label>TG bắt đầu</label><input type="time" id="fn5_tgbd"></div>
+    <div class="form-row"><label>Ngày cân</label><input type="date" id="fn5_ngaycan"></div>
+    <div class="form-row"><label>Giờ cân</label><input type="time" id="fn5_giocan"></div>
+    <div class="form-row"><label>gr/con</label><input type="number" step="0.01" id="fn5_grcon"></div>
+    <div class="form-row"><label>con/khay</label><input type="number" step="0.01" id="fn5_conkhay"></div>
+    <div class="form-row"><label>Công đoạn <span class="req">*</span></label><select id="fn5_congdoan" onchange="document.getElementById('fn5_dvt').value = this.value === 'May tay áo' ? 'con' : 'kg';"><option>-- Chọn --</option><option value="May thân trước">May thân trước</option><option value="May tay áo">May tay áo</option><option value="Hoàn thiện">Hoàn thiện</option></select></div>
+    <div class="form-row"><label>Khối lượng (KL) <span class="req">*</span></label><input type="number" step="0.01" id="fn5_kl" placeholder="14.41"></div>
+    <div class="form-row"><label>Đơn vị tính <span class="req">*</span></label><select id="fn5_dvt"><option value="kg">kg</option><option value="con">con</option><option value="Thùng">Thùng</option><option value="Lít">Lít</option><option value="Miếng">Miếng</option><option value="Khay">Khay</option></select></div>
+    <div class="form-row"><label>NS Làm <span class="req">*</span></label><select id="fn5_nslam"><option value="1">1: Trong giờ</option><option value="2">2: Ca đêm</option><option value="3">3: Tăng ca</option><option value="4">4: Tăng ca đêm</option><option value="5">5: Ngày nghỉ</option><option value="6">6: Đêm ngày nghỉ</option><option value="7">7: Ngày lễ</option><option value="8">8: Đêm ngày lễ</option></select></div>
+    <div class="form-row"><label>Line.Bơ</label><input type="text" id="fn5_linebo" placeholder="2226029.15015"></div>
+    <div class="form-row" style="grid-column:span 4"><label>Ghi chú</label><input type="text" id="fn5_ghichu" placeholder="Nhập ghi chú..." style="width:100%"></div>
+  </div>
+  <div class="modal-ftr">
+    <button class="btn-cancel" onclick="hideModal('fn5-add')">Hủy</button>
+    <button class="btn-ok" onclick="saveFn5Form()">Lưu</button>
+  </div>
+</div></div>
+<div class="modal-overlay" id="fn5-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>NHẬP DỮ LIỆU TỪ EXCEL</span><button class="x" onclick="hideModal('fn5-imp')">✕</button></div>
+  <div class="modal-body"><input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a></div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('fn5-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('fn5-imp')">Import</button></div>
+</div></div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function saveFn5Form() {
+      const cd = document.getElementById('fn5_congdoan').value;
+      const dvt = document.getElementById('fn5_dvt').value.toLowerCase();
+      let expectedDvt = cd === 'May tay áo' ? 'con' : 'kg';
+
+      if (cd && cd !== '-- Chọn --' && dvt !== expectedDvt) {
+        alert("LỖI NGHIỆP VỤ: Đơn vị tính [" + dvt + "] không khớp với cấu hình của công đoạn [" + cd + "] (" + expectedDvt + "). Vui lòng kiểm tra lại!");
+        return false;
+      }
+
+      hideModal('fn5-add');
+      alert("Lưu năng suất thành công!");
+    }
+
+    // ============ THÊM MỚI / SỬA ============
+    const FN5_SHIFT_FIELDS = ['fn5_kl_1','fn5_kl_2','fn5_kl_3','fn5_kl_4','fn5_kl_5','fn5_kl_6','fn5_kl_7','fn5_kl_8'];
+
+    function fn5ClearForm() {
+      ['fn5_mabp','fn5_kalv','fn5_ngaynl','fn5_lo','fn5_nhomks','fn5_klbo','fn5_qcsx','fn5_manb','fn5_sizenb',
+       'fn5_qctl','fn5_ngaylv','fn5_tgbd','fn5_ngaycan','fn5_giocan','fn5_grcon','fn5_conkhay','fn5_kl','fn5_linebo']
+        .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      document.getElementById('fn5_congdoan').selectedIndex = 0;
+      document.getElementById('fn5_dvt').selectedIndex = 0;
+      document.getElementById('fn5_nslam').selectedIndex = 0;
+    }
+
+    function fn5NewRow() {
+      fn5ClearForm();
+      document.getElementById('fn5-modal-title').textContent = 'THÊM NĂNG SUẤT THEO CÔNG ĐOẠN';
+      showModal('fn5-add');
+    }
+
+    // Chuyển "DD/MM/YYYY" -> "YYYY-MM-DD" để gán cho input[type=date]
+    function fn5ToISODate(str) {
+      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec((str || '').trim());
+      return m ? m[3] + '-' + m[2] + '-' + m[1] : '';
+    }
+
+    function fn5ToggleAll(src) {
+      var cbs = document.querySelectorAll('.fn5-chk');
+      for (var i = 0; i < cbs.length; i++) cbs[i].checked = src.checked;
+    }
+
+    function fn5DeleteChecked() {
+      var cbs = document.querySelectorAll('.fn5-chk:checked');
+      if (cbs.length === 0) { alert('Vui lòng chọn dòng cần xóa.'); return; }
+      if (!confirm('Bạn có chắc chắn muốn xóa ' + cbs.length + ' dòng?')) return;
+      cbs.forEach(function(cb) { cb.closest('tr').remove(); });
+      document.getElementById('fn5ChkAll').checked = false;
+      // Re-number STT
+      var rows = document.querySelectorAll('.tbl-yellow tbody tr');
+      rows.forEach(function(r, i) { r.cells[2].textContent = i + 1; });
+    }
+
+    function fn5EditRow(el) {
+      const row = el.closest('tr');
+      const c = row.cells;
+
+      document.getElementById('fn5_mabp').value = c[3].innerText.trim();
+      document.getElementById('fn5_kalv').value = c[4].innerText.trim();
+      document.getElementById('fn5_ngaynl').value = fn5ToISODate(c[5].innerText);
+      document.getElementById('fn5_lo').value = c[6].innerText.trim();
+      document.getElementById('fn5_nhomks').value = c[7].innerText.trim();
+      document.getElementById('fn5_klbo').value = c[8].innerText.trim();
+      document.getElementById('fn5_qcsx').value = c[9].innerText.trim();
+      document.getElementById('fn5_manb').value = c[10].innerText.trim();
+      document.getElementById('fn5_sizenb').value = c[11].innerText.trim();
+      document.getElementById('fn5_qctl').value = c[12].innerText.trim();
+      document.getElementById('fn5_ngaylv').value = fn5ToISODate(c[13].innerText);
+      document.getElementById('fn5_tgbd').value = c[14].innerText.trim();
+      document.getElementById('fn5_ngaycan').value = fn5ToISODate(c[15].innerText);
+      document.getElementById('fn5_giocan').value = c[16].innerText.trim();
+      document.getElementById('fn5_grcon').value = c[17].innerText.trim();
+      document.getElementById('fn5_conkhay').value = c[18].innerText.trim();
+
+      // 8 cột sản lượng theo ca (Trong giờ...Đêm ngày lễ) — cell index 19..26
+      let nsLam = '1', kl = '0.00';
+      for (let i = 0; i < 8; i++) {
+        const v = parseFloat(c[19 + i].innerText);
+        if (v) { nsLam = String(i + 1); kl = c[19 + i].innerText.trim(); break; }
+      }
+      document.getElementById('fn5_kl').value = kl;
+      document.getElementById('fn5_nslam').value = nsLam;
+
+      document.getElementById('fn5_dvt').value = c[27].innerText.trim();
+      document.getElementById('fn5_linebo').value = c[28].innerText.trim();
+      document.getElementById('fn5_congdoan').selectedIndex = 0;
+
+      document.getElementById('fn5-modal-title').textContent = 'SỬA NĂNG SUẤT THEO CÔNG ĐOẠN';
+      showModal('fn5-add');
+    }
+
+  </script>
+</body>
+</html>

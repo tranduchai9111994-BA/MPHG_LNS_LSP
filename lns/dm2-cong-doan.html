@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Năng Suất</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Công đoạn</div>
+  <div class="page-title">DANH MỤC CÔNG ĐOẠN</div>
+  <div id="dm2-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Ngày hiệu lực</label>
+      <div class="input-wrap"><input type="text" id="dm2_ngayhl" maxlength="10" placeholder="DD/MM/YYYY"><div class="input-note">Bắt buộc nhập dạng DD/MM/YYYY</div></div>
+      <label class="lbl-red">Mã công đoạn</label>
+      <div class="input-wrap"><input type="text" id="dm2_ma" maxlength="50" placeholder="Nhập mã..."><div class="input-note">Unique. Không dấu, không khoảng trắng.</div></div>
+      <label>Tiến trình</label>
+      <select id="dm2_tt"><option value="">-- Chọn Tiến trình --</option><option value="TT_TOM_SU">TT_TOM_SU - Sơ chế Tôm Sú</option><option value="TT_TOM_THE">TT_TOM_THE - Sơ chế Tôm Thẻ</option><option value="TT_DONG_GOI">TT_DONG_GOI - Đóng gói</option></select>
+      <label class="lbl-red">Tên tiếng Việt</label><input type="text" id="dm2_tenVI" maxlength="255" placeholder="Tên tiếng Việt...">
+      <label class="lbl-red">Đơn vị tính</label><select id="dm2_dvt"></select>
+      <label class="lbl-red">Tên tiếng Anh</label><input type="text" id="dm2_tenEN" maxlength="255" placeholder="Tên tiếng Anh...">
+      <label>Nhóm công thức</label>
+      <select id="dm2_nhomct">
+        <option value="">-- Chọn nhóm --</option>
+        <option value="N1">N1</option>
+        <option value="N2">N2</option>
+        <option value="N3">N3</option>
+        <option value="N4">N4</option>
+      </select>
+      <label>Ghi chú</label><textarea id="dm2_note" maxlength="1000" style="height:50px;"></textarea>
+      <label></label>
+      <div style="display:flex; gap:20px;">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dm2_req_manb"> Bắt buộc nhập mã nội bộ?</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dm2_use" checked> Sử dụng?</label>
+      </div>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dm2Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm2Save()">Lưu</button><button class="btn-delete" onclick="dm2Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm2-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button><button class="btn-export" style="background:#8e44ad;border-color:#732d91;">Xuất DL import</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox"></th><th>Sửa</th><th>STT</th><th>Ngày hiệu lực</th><th>Mã CĐ</th><th>Tên tiếng Việt</th><th>Tên tiếng Anh</th><th>Tiến trình</th><th>ĐVT</th><th>Nhóm CT</th><th>Bắt buộc mã NB</th><th>Ghi chú</th><th>Sử dụng</th></tr></thead>
+    <tbody id="dm2-tbody">
+      <tr data-ma="CD_PTO"><td><input type="checkbox" class="dm2-chk"></td><td><span class="edit-icon" onclick="dm2Edit(this)">✎</span></td><td>1</td><td style="text-align:center;">01/01/2026</td><td><b>CD_PTO</b></td><td>Lặt đầu tôm (PTO)</td><td>Headless (PTO)</td><td>TT_TOM_SU</td><td>Kg</td><td><span style="display:inline-block;background:#1976d2;color:#fff;border-radius:3px;padding:1px 7px;font-size:11px;font-weight:bold;">N1</span></td><td style="color:#d32f2f;font-weight:bold;text-align:center;">✔</td><td>Công đoạn sơ chế</td><td style="color:green;font-weight:bold">✔</td></tr>
+      <tr data-ma="CD_NOBASHI"><td><input type="checkbox" class="dm2-chk"></td><td><span class="edit-icon" onclick="dm2Edit(this)">✎</span></td><td>2</td><td style="text-align:center;">01/01/2026</td><td><b>CD_NOBASHI</b></td><td>Lột vỏ chừa đuôi (Nobashi)</td><td>Nobashi</td><td>TT_TOM_SU</td><td>Kg</td><td><span style="display:inline-block;background:#388e3c;color:#fff;border-radius:3px;padding:1px 7px;font-size:11px;font-weight:bold;">N2</span></td><td style="color:#aaa;font-weight:bold;text-align:center;">✘</td><td></td><td style="color:green;font-weight:bold">✔</td></tr>
+      <tr data-ma="CD_VIRUS"><td><input type="checkbox" class="dm2-chk"></td><td><span class="edit-icon" onclick="dm2Edit(this)">✎</span></td><td>3</td><td style="text-align:center;">01/01/2026</td><td><b>CD_VIRUS</b></td><td>Kiểm tra hàng Virut</td><td>Virus Check</td><td>TT_TOM_THE</td><td>Con</td><td><span style="display:inline-block;background:#f57c00;color:#fff;border-radius:3px;padding:1px 7px;font-size:11px;font-weight:bold;">N3</span></td><td style="color:#d32f2f;font-weight:bold;text-align:center;">✔</td><td>Tính theo con</td><td style="color:green;font-weight:bold">✔</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<div class="modal-overlay" id="dm2-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC CÔNG ĐOẠN</span><button class="x" onclick="hideModal('dm2-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;"><strong>Rule BR-CD-01:</strong><br>1. ĐV cấp 3 tồn tại + Mã CĐ tồn tại → UPDATE<br>2. ĐV cấp 3 tồn tại + Mã CĐ chưa tồn tại → INSERT<br><span style="color:red">3. ĐV cấp 3 KHÔNG tồn tại → DỪNG TOÀN BỘ file.</span></div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('dm2-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('dm2-imp');showAlert2('dm2-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // General Utils
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+    function toggleCollapse(id) {
+      const el = document.getElementById(id);
+      if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Mock load Đơn vị tính từ danh mục dm1b
+    const dmDVT = [
+      {ma: 'KG', ten: 'Kg'}, {ma: 'CON', ten: 'Con'}, {ma: 'THUNG', ten: 'Thùng'},
+      {ma: 'LIT', ten: 'Lít'}, {ma: 'MIENG', ten: 'Miếng'}, {ma: 'KHAY', ten: 'Khay'}
+    ];
+    function loadDVT() {
+      const sel = document.getElementById('dm2_dvt');
+      if(sel) sel.innerHTML = dmDVT.map(x => `<option value="${x.ten}">${x.ten}</option>`).join('');
+    }
+    loadDVT();
+
+const dm2Existing = ['CD_PTO','CD_NOBASHI','CD_VIRUS'];
+function dm2Clear() {
+  document.getElementById('dm2_ngayhl').value = '';
+  document.getElementById('dm2_ma').value = '';
+  document.getElementById('dm2_ma').readOnly = false;
+  document.getElementById('dm2_tenVI').value = '';
+  document.getElementById('dm2_tenEN').value = '';
+  document.getElementById('dm2_tt').selectedIndex = 0;
+  document.getElementById('dm2_dvt').selectedIndex = 0;
+  document.getElementById('dm2_nhomct').selectedIndex = 0;
+  document.getElementById('dm2_note').value = '';
+  document.getElementById('dm2_req_manb').checked = false;
+  document.getElementById('dm2_use').checked = true;
+  document.getElementById('dm2-alert').style.display = 'none';
+}
+function dm2Edit(el) {
+  const row = el.closest('tr');
+  document.getElementById('dm2_ngayhl').value = row.cells[3].innerText.trim();
+  document.getElementById('dm2_ma').value = row.cells[4].innerText.trim();
+  document.getElementById('dm2_ma').readOnly = true;
+  document.getElementById('dm2_tenVI').value = row.cells[5].innerText;
+  document.getElementById('dm2_tenEN').value = row.cells[6].innerText;
+  document.getElementById('dm2_tt').value = row.cells[7].innerText;
+  document.getElementById('dm2_dvt').value = row.cells[8].innerText;
+  document.getElementById('dm2_nhomct').value = row.cells[9].querySelector('span') ? row.cells[9].querySelector('span').innerText.trim() : '';
+  document.getElementById('dm2_req_manb').checked = row.cells[10].innerText.includes('✔');
+  document.getElementById('dm2_note').value = row.cells[11].innerText;
+  document.getElementById('dm2_use').checked = row.cells[12].innerText.includes('✔');
+  window.scrollTo(0,0);
+}
+function dm2Save() {
+  const ngayhl = document.getElementById('dm2_ngayhl').value.trim();
+  const ma = document.getElementById('dm2_ma').value.trim();
+  const vi = document.getElementById('dm2_tenVI').value.trim();
+  const en = document.getElementById('dm2_tenEN').value.trim();
+  const isEdit = document.getElementById('dm2_ma').readOnly;
+  if (!ngayhl || !ma || !vi || !en) return showAlert2('dm2-alert','Vui lòng nhập đầy đủ các trường bắt buộc.','error');
+  if (!/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/\d{4}$/.test(ngayhl)) return showAlert2('dm2-alert','Ngày hiệu lực phải đúng định dạng DD/MM/YYYY.','error');
+  if (!/^[a-zA-Z0-9_]+$/.test(ma)) return showAlert2('dm2-alert','Mã công đoạn không hợp lệ.','error');
+  if (!isEdit && dm2Existing.includes(ma.toUpperCase())) return showAlert2('dm2-alert','<b>Lỗi (Blocking):</b> Mã ['+ma.toUpperCase()+'] đã tồn tại.','error');
+  showAlert2('dm2-alert','Lưu Công đoạn thành công!','success');
+  dm2Clear();
+}
+function dm2Delete() {
+  const chks = document.querySelectorAll('.dm2-chk:checked');
+  if (!chks.length) return showAlert2('dm2-alert','Vui lòng chọn công đoạn cần xóa.','error');
+  if (confirm('Bạn có chắc muốn xóa?')) showAlert2('dm2-alert','Đã xóa công đoạn thành công.','success');
+}
+
+  </script>
+</body>
+</html>

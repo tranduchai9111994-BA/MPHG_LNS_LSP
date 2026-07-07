@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo kỳ Lương Sản Phẩm</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .btn-create { background-color: #28a745; }
+    .btn-delete { background-color: #dc3545; }
+    .edit-icon { color:#e67e22; cursor:pointer; font-size:15px; }
+    .edit-icon:hover { color:#d35400; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rsaquo; Chức năng &rsaquo; Tạo kỳ Lương Sản Phẩm</div>
+    <div class="page-title">TẠO KỲ LƯƠNG SẢN PHẨM</div>
+    <div class="info-bar">RÀNG BUỘC: Kỳ LSP phải tạo TRƯỚC khi tính. Hệ thống validate LNS và đơn giá ngay khi tạo kỳ.</div>
+    <div id="alertBox" class="alert-box"></div>
+    <div class="form-panel">
+      <div class="form-grid">
+        <label class="text-red">Kỳ lương sản phẩm</label>
+        <input type="text" id="txtMaKy" placeholder="Nhập mã kỳ...">
+        <label class="text-red">Tháng tính</label>
+        <input type="text" id="txtThang" placeholder="MM/yyyy" oninput="autoFillData()">
+
+        <label>Từ ngày</label>
+        <input type="date" id="txtTuNgay">
+        <label>Đến ngày</label>
+        <input type="date" id="txtDenNgay">
+
+        <label class="text-red">Nhóm lương</label>
+        <select id="cboNhomLuong">
+          <option value="">-- Chọn nhóm lương --</option>
+          <option value="NL_CHE_BIEN">NL_CHE_BIEN - Nhóm lương Chế biến</option>
+          <option value="NL_PHUC_VU">NL_PHUC_VU - Nhóm lương Phục vụ</option>
+          <option value="NL_VE_SINH">NL_VE_SINH - Nhóm lương Vệ sinh</option>
+        </select>
+        <label>Nhóm tính lương</label>
+        <select id="cboNhomTinhLuong">
+          <option value="">-- Chọn nhóm tính lương --</option>
+          <option value="NTL01">NTL01 - Hệ số</option>
+          <option value="NTL02">NTL02 - Năng suất</option>
+          <option value="NTL03">NTL03 - Bình quân lương sản phẩm</option>
+        </select>
+
+        <label>Ghi chú</label>
+        <input type="text" id="txtGhiChu" placeholder="Ghi chú..." style="grid-column: span 3;">
+      </div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn-search">Tìm Kiếm</button>
+      <button class="btn-create" onclick="createPeriod()">Tạo kỳ Lương</button>
+      <button class="btn-refresh" onclick="resetForm()">Làm mới</button>
+      <button class="btn-delete" onclick="deletePeriod()">Xóa kỳ</button>
+    </div>
+    <div class="grid-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30px;"><input type="checkbox" id="chkAll" onchange="toggleAllCheckboxes(this, '.chk-row')"></th>
+            <th style="width:50px;">STT</th>
+            <th>Sửa</th>
+            <th>Mã kỳ LSP</th>
+            <th>Tháng tính</th>
+            <th>Từ ngày</th>
+            <th>Đến ngày</th>
+            <th>Nhóm lương</th>
+            <th>Nhóm tính lương</th>
+            <th>Ghi chú</th>
+            <th>Người tạo</th>
+            <th>Ngày tạo</th>
+            <th>Người sửa</th>
+            <th>Ngày sửa</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    let rowCount = 0;
+    let editingRow = null;
+
+    function autoFillData() {
+      const thang = document.getElementById('txtThang').value.trim();
+      if (!validateMonthFormat(thang)) return;
+      const parts = thang.split('/');
+      const m = parseInt(parts[0], 10);
+      const y = parseInt(parts[1], 10);
+      const firstDay = new Date(y, m - 1, 1);
+      const lastDay  = new Date(y, m, 0);
+      const pad = n => String(n).padStart(2, '0');
+      document.getElementById('txtTuNgay').value  = `${y}-${pad(m)}-01`;
+      document.getElementById('txtDenNgay').value = `${y}-${pad(m)}-${pad(lastDay.getDate())}`;
+      if (!document.getElementById('txtMaKy').value.trim()) {
+        document.getElementById('txtMaKy').value = `LSP_${String(y).slice(2)}${pad(m)}`;
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('txtMaKy').value = '';
+      document.getElementById('txtThang').value = '';
+      document.getElementById('txtTuNgay').value = '';
+      document.getElementById('txtDenNgay').value = '';
+      document.getElementById('txtGhiChu').value = '';
+      document.getElementById('cboNhomLuong').value = '';
+      document.getElementById('cboNhomTinhLuong').value = '';
+      document.getElementById('alertBox').style.display = 'none';
+      document.getElementById('txtMaKy').readOnly = false;
+      editingRow = null;
+    }
+
+    const CURRENT_USER = 'FPT Admin';
+    function nowStr() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function buildRow(stt, maKy, thang, tuNgay, denNgay, nhomLuong, nhomTinhLuong, ghiChu, nguoiTao, ngayTao, nguoiSua, ngaySua) {
+      return `
+        <td><input type="checkbox" class="chk-row"></td>
+        <td>${stt}</td>
+        <td style="text-align:center;"><span class="edit-icon" onclick="startEdit(this)">✎</span></td>
+        <td style="font-weight:bold;">${maKy}</td>
+        <td>${thang}</td>
+        <td>${tuNgay}</td>
+        <td>${denNgay}</td>
+        <td>${nhomLuong}</td>
+        <td>${nhomTinhLuong}</td>
+        <td>${ghiChu}</td>
+        <td>${nguoiTao || ''}</td>
+        <td>${ngayTao  || ''}</td>
+        <td>${nguoiSua || ''}</td>
+        <td>${ngaySua  || ''}</td>
+      `;
+    }
+
+    function createPeriod() {
+      const maKy         = document.getElementById('txtMaKy').value.trim();
+      const thang        = document.getElementById('txtThang').value.trim();
+      const tuNgay       = document.getElementById('txtTuNgay').value;
+      const denNgay      = document.getElementById('txtDenNgay').value;
+      const nhomLuong    = document.getElementById('cboNhomLuong').value;
+      const nhomTinhLuong= document.getElementById('cboNhomTinhLuong').value;
+      const ghiChu       = document.getElementById('txtGhiChu').value.trim();
+      if (!maKy || !thang || !tuNgay || !nhomLuong) {
+        showAlert('alertBox', 'Vui lòng nhập đầy đủ các thông tin bắt buộc có nhãn màu đỏ.', 'error');
+        return;
+      }
+      if (!validateMonthFormat(thang)) {
+        showAlert('alertBox', 'Tháng tính không hợp lệ (Phải là định dạng MM/yyyy).', 'error');
+        return;
+      }
+      rowCount++;
+      const tr = document.createElement('tr');
+      tr.innerHTML = buildRow(rowCount, maKy, thang, formatDate(tuNgay), formatDate(denNgay), nhomLuong, nhomTinhLuong, ghiChu, CURRENT_USER, nowStr(), '', '');
+      document.getElementById('tableBody').appendChild(tr);
+      showAlert('alertBox', `Đã tạo kỳ lương [${maKy}] thành công. Hệ thống đã xác thực LNS & đơn giá.`, 'success');
+      document.getElementById('txtMaKy').value = '';
+      document.getElementById('txtGhiChu').value = '';
+    }
+
+    function startEdit(btn) {
+      const row = btn.closest('tr');
+      const cells = row.cells;
+      document.getElementById('txtMaKy').value        = cells[3].innerText.trim();
+      document.getElementById('txtMaKy').readOnly     = true;
+      document.getElementById('txtThang').value       = cells[4].innerText.trim();
+      document.getElementById('txtTuNgay').value      = dmyToInput(cells[5].innerText.trim());
+      document.getElementById('txtDenNgay').value     = dmyToInput(cells[6].innerText.trim());
+      document.getElementById('cboNhomLuong').value   = cells[7].innerText.trim();
+      document.getElementById('cboNhomTinhLuong').value = cells[8].innerText.trim();
+      document.getElementById('txtGhiChu').value      = cells[9].innerText.trim();
+      editingRow = row;
+      window.scrollTo(0, 0);
+    }
+
+    function dmyToInput(dmy) {
+      // DD/MM/YYYY → YYYY-MM-DD
+      if (!dmy || !dmy.includes('/')) return dmy;
+      const p = dmy.split('/');
+      if (p.length !== 3) return '';
+      return `${p[2]}-${p[1]}-${p[0]}`;
+    }
+
+    function saveEdit() {
+      if (!editingRow) return;
+      const denNgay = document.getElementById('txtDenNgay').value;
+      const tuNgay  = document.getElementById('txtTuNgay').value;
+      const ghiChu  = document.getElementById('txtGhiChu').value.trim();
+      editingRow.cells[5].innerText  = formatDate(tuNgay);
+      editingRow.cells[6].innerText  = formatDate(denNgay);
+      editingRow.cells[7].innerText  = document.getElementById('cboNhomLuong').value;
+      editingRow.cells[8].innerText  = document.getElementById('cboNhomTinhLuong').value;
+      editingRow.cells[9].innerText  = ghiChu;
+      editingRow.cells[12].innerText = CURRENT_USER;
+      editingRow.cells[13].innerText = nowStr();
+      showAlert('alertBox', 'Đã lưu chỉnh sửa kỳ lương thành công.', 'success');
+      resetForm();
+    }
+
+    function deletePeriod() {
+      const checkboxes = document.querySelectorAll('.chk-row:checked');
+      if (!checkboxes.length) { showAlert('alertBox', 'Vui lòng chọn kỳ cần xóa.', 'error'); return; }
+      confirmAction('Bạn có chắc chắn muốn xóa các kỳ đã chọn?', function() {
+        checkboxes.forEach(chk => chk.closest('tr').remove());
+        document.getElementById('chkAll').checked = false;
+        showAlert('alertBox', 'Đã xóa kỳ lương thành công.', 'success');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const tbody = document.getElementById('tableBody');
+      if (window.MOCK && window.MOCK.lsp && window.MOCK.lsp.kyLuong) {
+        window.MOCK.lsp.kyLuong.forEach(item => {
+          rowCount++;
+          const tr = document.createElement('tr');
+          tr.innerHTML = buildRow(rowCount, item.maKy, item.thang, item.tuNgay, item.denNgay, item.nhomLuong || 'NL_CHE_BIEN', item.nhomTinhLuong || '', item.ghiChu || '', item.nguoiTao || 'FPT Admin', item.ngayTao || '01/05/2026 08:00', '', '');
+          tbody.appendChild(tr);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

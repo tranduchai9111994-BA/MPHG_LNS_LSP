@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Báo cáo check NS tính lương</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .fp-grid { display:grid; grid-template-columns:90px 1fr 70px 1fr 70px 1fr 70px 1fr; gap:6px 10px; align-items:center; font-size:11px; }
+    .fp-grid label { font-weight:bold; }
+    .fp-grid select, .fp-grid input { height:26px; font-size:11px; padding:0 6px; border:1px solid #ccc; border-radius:3px; }
+    .fp-row2 { display:flex; gap:10px; align-items:center; margin-top:8px; flex-wrap:wrap; font-size:11px; }
+    .fp-row2 label { font-weight:bold; }
+    .fp-row2 select { height:26px; font-size:11px; padding:0 6px; border:1px solid #ccc; border-radius:3px; }
+    .lbl-red { color:#d32f2f !important; }
+
+    .bc5-actions { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+    .bc5-actions button { height:32px; padding:0 14px; border:none; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold; color:#fff; display:flex; align-items:center; gap:4px; }
+
+    .bc5-tabs { display:flex; border-bottom:2px solid #0056b3; margin-bottom:0; }
+    .bc5-tab { padding:8px 18px; cursor:pointer; font-weight:bold; font-size:12px; border:1px solid #ccc; border-bottom:none; border-radius:4px 4px 0 0; margin-right:2px; background:#f8f9fa; color:#333; }
+    .bc5-tab.active { background:#0056b3; color:#fff; border-color:#0056b3; }
+    .bc5-tab .cnt { background:#dc3545; color:#fff; font-size:9px; padding:1px 5px; border-radius:8px; margin-left:4px; }
+
+    .grid-wrap { overflow-x:auto; max-height:600px; border:1px solid #ccc; background:#fff; margin-bottom:15px; }
+    table { width:100%; border-collapse:collapse; font-size:10px; white-space:nowrap; }
+    th { padding:5px 6px; border:1px solid #ddd; text-align:center; font-weight:bold; position:sticky; top:0; z-index:2; }
+    td { padding:4px 6px; border:1px solid #ddd; text-align:center; background:#fff; }
+    .tl { text-align:left !important; }
+    tr:hover td { background:#f0f7ff !important; }
+    tr.row-hl td { background:#fff3cd !important; }
+    .sum-row td { background:#e9ecef !important; font-weight:bold; }
+
+    .badge-th { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold; }
+    .badge-th.TH2 { background:#d4edda; color:#155724; }
+    .badge-th.TH3 { background:#cce5ff; color:#004085; }
+    .badge-th.TH4 { background:#f8d7da; color:#721c24; }
+    .badge-vai { display:inline-block; padding:1px 5px; border-radius:6px; font-size:9px; font-weight:bold; }
+    .badge-vai.SX { background:#e3f2fd; color:#1565c0; }
+    .badge-vai.PV { background:#f3e5f5; color:#7b1fa2; }
+
+    .bc5-summary { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:12px; }
+    .bc5-stat { background:#fff; border:1px solid #ddd; border-radius:4px; padding:8px 12px; text-align:center; font-size:10px; color:#555; }
+    .bc5-stat b { display:block; font-size:16px; margin-top:2px; }
+
+    .empty-state { text-align:center; padding:40px; color:#666; font-size:13px; font-style:italic; background:#fafafa; }
+
+    .th-col-grp1 { background:#2980b9 !important; color:#fff !important; }
+    .th-col-grp2 { background:#27ae60 !important; color:#fff !important; }
+    .th-col-grp3 { background:#e67e22 !important; color:#fff !important; }
+    .th-col-grp4 { background:#8e44ad !important; color:#fff !important; }
+    .th-col-grp5 { background:#c0392b !important; color:#fff !important; }
+    .th-col-grp6 { background:#16a085 !important; color:#fff !important; }
+    .th-info { background:#34495e !important; color:#fff !important; }
+
+    .val-final { font-weight:bold; color:#c0392b; font-size:11px; }
+    .val-sum { font-weight:bold; color:#27ae60; }
+    .val-pv { color:#8e44ad; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Lương năng suất › Báo cáo › Báo cáo check NS tính lương</div>
+    <div class="page-title">BÁO CÁO CHECK NS TÍNH LƯƠNG</div>
+
+    <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1b5e20;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:18px">ⓘ</span>
+      <div>
+        <b>Báo cáo check:</b> Hiển thị toàn bộ cột tính toán giống Excel cho từng trường hợp (TH2, TH3, TH4).
+        Xuất Excel để dò và đối chiếu. Mỗi tab = 1 trường hợp với đầy đủ các cột trung gian.
+      </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="form-panel">
+      <div class="fp-grid">
+        <label class="lbl-red">Tháng *</label>
+        <input type="text" id="bc5-thang" value="07/2026" style="width:100px;" placeholder="MM/YYYY">
+        <label>Công ty</label>
+        <select id="bc5-cty"><option value="MPHG" selected>MPHG</option><option value="MPCA">MPCA</option></select>
+        <label>Level 1</label>
+        <select id="bc5-l1"><option>Bộ phận PTO</option><option>Bộ phận Semi-Block</option></select>
+        <label>Level 2</label>
+        <select id="bc5-l2"><option>Ka</option></select>
+      </div>
+      <div class="fp-row2">
+        <label>Level 3</label>
+        <select id="bc5-l3"><option>-- Tất cả --</option><option>Ka Sáng</option><option>Ka Chiều</option></select>
+        <label>Level 4</label>
+        <select id="bc5-l4"><option>-- Tất cả --</option></select>
+        <label>Level 5</label>
+        <select id="bc5-l5"><option>-- Tất cả --</option></select>
+        <label class="lbl-red">Trường hợp *</label>
+        <select id="bc5-th"><option>-- Tất cả --</option><option value="TH2">TH2 — Chung 1 ĐV</option><option value="TH3">TH3 — Chung nhiều ĐV</option><option value="TH4">TH4 — Tách PV</option></select>
+      </div>
+    </div>
+
+    <!-- Sắp xếp tiến trình -->
+    <div class="form-panel" style="background:#f0f4ff; border:1px solid #b3c6e0; padding:12px 15px; margin-bottom:15px;">
+      <div style="font-weight:bold;color:#003366;font-size:12px;margin-bottom:8px;">Sắp xếp tiến trình / quy cách khi xuất báo cáo</div>
+      <div style="display:grid; grid-template-columns:140px 1fr 140px 1fr; gap:8px 12px; align-items:center; font-size:12px;">
+        <label class="lbl-red" style="font-size:12px;">Nguyên tắc sắp xếp (*)</label>
+        <select id="bc5_sort_rule" style="padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">
+          <option value="REPORT_TEMPLATE_ORDER" selected>Theo thứ tự cấu hình báo cáo</option>
+          <option value="PROCESS_NAME">Theo tên tiến trình/công đoạn</option>
+          <option value="PRODUCT_SPEC_GROUP">Theo nhóm sản phẩm/quy cách</option>
+          <option value="SHIFT_TYPE">Theo loại ca</option>
+          <option value="UOM">Theo đơn vị tính</option>
+          <option value="SAP_INTERNAL_CODE">Theo mã SAP / mã nội bộ</option>
+          <option value="QUANTITY_DESC">Theo sản lượng phát sinh giảm dần</option>
+          <option value="HAS_DATA_FIRST">Có phát sinh trước, không phát sinh sau</option>
+          <option value="PROCESS_CODE">Theo mã tiến trình</option>
+          <option value="USER_CUSTOM">Theo cấu hình cá nhân</option>
+        </select>
+        <label class="lbl-red" style="font-size:12px;">Chiều sắp xếp (*)</label>
+        <div style="display:flex;gap:15px;align-items:center;">
+          <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc5_sort_dir" value="ASC" checked> Tăng dần</label>
+          <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="radio" name="bc5_sort_dir" value="DESC"> Giảm dần</label>
+        </div>
+        <label style="font-size:12px;">Ẩn QCTL không phát sinh</label>
+        <label style="font-weight:normal;cursor:pointer;font-size:12px;"><input type="checkbox" id="bc5_hide_empty" checked> Chỉ xuất QCTL có năng suất phát sinh</label>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="bc5-actions">
+      <button onclick="bc5Load()" style="background:#007bff">🔍 Xem báo cáo</button>
+      <button onclick="bc5ExportExcel()" style="background:#28a745">📥 Xuất Excel</button>
+      <button onclick="bc5ExportAll()" style="background:#fd7e14">📥 Xuất tất cả TH</button>
+      <button onclick="bc5Reset()" style="background:#6c757d">🔄 Làm mới</button>
+      <span style="flex:1"></span>
+      <span style="font-size:11px;color:#666">Dữ liệu từ engine Tính Lương NS (fn6)</span>
+    </div>
+
+    <!-- Summary -->
+    <div class="bc5-summary" id="bc5-summary" style="display:none">
+      <div class="bc5-stat">Tổng NV<b id="bc5-s-nv">0</b></div>
+      <div class="bc5-stat">Nhóm NS<b id="bc5-s-nhom">0</b></div>
+      <div class="bc5-stat">NV SX<b id="bc5-s-sx">0</b></div>
+      <div class="bc5-stat">NV PV<b id="bc5-s-pv">0</b></div>
+      <div class="bc5-stat">Σ NS_FINAL<b id="bc5-s-ns">0</b></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bc5-tabs" id="bc5-tabs" style="display:none">
+      <div class="bc5-tab active" onclick="bc5SwitchTab('TH2')" id="bc5-tab-TH2">TH2 — Chung 1 ĐV <span class="cnt" id="bc5-cnt-TH2">0</span></div>
+      <div class="bc5-tab" onclick="bc5SwitchTab('TH3')" id="bc5-tab-TH3">TH3 — Chung nhiều ĐV <span class="cnt" id="bc5-cnt-TH3">0</span></div>
+      <div class="bc5-tab" onclick="bc5SwitchTab('TH4')" id="bc5-tab-TH4">TH4 — Tách PV <span class="cnt" id="bc5-cnt-TH4">0</span></div>
+    </div>
+
+    <!-- TH2 Panel -->
+    <div id="bc5-panel-TH2">
+      <div style="background:#d4edda;border:1px solid #c3e6cb;border-top:none;padding:6px 14px;font-size:11px;color:#155724">
+        <b>TH2:</b> Chung 1 ĐV cấp 5. Công thức: NS_TL = NSTT × (CNS_NV / CNS_Tổng). Tất cả NV trong cùng 1 ĐV chia theo tỷ trọng CNS.
+      </div>
+      <div class="grid-wrap" style="border-top:none" id="bc5-grid-TH2">
+        <div class="empty-state">ⓘ Bấm "Xem báo cáo" để hiển thị.</div>
+      </div>
+    </div>
+
+    <!-- TH3 Panel -->
+    <div id="bc5-panel-TH3" style="display:none">
+      <div style="background:#cce5ff;border:1px solid #b8daff;border-top:none;padding:6px 14px;font-size:11px;color:#004085">
+        <b>TH3:</b> Chung nhiều ĐV cấp 5. Công thức: NS_TL = NSTT × (CNS_NV / CNS_Tổng). NV từ nhiều ĐV cấp 5 chung 1 nhóm NS.
+      </div>
+      <div class="grid-wrap" style="border-top:none" id="bc5-grid-TH3">
+        <div class="empty-state">ⓘ Bấm "Xem báo cáo" để hiển thị.</div>
+      </div>
+    </div>
+
+    <!-- TH4 Panel -->
+    <div id="bc5-panel-TH4" style="display:none">
+      <div style="background:#f8d7da;border:1px solid #f5c6cb;border-top:none;padding:6px 14px;font-size:11px;color:#721c24">
+        <b>TH4:</b> Tách PV. SX nhận NS sau giảm PV, PV nhận phần trích. Nhiều bước trung gian hơn TH2/TH3.
+      </div>
+      <div class="grid-wrap" style="border-top:none" id="bc5-grid-TH4">
+        <div class="empty-state">ⓘ Bấm "Xem báo cáo" để hiển thị.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:15px;border-top:2px dashed #ffd600;padding-top:12px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:6px;font-size:12px;">📋 GHI CHÚ</div>
+      <textarea rows="2" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;box-sizing:border-box;" placeholder="Ghi chú kiểm tra..."></textarea>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // Re-use fn6 engine logic
+    const BC5_NHOM = [
+      { id:"NS-001", ten:"Bàn 1 Ka Sáng", th:"TH2", level5:["CB101"] },
+      { id:"NS-002", ten:"Nhóm NL+PC Ka Sáng", th:"TH3", level5:["NL1PV","PC1T","PC1PV"] },
+      { id:"NS-003", ten:"Nhóm NL+PC Ka Chiều", th:"TH3", level5:["NL2PV","PC2T","PC2PV"] },
+      { id:"NS-004", ten:"Nhóm NO Ka Sáng", th:"TH4", level5:["NO101","NO102","NO103","NO1PV"], pv_level5:["NO1PV"] },
+      { id:"NS-005", ten:"Nhóm Sushi Ka Sáng", th:"TH4", level5:["SU1D101","SU1D102","SU1PV"], pv_level5:["SU1PV"] },
+      { id:"NS-006", ten:"Bàn 2 Ka Sáng", th:"TH2", level5:["CB102"] },
+      { id:"NS-007", ten:"Nhóm CB Ka Sáng", th:"TH3", level5:["CB103","CB104","CB1PV"] },
+      { id:"NS-008", ten:"Nhóm PTO Ka Sáng", th:"TH4", level5:["PTO101","PTO102","PTO1PV"], pv_level5:["PTO1PV"] },
+    ];
+    const nsttBase = {"NS-001":300000,"NS-002":1000000,"NS-003":850000,"NS-004":1500000,"NS-005":900000,"NS-006":250000,"NS-007":700000,"NS-008":600000};
+
+    let BC5_DATA = null;
+
+    function bc5CalcEngine() {
+      const names = ["Nguyễn Văn A","Trần Thị B","Lê Văn C","Phạm Thị D","Hoàng Văn E","Ngô Thị F","Đặng Văn G","Bùi Thị H","Vũ Văn I","Đỗ Thị K","Nguyễn Văn L","Trần Văn M","Lê Thị N","Phạm Văn O","Hoàng Thị P","Đinh Văn Q","Mai Thị R","Lý Văn S","Cao Thị T","Hà Văn U","Trịnh Thị V","Phan Văn W","Dương Thị X","Lương Văn Y","Tạ Thị Z","Châu Văn AA","Huỳnh Thị AB","Tô Văn AC","Thái Thị AD","La Văn AE","Kiều Thị AF","Từ Văn AG","Âu Thị AH","Sơn Văn AI","Kim Thị AK","Ông Văn AL","Bà Thị AM","Quách Văn AN","Mạc Thị AO","Lục Văn AP"];
+      const hsts = [110,100,100,85,90,105,100,102,100,95,108,100,100,88,92,103,100,100,97,100,110,105,100,90,100,100,100,85,100,105,100,100,95,100,100,100,100,100,90,100];
+      const bspvPct = 10;
+      let nvs = [], id = 1;
+
+      BC5_NHOM.forEach(nhom => {
+        const pvL5s = nhom.pv_level5 || [];
+        nhom.level5.forEach(l5 => {
+          const vaiTro = pvL5s.includes(l5) ? "PV" : "SX";
+          const cnt = nhom.th === "TH2" ? 12 : Math.max(3, Math.floor(35 / nhom.level5.length));
+          for (let j = 0; j < Math.min(cnt, 5); j++) {
+            const ni = (id - 1) % names.length;
+            const ctt = +(25 + Math.random() * 3).toFixed(1);
+            const hst = hsts[ni] || 100;
+            let cns;
+            if (vaiTro === "PV" && hst >= 100) cns = ctt * (hst / 100 + bspvPct / 100);
+            else if (vaiTro === "PV") cns = ctt;
+            else cns = ctt * (hst / 100);
+            nvs.push({ stt:id, ma:"NV"+String(id).padStart(3,"0"), ten:names[ni], th:nhom.th, vai_tro:vaiTro, nhom_id:nhom.id, nhom_ten:nhom.ten, level5:l5, ctt, hst, bspv:vaiTro==="PV"?bspvPct:0, cns:+cns.toFixed(3) });
+            id++;
+          }
+        });
+      });
+
+      const nhomMap = {};
+      BC5_NHOM.forEach(n => { nhomMap[n.id] = { ...n, cns_sx:0, cns_pv:0, cns_total:0, nstt:nsttBase[n.id]||500000, ns_giam_pv:0, ns_sau_giam:0, sum_final:0, nv_count:0, nv_sx:0, nv_pv:0 }; });
+      nvs.forEach(nv => { const nh = nhomMap[nv.nhom_id]; if(nv.vai_tro==="SX") nh.cns_sx+=nv.cns; else nh.cns_pv+=nv.cns; nh.cns_total+=nv.cns; nh.nv_count++; if(nv.vai_tro==="SX") nh.nv_sx++; else nh.nv_pv++; });
+
+      Object.values(nhomMap).forEach(nh => {
+        if (nh.th === "TH4") { nh.ns_giam_pv = nh.cns_total > 0 ? nh.nstt * (nh.cns_pv / nh.cns_total) : 0; nh.ns_sau_giam = nh.nstt - nh.ns_giam_pv; }
+        else { nh.ns_sau_giam = nh.nstt; }
+      });
+
+      nvs.forEach(nv => {
+        const nh = nhomMap[nv.nhom_id];
+        if (nv.th === "TH2" || nv.th === "TH3") {
+          nv.ty_trong = nh.cns_total > 0 ? nv.cns / nh.cns_total : 0;
+          nv.ns_final = nh.nstt * nv.ty_trong;
+        } else {
+          if (nv.vai_tro === "SX") { nv.ty_trong = nh.cns_sx > 0 ? nv.cns / nh.cns_sx : 0; nv.ns_final = nh.ns_sau_giam * nv.ty_trong; }
+          else { nv.ty_trong = nh.cns_pv > 0 ? nv.cns / nh.cns_pv : 0; nv.ns_final = nh.ns_giam_pv * nv.ty_trong; }
+        }
+        nv.sl_1_cong = nv.cns > 0 ? nv.ns_final / nv.cns : 0;
+        nh.sum_final += nv.ns_final;
+      });
+
+      BC5_DATA = { nvs, nhomMap };
+    }
+
+    function fmt(n) { return n == null || isNaN(n) ? "—" : n.toLocaleString("vi-VN",{maximumFractionDigits:2}); }
+
+    // ============================================================
+    // RENDER
+    // ============================================================
+    function bc5Render() {
+      if (!BC5_DATA) return;
+      const { nvs, nhomMap } = BC5_DATA;
+      const thRaw = document.getElementById("bc5-th").value;
+      const thFilter = ["TH2","TH3","TH4"].includes(thRaw) ? thRaw : "";
+
+      const th2 = nvs.filter(v => v.th === "TH2");
+      const th3 = nvs.filter(v => v.th === "TH3");
+      const th4 = nvs.filter(v => v.th === "TH4");
+
+      document.getElementById("bc5-cnt-TH2").textContent = th2.length;
+      document.getElementById("bc5-cnt-TH3").textContent = th3.length;
+      document.getElementById("bc5-cnt-TH4").textContent = th4.length;
+
+      const allNvs = thFilter ? nvs.filter(v => v.th === thFilter) : nvs;
+      const nhoms = [...new Set(allNvs.map(v => v.nhom_id))];
+      document.getElementById("bc5-s-nv").textContent = allNvs.length;
+      document.getElementById("bc5-s-nhom").textContent = nhoms.length;
+      document.getElementById("bc5-s-sx").textContent = allNvs.filter(v => v.vai_tro === "SX").length;
+      document.getElementById("bc5-s-pv").textContent = allNvs.filter(v => v.vai_tro === "PV").length;
+      document.getElementById("bc5-s-ns").textContent = fmt(allNvs.reduce((s,v) => s + v.ns_final, 0)) + " Kg";
+      document.getElementById("bc5-summary").style.display = "grid";
+      document.getElementById("bc5-tabs").style.display = "flex";
+
+      bc5RenderTH2(th2, nhomMap);
+      bc5RenderTH3(th3, nhomMap);
+      bc5RenderTH4(th4, nhomMap);
+
+      if (thFilter) bc5SwitchTab(thFilter);
+    }
+
+    function bc5RenderTH2(data, nhomMap) {
+      if (!data.length) { document.getElementById("bc5-grid-TH2").innerHTML = '<div class="empty-state">Không có dữ liệu TH2.</div>'; return; }
+      const grouped = {};
+      data.forEach(v => { if (!grouped[v.nhom_id]) grouped[v.nhom_id] = []; grouped[v.nhom_id].push(v); });
+
+      let html = `<table><thead><tr>
+        <th class="th-info" rowspan="2">STT</th>
+        <th class="th-info" rowspan="2">Mã NV</th>
+        <th class="th-info" rowspan="2" style="min-width:100px">Họ tên</th>
+        <th class="th-info" rowspan="2">Nhóm NS</th>
+        <th class="th-info" rowspan="2">Level 5</th>
+        <th class="th-col-grp1" colspan="4">Công NS</th>
+        <th class="th-col-grp2" colspan="2">Tổng nhóm</th>
+        <th class="th-col-grp3" colspan="2">Tỷ trọng & NS</th>
+        <th class="th-col-grp5" rowspan="2">NS_FINAL<br>(Kg)</th>
+        <th class="th-col-grp6" rowspan="2">SL 1 công<br>(Kg/công)</th>
+      </tr><tr>
+        <th class="th-col-grp1">CTT</th><th class="th-col-grp1">HST%</th><th class="th-col-grp1">BSPV%</th><th class="th-col-grp1">CNS</th>
+        <th class="th-col-grp2">CNS Tổng</th><th class="th-col-grp2">NSTT (Kg)</th>
+        <th class="th-col-grp3">CNS/Tổng</th><th class="th-col-grp3">Công thức</th>
+      </tr></thead><tbody>`;
+
+      let stt = 0;
+      Object.keys(grouped).forEach(nhomId => {
+        const grp = grouped[nhomId];
+        const nh = nhomMap[nhomId];
+        grp.forEach(v => {
+          stt++;
+          html += `<tr><td>${stt}</td><td>${v.ma}</td><td class="tl">${v.ten}</td><td style="font-size:9px" class="tl">${v.nhom_id}<br>${v.nhom_ten}</td><td>${v.level5}</td>
+            <td>${v.ctt}</td><td>${v.hst}%</td><td>${v.bspv||"—"}</td><td style="font-weight:bold">${v.cns.toFixed(3)}</td>
+            <td>${nh.cns_total.toFixed(3)}</td><td>${fmt(nh.nstt)}</td>
+            <td>${(v.ty_trong*100).toFixed(4)}%</td><td style="font-size:9px;text-align:left;font-family:monospace">${fmt(nh.nstt)}×${v.cns.toFixed(3)}/${nh.cns_total.toFixed(3)}</td>
+            <td class="val-final">${fmt(v.ns_final)}</td>
+            <td>${v.sl_1_cong.toFixed(2)}</td></tr>`;
+        });
+        html += `<tr class="sum-row"><td colspan="8" style="text-align:right">Tổng nhóm ${nhomId}</td><td class="val-sum">${nh.cns_total.toFixed(3)}</td><td></td><td>${fmt(nh.nstt)}</td><td>100%</td><td></td><td class="val-final">${fmt(nh.sum_final)}</td><td></td></tr>`;
+        const diff = Math.abs(nh.nstt - nh.sum_final);
+        html += `<tr class="sum-row"><td colspan="13" style="text-align:right;color:${diff<1?'#27ae60':'#c0392b'}">CHECK: NSTT=${fmt(nh.nstt)} | Σ NS_FINAL=${fmt(nh.sum_final)} | ${diff<1?'✅ OK':'❌ Chênh '+fmt(diff)}</td><td></td><td></td></tr>`;
+      });
+      html += '</tbody></table>';
+      document.getElementById("bc5-grid-TH2").innerHTML = html;
+    }
+
+    function bc5RenderTH3(data, nhomMap) {
+      if (!data.length) { document.getElementById("bc5-grid-TH3").innerHTML = '<div class="empty-state">Không có dữ liệu TH3.</div>'; return; }
+      const grouped = {};
+      data.forEach(v => { if (!grouped[v.nhom_id]) grouped[v.nhom_id] = []; grouped[v.nhom_id].push(v); });
+
+      let html = `<table><thead><tr>
+        <th class="th-info" rowspan="2">STT</th>
+        <th class="th-info" rowspan="2">Mã NV</th>
+        <th class="th-info" rowspan="2" style="min-width:100px">Họ tên</th>
+        <th class="th-info" rowspan="2">Nhóm NS</th>
+        <th class="th-info" rowspan="2">Level 5</th>
+        <th class="th-info" rowspan="2">Vai trò</th>
+        <th class="th-col-grp1" colspan="4">Công NS</th>
+        <th class="th-col-grp2" colspan="4">Tổng nhóm (nhiều ĐV)</th>
+        <th class="th-col-grp3" colspan="2">Tỷ trọng & NS</th>
+        <th class="th-col-grp5" rowspan="2">NS_FINAL<br>(Kg)</th>
+        <th class="th-col-grp6" rowspan="2">SL 1 công<br>(Kg/công)</th>
+      </tr><tr>
+        <th class="th-col-grp1">CTT</th><th class="th-col-grp1">HST%</th><th class="th-col-grp1">BSPV%</th><th class="th-col-grp1">CNS</th>
+        <th class="th-col-grp2">CNS SX</th><th class="th-col-grp2">CNS PV</th><th class="th-col-grp2">CNS Tổng</th><th class="th-col-grp2">NSTT (Kg)</th>
+        <th class="th-col-grp3">CNS/Tổng</th><th class="th-col-grp3">Công thức</th>
+      </tr></thead><tbody>`;
+
+      let stt = 0;
+      Object.keys(grouped).forEach(nhomId => {
+        const grp = grouped[nhomId];
+        const nh = nhomMap[nhomId];
+        grp.forEach(v => {
+          stt++;
+          html += `<tr><td>${stt}</td><td>${v.ma}</td><td class="tl">${v.ten}</td><td style="font-size:9px" class="tl">${v.nhom_id}<br>${v.nhom_ten}</td><td>${v.level5}</td><td><span class="badge-vai ${v.vai_tro}">${v.vai_tro}</span></td>
+            <td>${v.ctt}</td><td>${v.hst}%</td><td>${v.bspv||"—"}</td><td style="font-weight:bold">${v.cns.toFixed(3)}</td>
+            <td>${nh.cns_sx.toFixed(3)}</td><td>${nh.cns_pv>0?nh.cns_pv.toFixed(3):"—"}</td><td>${nh.cns_total.toFixed(3)}</td><td>${fmt(nh.nstt)}</td>
+            <td>${(v.ty_trong*100).toFixed(4)}%</td><td style="font-size:9px;text-align:left;font-family:monospace">${fmt(nh.nstt)}×${v.cns.toFixed(3)}/${nh.cns_total.toFixed(3)}</td>
+            <td class="val-final">${fmt(v.ns_final)}</td>
+            <td>${v.sl_1_cong.toFixed(2)}</td></tr>`;
+        });
+        html += `<tr class="sum-row"><td colspan="9" style="text-align:right">Tổng nhóm ${nhomId}</td><td class="val-sum">${nh.cns_total.toFixed(3)}</td><td colspan="3"></td><td>${fmt(nh.nstt)}</td><td>100%</td><td></td><td class="val-final">${fmt(nh.sum_final)}</td><td></td></tr>`;
+        const diff = Math.abs(nh.nstt - nh.sum_final);
+        html += `<tr class="sum-row"><td colspan="16" style="text-align:right;color:${diff<1?'#27ae60':'#c0392b'}">CHECK: NSTT=${fmt(nh.nstt)} | Σ NS_FINAL=${fmt(nh.sum_final)} | ${diff<1?'✅ OK':'❌ Chênh '+fmt(diff)}</td><td></td><td></td></tr>`;
+      });
+      html += '</tbody></table>';
+      document.getElementById("bc5-grid-TH3").innerHTML = html;
+    }
+
+    function bc5RenderTH4(data, nhomMap) {
+      if (!data.length) { document.getElementById("bc5-grid-TH4").innerHTML = '<div class="empty-state">Không có dữ liệu TH4.</div>'; return; }
+      const grouped = {};
+      data.forEach(v => { if (!grouped[v.nhom_id]) grouped[v.nhom_id] = []; grouped[v.nhom_id].push(v); });
+
+      let html = `<table><thead><tr>
+        <th class="th-info" rowspan="2">STT</th>
+        <th class="th-info" rowspan="2">Mã NV</th>
+        <th class="th-info" rowspan="2" style="min-width:100px">Họ tên</th>
+        <th class="th-info" rowspan="2">Nhóm NS</th>
+        <th class="th-info" rowspan="2">Level 5</th>
+        <th class="th-info" rowspan="2">Vai trò</th>
+        <th class="th-col-grp1" colspan="4">Công NS</th>
+        <th class="th-col-grp2" colspan="3">Tổng CNS nhóm</th>
+        <th class="th-col-grp4" colspan="3">Trích PV</th>
+        <th class="th-col-grp3" colspan="3">Chia NS</th>
+        <th class="th-col-grp5" rowspan="2">NS_FINAL<br>(Kg)</th>
+        <th class="th-col-grp6" rowspan="2">SL 1 công<br>(Kg/công)</th>
+      </tr><tr>
+        <th class="th-col-grp1">CTT</th><th class="th-col-grp1">HST%</th><th class="th-col-grp1">BSPV%</th><th class="th-col-grp1">CNS</th>
+        <th class="th-col-grp2">CNS SX</th><th class="th-col-grp2">CNS PV</th><th class="th-col-grp2">CNS Tổng</th>
+        <th class="th-col-grp4">NSTT (Kg)</th><th class="th-col-grp4">NS Giảm PV</th><th class="th-col-grp4">NS Sau Giảm</th>
+        <th class="th-col-grp3">Mẫu số</th><th class="th-col-grp3">Tỷ trọng</th><th class="th-col-grp3">Công thức</th>
+      </tr></thead><tbody>`;
+
+      let stt = 0;
+      Object.keys(grouped).forEach(nhomId => {
+        const grp = grouped[nhomId];
+        const nh = nhomMap[nhomId];
+        const sx = grp.filter(v => v.vai_tro === "SX");
+        const pv = grp.filter(v => v.vai_tro === "PV");
+
+        // SX rows
+        sx.forEach(v => {
+          stt++;
+          html += `<tr><td>${stt}</td><td>${v.ma}</td><td class="tl">${v.ten}</td><td style="font-size:9px" class="tl">${v.nhom_id}<br>${v.nhom_ten}</td><td>${v.level5}</td><td><span class="badge-vai SX">SX</span></td>
+            <td>${v.ctt}</td><td>${v.hst}%</td><td>${v.bspv||"—"}</td><td style="font-weight:bold">${v.cns.toFixed(3)}</td>
+            <td>${nh.cns_sx.toFixed(3)}</td><td>${nh.cns_pv.toFixed(3)}</td><td>${nh.cns_total.toFixed(3)}</td>
+            <td>${fmt(nh.nstt)}</td><td class="val-pv">${fmt(nh.ns_giam_pv)}</td><td>${fmt(nh.ns_sau_giam)}</td>
+            <td>CNS_SX=${nh.cns_sx.toFixed(3)}</td><td>${(v.ty_trong*100).toFixed(4)}%</td>
+            <td style="font-size:9px;text-align:left;font-family:monospace">${fmt(nh.ns_sau_giam)}×${v.cns.toFixed(3)}/${nh.cns_sx.toFixed(3)}</td>
+            <td class="val-final">${fmt(v.ns_final)}</td>
+            <td>${v.sl_1_cong.toFixed(2)}</td></tr>`;
+        });
+        // Subtotal SX
+        const sumSX = sx.reduce((s,v) => s + v.ns_final, 0);
+        html += `<tr class="sum-row" style="background:#e3f2fd!important"><td colspan="9" style="text-align:right;color:#1565c0">Tổng SX ${nhomId}</td><td class="val-sum">${nh.cns_sx.toFixed(3)}</td><td colspan="8"></td><td style="color:#1565c0;font-weight:bold">${fmt(sumSX)}</td><td></td></tr>`;
+
+        // PV rows
+        pv.forEach(v => {
+          stt++;
+          html += `<tr style="background:#faf0ff"><td>${stt}</td><td>${v.ma}</td><td class="tl">${v.ten}</td><td style="font-size:9px" class="tl">${v.nhom_id}<br>${v.nhom_ten}</td><td>${v.level5}</td><td><span class="badge-vai PV">PV</span></td>
+            <td>${v.ctt}</td><td>${v.hst}%</td><td>${v.bspv}%</td><td style="font-weight:bold">${v.cns.toFixed(3)}</td>
+            <td>${nh.cns_sx.toFixed(3)}</td><td>${nh.cns_pv.toFixed(3)}</td><td>${nh.cns_total.toFixed(3)}</td>
+            <td>${fmt(nh.nstt)}</td><td class="val-pv">${fmt(nh.ns_giam_pv)}</td><td>${fmt(nh.ns_sau_giam)}</td>
+            <td>CNS_PV=${nh.cns_pv.toFixed(3)}</td><td>${(v.ty_trong*100).toFixed(4)}%</td>
+            <td style="font-size:9px;text-align:left;font-family:monospace">${fmt(nh.ns_giam_pv)}×${v.cns.toFixed(3)}/${nh.cns_pv.toFixed(3)}</td>
+            <td class="val-final">${fmt(v.ns_final)}</td>
+            <td>${v.sl_1_cong.toFixed(2)}</td></tr>`;
+        });
+        const sumPV = pv.reduce((s,v) => s + v.ns_final, 0);
+        if (pv.length) html += `<tr class="sum-row" style="background:#f3e5f5!important"><td colspan="9" style="text-align:right;color:#7b1fa2">Tổng PV ${nhomId}</td><td class="val-pv">${nh.cns_pv.toFixed(3)}</td><td colspan="8"></td><td style="color:#7b1fa2;font-weight:bold">${fmt(sumPV)}</td><td></td></tr>`;
+
+        // Check row
+        const diff = Math.abs(nh.nstt - nh.sum_final);
+        html += `<tr class="sum-row"><td colspan="13" style="text-align:right;font-weight:bold">Tổng nhóm ${nhomId}</td><td>${fmt(nh.nstt)}</td><td class="val-pv">${fmt(nh.ns_giam_pv)}</td><td>${fmt(nh.ns_sau_giam)}</td><td colspan="3"></td><td class="val-final">${fmt(nh.sum_final)}</td><td></td></tr>`;
+        html += `<tr class="sum-row"><td colspan="19" style="text-align:right;color:${diff<1?'#27ae60':'#c0392b'}">CHECK: NSTT=${fmt(nh.nstt)} | Σ SX=${fmt(sumSX)} + Σ PV=${fmt(sumPV)} = ${fmt(sumSX+sumPV)} | ${diff<1?'✅ OK':'❌ Chênh '+fmt(diff)}</td><td></td><td></td></tr>`;
+      });
+      html += '</tbody></table>';
+      document.getElementById("bc5-grid-TH4").innerHTML = html;
+    }
+
+    // ============================================================
+    // TAB SWITCH
+    // ============================================================
+    function bc5SwitchTab(th) {
+      ["TH2","TH3","TH4"].forEach(t => {
+        document.getElementById("bc5-panel-" + t).style.display = t === th ? "block" : "none";
+        document.getElementById("bc5-tab-" + t).className = t === th ? "bc5-tab active" : "bc5-tab";
+      });
+    }
+
+    // ============================================================
+    // ACTIONS
+    // ============================================================
+    function bc5Load() {
+      bc5CalcEngine();
+      bc5Render();
+    }
+
+    function bc5Reset() {
+      BC5_DATA = null;
+      ["TH2","TH3","TH4"].forEach(t => {
+        document.getElementById("bc5-grid-" + t).innerHTML = '<div class="empty-state">ⓘ Bấm "Xem báo cáo" để hiển thị.</div>';
+        document.getElementById("bc5-cnt-" + t).textContent = "0";
+      });
+      document.getElementById("bc5-summary").style.display = "none";
+      document.getElementById("bc5-tabs").style.display = "none";
+    }
+
+    // ============================================================
+    // EXPORT EXCEL (CSV UTF-8 BOM)
+    // ============================================================
+    function bc5ExportExcel() {
+      if (!BC5_DATA) { alert("Chưa có dữ liệu. Bấm Xem báo cáo trước."); return; }
+      const thRaw2 = document.getElementById("bc5-th").value;
+      const th = ["TH2","TH3","TH4"].includes(thRaw2) ? thRaw2 : "ALL";
+      const thang = document.getElementById("bc5-thang").value.replace("/","-");
+
+      if (th === "ALL") { bc5ExportAll(); return; }
+      const data = BC5_DATA.nvs.filter(v => v.th === th);
+      const csv = bc5BuildCsv(th, data, BC5_DATA.nhomMap);
+      bc5Download(csv, `BC_Check_NS_${th}_${thang}.csv`);
+    }
+
+    function bc5ExportAll() {
+      if (!BC5_DATA) { alert("Chưa có dữ liệu."); return; }
+      const thang = document.getElementById("bc5-thang").value.replace("/","-");
+      ["TH2","TH3","TH4"].forEach(th => {
+        const data = BC5_DATA.nvs.filter(v => v.th === th);
+        if (data.length) { const csv = bc5BuildCsv(th, data, BC5_DATA.nhomMap); bc5Download(csv, `BC_Check_NS_${th}_${thang}.csv`); }
+      });
+    }
+
+    function bc5BuildCsv(th, data, nhomMap) {
+      let csv = '﻿';
+      csv += `BÁO CÁO CHECK NS TÍNH LƯƠNG — ${th}\r\n`;
+      csv += `Tháng,${document.getElementById("bc5-thang").value}\r\n\r\n`;
+
+      const grouped = {};
+      data.forEach(v => { if (!grouped[v.nhom_id]) grouped[v.nhom_id] = []; grouped[v.nhom_id].push(v); });
+
+      if (th === "TH2") {
+        csv += `STT,Mã NV,Họ tên,Nhóm NS,Tên nhóm,Level 5,CTT,HST%,BSPV%,CNS,CNS Tổng nhóm,NSTT (Kg),Tỷ trọng%,NS_FINAL (Kg),SL 1 công (Kg/công)\r\n`;
+        let stt = 0;
+        Object.keys(grouped).forEach(nhomId => {
+          const nh = nhomMap[nhomId];
+          grouped[nhomId].forEach(v => { stt++; csv += `${stt},${v.ma},${v.ten},${v.nhom_id},${v.nhom_ten},${v.level5},${v.ctt},${v.hst},${v.bspv},${v.cns.toFixed(3)},${nh.cns_total.toFixed(3)},${nh.nstt},${(v.ty_trong*100).toFixed(4)},${v.ns_final.toFixed(2)},${v.sl_1_cong.toFixed(2)}\r\n`; });
+          csv += `,,,,,TỔNG ${nhomId},,,,${nh.cns_total.toFixed(3)},,${nh.nstt},100%,${nh.sum_final.toFixed(2)},\r\n`;
+          csv += `,,,,,CHECK,NSTT=${nh.nstt},Σ=${nh.sum_final.toFixed(2)},Chênh=${Math.abs(nh.nstt-nh.sum_final).toFixed(2)},,,,,,\r\n`;
+        });
+      } else if (th === "TH3") {
+        csv += `STT,Mã NV,Họ tên,Nhóm NS,Tên nhóm,Level 5,Vai trò,CTT,HST%,BSPV%,CNS,CNS SX,CNS PV,CNS Tổng,NSTT (Kg),Tỷ trọng%,NS_FINAL (Kg),SL 1 công\r\n`;
+        let stt = 0;
+        Object.keys(grouped).forEach(nhomId => {
+          const nh = nhomMap[nhomId];
+          grouped[nhomId].forEach(v => { stt++; csv += `${stt},${v.ma},${v.ten},${v.nhom_id},${v.nhom_ten},${v.level5},${v.vai_tro},${v.ctt},${v.hst},${v.bspv},${v.cns.toFixed(3)},${nh.cns_sx.toFixed(3)},${nh.cns_pv.toFixed(3)},${nh.cns_total.toFixed(3)},${nh.nstt},${(v.ty_trong*100).toFixed(4)},${v.ns_final.toFixed(2)},${v.sl_1_cong.toFixed(2)}\r\n`; });
+          csv += `,,,,,,TỔNG ${nhomId},,,,${nh.cns_total.toFixed(3)},${nh.cns_sx.toFixed(3)},${nh.cns_pv.toFixed(3)},${nh.cns_total.toFixed(3)},${nh.nstt},100%,${nh.sum_final.toFixed(2)},\r\n`;
+        });
+      } else {
+        csv += `STT,Mã NV,Họ tên,Nhóm NS,Tên nhóm,Level 5,Vai trò,CTT,HST%,BSPV%,CNS,CNS SX,CNS PV,CNS Tổng,NSTT (Kg),NS Giảm PV (Kg),NS Sau Giảm (Kg),Mẫu số,Tỷ trọng%,NS_FINAL (Kg),SL 1 công\r\n`;
+        let stt = 0;
+        Object.keys(grouped).forEach(nhomId => {
+          const nh = nhomMap[nhomId];
+          const grp = grouped[nhomId];
+          const sx = grp.filter(v => v.vai_tro === "SX");
+          const pv = grp.filter(v => v.vai_tro === "PV");
+          sx.forEach(v => { stt++; csv += `${stt},${v.ma},${v.ten},${v.nhom_id},${v.nhom_ten},${v.level5},SX,${v.ctt},${v.hst},${v.bspv},${v.cns.toFixed(3)},${nh.cns_sx.toFixed(3)},${nh.cns_pv.toFixed(3)},${nh.cns_total.toFixed(3)},${nh.nstt},${nh.ns_giam_pv.toFixed(2)},${nh.ns_sau_giam.toFixed(2)},CNS_SX=${nh.cns_sx.toFixed(3)},${(v.ty_trong*100).toFixed(4)},${v.ns_final.toFixed(2)},${v.sl_1_cong.toFixed(2)}\r\n`; });
+          csv += `,,,,,,Tổng SX,,,,${nh.cns_sx.toFixed(3)},,,,,,,,,,${sx.reduce((s,v)=>s+v.ns_final,0).toFixed(2)},\r\n`;
+          pv.forEach(v => { stt++; csv += `${stt},${v.ma},${v.ten},${v.nhom_id},${v.nhom_ten},${v.level5},PV,${v.ctt},${v.hst},${v.bspv},${v.cns.toFixed(3)},${nh.cns_sx.toFixed(3)},${nh.cns_pv.toFixed(3)},${nh.cns_total.toFixed(3)},${nh.nstt},${nh.ns_giam_pv.toFixed(2)},${nh.ns_sau_giam.toFixed(2)},CNS_PV=${nh.cns_pv.toFixed(3)},${(v.ty_trong*100).toFixed(4)},${v.ns_final.toFixed(2)},${v.sl_1_cong.toFixed(2)}\r\n`; });
+          if (pv.length) csv += `,,,,,,Tổng PV,,,,${nh.cns_pv.toFixed(3)},,,,,,,,,,${pv.reduce((s,v)=>s+v.ns_final,0).toFixed(2)},\r\n`;
+          csv += `,,,,,,TỔNG NHÓM ${nhomId},,,,${nh.cns_total.toFixed(3)},,,,${nh.nstt},${nh.ns_giam_pv.toFixed(2)},${nh.ns_sau_giam.toFixed(2)},,,${nh.sum_final.toFixed(2)},\r\n`;
+        });
+      }
+      return csv;
+    }
+
+    function bc5Download(csv, filename) {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

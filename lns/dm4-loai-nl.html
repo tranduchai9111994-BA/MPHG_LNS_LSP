@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Danh mục Loại nguyên liệu</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Tính Lương năng suất › Danh mục › Loại nguyên liệu</div>
+  <div class="page-title">DANH MỤC LOẠI NGUYÊN LIỆU</div>
+  <div id="dm4-alert" class="alert-box"></div>
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Mã NL</label>
+      <div class="input-wrap"><input type="text" id="dm4_ma" maxlength="20" placeholder="Nhập mã..."><div class="input-note">Unique. Không dấu, không khoảng trắng. VD: TH, VR, SO</div></div>
+      <label class="lbl-red">Loại nguyên liệu</label>
+      <input type="text" id="dm4_loai" maxlength="100" placeholder="Tên loại nguyên liệu... VD: Thường, Sạch virus, Sống">
+      <label>Ghi chú</label>
+      <textarea id="dm4_note" maxlength="500" style="height:50px;" placeholder="Nhập ghi chú..."></textarea>
+      <label></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="dm4_use" checked> Sử dụng?</label>
+    </div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-search">Tìm Kiếm</button><button class="btn-refresh" onclick="dm4Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="dm4Save()">Lưu</button><button class="btn-delete" onclick="dm4Delete()">Xóa</button>
+    <button class="btn-import" onclick="showModal('dm4-imp')">Nhập dữ liệu</button><button class="btn-export">Xuất dữ liệu</button>
+  </div>
+  <div class="grid-wrap"><table>
+    <thead><tr><th><input type="checkbox" id="dm4-chkAll" onchange="toggleAll('dm4-chkAll','.dm4-chk')"></th><th>Sửa</th><th>STT</th><th>Mã NL</th><th>Loại nguyên liệu</th><th>Ghi chú</th><th>Sử dụng</th></tr></thead>
+    <tbody id="dm4-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-overlay" id="dm4-imp"><div class="modal-box">
+  <div class="modal-hdr cyan"><span>IMPORT DANH MỤC LOẠI NGUYÊN LIỆU</span><button class="x" onclick="hideModal('dm4-imp')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:#f9f9f9;padding:8px;margin-bottom:12px;font-size:11px;border:1px dashed #999;"><strong>Rule Import:</strong><br>
+      1. Mã NL tồn tại → UPDATE Loại nguyên liệu<br>
+      2. Mã NL chưa tồn tại → INSERT mới<br>
+      <span style="color:red">3. Mã trùng trong file → DỪNG, báo lỗi dòng đầu tiên trùng.</span>
+    </div>
+    <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;"><a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+  </div>
+  <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('dm4-imp')">Đóng</button><button class="btn-ok" onclick="hideModal('dm4-imp');showAlert2('dm4-alert','Import thành công!','success')">Thực hiện Import</button></div>
+</div></div>
+
+<!-- VÍ DỤ MẪU dm4 -->
+<div style="margin-top:18px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:6px;padding:14px 16px;">
+  <div style="font-weight:bold;color:#1b5e20;font-size:12px;margin-bottom:10px;">
+    💡 VÍ DỤ MẪU – Danh mục Loại nguyên liệu (tham khảo khi nhập liệu)
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:11px;">
+    <thead>
+      <tr style="background:#c8e6c9;">
+        <th style="padding:5px 8px;text-align:center;border:1px solid #a5d6a7;width:36px;">STT</th>
+        <th style="padding:5px 8px;text-align:center;border:1px solid #a5d6a7;width:80px;">Mã NL</th>
+        <th style="padding:5px 8px;text-align:left;border:1px solid #a5d6a7;">Loại NL</th>
+        <th style="padding:5px 8px;text-align:left;border:1px solid #a5d6a7;">Ghi chú</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#fff;">
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;text-align:center;">1</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;text-align:center;font-weight:bold;color:#1565c0;">TH</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;">Thường</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;color:#555;">Nguyên liệu thông thường, không qua xử lý đặc biệt</td>
+      </tr>
+      <tr style="background:#f1f8e9;">
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;text-align:center;">2</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;text-align:center;font-weight:bold;color:#1565c0;">VR</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;">Sạch virus</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;color:#555;">Nguyên liệu đã kiểm tra âm tính virus – tiêu chuẩn xuất khẩu</td>
+      </tr>
+      <tr style="background:#fff;">
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;text-align:center;">3</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;text-align:center;font-weight:bold;color:#1565c0;">SO</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;">Sống</td>
+        <td style="padding:4px 8px;border:1px solid #a5d6a7;color:#555;">Nguyên liệu còn sống khi tiếp nhận vào xưởng</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:10px;background:#f1f8e9;border:1px solid #a5d6a7;border-radius:4px;padding:8px 12px;font-size:11px;color:#33691e;">
+    <strong>⚠️ Lưu ý nghiệp vụ:</strong>
+    <ul style="margin:4px 0 0 16px;padding:0;">
+      <li>Mã NL dùng để phân loại <strong>chất lượng nguyên liệu đầu vào</strong> khi ghi nhận sản lượng.</li>
+      <li>Loại nguyên liệu ảnh hưởng đến <strong>đơn giá lương</strong> (NL sạch virus thường có đơn giá cao hơn).</li>
+      <li>Không xóa mã đang tham chiếu trong dữ liệu sản lượng thực tế.</li>
+    </ul>
+  </div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+    function toggleAll(masterChk, selector) {
+      const checked = document.getElementById(masterChk).checked;
+      document.querySelectorAll(selector).forEach(c => c.checked = checked);
+    }
+
+    let dm4Data = [
+      { id:1, ma:'TH', loai:'Thường',      note:'Nguyên liệu thông thường, không qua xử lý đặc biệt',       use:true },
+      { id:2, ma:'VR', loai:'Sạch virus',  note:'Nguyên liệu đã kiểm tra âm tính virus – tiêu chuẩn XK',   use:true },
+      { id:3, ma:'SO', loai:'Sống',         note:'Nguyên liệu còn sống khi tiếp nhận vào xưởng',            use:true }
+    ];
+    let dm4NextId = 4;
+
+    function dm4Render() {
+      const tbody = document.getElementById('dm4-tbody');
+      tbody.innerHTML = '';
+      dm4Data.forEach((r, i) => {
+        tbody.innerHTML += `<tr>
+          <td><input type="checkbox" class="dm4-chk" value="${r.id}"></td>
+          <td><span class="edit-icon" onclick="dm4EditById(${r.id})">✎</span></td>
+          <td>${i+1}</td>
+          <td><b style="color:#1565c0">${r.ma}</b></td>
+          <td>${r.loai}</td>
+          <td>${r.note}</td>
+          <td style="color:${r.use?'green':'#aaa'};font-weight:bold">${r.use?'✔':'✘'}</td>
+        </tr>`;
+      });
+    }
+
+    function dm4Clear() {
+      document.getElementById('dm4_ma').value = '';
+      document.getElementById('dm4_ma').readOnly = false;
+      document.getElementById('dm4_loai').value = '';
+      document.getElementById('dm4_note').value = '';
+      document.getElementById('dm4_use').checked = true;
+      document.getElementById('dm4-alert').style.display = 'none';
+    }
+
+    function dm4EditById(id) {
+      const r = dm4Data.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('dm4_ma').value = r.ma;
+      document.getElementById('dm4_ma').readOnly = true;
+      document.getElementById('dm4_loai').value = r.loai;
+      document.getElementById('dm4_note').value = r.note;
+      document.getElementById('dm4_use').checked = r.use;
+      window.scrollTo(0, 0);
+      showAlert2('dm4-alert', "Đang ở chế độ Cập nhật. Sửa thông tin và bấm 'Lưu'.", 'success');
+    }
+
+    function dm4Save() {
+      const ma = document.getElementById('dm4_ma').value.trim().toUpperCase();
+      const loai = document.getElementById('dm4_loai').value.trim();
+      const note = document.getElementById('dm4_note').value.trim();
+      const use = document.getElementById('dm4_use').checked;
+      const isEdit = document.getElementById('dm4_ma').readOnly;
+      if (!ma || !loai) return showAlert2('dm4-alert', 'Vui lòng nhập đầy đủ Mã NL và Loại nguyên liệu.', 'error');
+      if (!/^[a-zA-Z0-9]+$/.test(ma)) return showAlert2('dm4-alert', 'Mã NL không hợp lệ (chỉ chữ/số, không dấu).', 'error');
+      if (!isEdit && dm4Data.find(x => x.ma === ma)) return showAlert2('dm4-alert', '<b>Lỗi:</b> Mã [' + ma + '] đã tồn tại.', 'error');
+      if (isEdit) {
+        const r = dm4Data.find(x => x.ma === ma);
+        if (r) { r.loai = loai; r.note = note; r.use = use; }
+        showAlert2('dm4-alert', 'Cập nhật Loại nguyên liệu thành công!', 'success');
+      } else {
+        dm4Data.push({ id: dm4NextId++, ma, loai, note, use });
+        showAlert2('dm4-alert', 'Thêm mới Loại nguyên liệu thành công!', 'success');
+      }
+      dm4Render();
+      dm4Clear();
+    }
+
+    function dm4Delete() {
+      const chks = document.querySelectorAll('.dm4-chk:checked');
+      if (!chks.length) return showAlert2('dm4-alert', 'Vui lòng chọn dòng cần xóa.', 'warning');
+      if (confirm(`Xóa ${chks.length} loại NL đã chọn?`)) {
+        const ids = Array.from(chks).map(c => parseInt(c.value));
+        dm4Data = dm4Data.filter(x => !ids.includes(x.id));
+        dm4Render();
+        showAlert2('dm4-alert', 'Đã xóa thành công.', 'success');
+      }
+    }
+
+    dm4Render();
+  </script>
+</body>
+</html>
