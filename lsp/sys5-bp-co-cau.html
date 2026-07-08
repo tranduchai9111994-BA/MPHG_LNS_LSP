@@ -253,6 +253,7 @@
         <button class="btn-refresh" onclick="doRefresh()">Làm mới</button>
         <button class="btn-save" onclick="openPopupAdd()">Thêm mới</button>
         <button class="btn-export">Xuất</button>
+        <button class="btn-import" onclick="doImport()">Nhập dữ liệu</button>
         <button class="btn-delete" onclick="doDeleteSelected()">Xóa dữ liệu</button>
     </div>
 
@@ -543,6 +544,18 @@ function doDeleteSelected() {
     filteredData = filteredData.filter(r => !ids.includes(r.id));
     renderGrid();
     showAlert('alertBox', `Đã xóa ${ids.length} bản ghi.`, 'success');
+}
+
+function doImport() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx,.xls,.csv';
+    input.onchange = () => {
+        if (input.files.length) {
+            showAlert('alertBox', `Đã chọn file: ${input.files[0].name}. (Chức năng nhập dữ liệu đang phát triển)`, 'success');
+        }
+    };
+    input.click();
 }
 
 // ---- CHECKBOX ALL ----
