@@ -254,6 +254,7 @@
         <button class="btn-save" onclick="openPopupAdd()">Thêm mới</button>
         <button class="btn-export">Xuất</button>
         <button class="btn-import" onclick="doImport()">Nhập dữ liệu</button>
+        <button class="btn-export" onclick="doExportTemplate()">Xuất DL import</button>
         <button class="btn-delete" onclick="doDeleteSelected()">Xóa dữ liệu</button>
     </div>
 
@@ -544,6 +545,10 @@ function doDeleteSelected() {
     filteredData = filteredData.filter(r => !ids.includes(r.id));
     renderGrid();
     showAlert('alertBox', `Đã xóa ${ids.length} bản ghi.`, 'success');
+}
+
+function doExportTemplate() {
+    showAlert('alertBox', 'Đang xuất file mẫu import... (Chức năng đang phát triển)', 'success');
 }
 
 function doImport() {
