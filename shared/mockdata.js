@@ -285,6 +285,39 @@ window.MOCK = {
         ]
     },
 
+    // Danh mục dùng chung LSP
+    nhomTinhLuong: [
+        { ma: "NTL01", ten: "Hệ số",                          suDung: true },
+        { ma: "NTL02", ten: "Năng suất",                      suDung: true },
+        { ma: "NTL03", ten: "Bình quân lương sản phẩm",       suDung: true },
+        { ma: "NTL04", ten: "Bình quân ca bàn chuyền",        suDung: true },
+        { ma: "NTL05", ten: "Hệ số điều chỉnh đặc biệt",     suDung: true }
+    ],
+    bpBangKe: [
+        { id: 1, ma: "BPBK001", ten: "Băng chuyền K1",        suDung: true, note: "" },
+        { id: 2, ma: "BPBK002", ten: "Băng chuyền K2",        suDung: true, note: "" },
+        { id: 3, ma: "BPBK003", ten: "Chế biến K1",           suDung: true, note: "" },
+        { id: 4, ma: "BPBK004", ten: "Chế biến K2",           suDung: true, note: "" },
+        { id: 5, ma: "BPBK005", ten: "PTO K1",                suDung: true, note: "" },
+        { id: 6, ma: "BPBK006", ten: "PTO K2",                suDung: true, note: "" },
+        { id: 7, ma: "BPBK007", ten: "Tẩm bột",              suDung: true, note: "" },
+        { id: 8, ma: "BPBK008", ten: "Xuất hàng Tp",          suDung: true, note: "" },
+        { id: 9, ma: "BPBK009", ten: "Phân cỡ tay",           suDung: true, note: "" },
+        { id:10, ma: "BPBK010", ten: "Vệ sinh khuôn viên",    suDung: true, note: "" }
+    ],
+    bpTinhLuong: [
+        { id: 1, ma: "BPTL001", ten: "Bộ phận PTO",           suDung: true, note: "" },
+        { id: 2, ma: "BPTL002", ten: "Bộ phận Tẩm bột",       suDung: true, note: "" },
+        { id: 3, ma: "BPTL003", ten: "Bộ phận Chiên",         suDung: true, note: "" },
+        { id: 4, ma: "BPTL004", ten: "Bộ phận Chế biến",      suDung: true, note: "" },
+        { id: 5, ma: "BPTL005", ten: "Bộ phận Sơ chế",        suDung: true, note: "" },
+        { id: 6, ma: "BPTL006", ten: "Bộ phận Đóng gói",      suDung: true, note: "" },
+        { id: 7, ma: "BPTL007", ten: "Bộ phận Kho lạnh",      suDung: true, note: "" },
+        { id: 8, ma: "BPTL008", ten: "Bộ phận Luộc / Hấp",    suDung: true, note: "" },
+        { id: 9, ma: "BPTL009", ten: "Bộ phận Hàng GTGT",     suDung: true, note: "" },
+        { id:10, ma: "BPTL010", ten: "Bộ phận Xuất hàng",     suDung: true, note: "" }
+    ],
+
     // System data
     sys: {
         tieuChiTimKiem: [

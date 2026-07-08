@@ -3,13 +3,16 @@ window.NAV_CONFIG = {
     {
       title: "LSP · Danh mục",
       items: [
-        { id: "lsp_dm1", label: "Nhóm lương", src: "lsp/dm1-nhom-luong.html" },
-        { id: "lsp_dm2", label: "Nhóm tính lương", src: "lsp/dm2-nhom-tinh-luong.html" },
+        { id: "lsp_dm1",  label: "Nhóm lương",       src: "lsp/dm1-nhom-luong.html" },
+        { id: "lsp_dm2",  label: "Nhóm tính lương",  src: "lsp/dm2-nhom-tinh-luong.html" },
+        { id: "lsp_dm3",  label: "Bộ phận bảng kê",   src: "lsp/dm3-bp-bang-ke.html" },
+        { id: "lsp_dm4",  label: "Bộ phận tính lương", src: "lsp/dm4-bp-tinh-luong.html" },
       ]
     },
     {
       title: "LSP · Thiết lập",
       items: [
+        { id: "sys5", label: "Thiết lập BP tính lương theo cơ cấu", src: "lsp/sys5-bp-co-cau.html" },
         { id: "dm7", label: "Quy cách tính lương",    src: "lns/dm7-quy-cach.html" },
         { id: "pg8", label: "Hỗ trợ quy cách tính lương",     src: "lsp/pg8-ho-tro-cd.html" },
         { id: "pg8_1", label: "Hỗ trợ Độc hại chiên", src: "lsp/pg8-ho-tro-cd-chien.html" },

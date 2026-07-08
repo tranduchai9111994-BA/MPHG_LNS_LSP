@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Bộ phận bảng kê</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+<!-- TOP HEADER -->
+<div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+        <span>🇻🇳 VN ⌄</span>
+        <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+        <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+        <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+</div>
+
+<!-- MAIN MENU -->
+<div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+</div>
+
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương Sản Phẩm › Danh mục › Bộ phận bảng kê</div>
+    <div class="page-title">BỘ PHẬN BẢNG KÊ</div>
+    <div id="alertBox" class="alert-box"></div>
+
+    <!-- FORM -->
+    <div class="form-panel">
+        <div style="display:grid;grid-template-columns:130px 1fr 130px 1fr;gap:10px 20px;align-items:center;">
+            <input type="hidden" id="txtEditId">
+            <label class="lbl-red">Mã</label>
+            <input type="text" id="txtMa" maxlength="20" placeholder="VD: BPBK001" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;">
+            <label>Sử dụng?</label>
+            <input type="checkbox" id="chkSuDung" checked style="width:16px;height:16px;">
+
+            <label class="lbl-red">Tên</label>
+            <input type="text" id="txtTen" maxlength="100" placeholder="Nhập tên bộ phận bảng kê" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;">
+            <label></label><span></span>
+
+            <label>Ghi chú</label>
+            <input type="text" id="txtGhiChu" maxlength="200" placeholder="Ghi chú (không bắt buộc)" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;grid-column:2/5;">
+        </div>
+    </div>
+
+    <!-- ACTIONS BAR -->
+    <div class="actions-bar">
+        <button class="btn-search" onclick="doSearch()">Tìm Kiếm</button>
+        <button class="btn-refresh" onclick="clearForm()">Làm mới</button>
+        <button class="btn-save" onclick="saveData()">Lưu</button>
+        <button class="btn-delete" onclick="deleteData()">Xóa</button>
+        <button class="btn-export" onclick="alert('Xuất dữ liệu...')">Xuất dữ liệu</button>
+        <button class="btn-import" onclick="alert('Nhập dữ liệu...')">Nhập dữ liệu</button>
+    </div>
+
+    <!-- DATA GRID -->
+    <div class="grid-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="chkAll" onchange="toggleAll()"></th>
+                    <th>STT</th>
+                    <th>Sửa</th>
+                    <th>Mã</th>
+                    <th>Tên bộ phận bảng kê</th>
+                    <th>Sử dụng</th>
+                    <th>Ghi chú</th>
+                    <th>Người tạo</th>
+                    <th>Ngày tạo</th>
+                    <th>Người sửa</th>
+                    <th>Ngày sửa</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- GHI CHÚ NGHIỆP VỤ -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;"
+            placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+        <div style="text-align:right;margin-top:6px;">
+            <button class="btn-save2" style="font-size:11px;padding:4px 14px;" onclick="showAlert('alertBox','Đã lưu ghi chú.','success')">💾 Lưu ghi chú</button>
+        </div>
+    </div>
+</div>
+
+<script src="../shared/mockdata.js"></script>
+<script src="../shared/utils.js"></script>
+<script>
+const CURRENT_USER = 'FPT Admin';
+function nowStr() {
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+let DATA = (window.MOCK.bpBangKe || []).map((r, i) => ({
+    id: r.id,
+    ma: r.ma,
+    ten: r.ten,
+    suDung: r.suDung,
+    ghiChu: r.note || '',
+    nguoiTao: 'FPT Admin',
+    ngayTao: '01/06/2026 08:00',
+    nguoiSua: '',
+    ngaySua: ''
+}));
+
+let filteredData = [...DATA];
+let nextId = DATA.length + 1;
+const existingMa = DATA.map(r => r.ma);
+
+function renderGrid() {
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = filteredData.map((r, i) => `
+        <tr>
+            <td style="text-align:center"><input type="checkbox" class="chk-row" value="${r.id}"></td>
+            <td style="text-align:center">${i + 1}</td>
+            <td style="text-align:center"><span class="edit-icon" onclick="startEdit(${r.id})">✎</span></td>
+            <td><b>${r.ma}</b></td>
+            <td>${r.ten}</td>
+            <td style="text-align:center">${r.suDung ? 'X' : ''}</td>
+            <td>${r.ghiChu}</td>
+            <td>${r.nguoiTao}</td>
+            <td>${r.ngayTao}</td>
+            <td>${r.nguoiSua}</td>
+            <td>${r.ngaySua}</td>
+        </tr>
+    `).join('');
+}
+
+function doSearch() {
+    const q = document.getElementById('txtMa').value.trim().toLowerCase();
+    const t = document.getElementById('txtTen').value.trim().toLowerCase();
+    filteredData = DATA.filter(r =>
+        (!q || r.ma.toLowerCase().includes(q)) &&
+        (!t || r.ten.toLowerCase().includes(t))
+    );
+    renderGrid();
+    showAlert('alertBox', `Tìm thấy ${filteredData.length} bản ghi.`, 'success');
+}
+
+function clearForm() {
+    document.getElementById('txtEditId').value = '';
+    document.getElementById('txtMa').value = '';
+    document.getElementById('txtTen').value = '';
+    document.getElementById('txtGhiChu').value = '';
+    document.getElementById('chkSuDung').checked = true;
+    document.getElementById('txtMa').removeAttribute('readonly');
+}
+
+function startEdit(id) {
+    const r = DATA.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('txtEditId').value = id;
+    document.getElementById('txtMa').value = r.ma;
+    document.getElementById('txtMa').setAttribute('readonly', true);
+    document.getElementById('txtTen').value = r.ten;
+    document.getElementById('txtGhiChu').value = r.ghiChu;
+    document.getElementById('chkSuDung').checked = r.suDung;
+    window.scrollTo(0, 0);
+}
+
+function saveData() {
+    const ma  = document.getElementById('txtMa').value.trim().toUpperCase();
+    const ten = document.getElementById('txtTen').value.trim();
+    if (!ma)  { showAlert('alertBox', 'Vui lòng nhập Mã.', 'error'); return; }
+    if (!ten) { showAlert('alertBox', 'Vui lòng nhập Tên.', 'error'); return; }
+
+    const editId = parseInt(document.getElementById('txtEditId').value) || 0;
+
+    if (editId) {
+        const idx = DATA.findIndex(x => x.id === editId);
+        if (idx >= 0) {
+            DATA[idx] = { ...DATA[idx], ten, ghiChu: document.getElementById('txtGhiChu').value, suDung: document.getElementById('chkSuDung').checked, nguoiSua: CURRENT_USER, ngaySua: nowStr() };
+        }
+        showAlert('alertBox', 'Cập nhật thành công.', 'success');
+    } else {
+        if (DATA.find(r => r.ma === ma)) { showAlert('alertBox', `Mã "${ma}" đã tồn tại.`, 'error'); return; }
+        DATA.push({ id: nextId++, ma, ten, suDung: document.getElementById('chkSuDung').checked, ghiChu: document.getElementById('txtGhiChu').value, nguoiTao: CURRENT_USER, ngayTao: nowStr(), nguoiSua: '', ngaySua: '' });
+        showAlert('alertBox', 'Thêm mới thành công.', 'success');
+        // Sync sang MOCK để popup sys5 dùng được trong cùng session
+        if (window.MOCK && window.MOCK.bpBangKe) {
+            window.MOCK.bpBangKe = DATA.map(r => ({ id: r.id, ma: r.ma, ten: r.ten, suDung: r.suDung, note: r.ghiChu }));
+        }
+    }
+    filteredData = [...DATA];
+    renderGrid();
+    clearForm();
+}
+
+function deleteData() {
+    const ids = [...document.querySelectorAll('.chk-row:checked')].map(c => parseInt(c.value));
+    if (!ids.length) { showAlert('alertBox', 'Chưa chọn bản ghi nào.', 'error'); return; }
+    if (!confirm(`Xóa ${ids.length} bản ghi?`)) return;
+    DATA = DATA.filter(r => !ids.includes(r.id));
+    filteredData = [...DATA];
+    renderGrid();
+    showAlert('alertBox', `Đã xóa ${ids.length} bản ghi.`, 'success');
+}
+
+function toggleAll() {
+    const c = document.getElementById('chkAll').checked;
+    document.querySelectorAll('.chk-row').forEach(x => x.checked = c);
+}
+
+function showAlert(id, msg, type) {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.className = 'alert-box alert-' + type;
+    b.innerHTML = msg;
+    b.style.display = 'block';
+    if (type !== 'error') setTimeout(() => { b.style.display = 'none'; }, 4000);
+}
+
+renderGrid();
+</script>
+</body>
+</html>

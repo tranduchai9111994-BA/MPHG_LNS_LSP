@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Thiết lập bộ phận tính lương theo cơ cấu</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 110px 1fr 110px 1fr;
+            gap: 8px 15px;
+            align-items: center;
+        }
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+            width: 90vw;
+            max-width: 980px;
+            max-height: 92vh;
+            overflow-y: auto;
+        }
+        .popup-titlebar {
+            background: #f0f0f0;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .popup-titlebar .dot { width: 13px; height: 13px; border-radius: 50%; display: inline-block; }
+        .popup-titlebar .dot-yellow { background: #ffd600; }
+        .popup-titlebar .dot-blue   { background: #007bff; }
+        .popup-titlebar .dot-orange { background: #fd7e14; }
+        .popup-titlebar .popup-title-text {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            color: #0056b3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .popup-body {
+            padding: 18px 22px 12px;
+        }
+        .popup-form-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr 150px 1fr;
+            gap: 10px 20px;
+            align-items: center;
+        }
+        .popup-form-grid label { font-size: 12px; }
+        .popup-form-grid select, .popup-form-grid input[type="text"] {
+            width: 100%;
+            height: 26px;
+            padding: 3px 6px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+        }
+        .popup-form-full {
+            display: grid;
+            grid-template-columns: 150px 1fr 150px 1fr;
+            gap: 10px 20px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .popup-form-full select, .popup-form-full input[type="text"] {
+            width: 100%;
+            height: 26px;
+            padding: 3px 6px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+        }
+        .popup-check-row {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-left: 170px;
+        }
+        .popup-check-row label { font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .popup-note-row {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: 10px 14px;
+            align-items: flex-start;
+        }
+        .popup-note-row label { font-size: 12px; padding-top: 4px; }
+        .popup-note-row textarea {
+            width: 100%;
+            height: 52px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+            padding: 4px 6px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+        .popup-footer {
+            background: #f8f8f8;
+            border-top: 1px solid #eee;
+            padding: 10px 22px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        /* Pagination */
+        .paging-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .paging-bar button {
+            border: 1px solid #ccc;
+            background: #fff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .paging-bar button:hover { background: #f0f0f0; }
+        .paging-bar input[type="text"] {
+            width: 36px;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+            font-size: 11px;
+            text-align: center;
+        }
+        .grid-wrap table { font-size: 12px; }
+        .grid-wrap th, .grid-wrap td { white-space: nowrap; }
+        .grid-wrap td.bp-cell { white-space: normal; max-width: 200px; font-size: 11px; }
+        .lbl-red { color: #d32f2f; font-weight: bold; }
+        .span-full-col { grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+<!-- TOP HEADER -->
+<div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+        <span>🇻🇳 VN ⌄</span>
+        <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+        <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+        <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+</div>
+
+<!-- MAIN MENU -->
+<div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+</div>
+
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương Sản Phẩm › Thiết lập › Thiết lập bộ phận tính lương theo cơ cấu</div>
+    <div class="page-title">THIẾT LẬP BỘ PHẬN TÍNH LƯƠNG THEO CƠ CẤU</div>
+    <div id="alertBox" class="alert-box"></div>
+
+    <!-- FILTER FORM -->
+    <div class="form-panel">
+        <div class="filter-grid">
+            <label>Công ty</label>
+            <select id="fCongTy">
+                <option value="">-- Tất cả --</option>
+                <option value="MPCM">Công Ty CP Thủy Sản Minh Phú - Cà Mau</option>
+                <option value="MPHG">Công Ty CP Thủy Sản Minh Phú Hậu Giang</option>
+                <option value="MPS">Công Ty CP Minh Phú Seafood</option>
+            </select>
+            <label>Đơn vị cấp 1</label>
+            <select id="fDv1">
+                <option value="">-- Tất cả --</option>
+                <option value="MPCM">MPCM</option>
+                <option value="MPHG">MPHG</option>
+                <option value="MPS">MPS</option>
+            </select>
+
+            <label>Đơn vị cấp 2</label>
+            <select id="fDv2">
+                <option value="">-- Tất cả --</option>
+                <option value="VP_HCM">Văn phòng Tp. HCM</option>
+                <option value="NM1">Nhà máy 1</option>
+                <option value="NM2">Nhà máy 2</option>
+            </select>
+            <label>Đơn vị cấp 3</label>
+            <select id="fDv3">
+                <option value="">-- Tất cả --</option>
+                <option value="VP_TU">Văn phòng Tư</option>
+                <option value="SX">Sản xuất</option>
+            </select>
+
+            <label>Đơn vị cấp 4</label>
+            <select id="fDv4">
+                <option value="">-- Tất cả --</option>
+            </select>
+            <label>Đơn vị cấp 5</label>
+            <select id="fDv5">
+                <option value="">-- Tất cả --</option>
+            </select>
+
+            <label>Đơn vị cấp 6</label>
+            <select id="fDv6">
+                <option value="">-- Tất cả --</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ACTIONS BAR -->
+    <div class="actions-bar">
+        <button class="btn-search" onclick="doSearch()">Tìm Kiếm</button>
+        <button class="btn-refresh" onclick="doRefresh()">Làm mới</button>
+        <button class="btn-save" onclick="openPopupAdd()">Thêm mới</button>
+        <button class="btn-export">Xuất</button>
+        <button class="btn-delete" onclick="doDeleteSelected()">Xóa dữ liệu</button>
+    </div>
+
+    <!-- DATA GRID -->
+    <div class="grid-wrap">
+        <table id="tblMain">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="chkAll" onchange="toggleAll()"></th>
+                    <th>STT</th>
+                    <th>Sửa</th>
+                    <th>Công ty</th>
+                    <th>Đơn vị cấp 1</th>
+                    <th>Đơn vị cấp 2</th>
+                    <th>Đơn vị cấp 3</th>
+                    <th>Đơn vị cấp 4</th>
+                    <th>Đơn vị cấp 5</th>
+                    <th>Nhóm tính lương</th>
+                    <th>Bộ phận bảng kê</th>
+                    <th>Bộ phận tính lương</th>
+                    <th>Bộ phận nhóm lương<br>(Theo NĐ/Theo HĐ...)</th>
+                    <th>Ghi chú</th>
+                    <th>Người tạo</th>
+                    <th>Ngày tạo</th>
+                    <th>Người sửa</th>
+                    <th>Ngày sửa</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyMain">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGING -->
+    <div class="paging-bar">
+        <button onclick="goPage('first')">|◀</button>
+        <button onclick="goPage('prev')">◀</button>
+        <span>Page</span>
+        <input type="text" id="txtPage" value="1" onchange="goPageNum()">
+        <span id="lblTotalPage">of 1</span>
+        <button onclick="goPage('next')">▶</button>
+        <button onclick="goPage('last')">▶|</button>
+        <span style="margin-left:10px;">Pagesize:</span>
+        <select id="selPageSize" onchange="changePageSize()" style="font-size:11px;padding:1px 3px;border:1px solid #ccc;">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+        </select>
+        <span id="lblTotal" style="margin-left:10px;color:#555;"></span>
+    </div>
+
+    <!-- GHI CHÚ NGHIỆP VỤ -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;"
+            placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+        <div style="text-align:right;margin-top:6px;">
+            <button class="btn-save2" style="font-size:11px;padding:4px 14px;" onclick="showAlert('alertBox','Đã lưu ghi chú.','success')">💾 Lưu ghi chú</button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== POPUP THÊM / SỬA ======================== -->
+<div class="popup-overlay" id="popupMain">
+    <div class="popup-box">
+        <!-- Titlebar giống macOS -->
+        <div class="popup-titlebar">
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-blue"></span>
+            <span class="dot dot-orange"></span>
+            <span class="popup-title-text">THIẾT LẬP BỘ PHẬN TÍNH LƯƠNG THEO CƠ CẤU</span>
+        </div>
+
+        <div class="popup-body">
+            <input type="hidden" id="pEditId">
+
+            <!-- Dòng 1: Công ty | Đơn vị cấp 1 -->
+            <div class="popup-form-grid">
+                <label class="lbl-red">Công ty</label>
+                <select id="pCongTy">
+                    <option value="">-- Chọn --</option>
+                    <option value="MPCM">Công Ty CP Thủy Sản Minh Phú - Cà Mau</option>
+                    <option value="MPHG">Công Ty CP Thủy Sản Minh Phú Hậu Giang</option>
+                    <option value="MPS">Công Ty CP Minh Phú Seafood</option>
+                </select>
+                <label>Đơn vị cấp 1</label>
+                <select id="pDv1">
+                    <option value="">-- Chọn --</option>
+                    <option value="MPCM">MPCM</option>
+                    <option value="MPHG">MPHG</option>
+                    <option value="MPS">MPS</option>
+                </select>
+
+                <!-- Dòng 2: Đơn vị cấp 2 | cấp 3 -->
+                <label>Đơn vị cấp 2</label>
+                <select id="pDv2">
+                    <option value="">-- Chọn --</option>
+                    <option value="VP_HCM">Văn phòng Tp. HCM</option>
+                    <option value="BAN_LDMPCM">Ban lãnh đạo MPCM</option>
+                    <option value="NM1">Nhà máy 1</option>
+                    <option value="NM2">Nhà máy 2</option>
+                </select>
+                <label>Đơn vị cấp 3</label>
+                <select id="pDv3">
+                    <option value="">-- Chọn --</option>
+                    <option value="BAN_LDMPHG">Ban lãnh đạo MPHG</option>
+                    <option value="KE_HOACH">Kế hoạch sản xuất</option>
+                    <option value="SX_1">Sản xuất 1</option>
+                </select>
+
+                <!-- Dòng 3: cấp 4 | cấp 5 -->
+                <label>Đơn vị cấp 4</label>
+                <select id="pDv4">
+                    <option value="">-- Chọn --</option>
+                    <option value="BP_MPHG">Bộ phận MPHG</option>
+                    <option value="TO_SX">Tổ sản xuất</option>
+                </select>
+                <label>Đơn vị cấp 5</label>
+                <select id="pDv5">
+                    <option value="">-- Chọn --</option>
+                    <option value="NM1_MPHG">Nhà máy 1 MPHG</option>
+                    <option value="NM2_MPHG">Nhà máy 2 MPHG</option>
+                </select>
+            </div>
+
+            <!-- Dòng 4: Đơn vị cấp 6 | Nhóm tính lương -->
+            <div class="popup-form-full">
+                <label>Đơn vị cấp 6</label>
+                <select id="pDv6">
+                    <option value="">-- Chọn --</option>
+                    <option value="BP_SX">Bộ phận sản xuất MPHG</option>
+                    <option value="KY_THUAT">Kỹ thuật</option>
+                </select>
+                <label>Nhóm tính lương</label>
+                <select id="pNhomTinhLuong">
+                    <option value="">-- Chọn --</option>
+                </select>
+            </div>
+
+            <!-- Dòng 5: Bộ phận bảng kê | (trống) -->
+            <div class="popup-form-full" style="margin-top:10px;">
+                <label>Bộ phận bảng kê</label>
+                <select id="pBpBangKe">
+                    <option value="">-- Chọn --</option>
+                </select>
+                <label></label>
+                <span></span>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="popup-check-row">
+                <label>
+                    <input type="checkbox" id="chkThietLapBP" onchange="toggleBpTinhLuong()">
+                    Thiết lập bộ phận tính lương
+                </label>
+                <label>
+                    <input type="checkbox" id="chkHLevel2">
+                    Thiết lập hLevel2
+                </label>
+            </div>
+
+            <!-- Bộ phận tính lương – hiện khi check "Thiết lập bộ phận tính lương" -->
+            <div id="rowBpTinhLuong" class="popup-form-full" style="margin-top:10px;display:none;">
+                <label style="color:#d32f2f;font-weight:bold;padding-left:24px;">Bộ phận tính lương</label>
+                <select id="pBpTinhLuong">
+                    <option value="">-- Chọn --</option>
+                </select>
+                <label></label><span></span>
+            </div>
+
+            <!-- Ghi chú -->
+            <div class="popup-note-row">
+                <label>Ghi chú</label>
+                <textarea id="pGhiChu" placeholder="Nhập ghi chú..."></textarea>
+            </div>
+        </div>
+
+        <div class="popup-footer">
+            <button class="btn-refresh" onclick="clearPopup()">Làm mới</button>
+            <button class="btn-save" onclick="savePopup()">Lưu</button>
+            <button class="btn-delete" onclick="closePopup()">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script src="../shared/mockdata.js"></script>
+<script src="../shared/utils.js"></script>
+<script>
+const CURRENT_USER = 'FPT Admin';
+function nowStr() {
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+// ---- MOCK DATA ----
+let DATA = [
+    { id:1,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPHG', dv2:'MPHG', dv3:'Văn phòng Tp. HCM',   dv4:'Văn phòng Tp. HCM',   dv5:'Văn phòng Tp. HCM',   dv6:'', nhomTinhLuong:'NTL01', bpBangKe:'BPBK003', bpTinhLuong:'BPTL001', boPhan:'Thiết lập bộ phận tính lương',           ghiChu:'',              nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:2,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPHG', dv2:'MPHG', dv3:'Ban lãnh đạo MPCM',   dv4:'Ban lãnh đạo MPCM',   dv5:'Ban lãnh đạo MPCM',   dv6:'', nhomTinhLuong:'NTL01', bpBangKe:'BPBK003', bpTinhLuong:'BPTL001', boPhan:'Thiết lập bộ phận tính lương',           ghiChu:'',              nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:3,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Kế hoạch sản xuất',   dv4:'Kế hoạch sản xuất',   dv5:'Kế hoạch sản xuất',   dv6:'', nhomTinhLuong:'NTL02', bpBangKe:'BPBK005', bpTinhLuong:'BPTL002', boPhan:'Thiết lập bộ phận tính lương, Thiết lập hLevel2', ghiChu:'',         nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:01', nguoiSua:'', ngaySua:'' },
+    { id:4,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Kế hoạch MPS',        dv4:'Kế hoạch MPS',        dv5:'Kế hoạch MPS',        dv6:'', nhomTinhLuong:'NTL02', bpBangKe:'BPBK005', bpTinhLuong:'BPTL002', boPhan:'Thiết lập bộ phận tính lương, Thiết lập hLevel2', ghiChu:'',         nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:01', nguoiSua:'', ngaySua:'' },
+    { id:5,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Kỹ thuật MPS',        dv4:'Kỹ thuật MPS',        dv5:'Kỹ thuật MPS',        dv6:'', nhomTinhLuong:'NTL03', bpBangKe:'BPBK007', bpTinhLuong:'BPTL003', boPhan:'Thiết lập bộ phận tính lương',           ghiChu:'',              nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:02', nguoiSua:'', ngaySua:'' },
+    { id:6,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Kỹ thuật sản xuất',   dv4:'Kỹ thuật sản xuất',   dv5:'Kỹ thuật sản xuất',   dv6:'', nhomTinhLuong:'NTL03', bpBangKe:'BPBK007', bpTinhLuong:'BPTL003', boPhan:'Thiết lập bộ phận tính lương',           ghiChu:'',              nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:02', nguoiSua:'', ngaySua:'' },
+    { id:7,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Bao bì MPHG',         dv4:'Bao bì MPHG',         dv5:'Bao bì MPHG',         dv6:'', nhomTinhLuong:'NTL04', bpBangKe:'BPBK009', bpTinhLuong:'',        boPhan:'Thiết lập hLevel2',                      ghiChu:'Chỉ hLevel2',  nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:03', nguoiSua:'', ngaySua:'' },
+    { id:8,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Bao bì sản xuất',     dv4:'Bao bì sản xuất',     dv5:'Bao bì sản xuất',     dv6:'', nhomTinhLuong:'NTL04', bpBangKe:'BPBK009', bpTinhLuong:'',        boPhan:'Thiết lập hLevel2',                      ghiChu:'Chỉ hLevel2',  nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:03', nguoiSua:'', ngaySua:'' },
+    { id:9,  congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Ban lãnh đạo MPHG',   dv4:'Ban lãnh đạo MPHG',   dv5:'Ban lãnh đạo MPHG',   dv6:'', nhomTinhLuong:'NTL05', bpBangKe:'',        bpTinhLuong:'BPTL004', boPhan:'Thiết lập bộ phận tính lương',           ghiChu:'',              nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:04', nguoiSua:'', ngaySua:'' },
+    { id:10, congTy:'Công Ty CP Thủy Sản Minh Phú Hậu Giang', dv1:'MPS',  dv2:'MPS',  dv3:'Bảo vệ MPHG',         dv4:'Bảo vệ MPHG',         dv5:'Bảo vệ MPHG',         dv6:'', nhomTinhLuong:'',      bpBangKe:'BPBK010', bpTinhLuong:'',        boPhan:'',                                       ghiChu:'Chưa cấu hình',nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:04', nguoiSua:'', ngaySua:'' },
+];
+
+let filteredData = [...DATA];
+let curPage = 1;
+let pageSize = 50;
+let nextId = DATA.length + 1;
+
+// ---- RENDER GRID ----
+function renderGrid() {
+    const tbody = document.getElementById('tbodyMain');
+    const total = filteredData.length;
+    const totalPage = Math.max(1, Math.ceil(total / pageSize));
+    if (curPage > totalPage) curPage = totalPage;
+
+    document.getElementById('txtPage').value = curPage;
+    document.getElementById('lblTotalPage').textContent = 'of ' + totalPage;
+    document.getElementById('lblTotal').textContent = `Hiển thị ${total} bản ghi`;
+
+    const start = (curPage - 1) * pageSize;
+    const rows = filteredData.slice(start, start + pageSize);
+
+    tbody.innerHTML = rows.map((r, i) => `
+        <tr data-id="${r.id}">
+            <td style="text-align:center"><input type="checkbox" class="chk-row" value="${r.id}"></td>
+            <td style="text-align:center">${start + i + 1}</td>
+            <td style="text-align:center"><span class="edit-icon" onclick="openPopupEdit(${r.id})">✎</span></td>
+            <td>${r.congTy}</td>
+            <td>${r.dv1}</td>
+            <td>${r.dv2}</td>
+            <td>${r.dv3}</td>
+            <td>${r.dv4}</td>
+            <td>${r.dv5}</td>
+            <td>${r.nhomTinhLuong || ''}</td>
+            <td>${r.bpBangKe || ''}</td>
+            <td>${r.bpTinhLuong || ''}</td>
+            <td class="bp-cell">${r.boPhan}</td>
+            <td>${r.ghiChu}</td>
+            <td>${r.nguoiTao}</td>
+            <td>${r.ngayTao}</td>
+            <td>${r.nguoiSua}</td>
+            <td>${r.ngaySua}</td>
+        </tr>
+    `).join('');
+}
+
+// ---- SEARCH & REFRESH ----
+function doSearch() {
+    const ct  = document.getElementById('fCongTy').value.toLowerCase();
+    const dv1 = document.getElementById('fDv1').value.toLowerCase();
+    const dv2 = document.getElementById('fDv2').value.toLowerCase();
+    const dv3 = document.getElementById('fDv3').value.toLowerCase();
+    filteredData = DATA.filter(r =>
+        (!ct  || r.congTy.toLowerCase().includes(ct)  || r.dv1.toLowerCase() === ct) &&
+        (!dv1 || r.dv1.toLowerCase() === dv1) &&
+        (!dv2 || r.dv2.toLowerCase() === dv2) &&
+        (!dv3 || r.dv3.toLowerCase() === dv3)
+    );
+    curPage = 1;
+    renderGrid();
+    showAlert('alertBox', `Tìm thấy ${filteredData.length} bản ghi.`, 'success');
+}
+
+function doRefresh() {
+    ['fCongTy','fDv1','fDv2','fDv3','fDv4','fDv5','fDv6'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    filteredData = [...DATA];
+    curPage = 1;
+    renderGrid();
+}
+
+// ---- DELETE SELECTED ----
+function doDeleteSelected() {
+    const ids = [...document.querySelectorAll('.chk-row:checked')].map(c => parseInt(c.value));
+    if (!ids.length) { showAlert('alertBox', 'Chưa chọn bản ghi nào.', 'error'); return; }
+    if (!confirm(`Xóa ${ids.length} bản ghi đã chọn?`)) return;
+    DATA = DATA.filter(r => !ids.includes(r.id));
+    filteredData = filteredData.filter(r => !ids.includes(r.id));
+    renderGrid();
+    showAlert('alertBox', `Đã xóa ${ids.length} bản ghi.`, 'success');
+}
+
+// ---- CHECKBOX ALL ----
+function toggleAll() {
+    const master = document.getElementById('chkAll').checked;
+    document.querySelectorAll('.chk-row').forEach(c => c.checked = master);
+}
+
+// ---- PAGINATION ----
+function goPage(dir) {
+    const total = Math.max(1, Math.ceil(filteredData.length / pageSize));
+    if (dir === 'first') curPage = 1;
+    else if (dir === 'prev') curPage = Math.max(1, curPage - 1);
+    else if (dir === 'next') curPage = Math.min(total, curPage + 1);
+    else if (dir === 'last') curPage = total;
+    renderGrid();
+}
+function goPageNum() {
+    const v = parseInt(document.getElementById('txtPage').value) || 1;
+    const total = Math.max(1, Math.ceil(filteredData.length / pageSize));
+    curPage = Math.min(Math.max(1, v), total);
+    renderGrid();
+}
+function changePageSize() {
+    pageSize = parseInt(document.getElementById('selPageSize').value);
+    curPage = 1;
+    renderGrid();
+}
+
+// ---- POPUP ----
+function openPopupAdd() {
+    document.getElementById('pEditId').value = '';
+    clearPopup();
+    document.getElementById('popupMain').style.display = 'flex';
+}
+
+function openPopupEdit(id) {
+    const r = DATA.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('pEditId').value = id;
+    document.getElementById('pCongTy').value = '';
+    document.getElementById('pDv1').value = r.dv1;
+    document.getElementById('pDv2').value = '';
+    document.getElementById('pDv3').value = '';
+    document.getElementById('pDv4').value = '';
+    document.getElementById('pDv5').value = '';
+    document.getElementById('pDv6').value = '';
+    document.getElementById('pNhomTinhLuong').value = r.nhomTinhLuong || '';
+    document.getElementById('pBpBangKe').value = r.bpBangKe || '';
+    document.getElementById('pGhiChu').value = r.ghiChu;
+    const hasThietLap = r.boPhan && r.boPhan.includes('Thiết lập bộ phận tính lương');
+    document.getElementById('chkThietLapBP').checked = hasThietLap;
+    document.getElementById('chkHLevel2').checked = !!(r.boPhan && r.boPhan.includes('hLevel2'));
+    document.getElementById('pBpTinhLuong').value = r.bpTinhLuong || '';
+    document.getElementById('rowBpTinhLuong').style.display = hasThietLap ? 'grid' : 'none';
+    document.getElementById('popupMain').style.display = 'flex';
+}
+
+function clearPopup() {
+    ['pCongTy','pDv1','pDv2','pDv3','pDv4','pDv5','pDv6','pNhomTinhLuong','pBpBangKe','pBpTinhLuong'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('pGhiChu').value = '';
+    document.getElementById('chkThietLapBP').checked = false;
+    document.getElementById('chkHLevel2').checked = false;
+    document.getElementById('rowBpTinhLuong').style.display = 'none';
+}
+
+function closePopup() {
+    document.getElementById('popupMain').style.display = 'none';
+}
+
+function savePopup() {
+    const congTy = document.getElementById('pCongTy');
+    if (!congTy.value) { showAlert('alertBox','Vui lòng chọn Công ty.','error'); return; }
+
+    const editId = parseInt(document.getElementById('pEditId').value) || 0;
+    const rec = {
+        congTy: congTy.options[congTy.selectedIndex].text,
+        dv1: document.getElementById('pDv1').value,
+        dv2: document.getElementById('pDv2').value,
+        dv3: document.getElementById('pDv3').value,
+        dv4: document.getElementById('pDv4').value,
+        dv5: document.getElementById('pDv5').value,
+        dv6: document.getElementById('pDv6').value,
+        nhomTinhLuong: document.getElementById('pNhomTinhLuong').value,
+        bpBangKe: document.getElementById('pBpBangKe').value,
+        bpTinhLuong: document.getElementById('chkThietLapBP').checked ? document.getElementById('pBpTinhLuong').value : '',
+        boPhan: buildBoPhan(),
+        ghiChu: document.getElementById('pGhiChu').value,
+    };
+
+    if (editId) {
+        const idx = DATA.findIndex(x => x.id === editId);
+        if (idx >= 0) {
+            DATA[idx] = { ...DATA[idx], ...rec, nguoiSua: CURRENT_USER, ngaySua: nowStr() };
+        }
+        showAlert('alertBox','Cập nhật thành công.','success');
+    } else {
+        DATA.push({ id: nextId++, ...rec, nguoiTao: CURRENT_USER, ngayTao: nowStr(), nguoiSua: '', ngaySua: '' });
+        showAlert('alertBox','Thêm mới thành công.','success');
+    }
+
+    filteredData = [...DATA];
+    renderGrid();
+    closePopup();
+}
+
+function buildBoPhan() {
+    const parts = [];
+    if (document.getElementById('chkThietLapBP').checked) parts.push('Thiết lập bộ phận tính lương');
+    if (document.getElementById('chkHLevel2').checked)    parts.push('Thiết lập hLevel2');
+    return parts.join(', ');
+}
+
+// ---- ALERT ----
+function showAlert(id, msg, type) {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.className = 'alert-box alert-' + type;
+    b.innerHTML = msg;
+    b.style.display = 'block';
+    if (type !== 'error') setTimeout(() => { b.style.display = 'none'; }, 4000);
+}
+
+// ---- LOAD DROPDOWN DATA FROM MOCK ----
+function loadDropdowns() {
+    const fill = (selId, list) => {
+        const sel = document.getElementById(selId);
+        sel.innerHTML = '<option value="">-- Chọn --</option>';
+        (list || []).forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.ma;
+            opt.textContent = `${r.ma} - ${r.ten}`;
+            sel.appendChild(opt);
+        });
+    };
+    fill('pNhomTinhLuong', window.MOCK.nhomTinhLuong);
+    fill('pBpBangKe',      window.MOCK.bpBangKe);
+    fill('pBpTinhLuong',   window.MOCK.bpTinhLuong);
+}
+
+// ---- TOGGLE BỘ PHẬN TÍNH LƯƠNG ----
+function toggleBpTinhLuong() {
+    const checked = document.getElementById('chkThietLapBP').checked;
+    const row = document.getElementById('rowBpTinhLuong');
+    row.style.display = checked ? 'grid' : 'none';
+    if (!checked) document.getElementById('pBpTinhLuong').value = '';
+}
+
+// Close popup when clicking overlay background
+document.getElementById('popupMain').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+});
+
+// Init
+loadDropdowns();
+renderGrid();
+</script>
+</body>
+</html>
