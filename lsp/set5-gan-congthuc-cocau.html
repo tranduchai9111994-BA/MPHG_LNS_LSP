@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Gán công thức lương cho cơ cấu</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .cascade-grid {
+        display: grid;
+        grid-template-columns: 110px 1fr 110px 1fr 110px 1fr;
+        gap: 8px 15px;
+        align-items: center;
+      }
+      .cascade-grid label { font-size: 12px; }
+      .cascade-grid select, .cascade-grid input { height: 26px; font-size: 12px; border: 1px solid #ccc; padding: 2px 6px; }
+      .span2 { grid-column: span 2; }
+      .tag-ct { display:inline-block; background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; border-radius:3px; padding:1px 8px; margin:2px; font-size:11px; cursor:pointer; }
+      .tag-ct .x { margin-left:4px; color:#c00; font-weight:bold; cursor:pointer; }
+      .tag-ct .x:hover { color:#f00; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Thiết lập (System) › Thiết lập công thức tính lương › Gán công thức lương cho cơ cấu</div>
+    <div class="page-title">GÁN CÔNG THỨC LƯƠNG CHO CƠ CẤU</div>
+
+    <div class="info-bar">
+      ĐẶC ĐIỂM: Gán công thức lương (đã tạo ở MH Tạo công thức lương) cho từng cơ cấu tổ chức.<br>
+      Cùng 1 cơ cấu có thể gán nhiều công thức khác nhau theo <strong>ngày hiệu lực</strong>.<br>
+      Cascade: Đơn vị cấp 1 → 2 → 3 → 4 → 5 → Bộ phận tính lương → Nhóm tính lương cấp 1 → cấp 2.
+    </div>
+
+    <div id="alertBox" class="alert-box" style="display:none;"></div>
+
+    <!-- BỘ LỌC -->
+    <div class="form-panel" style="margin-top:10px;">
+      <div class="cascade-grid">
+        <label class="lbl-red">Đơn vị cấp 1</label>
+        <select id="selDV1" onchange="cascadeDV(1)"><option value="">-- Tất cả --</option></select>
+        <label>Đơn vị cấp 2</label>
+        <select id="selDV2" onchange="cascadeDV(2)"><option value="">-- Tất cả --</option></select>
+        <label>Đơn vị cấp 3</label>
+        <select id="selDV3" onchange="cascadeDV(3)"><option value="">-- Tất cả --</option></select>
+
+        <label>Đơn vị cấp 4</label>
+        <select id="selDV4" onchange="cascadeDV(4)"><option value="">-- Tất cả --</option></select>
+        <label>Đơn vị cấp 5</label>
+        <select id="selDV5"><option value="">-- Tất cả --</option></select>
+        <label>BP tính lương</label>
+        <select id="selBPTL"><option value="">-- Tất cả --</option></select>
+
+        <label>Nhóm TL cấp 1</label>
+        <select id="selNTL1"><option value="">-- Tất cả --</option></select>
+        <label>Nhóm TL cấp 2</label>
+        <select id="selNTL2"><option value="">-- Tất cả --</option></select>
+        <label>Ngày hiệu lực</label>
+        <input type="date" id="txtNgayHL">
+      </div>
+    </div>
+
+    <!-- NÚT HÀNH ĐỘNG -->
+    <div class="actions-bar" style="margin-top:10px;">
+      <button class="btn btn-search" onclick="timKiem()">Tìm Kiếm</button>
+      <button class="btn btn-save2" onclick="luuGan()">Lưu</button>
+      <button class="btn btn-refresh" onclick="lamMoi()">Làm mới</button>
+      <button class="btn btn-delete" onclick="xoaChon()">Xóa</button>
+    </div>
+
+    <!-- FORM THÊM / SỬA -->
+    <div class="form-panel" id="pnlEdit" style="margin-top:10px; display:none;">
+      <div style="font-weight:bold;color:#0056b3;margin-bottom:8px;font-size:12px;">THÊM / SỬA GÁN CÔNG THỨC</div>
+      <div class="cascade-grid">
+        <label class="lbl-red">Đơn vị cấp 1</label>
+        <select id="edDV1" onchange="cascadeEdit(1)"><option value="">-- Chọn --</option></select>
+        <label>Đơn vị cấp 2</label>
+        <select id="edDV2" onchange="cascadeEdit(2)"><option value="">-- Chọn --</option></select>
+        <label>Đơn vị cấp 3</label>
+        <select id="edDV3" onchange="cascadeEdit(3)"><option value="">-- Chọn --</option></select>
+
+        <label>Đơn vị cấp 4</label>
+        <select id="edDV4" onchange="cascadeEdit(4)"><option value="">-- Chọn --</option></select>
+        <label>Đơn vị cấp 5</label>
+        <select id="edDV5"><option value="">-- Chọn --</option></select>
+        <label class="lbl-red">BP tính lương</label>
+        <select id="edBPTL"><option value="">-- Chọn --</option></select>
+
+        <label>Nhóm TL cấp 1</label>
+        <select id="edNTL1"><option value="">-- Chọn --</option></select>
+        <label>Nhóm TL cấp 2</label>
+        <select id="edNTL2"><option value="">-- Chọn --</option></select>
+        <label class="lbl-red">Ngày hiệu lực</label>
+        <input type="date" id="edNgayHL">
+
+        <label class="lbl-red">Công thức lương</label>
+        <div class="span2">
+          <select id="edCongThuc"><option value="">-- Chọn công thức --</option></select>
+          <button class="btn" style="background:#28a745;color:#fff;padding:2px 10px;font-size:11px;margin-left:4px;" onclick="themCongThuc()">+ Thêm</button>
+          <div id="edCTList" style="margin-top:4px;"></div>
+        </div>
+        <label>Ghi chú</label>
+        <input type="text" id="edGhiChu" style="width:100%;" class="span2">
+      </div>
+      <div style="text-align:right;margin-top:8px;">
+        <button class="btn btn-save2" onclick="apDungEdit()">Áp dụng</button>
+        <button class="btn btn-cancel" onclick="huyEdit()">Hủy</button>
+      </div>
+    </div>
+
+    <!-- LƯỚI DỮ LIỆU -->
+    <div class="grid-wrap" style="margin-top:10px;">
+      <table id="tblMain">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="chkAll" onclick="toggleAll(this)"></th>
+            <th>STT</th>
+            <th>Sửa</th>
+            <th>Đơn vị cấp 1</th>
+            <th>Đơn vị cấp 2</th>
+            <th>Đơn vị cấp 3</th>
+            <th>Đơn vị cấp 4</th>
+            <th>Đơn vị cấp 5</th>
+            <th>BP tính lương</th>
+            <th>Nhóm TL cấp 1</th>
+            <th>Nhóm TL cấp 2</th>
+            <th>Ngày hiệu lực</th>
+            <th>Công thức lương</th>
+            <th>Ghi chú</th>
+            <th>Người tạo</th>
+            <th>Ngày tạo</th>
+            <th>Người sửa</th>
+            <th>Ngày sửa</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+
+    <!-- GHI CHÚ NGHIỆP VỤ -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+<script src="../shared/mockdata.js"></script>
+<script src="../shared/utils.js"></script>
+<script>
+const CURRENT_USER = 'FPT Admin';
+function nowStr() {
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+const MOCK_DV = {
+  cap1: [
+    { ma:'CTY01', ten:'Công Ty CP Thủy Sản MPHG' }
+  ],
+  cap2: [
+    { ma:'KSX', ten:'Khối Sản Xuất', parent:'CTY01' },
+    { ma:'KVP', ten:'Khối Văn Phòng', parent:'CTY01' }
+  ],
+  cap3: [
+    { ma:'NM1', ten:'Nhà máy 1', parent:'KSX' },
+    { ma:'NM2', ten:'Nhà máy 2', parent:'KSX' }
+  ],
+  cap4: [
+    { ma:'PX_CB', ten:'Phân xưởng Chế biến', parent:'NM1' },
+    { ma:'PX_DG', ten:'Phân xưởng Đóng gói', parent:'NM1' },
+    { ma:'PX_CB2', ten:'Phân xưởng Chế biến NM2', parent:'NM2' }
+  ],
+  cap5: [
+    { ma:'TO_PTO', ten:'Tổ PTO', parent:'PX_CB' },
+    { ma:'TO_TB', ten:'Tổ Tẩm bột', parent:'PX_CB' },
+    { ma:'TO_DG1', ten:'Tổ Đóng gói 1', parent:'PX_DG' }
+  ]
+};
+
+const MOCK_NTL2 = [
+  { ma:'NTL2_01', ten:'NTL2 - Năng suất ca ngày', ntl1:'NTL02' },
+  { ma:'NTL2_02', ten:'NTL2 - Năng suất ca đêm', ntl1:'NTL02' },
+  { ma:'NTL2_03', ten:'NTL2 - Hệ số điều chỉnh HS1', ntl1:'NTL01' },
+  { ma:'NTL2_04', ten:'NTL2 - Hệ số điều chỉnh HS2', ntl1:'NTL01' }
+];
+
+const MOCK_CT = [
+  { ma:'CT_LSP_01', ten:'Công thức LSP Chế biến 2026' },
+  { ma:'CT_LSP_02', ten:'Công thức LSP Tẩm bột 2026' },
+  { ma:'CT_LSP_03', ten:'Công thức LSP PTO 2026' },
+  { ma:'CT_LSP_04', ten:'Công thức LSP Đóng gói 2026' },
+  { ma:'CT_LSP_05', ten:'Công thức LSP Vệ sinh 2026' }
+];
+
+let MOCK_GAN = [
+  { id:1, dv1:'CTY01', dv2:'KSX', dv3:'NM1', dv4:'PX_CB', dv5:'', bptl:'BPTL001', ntl1:'NTL02', ntl2:'', ngayHL:'2026-01-01', congThuc:['CT_LSP_03'], ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'10/01/2026 08:00', nguoiSua:'', ngaySua:'' },
+  { id:2, dv1:'CTY01', dv2:'KSX', dv3:'NM1', dv4:'PX_CB', dv5:'', bptl:'BPTL002', ntl1:'NTL02', ntl2:'', ngayHL:'2026-01-01', congThuc:['CT_LSP_02'], ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'10/01/2026 08:00', nguoiSua:'', ngaySua:'' },
+  { id:3, dv1:'CTY01', dv2:'KSX', dv3:'NM1', dv4:'PX_CB', dv5:'', bptl:'BPTL003', ntl1:'NTL02', ntl2:'', ngayHL:'2026-01-01', congThuc:['CT_LSP_01'], ghiChu:'Chiên dùng CT CB', nguoiTao:'FPT Admin', ngayTao:'10/01/2026 08:00', nguoiSua:'', ngaySua:'' },
+  { id:4, dv1:'CTY01', dv2:'KSX', dv3:'NM1', dv4:'PX_CB', dv5:'', bptl:'BPTL004', ntl1:'NTL02', ntl2:'', ngayHL:'2026-01-01', congThuc:['CT_LSP_01'], ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'10/01/2026 08:00', nguoiSua:'', ngaySua:'' },
+  { id:5, dv1:'CTY01', dv2:'KSX', dv3:'NM1', dv4:'PX_DG', dv5:'', bptl:'BPTL006', ntl1:'NTL02', ntl2:'', ngayHL:'2026-01-01', congThuc:['CT_LSP_04'], ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'10/01/2026 08:05', nguoiSua:'', ngaySua:'' },
+  { id:6, dv1:'CTY01', dv2:'KSX', dv3:'NM1', dv4:'PX_CB', dv5:'', bptl:'BPTL001', ntl1:'NTL02', ntl2:'', ngayHL:'2026-07-01', congThuc:['CT_LSP_03','CT_LSP_05'], ghiChu:'Từ T7 thêm CT VS', nguoiTao:'FPT Admin', ngayTao:'25/06/2026 10:00', nguoiSua:'', ngaySua:'' },
+  { id:7, dv1:'CTY01', dv2:'KSX', dv3:'NM2', dv4:'PX_CB2', dv5:'', bptl:'BPTL004', ntl1:'NTL02', ntl2:'', ngayHL:'2026-01-01', congThuc:['CT_LSP_01'], ghiChu:'NM2 dùng chung CT CB', nguoiTao:'FPT Admin', ngayTao:'12/01/2026 09:00', nguoiSua:'', ngaySua:'' }
+];
+
+function lookupTen(list, ma) { const r = list.find(i => i.ma === ma); return r ? r.ten : ''; }
+function lookupDV(cap, ma) { const r = MOCK_DV[cap].find(i => i.ma === ma); return r ? r.ten : ''; }
+function lookupBPTL(ma) { const r = (window.MOCK && MOCK.bpTinhLuong || []).find(i => i.ma === ma); return r ? r.ten : ''; }
+function lookupNTL(ma) { const r = (window.MOCK && MOCK.nhomTinhLuong || []).find(i => i.ma === ma); return r ? r.ten : ''; }
+function lookupNTL2(ma) { const r = MOCK_NTL2.find(i => i.ma === ma); return r ? r.ten : ''; }
+function lookupCT(ma) { const r = MOCK_CT.find(i => i.ma === ma); return r ? r.ten : ma; }
+
+function fillSelect(sel, items, valKey, lblFn) {
+  const v = sel.value;
+  sel.innerHTML = '<option value="">-- Tất cả --</option>';
+  items.forEach(i => { sel.innerHTML += `<option value="${i[valKey]}">${lblFn(i)}</option>`; });
+  if ([...sel.options].some(o => o.value === v)) sel.value = v;
+}
+function fillEditSelect(sel, items, valKey, lblFn) {
+  const v = sel.value;
+  sel.innerHTML = '<option value="">-- Chọn --</option>';
+  items.forEach(i => { sel.innerHTML += `<option value="${i[valKey]}">${lblFn(i)}</option>`; });
+  if ([...sel.options].some(o => o.value === v)) sel.value = v;
+}
+
+function initDropdowns() {
+  const fmt = i => `${i.ma} - ${i.ten}`;
+  fillSelect(document.getElementById('selDV1'), MOCK_DV.cap1, 'ma', fmt);
+  fillSelect(document.getElementById('selBPTL'), (window.MOCK && MOCK.bpTinhLuong || []), 'ma', fmt);
+  fillSelect(document.getElementById('selNTL1'), (window.MOCK && MOCK.nhomTinhLuong || []), 'ma', fmt);
+  fillSelect(document.getElementById('selNTL2'), MOCK_NTL2, 'ma', fmt);
+
+  fillEditSelect(document.getElementById('edDV1'), MOCK_DV.cap1, 'ma', fmt);
+  fillEditSelect(document.getElementById('edBPTL'), (window.MOCK && MOCK.bpTinhLuong || []), 'ma', fmt);
+  fillEditSelect(document.getElementById('edNTL1'), (window.MOCK && MOCK.nhomTinhLuong || []), 'ma', fmt);
+  fillEditSelect(document.getElementById('edNTL2'), MOCK_NTL2, 'ma', fmt);
+
+  const sCT = document.getElementById('edCongThuc');
+  sCT.innerHTML = '<option value="">-- Chọn công thức --</option>';
+  MOCK_CT.forEach(c => { sCT.innerHTML += `<option value="${c.ma}">${c.ma} - ${c.ten}</option>`; });
+
+  cascadeDV(0);
+}
+
+function cascadeDV(fromLevel) {
+  const fmt = i => `${i.ma} - ${i.ten}`;
+  if (fromLevel <= 1) {
+    const p = document.getElementById('selDV1').value;
+    fillSelect(document.getElementById('selDV2'), MOCK_DV.cap2.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+  if (fromLevel <= 2) {
+    const p = document.getElementById('selDV2').value;
+    fillSelect(document.getElementById('selDV3'), MOCK_DV.cap3.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+  if (fromLevel <= 3) {
+    const p = document.getElementById('selDV3').value;
+    fillSelect(document.getElementById('selDV4'), MOCK_DV.cap4.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+  if (fromLevel <= 4) {
+    const p = document.getElementById('selDV4').value;
+    fillSelect(document.getElementById('selDV5'), MOCK_DV.cap5.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+}
+
+function cascadeEdit(fromLevel) {
+  const fmt = i => `${i.ma} - ${i.ten}`;
+  if (fromLevel <= 1) {
+    const p = document.getElementById('edDV1').value;
+    fillEditSelect(document.getElementById('edDV2'), MOCK_DV.cap2.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+  if (fromLevel <= 2) {
+    const p = document.getElementById('edDV2').value;
+    fillEditSelect(document.getElementById('edDV3'), MOCK_DV.cap3.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+  if (fromLevel <= 3) {
+    const p = document.getElementById('edDV3').value;
+    fillEditSelect(document.getElementById('edDV4'), MOCK_DV.cap4.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+  if (fromLevel <= 4) {
+    const p = document.getElementById('edDV4').value;
+    fillEditSelect(document.getElementById('edDV5'), MOCK_DV.cap5.filter(i => !p || i.parent === p), 'ma', fmt);
+  }
+}
+
+function formatDateVN(iso) {
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+let editingId = null;
+let editCTList = [];
+
+function renderGrid(data) {
+  const tb = document.getElementById('tblBody');
+  tb.innerHTML = '';
+  data.forEach((r, idx) => {
+    const ctNames = (r.congThuc||[]).map(ma => `<span class="tag-ct">${ma}</span>`).join(' ');
+    tb.innerHTML += `<tr>
+      <td style="text-align:center"><input type="checkbox" class="chk-row" value="${r.id}"></td>
+      <td style="text-align:center">${idx+1}</td>
+      <td style="text-align:center"><span class="edit-icon" onclick="startEdit(${r.id})">✎</span></td>
+      <td>${lookupDV('cap1',r.dv1)}</td>
+      <td>${lookupDV('cap2',r.dv2)}</td>
+      <td>${lookupDV('cap3',r.dv3)}</td>
+      <td>${lookupDV('cap4',r.dv4)}</td>
+      <td>${lookupDV('cap5',r.dv5)}</td>
+      <td>${r.bptl} - ${lookupBPTL(r.bptl)}</td>
+      <td>${r.ntl1 ? r.ntl1+' - '+lookupNTL(r.ntl1) : ''}</td>
+      <td>${r.ntl2 ? r.ntl2+' - '+lookupNTL2(r.ntl2) : ''}</td>
+      <td style="text-align:center">${formatDateVN(r.ngayHL)}</td>
+      <td>${ctNames}</td>
+      <td>${r.ghiChu||''}</td>
+      <td>${r.nguoiTao||''}</td>
+      <td>${r.ngayTao||''}</td>
+      <td>${r.nguoiSua||''}</td>
+      <td>${r.ngaySua||''}</td>
+    </tr>`;
+  });
+}
+
+function timKiem() {
+  let data = [...MOCK_GAN];
+  const v = id => document.getElementById(id).value;
+  if (v('selDV1')) data = data.filter(r => r.dv1 === v('selDV1'));
+  if (v('selDV2')) data = data.filter(r => r.dv2 === v('selDV2'));
+  if (v('selDV3')) data = data.filter(r => r.dv3 === v('selDV3'));
+  if (v('selDV4')) data = data.filter(r => r.dv4 === v('selDV4'));
+  if (v('selDV5')) data = data.filter(r => r.dv5 === v('selDV5'));
+  if (v('selBPTL')) data = data.filter(r => r.bptl === v('selBPTL'));
+  if (v('selNTL1')) data = data.filter(r => r.ntl1 === v('selNTL1'));
+  if (v('selNTL2')) data = data.filter(r => r.ntl2 === v('selNTL2'));
+  if (v('txtNgayHL')) data = data.filter(r => r.ngayHL === v('txtNgayHL'));
+  renderGrid(data);
+  showAlert('alertBox', `Tìm thấy ${data.length} dòng.`, 'success');
+}
+
+function lamMoi() {
+  ['selDV1','selDV2','selDV3','selDV4','selDV5','selBPTL','selNTL1','selNTL2','txtNgayHL'].forEach(id => document.getElementById(id).value = '');
+  cascadeDV(0);
+  renderGrid(MOCK_GAN);
+  huyEdit();
+}
+
+function startEdit(id) {
+  const r = MOCK_GAN.find(i => i.id === id);
+  if (!r) return;
+  editingId = id;
+  document.getElementById('pnlEdit').style.display = 'block';
+  document.getElementById('edDV1').value = r.dv1; cascadeEdit(1);
+  document.getElementById('edDV2').value = r.dv2; cascadeEdit(2);
+  document.getElementById('edDV3').value = r.dv3; cascadeEdit(3);
+  document.getElementById('edDV4').value = r.dv4; cascadeEdit(4);
+  document.getElementById('edDV5').value = r.dv5;
+  document.getElementById('edBPTL').value = r.bptl;
+  document.getElementById('edNTL1').value = r.ntl1;
+  document.getElementById('edNTL2').value = r.ntl2;
+  document.getElementById('edNgayHL').value = r.ngayHL;
+  document.getElementById('edGhiChu').value = r.ghiChu || '';
+  editCTList = [...(r.congThuc||[])];
+  renderCTList();
+  window.scrollTo(0, 0);
+}
+
+function themMoi() {
+  editingId = null;
+  document.getElementById('pnlEdit').style.display = 'block';
+  ['edDV1','edDV2','edDV3','edDV4','edDV5','edBPTL','edNTL1','edNTL2','edNgayHL','edGhiChu'].forEach(id => document.getElementById(id).value = '');
+  editCTList = [];
+  renderCTList();
+  window.scrollTo(0, 0);
+}
+
+function huyEdit() {
+  document.getElementById('pnlEdit').style.display = 'none';
+  editingId = null;
+  editCTList = [];
+}
+
+function themCongThuc() {
+  const sel = document.getElementById('edCongThuc');
+  const ma = sel.value;
+  if (!ma) return;
+  if (editCTList.includes(ma)) { showAlert('alertBox','Công thức đã được thêm.','warning'); return; }
+  editCTList.push(ma);
+  renderCTList();
+  sel.value = '';
+}
+
+function xoaCT(ma) {
+  editCTList = editCTList.filter(m => m !== ma);
+  renderCTList();
+}
+
+function renderCTList() {
+  const div = document.getElementById('edCTList');
+  if (!editCTList.length) { div.innerHTML = '<span style="color:#999;font-size:11px;">Chưa gán công thức nào</span>'; return; }
+  div.innerHTML = editCTList.map(ma => `<span class="tag-ct">${ma} - ${lookupCT(ma)} <span class="x" onclick="xoaCT('${ma}')">×</span></span>`).join(' ');
+}
+
+function apDungEdit() {
+  const v = id => document.getElementById(id).value;
+  if (!v('edDV1')) { showAlert('alertBox','Vui lòng chọn Đơn vị cấp 1.','error'); return; }
+  if (!v('edBPTL')) { showAlert('alertBox','Vui lòng chọn BP tính lương.','error'); return; }
+  if (!v('edNgayHL')) { showAlert('alertBox','Vui lòng nhập Ngày hiệu lực.','error'); return; }
+  if (!editCTList.length) { showAlert('alertBox','Vui lòng thêm ít nhất 1 công thức lương.','error'); return; }
+
+  const obj = {
+    dv1: v('edDV1'), dv2: v('edDV2'), dv3: v('edDV3'), dv4: v('edDV4'), dv5: v('edDV5'),
+    bptl: v('edBPTL'), ntl1: v('edNTL1'), ntl2: v('edNTL2'),
+    ngayHL: v('edNgayHL'), congThuc: [...editCTList], ghiChu: v('edGhiChu')
+  };
+
+  if (editingId) {
+    const r = MOCK_GAN.find(i => i.id === editingId);
+    Object.assign(r, obj);
+    r.nguoiSua = CURRENT_USER;
+    r.ngaySua = nowStr();
+    showAlert('alertBox','Cập nhật thành công.','success');
+  } else {
+    const newId = Math.max(...MOCK_GAN.map(i=>i.id), 0) + 1;
+    MOCK_GAN.push({ id: newId, ...obj, nguoiTao: CURRENT_USER, ngayTao: nowStr(), nguoiSua:'', ngaySua:'' });
+    showAlert('alertBox','Thêm mới thành công.','success');
+  }
+  renderGrid(MOCK_GAN);
+  huyEdit();
+}
+
+function luuGan() { showAlert('alertBox','Đã lưu dữ liệu (mock).','success'); }
+
+function xoaChon() {
+  const ids = [...document.querySelectorAll('.chk-row:checked')].map(c => +c.value);
+  if (!ids.length) { showAlert('alertBox','Chọn dòng cần xóa.','warning'); return; }
+  MOCK_GAN = MOCK_GAN.filter(r => !ids.includes(r.id));
+  renderGrid(MOCK_GAN);
+  showAlert('alertBox',`Đã xóa ${ids.length} dòng.`, 'success');
+}
+
+function toggleAll(cb) { document.querySelectorAll('.chk-row').forEach(c => c.checked = cb.checked); }
+
+function showAlert(id, msg, type) {
+  const b = document.getElementById(id);
+  b.className = 'alert-box alert-' + type;
+  b.innerHTML = msg;
+  b.style.display = 'block';
+  if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+}
+
+initDropdowns();
+renderGrid(MOCK_GAN);
+</script>
+</body>
+</html>

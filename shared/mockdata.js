@@ -203,25 +203,25 @@ window.MOCK = {
             { loai: "VS_KDV",    ten: "VS Kiểm đầu vỏ",     pct: 95 }
         ],
         vsNhanVien: [
-            { maNV: "1022901896", hoTen: "Trần Thị Út",           khuVuc: "Vệ sinh Bến NL Ka1",  ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 26.0, htL4Pct: 2, ghiChu: "" },
-            { maNV: "1022900957", hoTen: "Tạ Thị Kim Tuyền",      khuVuc: "Vệ sinh Bến NL Ka1",  ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 2, ghiChu: "" },
-            { maNV: "1022902032", hoTen: "Huỳnh Thị Me",          khuVuc: "Vệ sinh Bến NL Ka2",  ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 26.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022902160", hoTen: "Nguyễn Thị Nga",        khuVuc: "Vệ sinh Bến NL Ka2",  ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 21.5, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022900988", hoTen: "Nguyễn Thị Hồng Thắm",  khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022904592", hoTen: "Nguyễn Thị Phước",      khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 22.9, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022901790", hoTen: "Lê Thị Bé Hậu",         khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022902153", hoTen: "Trần Thị Trúc Linh",    khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 21.2, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022900669", hoTen: "Bùi Thị Huệ",           khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022903601", hoTen: "Phạm Thanh Thúy",       khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 26.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022907151", hoTen: "Ngô Thị Kiều Thanh",    khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 25.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022908092", hoTen: "Hà Thị Bảy",            khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 23.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022904794", hoTen: "Đặng Thị Chung",        khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 1.0,  htL4Pct: 0, ghiChu: "NV" },
-            { maNV: "1022902738", hoTen: "Nguyễn Thị Mỹ Tú",      khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 25.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022902339", hoTen: "Trần Thị Cẩm Hằng",     khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 18.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022901543", hoTen: "Nguyễn Văn Dũ",         khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022900491", hoTen: "Nguyễn Thị Tô Châu",    khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022911236", hoTen: "Trần Vũ Linh",          khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
-            { maNV: "1022906002", hoTen: "Nguyễn Thị Thanh Nga",  khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" }
+            { maNV: "1022901896", hoTen: "Trần Thị Út",           khuVuc: "Vệ sinh Bến NL Ka1",  ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "NL1VS", cap3: "NL",  cap4: "NL1",  cap5: "NL1VS",  loaiVS: "VS_THUONG", congTT: 26.0, htL4Pct: 2, ghiChu: "" },
+            { maNV: "1022900957", hoTen: "Tạ Thị Kim Tuyền",      khuVuc: "Vệ sinh Bến NL Ka1",  ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "NL1VS", cap3: "NL",  cap4: "NL1",  cap5: "NL1VS",  loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 2, ghiChu: "" },
+            { maNV: "1022902032", hoTen: "Huỳnh Thị Me",          khuVuc: "Vệ sinh Bến NL Ka2",  ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "NL2VS", cap3: "NL",  cap4: "NL2",  cap5: "NL2VS",  loaiVS: "VS_THUONG", congTT: 26.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022902160", hoTen: "Nguyễn Thị Nga",        khuVuc: "Vệ sinh Bến NL Ka2",  ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "NL2VS", cap3: "NL",  cap4: "NL2",  cap5: "NL2VS",  loaiVS: "VS_THUONG", congTT: 21.5, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022900988", hoTen: "Nguyễn Thị Hồng Thắm",  khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC1VS", cap3: "PC",  cap4: "PC1",  cap5: "PC1VS",  loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022904592", hoTen: "Nguyễn Thị Phước",      khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC1VS", cap3: "PC",  cap4: "PC1",  cap5: "PC1VS",  loaiVS: "VS_THUONG", congTT: 22.9, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022901790", hoTen: "Lê Thị Bé Hậu",         khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC1VS", cap3: "PC",  cap4: "PC1",  cap5: "PC1VS",  loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022902153", hoTen: "Trần Thị Trúc Linh",    khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC1VS", cap3: "PC",  cap4: "PC1",  cap5: "PC1VS",  loaiVS: "VS_THUONG", congTT: 21.2, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022900669", hoTen: "Bùi Thị Huệ",           khuVuc: "Vệ sinh Phân Cỡ Ka1", ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC1VS", cap3: "PC",  cap4: "PC1",  cap5: "PC1VS",  loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022903601", hoTen: "Phạm Thanh Thúy",       khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC2VS", cap3: "PC",  cap4: "PC2",  cap5: "PC2VS",  loaiVS: "VS_THUONG", congTT: 26.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022907151", hoTen: "Ngô Thị Kiều Thanh",    khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC2VS", cap3: "PC",  cap4: "PC2",  cap5: "PC2VS",  loaiVS: "VS_THUONG", congTT: 25.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022908092", hoTen: "Hà Thị Bảy",            khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC2VS", cap3: "PC",  cap4: "PC2",  cap5: "PC2VS",  loaiVS: "VS_THUONG", congTT: 23.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022904794", hoTen: "Đặng Thị Chung",        khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC2VS", cap3: "PC",  cap4: "PC2",  cap5: "PC2VS",  loaiVS: "VS_THUONG", congTT: 1.0,  htL4Pct: 0, ghiChu: "NV" },
+            { maNV: "1022902738", hoTen: "Nguyễn Thị Mỹ Tú",      khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC2VS", cap3: "PC",  cap4: "PC2",  cap5: "PC2VS",  loaiVS: "VS_THUONG", congTT: 25.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022902339", hoTen: "Trần Thị Cẩm Hằng",     khuVuc: "Vệ sinh Phân Cỡ Ka2", ka: "K2", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PC2VS", cap3: "PC",  cap4: "PC2",  cap5: "PC2VS",  loaiVS: "VS_THUONG", congTT: 18.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022901543", hoTen: "Nguyễn Văn Dũ",         khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PTO1VS", cap3: "PTO", cap4: "PTO1", cap5: "PTO1VS", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022900491", hoTen: "Nguyễn Thị Tô Châu",    khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PTO1VS", cap3: "PTO", cap4: "PTO1", cap5: "PTO1VS", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022911236", hoTen: "Trần Vũ Linh",          khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PTO1VS", cap3: "PTO", cap4: "PTO1", cap5: "PTO1VS", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" },
+            { maNV: "1022906002", hoTen: "Nguyễn Thị Thanh Nga",  khuVuc: "Vệ sinh PTO Ka1",     ka: "K1", nhomBQ: "BQ_CB_XQ_PTO", nhomTL: "Năng suất", maBP: "PTO1VS", cap3: "PTO", cap4: "PTO1", cap5: "PTO1VS", loaiVS: "VS_THUONG", congTT: 27.0, htL4Pct: 0, ghiChu: "" }
         ]
     },
 
@@ -328,8 +328,17 @@ window.MOCK = {
             { id: 1, ma: "HT01", tenEN: "Lock Status", tenVN: "Trạng thái khóa", thuTu: 1, bang: "Sys_Status", sql: "...", type: "Boolean", note: "" }
         ],
         tieuChiTinhToan: [
-            { id: 1, ma: "CALC_01", tenEN: "Base NS", tenVN: "NS Cơ bản", thuTu: 1, rank: 1, bang: "NS_Calc", sql: "...", type: "Number", note: "" },
-            { id: 2, ma: "CALC_02", tenEN: "Dept Support", tenVN: "Hỗ trợ BP", thuTu: 2, rank: 2, bang: "NS_Calc", sql: "...", type: "Number", note: "" }
+            { id: 1,  ma: "TT_LSP_Base_L0",          tenEN: "Base L0",               tenVN: "Lương gốc L0",                      thuTu: 1,  prio: 10, rowClass: "Detail",  alloc: "None",          sumPrev: "N", prorataBasis: "", type: "Number", note: "" },
+            { id: 2,  ma: "TT_LSP_TienL1",            tenEN: "After L1",              tenVN: "Tiền sau ĐC lần 1",                 thuTu: 2,  prio: 20, rowClass: "Detail",  alloc: "None",          sumPrev: "N", prorataBasis: "", type: "Number", note: "" },
+            { id: 3,  ma: "TT_LSP_TienL2",            tenEN: "After L2",              tenVN: "Tiền sau ĐC lần 2",                 thuTu: 3,  prio: 30, rowClass: "Detail",  alloc: "None",          sumPrev: "N", prorataBasis: "", type: "Number", note: "" },
+            { id: 4,  ma: "TT_LSP_TienL3",            tenEN: "After L3",              tenVN: "Tiền sau ĐC lần 3",                 thuTu: 4,  prio: 40, rowClass: "Detail",  alloc: "None",          sumPrev: "N", prorataBasis: "", type: "Number", note: "" },
+            { id: 5,  ma: "TT_LSP_HoTroChuyenBan",    tenEN: "Station handover support", tenVN: "Hỗ trợ bàn giao (giai đoạn cũ)", thuTu: 5,  prio: 45, rowClass: "Detail",  alloc: "OldStage",      sumPrev: "N", prorataBasis: "", type: "Number", note: "Dồn vào giai đoạn CŨ trước khi chuyển bàn" },
+            { id: 6,  ma: "TT_LSP_LuongThoiGian",     tenEN: "Time salary",           tenVN: "Lương thời gian (ngày công)",        thuTu: 6,  prio: 50, rowClass: "Detail",  alloc: "Prorata",       sumPrev: "N", prorataBasis: "HT_TS_CongThucTe", type: "Number", note: "" },
+            { id: 7,  ma: "TT_LSP_LuongDongBH",       tenEN: "Insurance base",        tenVN: "Lương đóng bảo hiểm",               thuTu: 7,  prio: 60, rowClass: "Summary", alloc: "MaxSalaryRow",  sumPrev: "Y", prorataBasis: "", type: "Number", note: "" },
+            { id: 8,  ma: "TT_LSP_KhoanTruThang",     tenEN: "Monthly deduction",     tenVN: "Khoản trừ tháng (tạm ứng, kỷ luật...)", thuTu: 8, prio: 62, rowClass: "Summary", alloc: "MaxSalaryRow", sumPrev: "Y", prorataBasis: "", type: "Number", note: "Gán theo tháng cho NV" },
+            { id: 9,  ma: "TT_LSP_LuyKeLuong",        tenEN: "Cumulative salary",     tenVN: "Lương lũy kế xuyên giai đoạn",      thuTu: 9,  prio: 65, rowClass: "Summary", alloc: "Accumulate",    sumPrev: "Y", prorataBasis: "", type: "Number", note: "" },
+            { id: 10, ma: "TT_LSP_ThuNhapTinhThue",   tenEN: "Taxable income",        tenVN: "Thu nhập tính thuế",                 thuTu: 10, prio: 70, rowClass: "Summary", alloc: "LastStageRow",  sumPrev: "Y", prorataBasis: "", type: "Number", note: "" },
+            { id: 11, ma: "TT_LSP_KetQua_Final",      tenEN: "Final result",          tenVN: "Tổng LSP cuối cùng",                thuTu: 11, prio: 99, rowClass: "Summary", alloc: "None",          sumPrev: "Y", prorataBasis: "", type: "Number", note: "" }
         ],
         congThucLuong: [
             { id: 1, ten: "Công thức LNS 2026", loai: "LNS", hieuLuc: "01/01/2026", congThuc: "CALC_01 + CALC_02" }

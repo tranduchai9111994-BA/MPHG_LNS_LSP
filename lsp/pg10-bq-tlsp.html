@@ -139,33 +139,11 @@
         <i>* BQ theo c&ocirc;ng = QTL / T&#7893;ng c&ocirc;ng &times; C&ocirc;ng &#273;&#7911; c&#7911;a Ka. C&#7897;t &gt;3T lo&#7841;i lao &#273;&#7897;ng m&#7899;i v&agrave;o d&#432;&#7899;i 3 th&aacute;ng kh&#7887;i c&#7843; t&#7917; s&#7889; v&agrave; m&#7851;u s&#7889;.</i>
     </div>
 
-    <!-- ========== GRID 2: NHOM BINH QUAN ========== -->
-    <hr class="section-divider">
-    <div class="section-title">L&#431;&#7898;I 2 &mdash; C&Aacute;C NH&Oacute;M B&Igrave;NH QU&Acirc;N T&#7892;NG H&#7906;P (ngu&#7891;n &#273;&#417;n gi&aacute; tr&#7843; l&#432;&#417;ng ph&#7909; tr&#7907;)</div>
-    <div class="info-bar-blue info-bar" style="font-size:11px; padding:8px 12px; margin-bottom:10px;">
-        <b>C&ocirc;ng th&#7913;c:</b> BQ nh&oacute;m = SUM(QTL c&aacute;c BP th&agrave;nh vi&ecirc;n) / SUM(C&ocirc;ng c&aacute;c BP th&agrave;nh vi&ecirc;n) &times; BQ c&ocirc;ng &#273;&#7911; (gia quy&#7873;n theo SL b&agrave;n).
-        K&#7871;t qu&#7843; nh&oacute;m <b>BQ (CB, XQ, PTO, BCtb, CBTB, TB)</b> l&agrave; &#273;&#7847;u v&agrave;o b&#7855;t bu&#7897;c c&#7911;a ch&#7913;c n&#259;ng <b>B&#7843;ng t&iacute;nh l&#432;&#417;ng V&#7879; sinh</b>.
-    </div>
-    <div class="grid-container" style="max-height:250px;">
-        <table class="data-table">
-            <thead><tr>
-                <th>TT</th><th class="text-left">Nh&oacute;m b&igrave;nh qu&acirc;n</th>
-                <th class="text-left">Th&agrave;nh ph&#7847;n (BP&times;Ka)</th>
-                <th>BQ c&ocirc;ng &#273;&#7911;</th>
-                <th class="col-money">T&#7893;ng QTL (VND)</th>
-                <th>T&#7893;ng c&ocirc;ng</th>
-                <th class="col-money" style="background-color:#ffcccc;">BQ th&aacute;ng (VND)</th>
-                <th class="text-left">D&ugrave;ng tr&#7843; l&#432;&#417;ng cho</th>
-            </tr></thead>
-            <tbody id="tbNhom"></tbody>
-        </table>
-    </div>
-
     <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
         <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
             &#128203; GHI CH&Uacute; NGHI&#7878;P V&#7908; (d&agrave;nh cho th&#7849;m &#273;&#7883;nh)
         </div>
-        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Tham khảo file QTLSP T07-2026 (Sheet Report3_BTiHRP).</textarea>
     </div>
 
   </div><!-- end container -->
@@ -227,35 +205,10 @@
             '<td>' + sumBan + '</td>' +
             '<td class="col-money text-danger" colspan="2" style="font-size:13px;">' + formatNumber(Math.round(bqAll)) + ' &#273;</td></tr>';
 
-        renderNhomBQ();
-
         _daTinh = true;
         var b = document.getElementById('btn-khoa-bq');
         b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
         showAlert('alertBox', 'Đã tính bình quân cho ' + rows.length + ' Bộ phận × Ka và ' + window.MOCK.lsp.nhomBQ.length + ' nhóm BQ tổng hợp.', 'success');
-    }
-
-    /* ============================
-       LƯỚI 2: NHÓM BÌNH QUÂN (BQ-06)
-    ============================ */
-    function renderNhomBQ() {
-        var phamVi = getPhamVi();
-        var tbody = document.getElementById('tbNhom');
-        tbody.innerHTML = '';
-        window.MOCK.lsp.nhomBQ.forEach(function (n, idx) {
-            var kq = computeBQNhomLSP(n.ma, phamVi);
-            if (!kq) return;
-            var thanhPhan = n.members.join(', ');
-            tbody.innerHTML += '<tr class="row-nhom-bq">' +
-                '<td>' + (idx + 1) + '</td>' +
-                '<td class="text-left">' + n.ten + '<br><small style="font-weight:normal;color:#888;">' + n.excelRef + '</small></td>' +
-                '<td class="text-left" style="font-weight:normal; font-size:10px; max-width:220px;">' + thanhPhan + '</td>' +
-                '<td>' + formatNumber(kq.bqCongDu, 2) + '</td>' +
-                '<td class="col-money">' + formatNumber(kq.tongQTL) + '</td>' +
-                '<td>' + formatNumber(kq.tongCong, 1) + '</td>' +
-                '<td class="col-money text-danger" style="font-size:13px;">' + formatNumber(kq.bqThang) + '</td>' +
-                '<td class="text-left"><span class="badge-nhom">' + n.nhomHuong + '</span></td></tr>';
-        });
     }
 
     /* ============================

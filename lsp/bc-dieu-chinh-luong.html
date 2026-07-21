@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Báo cáo điều chỉnh lương theo bộ phận</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 20px 0; letter-spacing: 1px; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+
+      .table-header th { background: #f4d03f; color: #333; padding: 6px 8px; text-align: center; font-size: 11px; border: 1px solid #cfd8dc; }
+      .table-row td { padding: 6px 8px; font-size: 11px; border: 1px solid #cfd8dc; white-space: nowrap; }
+      .row-subtotal td { background: #d9ead3; font-weight: bold; }
+      .row-group td { background: #eee; font-weight: bold; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương Sản Phẩm › Báo cáo › Bảng điều chỉnh lương theo bộ phận</div>
+      <div class="bc-title">BẢNG ĐIỀU CHỈNH LƯƠNG THEO BỘ PHẬN</div>
+      <div id="bc2-alert" class="alert-box"></div>
+
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label>Công ty</label>
+          <select id="bc2_congty">
+            <option value="">-- Chọn --</option>
+            <option value="CT1">Công Ty Cổ Phần Thủy Sản Minh Phú Hậu Giang</option>
+          </select>
+
+          <label>Đơn vị cấp 1</label>
+          <select id="bc2_dv1">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất">Sản xuất</option>
+          </select>
+
+          <label>Đơn vị cấp 2</label>
+          <select id="bc2_dv2">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất MPHG">Sản xuất MPHG</option>
+          </select>
+
+          <label>Bộ phận bảng kê</label>
+          <select id="bc2_bpbk"><option value="">-- Chọn --</option></select>
+
+          <label>Bộ phận tính lương</label>
+          <select id="bc2_bptl"><option value="">-- Chọn --</option></select>
+
+          <label>Nhóm tính lương</label>
+          <select id="bc2_ntl"><option value="">-- Chọn --</option></select>
+
+          <label class="lbl-red">Tháng (*)</label>
+          <input type="text" id="bc2_thang" placeholder="MM/YYYY" maxlength="7" value="06/2026">
+
+          <label>Từ ngày</label>
+          <input type="date" id="bc2_tungay">
+
+          <label>Đến ngày</label>
+          <input type="date" id="bc2_denngay">
+        </div>
+      </div>
+
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc2Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="showAlert2('bc2-alert', 'Tính năng xuất Excel đang hoàn thiện.', 'info')">Xuất Excel</button>
+      </div>
+
+      <div class="grid-wrap" style="height:450px; overflow-x: auto; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse; min-width: 1900px;">
+          <thead>
+            <tr class="table-header">
+              <th rowspan="2">Bộ Phận</th>
+              <th rowspan="2">Số LĐ</th>
+              <th rowspan="2">Ngày<br>Công</th>
+              <th colspan="2">QUỸ TIỀN LƯƠNG SẢN PHẨM (QTLSP)</th>
+              <th colspan="2">QUỸ TIỀN LƯƠNG (QTL)</th>
+              <th colspan="3">BÌNH QUÂN LƯƠNG SẢN PHẨM (BQ LSP)</th>
+              <th rowspan="2">Công<br>Q.Đổi</th>
+              <th rowspan="2">TLSP</th>
+              <th rowspan="2">TL</th>
+              <th rowspan="2">TLĐH<br>(Chỉnh)</th>
+              <th colspan="2">TIỀN ĐIỀU CHỈNH</th>
+              <th rowspan="2" style="background:#c6e0b4;">TLSP<br>Sau ĐC +5%</th>
+              <th rowspan="2" style="background:#c6e0b4;">TL<br>Sau ĐC</th>
+            </tr>
+            <tr class="table-header" style="background:#fce8b2;">
+              <th>Trước ĐC</th>
+              <th>Sau ĐC</th>
+              <th>Trước ĐC</th>
+              <th>Sau ĐC</th>
+              <th>BQ Trước ĐC</th>
+              <th>BQ Sau ĐC</th>
+              <th>BQ (L4)</th>
+              <th>Tiền C/G</th>
+              <th>Tiền T/G</th>
+            </tr>
+          </thead>
+          <tbody id="bc2-tbody">
+            <tr class="table-row"><td colspan="18" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+          📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;
+          font-size:12px;background:#fffef0;resize:vertical;"
+          placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Cần xác nhận với khách hàng công thức/định nghĩa chính xác của các cột QTLSP, QTL, BQ LSP, Tiền C/G, Tiền T/G (nguồn: sheet DC - file B.LUONG MPHG T07-2026), do các cột này trong file mẫu bị thu hẹp độ rộng nên nhãn cột chưa hiển thị đầy đủ.</textarea>
+        <div style="text-align:right;margin-top:6px;">
+          <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      bc2Search();
+    });
+
+    function bc2Row(bp, soLd, ngayCong, qtlspTruoc, qtlspSau, qtlTruoc, qtlSau, bqTruoc, bqSau, bqL4, congQd, tlsp, tl, tldh, tienCG, tienTG, tlspSau5, tlSau, cls) {
+      const fmt = n => (n === '' || n === null || n === undefined) ? '' : Number(n).toLocaleString('en-US');
+      return `<tr class="table-row${cls ? ' ' + cls : ''}">
+        <td>${bp}</td>
+        <td style="text-align:center;">${soLd}</td>
+        <td style="text-align:right;">${fmt(ngayCong)}</td>
+        <td style="text-align:right;">${fmt(qtlspTruoc)}</td>
+        <td style="text-align:right;">${fmt(qtlspSau)}</td>
+        <td style="text-align:right;">${fmt(qtlTruoc)}</td>
+        <td style="text-align:right;">${fmt(qtlSau)}</td>
+        <td style="text-align:right;">${fmt(bqTruoc)}</td>
+        <td style="text-align:right;">${fmt(bqSau)}</td>
+        <td style="text-align:right;">${fmt(bqL4)}</td>
+        <td style="text-align:right;">${fmt(congQd)}</td>
+        <td style="text-align:right;">${fmt(tlsp)}</td>
+        <td style="text-align:right;">${fmt(tl)}</td>
+        <td style="text-align:right;">${fmt(tldh)}</td>
+        <td style="text-align:right;">${fmt(tienCG)}</td>
+        <td style="text-align:right;">${fmt(tienTG)}</td>
+        <td style="text-align:right;font-weight:bold;">${fmt(tlspSau5)}</td>
+        <td style="text-align:right;font-weight:bold;">${fmt(tlSau)}</td>
+      </tr>`;
+    }
+
+    function bc2Search() {
+      const thang = document.getElementById('bc2_thang').value.trim();
+      if (!thang) {
+        showAlert2('bc2-alert', 'Vui lòng nhập Tháng tính lương (bắt buộc nhập).', 'error');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) {
+        showAlert2('bc2-alert', 'Định dạng tháng không hợp lệ. Vui lòng nhập MM/YYYY (Ví dụ: 06/2026).', 'error');
+        return;
+      }
+      const tbody = document.getElementById('bc2-tbody');
+
+      tbody.innerHTML =
+        `<tr class="table-row row-group"><td colspan="18">CA 1</td></tr>` +
+        bc2Row('Băng chuyền IQF ka 1', 88, 2033, 954749542, 850064483, 954749542, 850064483, 11739494, 10452298, 92798, 25.0, 11582664, 10312664, 91400, '', '', 11674064, 10312664) +
+        bc2Row('Băng chuyền IQF 08 ka 1', 29, 671.0, 316387221, 281696432, 316387221, 281696432, 11787899, 10495396, 93022, 25.0, 11582664, 10312664, 91400, 1270000, '', 11674064, 10312664) +
+        bc2Row('Băng chuyền IQF 09 ka 1', 29, 661.0, 311540872, 277381469, 311540872, 277381469, 11770473, 10479880, 93347, 25.0, 11582664, 10312664, 91400, 1270000, '', 11674064, 10312664) +
+        bc2Row('Băng chuyền IQF 10 ka 1', 30, 700.5, 326821448, 290986581, 326821448, 290986581, 11663863, 10384960, 92065, 25.0, 11582664, 10312664, 91400, 1270000, '', 11674064, 10312664) +
+        bc2Row('Băng chuyền GTGT ka 1', 82, 1806, 634229966, 725838822, 697652963, 725838822, 9130158, 10448928, 5069, 26.0, 9900752, 10300752, 4970, '', 400000, 9905721, 10300752) +
+        bc2Row('Băng chuyền Nobashi ka 1', 35, 795.4, 281080199, 321679724, 309188219, 321679724, 9187937, 10515053, 5156, 26.0, 9900752, 10300752, 4970, '', 400000, 9905721, 10300752) +
+        bc2Row('Băng chuyền Sushi ka 1', 47, 1010.7, 353149768, 404159098, 388464744, 404159098, 9084688, 10396890, 5001, 26.0, 9900752, 10300752, 4970, '', 400000, 9905721, 10300752) +
+        `<tr class="table-row row-group"><td colspan="18">CA 2</td></tr>` +
+        bc2Row('Băng chuyền IQF ka 2', 89, 2172, 923855440, 870546141, 923855440, 870546141, 11061080, 10422822, 116676, 26.0, 10917962, 10287962, 115281, '', '', 11033243, 10287962) +
+        bc2Row('Băng chuyền IQF 08 ka 2', 31, 726.8, 308886216, 291062531, 308886216, 291062531, 11049865, 10412253, 115898, 26.0, 10917962, 10287962, 115281, 630000, '', 11033243, 10287962) +
+        bc2Row('Băng chuyền IQF 09 ka 2', 31, 702.0, 296823539, 279695908, 296823539, 279695908, 10993464, 10359108, 115859, 26.0, 10917962, 10287962, 115281, 630000, '', 11033243, 10287962) +
+        bc2Row('Băng chuyền IQF 10 ka 2', 31, 742.8, 318145686, 299787701, 318145686, 299787701, 11135956, 10493377, 118211, 26.0, 10917962, 10287962, 115281, 630000, '', 11033243, 10287962) +
+        bc2Row('Băng chuyền BBCN', 8, 104.6, 16187284, 24533163, 16187284, 24533163, 3517140, 5863567, 4566, '', 4276089, 6480764, 9951, '', 2116489, 8345879, '') +
+        bc2Row('<b>TỔNG Băng chuyền GTGT</b>', 344, 7811, 3185292509, 3189055490, 3315961262, 3189055490, 10399324, 10825930, 58730, '', 10470339, '', '', '', 17988787, '', '', 'row-subtotal') +
+        bc2Row('<b>TỔNG Băng chuyền IQF</b>', 344, 7811, 3185292509, 3189055490, 3315961262, 3189055490, 10399324, 10825930, 58730, '', 10470339, '', '', '', 17988787, '', '', 'row-subtotal') +
+        bc2Row('<b>TỔNG Băng chuyền</b>', 352, 7915, 3200008222, 3213588653, 3332148546, 3213588653, 10309305, 10735015, 58015, '', 10411071, '', '', '', 18007892, '', '', 'row-subtotal') +
+        `<tr class="table-row row-group"><td colspan="18">XẾP HỘP / CẤP ĐÔNG / QUAY</td></tr>` +
+        bc2Row('Xếp Hộp', 87, 1871, 459728532, 572545018, 459728532, 696671721, 6266345, 9496006, 12916, 25.5, 8033466, 9583466, 13338, '', 124126704, 8046804, 947577) +
+        bc2Row('Xếp hộp 01 ka 1', 45, 927.2, 223518628, 287697824, 223518628, 348047854, 6026710, 9384379, 14838, 25.0, 7740361, 9490361, 15269, '', 60350030, 8337929, 550301) +
+        bc2Row('Xếp hộp 01 ka 2', 42, 943.6, 236209904, 284847193, 236209904, 348623868, 6508539, 9605999, 10947, 25.0, 8326572, 9676572, 11406, '', 63776764, 8337929, 397276) +
+        bc2Row('Cấp Đông', 36, 832, 265550917, 272884555, 265550917, 312517193, 8143774, 9584111, 10747, 25.5, 9474183, 9659183, 10515, '', 39832638, 9484698, 350432) +
+        bc2Row('Cấp đông 01 ka 1', 16, 380.9, 138941426, 129191529, 138941426, 150032743, 9119285, 9847253, 11121, 25.0, 9858373, 9694525, 10420, 716677, 20841214, 10334946, 169436) +
+        bc2Row('Cấp đông 01 ka 2', 20, 450.6, 126609491, 143493027, 126609491, 162484450, 7305474, 9375490, 10444, 25.0, 8623840, 9623840, 10609, 2124849, 18991424, 8634546, 180997) +
+        bc2Row('QUAY', 38, 905, 378283966, 354196698, 355586928, 354196698, 10600006, 9981231, 69883, 25.5, 10051113, 9794884, 68624, '', 163959341, 9863507, 2479870) +
+        bc2Row('Quay phục vụ ka 1', 19, 455.4, 179386106, 179815069, 168622940, 179815069, 9847720, 9871271, 74462, 25.0, 9945733, 9039725, 73012, 600000, 1356408, 9112737, '') +
+        bc2Row('Quay phục vụ ka 2', 17, 449.5, 198897860, 174381629, 186963988, 174381629, 11504659, 10086590, 64983, 26.0, 10151574, 10550043, 64235, 710000, 1123462, 10614278, '');
+
+      showAlert2('bc2-alert', 'Đã tải dữ liệu điều chỉnh lương theo bộ phận (dữ liệu minh họa).', 'success');
+    }
+  </script>
+</body>
+</html>

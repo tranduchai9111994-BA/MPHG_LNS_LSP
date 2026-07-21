@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Định nghĩa tiêu chí hệ thống</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .btn-vd{background:#0056b3;color:#fff;border:none;padding:2px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-weight:bold;}
+      .btn-vd:hover{background:#003d80;}
+      .vd-tbl{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0;}
+      .vd-tbl th{background:#e8eef5;padding:4px 6px;border:1px solid #ccc;text-align:left;font-weight:bold;}
+      .vd-tbl td{padding:4px 6px;border:1px solid #ddd;}
+      .vd-tbl .r{text-align:right;} .vd-tbl .hi{color:#0056b3;font-weight:bold;} .vd-tbl .hi2{color:#28a745;font-weight:bold;} .vd-tbl .dim{color:#999;} .vd-tbl .sum td{font-weight:bold;background:#f0f4f8;}
+      .vd-step{background:#f8f9fa;border-left:3px solid #0056b3;padding:8px 12px;margin:8px 0;font-size:11px;line-height:1.6;}
+      .vd-step .op{color:#d63384;font-weight:bold;} .vd-step .warn{color:#e67e22;font-weight:bold;}
+      .vd-info{background:#eaf7ea;border:1px solid #28a745;border-radius:4px;padding:6px 10px;font-size:11px;margin-top:8px;}
+      .ref-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
+      .ref-table th{background:#e8eef5;color:#333;padding:6px 8px;border:1px solid #ccc;text-align:left;font-weight:bold;}
+      .ref-table td{padding:6px 8px;border:1px solid #ddd;background:#f9fbfd;}
+      .ref-table tr:hover td{background:#eef4fb;}
+      .help-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#6c757d;color:#fff;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;vertical-align:middle;user-select:none;}
+      .help-icon:hover{background:#0056b3;}
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Thiết lập (System) › Thiết lập công thức tính lương › Định nghĩa tiêu chí hệ thống</div>
+  <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;">
+    <span>ĐỊNH NGHĨA TIÊU CHÍ HỆ THỐNG</span>
+    <span style="display:flex;gap:8px;">
+      <button onclick="showSystemParams()" style="background:#17a2b8;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">📖 Tham số hệ thống</button>
+      <button onclick="showRules()" style="background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">📋 Quy tắc</button>
+    </span>
+  </div>
+  <div class="info-bar" style="margin-bottom:10px;">
+    RÀNG BUỘC: Tiêu chí hệ thống <strong>chỉ cho phép CASE WHEN (SQL)</strong> với điều kiện là <strong>tiêu chí tìm kiếm (TK_*)</strong> — kiểu NVARCHAR/DATETIME.
+    Kiểu dữ liệu đầu ra: <strong>FLOAT</strong>. Không hỗ trợ JOIN, subquery.
+  </div>
+  <div id="set2-alert" class="alert-box"></div>
+
+  <!-- MODAL: Quy tắc màn hình -->
+  <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="max-width:720px;">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>📋 Quy tắc nghiệp vụ — Định nghĩa tiêu chí hệ thống</span>
+        <button class="x" onclick="document.getElementById('modal-rules').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body" id="modal-rules-body" style="max-height:75vh;overflow-y:auto;"></div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('modal-rules').style.display='none'">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Help icon (?) -->
+  <div class="modal-overlay" id="modal-help" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="max-width:600px;">
+      <div class="modal-hdr" style="background:#6c757d;">
+        <span id="modal-help-title">Giải thích</span>
+        <button class="x" onclick="document.getElementById('modal-help').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body" id="modal-help-body" style="max-height:65vh;overflow-y:auto;"></div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('modal-help').style.display='none'">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Tham số hệ thống (dev-code, truyền vào fn) -->
+  <div class="modal-overlay" id="modal-sysparam" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="max-width:820px;">
+      <div class="modal-hdr" style="background:#17a2b8;">
+        <span>📖 Tham số hệ thống (dev-code) — truyền vào function</span>
+        <button class="x" onclick="document.getElementById('modal-sysparam').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:75vh;overflow-y:auto;">
+        <div class="info-bar" style="margin-bottom:10px;">
+          Đây là các tham số kỹ thuật <strong>Dev đã code sẵn</strong> trong mọi function của từng Module — luôn có thể truyền vào khi viết SQL/CASE WHEN, khác với "Param" nghiệp vụ (PARAM_...) phải chọn qua popup Chọn Param.
+        </div>
+        <div id="sysparam-body"></div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('modal-sysparam').style.display='none'">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Mã tiêu chí</label>
+      <div class="input-wrap"><input type="text" id="set2_ma" maxlength="100" placeholder="Nhập mã tiêu chí..."><div class="input-note">Unique. Không dấu, không khoảng trắng.</div></div>
+      <label class="lbl-red">Tên tiếng việt</label>
+      <div class="input-wrap"><input type="text" id="set2_tenVI" maxlength="255" placeholder="Tên tiếng Việt..."></div>
+      <label>Tên tiếng anh</label>
+      <div class="input-wrap"><input type="text" id="set2_tenEN" maxlength="255" placeholder="Tên tiếng Anh..."></div>
+      <label>Thứ tự sắp xếp</label>
+      <div class="input-wrap"><input type="number" id="set2_thuTu" min="0" placeholder="0"></div>
+      <label>Dùng fn table</label>
+      <div class="input-wrap">
+        <select id="set2_fnTable">
+          <option value="">(Không)</option>
+          <option value="PR_LSP_fnGetNS">PR_LSP_fnGetNS</option>
+          <option value="PR_LSP_fnGetDonGia">PR_LSP_fnGetDonGia</option>
+          <option value="PR_LSP_fnGetHeSo">PR_LSP_fnGetHeSo</option>
+          <option value="PTS_fnGetCongChiTietNgay">PTS_fnGetCongChiTietNgay</option>
+          <option value="PR_LSP_fnGetCongChuan">PR_LSP_fnGetCongChuan</option>
+          <option value="PR_LSP_fnGetTongLSP_Dept">PR_LSP_fnGetTongLSP_Dept</option>
+          <option value="PR_LSP_fnGetTongCong_Dept">PR_LSP_fnGetTongCong_Dept</option>
+        </select>
+      </div>
+      <label class="lbl-red" style="grid-column:1">Công thức (SQL)</label>
+      <div class="input-wrap" style="grid-column:2/5"><textarea id="set2_sql" maxlength="2000" style="height:55px;width:100%;font-family:Consolas,monospace;font-size:11px;" placeholder="VD: dbo.PR_LSP_fnGetNS(...)"></textarea></div>
+      <label>Param</label>
+      <div style="display:flex;gap:4px;align-items:center;grid-column:2/5;max-width:320px;">
+        <input type="text" id="set2_param" readonly placeholder="(Chọn Param)" style="flex:1;padding:4px 6px;border:1px solid #ccc;height:26px;font-family:inherit;outline:none;background:#f8f9fa;">
+        <button onclick="openParamPopup()" style="padding:4px 10px;background:#17a2b8;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:bold;font-size:11px;height:26px;white-space:nowrap;">Tìm</button>
+        <button onclick="clearParam()" style="padding:4px 8px;background:#e2e6ea;color:#333;border:none;border-radius:3px;cursor:pointer;font-size:11px;height:26px;" title="Xóa Param">✕</button>
+      </div>
+      <label>Ghi chú</label>
+      <div class="input-wrap" style="grid-column:2/5"><textarea id="set2_note" maxlength="1000" style="height:45px;"></textarea></div>
+      <label></label>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="set2_maHoa"> Mã hóa dữ liệu</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="set2_use" checked> Sử dụng</label>
+      </div>
+    </div>
+
+    <!-- Collapsible: Thuộc tính nâng cao -->
+    <div style="margin-top:15px;border:1px solid #ccc;border-radius:4px;overflow:hidden;">
+      <div onclick="toggleAdvanced()" style="background:#e8f4f8;cursor:pointer;padding:8px 12px;font-weight:bold;color:#004085;font-size:12px;display:flex;align-items:center;gap:6px;user-select:none;">
+        <span id="set2_advIcon">▼</span> 🔧 Thuộc tính nâng cao — Hành vi nhiều dòng (LSP)
+      </div>
+      <div id="set2_advBody" style="padding:12px 15px;border-top:1px solid #ccc;background:#fafcff;">
+        <div class="form-grid-2col">
+          <label class="lbl-red">Cấp độ tính (CalcLevel)<span class="help-icon" onclick="showHelp('calcLevel')">?</span></label>
+          <div class="input-wrap">
+            <select id="set2_calcLevel" onchange="onHtCalcLevelChange()">
+              <option value="PerSlice">PerSlice</option>
+              <option value="PerEmployee" selected>PerEmployee</option>
+              <option value="Aggregate">Aggregate</option>
+            </select>
+          </div>
+
+          <label>Cho phép SUM tiêu chí trước (AllowSumPrev)<span class="help-icon" onclick="showHelp('sumprev')">?</span></label>
+          <div class="input-wrap">
+            <select id="set2_sumPrev">
+              <option value="N" selected>N</option>
+              <option value="Y">Y</option>
+            </select>
+          </div>
+
+          <label class="lbl-red">Cách phân bổ (Allocation)</label>
+          <div class="input-wrap">
+            <select id="set2_alloc" onchange="onHtAllocChange()">
+              <option value="None" selected>None</option>
+              <option value="Prorata">Prorata</option>
+              <option value="OldStage">OldStage</option>
+              <option value="MaxSalaryRow">MaxSalaryRow</option>
+              <option value="LastStageRow">LastStageRow</option>
+              <option value="Accumulate">Accumulate</option>
+            </select>
+          </div>
+
+          <label>Cơ sở chia tỷ lệ (ProrataBasis)<span class="help-icon" onclick="showHelp('prorataBasis')">?</span></label>
+          <div class="input-wrap">
+            <select id="set2_prorataBasis" disabled>
+              <option value="">(Chỉ áp dụng khi Allocation=Prorata)</option>
+            </select>
+          </div>
+
+          <label class="lbl-red">Độ ưu tiên (Priority)</label>
+          <div class="input-wrap"><input type="number" id="set2_rank" min="0" value="0" style="width:100px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VD HT -->
+  <div class="modal-overlay" id="modal-vd-ht" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:95vw;max-width:1300px;height:92vh;display:flex;flex-direction:column;">
+      <div class="modal-hdr" id="modal-vd-ht-title">📋 Ví dụ</div>
+      <div class="modal-body" id="modal-vd-ht-body" style="flex:1;overflow-y:auto;padding:12px 15px;font-size:12px;"></div>
+      <div class="modal-ftr"><button class="btn btn-cancel" onclick="document.getElementById('modal-vd-ht').style.display='none'">Đóng</button></div>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn-search" onclick="set2Search()">Tìm Kiếm</button>
+    <button class="btn-refresh" onclick="set2Clear()">Làm mới</button>
+    <button class="btn-save2" onclick="set2Save()">Lưu</button>
+    <button class="btn-delete" onclick="set2Delete()">Xóa</button>
+    <button class="btn-export">Xuất dữ liệu</button>
+  </div>
+
+  <div class="grid-wrap"><table>
+    <thead><tr>
+      <th><input type="checkbox" id="set2_chkAll" onchange="toggleAll('set2_chkAll','.set2-chk')"></th>
+      <th>STT</th>
+      <th>Sửa</th>
+      <th>Mã tiêu chí</th>
+      <th>Tên tiếng Việt</th>
+      <th>Ghi chú</th>
+      <th>Thứ tự</th>
+      <th>Công thức (SQL)</th>
+      <th>CalcLevel</th>
+      <th>Param</th>
+      <th>SUM trước</th>
+      <th>Allocation</th>
+      <th>Cơ sở Prorata</th>
+      <th>Priority</th>
+      <th>Ví dụ</th>
+      <th>Sử dụng</th>
+      <th>Người tạo</th>
+      <th>Ngày tạo</th>
+      <th>Người sửa</th>
+      <th>Ngày sửa</th>
+    </tr></thead>
+    <tbody id="set2-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Popup Chọn Param -->
+<div class="modal-overlay" id="set2-param-popup">
+  <div class="modal-box wide">
+    <div class="modal-hdr" style="background:#0056b3"><span>📋 CHỌN PARAM</span><button class="x" onclick="hideModal('set2-param-popup')">✕</button></div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+        <label style="font-weight:bold;margin:0;display:inline;">Phân hệ</label>
+        <select id="pp_module" style="width:100px;padding:4px;border:1px solid #ccc;height:26px;">
+          <option value="">Tất cả</option>
+          <option value="FO">FO</option><option value="HR">HR</option><option value="TS">TS</option>
+          <option value="PR">PR</option><option value="INS">INS</option><option value="PIT">PIT</option>
+        </select>
+        <label style="font-weight:bold;margin:0;display:inline;">Mã Param</label>
+        <input type="text" id="pp_code" placeholder="Mã..." style="width:120px;padding:4px 6px;border:1px solid #ccc;height:26px;">
+        <label style="font-weight:bold;margin:0;display:inline;">Tên Param</label>
+        <input type="text" id="pp_name" placeholder="Tên..." style="width:120px;padding:4px 6px;border:1px solid #ccc;height:26px;">
+        <button class="btn-search" onclick="filterParamPopup()" style="padding:4px 12px;">Tìm Kiếm</button>
+      </div>
+      <div style="overflow-x:auto;max-height:280px;overflow-y:auto;border:1px solid #ddd;">
+        <table>
+          <thead><tr>
+            <th>Mã Param</th><th>Tên Param</th><th>Kiểu dữ liệu</th><th>Phân hệ</th><th>Mô tả</th><th>Chọn</th>
+          </tr></thead>
+          <tbody id="pp-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-ftr"><button class="btn-cancel" onclick="hideModal('set2-param-popup')">Đóng</button></div>
+  </div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="5" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">CalcLevel: PerSlice = tính theo từng giai đoạn QTLV (công, NS theo slice); PerEmployee = 1 giá trị/NV; Aggregate = gộp nhiều NV theo group key + toán tử do chính function quyết định (đã bỏ field Scope/Op cấu hình riêng — mỗi Aggregate dùng 1 fn hardcode sẵn group/Op, tránh 2 nguồn sự thật giữa UI và code).
+Param (theo PeopleX): ánh xạ tiêu chí tới nguồn dữ liệu phân hệ do Dev cung cấp — dùng thay/bổ sung SQL tự do khi có Param chuẩn.
+Need Confirm (LSP-OP-07/09): Aggregate tính realtime hay materialized cho ~3000 NV? Loại trừ NV<50% công ở tử+mẫu hay chỉ mẫu?</textarea>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+const CURRENT_USER = 'FPT Admin';
+
+function nowStr() {
+  var d = new Date();
+  var dd = String(d.getDate()).padStart(2,'0');
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var yyyy = d.getFullYear();
+  var hh = String(d.getHours()).padStart(2,'0');
+  var mi = String(d.getMinutes()).padStart(2,'0');
+  return dd+'/'+mm+'/'+yyyy+' '+hh+':'+mi;
+}
+
+const MOCK_HT = [
+  {ma:'HT_TS_CongThucTe', vi:'Công thực tế', en:'', sql:'dbo.PTS_fnGetCongChiTietNgay(...)', calc:'PerSlice', param:'PARAM_CONG_TT', thuTu:1, rank:1, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_TS_CongChuan', vi:'Công chuẩn tháng', en:'', sql:'dbo.PR_LSP_fnGetCongChuan(PR_LSP.PRMonth)', calc:'PerEmployee', param:'PARAM_CONG_CHUAN', thuTu:2, rank:2, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_NangSuatTinhLuong', vi:'Sản lượng NS_FINAL', en:'', sql:'dbo.PR_LSP_fnGetNS(...)', calc:'PerSlice', param:'PARAM_NS_FINAL', thuTu:3, rank:3, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_DonGia', vi:'Đơn giá tiền lương', en:'', sql:'dbo.PR_LSP_fnGetDonGia(...)', calc:'PerSlice', param:'PARAM_DONGIA_LSP', thuTu:4, rank:4, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_HeSo1', vi:'Hệ số ĐC lần 1', en:'', sql:'dbo.PR_LSP_fnGetHeSo(...,1)', calc:'PerEmployee', param:'PARAM_HESO_DC', thuTu:5, rank:5, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_TongLSP_Dept', vi:'Tổng LSP theo Bộ phận', en:'', sql:'dbo.PR_LSP_fnGetTongLSP_Dept(...)', calc:'Aggregate', param:'', thuTu:6, rank:6, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_TongCong_Dept', vi:'Tổng công theo Bộ phận', en:'', sql:'dbo.PR_LSP_fnGetTongCong_Dept(...)', calc:'Aggregate', param:'', thuTu:7, rank:7, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_BinhQuanLuongCa', vi:'Bình quân LSP theo Ca', en:'', sql:'dbo.PR_LSP_fnGetBinhQuan_Ka(...)', calc:'Aggregate', param:'', thuTu:8, rank:8, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_MaxLuongBan', vi:'Lương cao nhất theo Bàn', en:'', sql:'dbo.PR_LSP_fnGetMax_Ban(...)', calc:'Aggregate', param:'', thuTu:9, rank:9, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_MinLuongNM', vi:'Lương thấp nhất toàn Nhà máy', en:'', sql:'dbo.PR_LSP_fnGetMin_CrossDept(...)', calc:'Aggregate', param:'', thuTu:10, rank:10, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_LSP_BinhQuanTheoChucVu', vi:'Bình quân lương theo Chức vụ', en:'', sql:'dbo.PR_LSP_fnGetBinhQuan_ChucVu(...)', calc:'Aggregate', param:'', thuTu:11, rank:11, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'Ví dụ Aggregate group theo Chức vụ (fn tự định nghĩa) thay vì Bàn/Ca/BP', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''},
+  {ma:'HT_PR_KhoanTruThang', vi:'Khoản trừ tháng (gán theo NV)', en:'', sql:'dbo.PR_fnGetKhoanTruThang(NVID, PRMonth)', calc:'PerEmployee', param:'PARAM_KHOANTRU_THANG', thuTu:12, rank:12, alloc:'None', sumPrev:'N', prorataBasis:'', used:true, note:'HR gán 1 số tiền/tháng cho NV (tạm ứng, kỷ luật...), không đổi theo giai đoạn QTLV nên CalcLevel=PerEmployee', maHoa:false, createdBy:CURRENT_USER, createdDate:'01/07/2026 08:00', updatedBy:'', updatedDate:''}
+];
+
+const MOCK_PARAM = [
+  {code:'PARAM_NS_FINAL', name:'Sản lượng NS_FINAL đã khóa', type:'float', module:'PR', desc:'NS_FINAL per NV × CĐ × loại ca'},
+  {code:'PARAM_CONG_TT', name:'Công thực tế', type:'float', module:'TS', desc:'Ngày công thực tế theo slice'},
+  {code:'PARAM_CONG_CHUAN', name:'Công chuẩn tháng', type:'float', module:'TS', desc:'Thường 26/27'},
+  {code:'PARAM_DONGIA_LSP', name:'Đơn giá tiền lương', type:'float', module:'PR', desc:'Theo CĐ × Quy cách × BP'},
+  {code:'PARAM_HESO_DC', name:'Hệ số điều chỉnh', type:'float', module:'PR', desc:'HS1/HS2/HS3'},
+  {code:'PARAM_KHOANTRU_THANG', name:'Khoản trừ tháng', type:'float', module:'PR', desc:'Tạm ứng/kỷ luật... HR gán theo tháng cho NV, không theo giai đoạn QTLV'},
+];
+
+function renderGrid(data) {
+  var tbody = document.getElementById('set2-tbody');
+  if (!data) data = MOCK_HT;
+  var html = '';
+  for (var i = 0; i < data.length; i++) {
+    var r = data[i];
+    html += '<tr data-ma="'+r.ma+'">'
+      +'<td><input type="checkbox" class="set2-chk"></td>'
+      +'<td>'+(i+1)+'</td>'
+      +'<td><span class="edit-icon" onclick="set2Edit(this)">✎</span></td>'
+      +'<td style="text-align:left;"><b>'+r.ma+'</b></td>'
+      +'<td style="text-align:left;">'+r.vi+'</td>'
+      +'<td style="text-align:left;">'+r.note+'</td>'
+      +'<td>'+r.thuTu+'</td>'
+      +'<td style="text-align:left;max-width:200px;overflow:hidden;text-overflow:ellipsis;" title="'+r.sql.replace(/"/g,'&quot;')+'">'+r.sql+'</td>'
+      +'<td>'+r.calc+'</td>'
+      +'<td>'+r.param+'</td>'
+      +'<td style="text-align:center;">'+r.sumPrev+'</td>'
+      +'<td style="text-align:center;">'+r.alloc+'</td>'
+      +'<td style="text-align:center;'+(r.alloc==='Prorata' ? 'color:#0056b3;font-weight:bold;' : 'color:#ccc;')+'">'+(r.prorataBasis || (r.alloc==='Prorata' ? '&#9888; chưa chọn' : '—'))+'</td>'
+      +'<td style="text-align:center;">'+r.rank+'</td>'
+      +'<td style="text-align:center;"><button class="btn-vd" onclick="showVD_HT(\''+r.ma+'\')">Xem VD</button></td>'
+      +'<td>'+(r.used ? '<span style="color:green;font-weight:bold">✔</span>' : '<span style="color:#ccc;font-weight:bold">✘</span>')+'</td>'
+      +'<td>'+r.createdBy+'</td>'
+      +'<td>'+r.createdDate+'</td>'
+      +'<td>'+r.updatedBy+'</td>'
+      +'<td>'+r.updatedDate+'</td>'
+      +'</tr>';
+  }
+  tbody.innerHTML = html;
+}
+
+function set2Save() {
+  var ma = document.getElementById('set2_ma').value.trim();
+  var vi = document.getElementById('set2_tenVI').value.trim();
+  var sql = document.getElementById('set2_sql').value.trim();
+  var isEdit = document.getElementById('set2_ma').readOnly;
+
+  if (!ma || !vi || !sql) return showAlert('set2-alert','Vui lòng nhập đầy đủ các trường bắt buộc (màu đỏ): Mã tiêu chí, Tên tiếng việt, Công thức (SQL).','error',0);
+  if (!/^[a-zA-Z0-9_]+$/.test(ma)) return showAlert('set2-alert','Mã tiêu chí không hợp lệ. Phải viết liền không dấu, không khoảng trắng.','error',0);
+
+  var calcLevel = document.getElementById('set2_calcLevel').value;
+  var param = document.getElementById('set2_param').value.trim();
+  var alloc = document.getElementById('set2_alloc').value;
+  var prorataBasis = document.getElementById('set2_prorataBasis').value;
+  var sumPrev = document.getElementById('set2_sumPrev').value;
+  var rank = parseInt(document.getElementById('set2_rank').value) || 0;
+
+  // Constraint: Allocation chỉ áp dụng khi CalcLevel≠PerSlice — PerSlice đã có giá trị
+  // riêng từng dòng (tự phân biệt theo TK_* của giai đoạn), không cần phân bổ lại.
+  // PerEmployee/Aggregate cho ra 1 giá trị dùng chung nhiều dòng nên mới cần Allocation.
+  if (alloc !== 'None' && calcLevel === 'PerSlice') {
+    return showAlert('set2-alert','<b>Lỗi (Blocking):</b> CalcLevel=PerSlice đã cho giá trị riêng mỗi dòng — không cần Allocation. Chỉ dùng Allocation khi CalcLevel=PerEmployee/Aggregate.','error',0);
+  }
+
+  // Constraint: Prorata requires prorataBasis
+  if (alloc === 'Prorata' && !prorataBasis) {
+    return showAlert('set2-alert','<b>Lỗi (Blocking):</b> Allocation=Prorata bắt buộc chọn Cơ sở chia tỷ lệ (ProrataBasis) — engine cần biết chia theo tiêu chí nào.','error',0);
+  }
+
+  // Constraint: MaxSalaryRow/Accumulate forces sumPrev=Y
+  if (['MaxSalaryRow', 'Accumulate'].indexOf(alloc) >= 0 && sumPrev !== 'Y') {
+    return showAlert('set2-alert','<b>Lỗi (Blocking):</b> Allocation='+alloc+' cần SUM_PREV để so sánh/cộng dồn giá trị giữa các dòng — bắt buộc AllowSumPrev=Y.','error',0);
+  }
+
+  // Check duplicate on new
+  if (!isEdit) {
+    for (var i = 0; i < MOCK_HT.length; i++) {
+      if (MOCK_HT[i].ma === ma) {
+        return showAlert('set2-alert','<b>Lỗi (Blocking):</b> Mã tiêu chí ['+ma+'] đã tồn tại.','error',0);
+      }
+    }
+  }
+
+  var en = document.getElementById('set2_tenEN').value.trim();
+  var thuTu = parseInt(document.getElementById('set2_thuTu').value) || 0;
+  var note = document.getElementById('set2_note').value.trim();
+  var maHoa = document.getElementById('set2_maHoa').checked;
+  var used = document.getElementById('set2_use').checked;
+  var fnTable = document.getElementById('set2_fnTable').value;
+
+  if (isEdit) {
+    for (var i = 0; i < MOCK_HT.length; i++) {
+      if (MOCK_HT[i].ma === ma) {
+        MOCK_HT[i].vi = vi;
+        MOCK_HT[i].en = en;
+        MOCK_HT[i].sql = sql;
+        MOCK_HT[i].thuTu = thuTu;
+        MOCK_HT[i].note = note;
+        MOCK_HT[i].maHoa = maHoa;
+        MOCK_HT[i].used = used;
+        MOCK_HT[i].calc = calcLevel;
+        MOCK_HT[i].param = param;
+        MOCK_HT[i].alloc = alloc;
+        MOCK_HT[i].prorataBasis = alloc === 'Prorata' ? prorataBasis : '';
+        MOCK_HT[i].sumPrev = sumPrev;
+        MOCK_HT[i].rank = rank;
+        MOCK_HT[i].updatedBy = CURRENT_USER;
+        MOCK_HT[i].updatedDate = nowStr();
+        break;
+      }
+    }
+  } else {
+    MOCK_HT.push({
+      ma: ma, vi: vi, en: en, sql: sql, calc: calcLevel,
+      param: param, thuTu: thuTu, used: used, note: note, maHoa: maHoa,
+      alloc: alloc, prorataBasis: alloc === 'Prorata' ? prorataBasis : '', sumPrev: sumPrev, rank: rank,
+      createdBy: CURRENT_USER, createdDate: nowStr(), updatedBy: '', updatedDate: ''
+    });
+  }
+
+  renderGrid();
+  set2Clear();
+  showAlert('set2-alert','Lưu tiêu chí hệ thống thành công!','success');
+}
+
+function set2Edit(el) {
+  var row = el.closest('tr');
+  var ma = row.getAttribute('data-ma');
+  var r = null;
+  for (var i = 0; i < MOCK_HT.length; i++) {
+    if (MOCK_HT[i].ma === ma) { r = MOCK_HT[i]; break; }
+  }
+  if (!r) return;
+
+  document.getElementById('set2_ma').value = r.ma;
+  document.getElementById('set2_ma').readOnly = true;
+  document.getElementById('set2_tenVI').value = r.vi;
+  document.getElementById('set2_tenEN').value = r.en;
+  document.getElementById('set2_sql').value = r.sql;
+  document.getElementById('set2_thuTu').value = r.thuTu;
+  document.getElementById('set2_note').value = r.note;
+  document.getElementById('set2_maHoa').checked = r.maHoa;
+  document.getElementById('set2_use').checked = r.used;
+  document.getElementById('set2_calcLevel').value = r.calc;
+  document.getElementById('set2_param').value = r.param;
+  document.getElementById('set2_alloc').value = r.alloc || 'None';
+  document.getElementById('set2_sumPrev').value = r.sumPrev || 'N';
+  document.getElementById('set2_rank').value = r.rank || 0;
+  populateProrataBasis();
+  document.getElementById('set2_prorataBasis').value = r.prorataBasis || '';
+
+  syncHtRowBehavior();
+  window.scrollTo(0,0);
+}
+
+function set2Delete() {
+  var chks = document.querySelectorAll('.set2-chk:checked');
+  if (!chks.length) return showAlert('set2-alert','Vui lòng chọn tiêu chí cần xóa.','error',0);
+  if (!confirm('Bạn có chắc muốn xóa '+chks.length+' tiêu chí đã chọn?')) return;
+  var toRemove = [];
+  chks.forEach(function(c) {
+    toRemove.push(c.closest('tr').getAttribute('data-ma'));
+  });
+  for (var i = MOCK_HT.length - 1; i >= 0; i--) {
+    if (toRemove.indexOf(MOCK_HT[i].ma) >= 0) {
+      MOCK_HT.splice(i, 1);
+    }
+  }
+  renderGrid();
+  showAlert('set2-alert','Đã xóa tiêu chí thành công.','success');
+}
+
+function set2Clear() {
+  document.getElementById('set2_ma').value = '';
+  document.getElementById('set2_ma').readOnly = false;
+  document.getElementById('set2_tenVI').value = '';
+  document.getElementById('set2_tenEN').value = '';
+  document.getElementById('set2_sql').value = '';
+  document.getElementById('set2_thuTu').value = '';
+  document.getElementById('set2_note').value = '';
+  document.getElementById('set2_maHoa').checked = false;
+  document.getElementById('set2_use').checked = true;
+  document.getElementById('set2_fnTable').value = '';
+  document.getElementById('set2_calcLevel').value = 'PerEmployee';
+  document.getElementById('set2_param').value = '';
+  document.getElementById('set2_alloc').value = 'None';
+  document.getElementById('set2_prorataBasis').value = '';
+  document.getElementById('set2_sumPrev').value = 'N';
+  document.getElementById('set2_rank').value = 0;
+  document.getElementById('set2-alert').style.display = 'none';
+  syncHtRowBehavior();
+}
+
+function set2Search() {
+  var keyword = document.getElementById('set2_ma').value.trim().toLowerCase()
+    || document.getElementById('set2_tenVI').value.trim().toLowerCase();
+  if (!keyword) { renderGrid(); return; }
+  var filtered = MOCK_HT.filter(function(r) {
+    return r.ma.toLowerCase().indexOf(keyword) >= 0
+      || r.vi.toLowerCase().indexOf(keyword) >= 0
+      || r.sql.toLowerCase().indexOf(keyword) >= 0;
+  });
+  renderGrid(filtered);
+}
+
+function syncHtRowBehavior() {
+  var calcLevel = document.getElementById('set2_calcLevel').value;
+  var allocEl = document.getElementById('set2_alloc');
+  var sumPrevEl = document.getElementById('set2_sumPrev');
+  var basisEl = document.getElementById('set2_prorataBasis');
+
+  // PerSlice đã cho giá trị riêng mỗi dòng — không cần Allocation, khóa về None.
+  // PerEmployee/Aggregate cho 1 giá trị dùng chung nhiều dòng — mở Allocation để phân bổ.
+  if (calcLevel === 'PerSlice') {
+    allocEl.value = 'None';
+    allocEl.disabled = true;
+  } else {
+    allocEl.disabled = false;
+  }
+
+  var alloc = allocEl.value;
+  var needsSumPrev = ['MaxSalaryRow', 'Accumulate'].indexOf(alloc) >= 0;
+  if (needsSumPrev) {
+    sumPrevEl.value = 'Y';
+    sumPrevEl.disabled = true;
+  } else {
+    sumPrevEl.disabled = false;
+  }
+  if (alloc === 'Prorata') {
+    basisEl.disabled = false;
+    populateProrataBasis();
+  } else {
+    basisEl.disabled = true;
+    basisEl.value = '';
+  }
+}
+function onHtCalcLevelChange() { syncHtRowBehavior(); }
+function onHtAllocChange() { syncHtRowBehavior(); }
+
+function populateProrataBasis() {
+  var sel = document.getElementById('set2_prorataBasis');
+  var curVal = sel.value;
+  var html = '<option value="">(Chỉ áp dụng khi Allocation=Prorata)</option>';
+  for (var i = 0; i < MOCK_HT.length; i++) {
+    var h = MOCK_HT[i];
+    if (h.calc === 'PerSlice') {
+      html += '<option value="'+h.ma+'">'+h.ma+' - '+h.vi+'</option>';
+    }
+  }
+  sel.innerHTML = html;
+  if (curVal) sel.value = curVal;
+}
+
+// ===== QUY TẮC NGHIỆP VỤ (popup) =====
+var RULES_HT = [
+  {loai:'Kiến trúc', text:'CalcLevel=<b>Aggregate</b> chỉ mang tính phân loại — việc group theo BP/Ca/Bàn nào và toán tử Sum/Avg/Max/Min do <b>function (Dùng fn table)</b> tự định nghĩa sẵn trong code, không cấu hình lại ở màn hình này.', vd:'Dòng 6-11 — các HT_PR_LSP_Tong.../BinhQuan.../Max.../Min... mỗi dòng dùng 1 fn riêng đã hardcode group key'},
+  {loai:'Bắt buộc (Blocking)', text:'Allocation (khác None) chỉ áp dụng khi CalcLevel=<b>PerEmployee/Aggregate</b> — vì đó là lúc 1 giá trị dùng chung cho nhiều dòng, cần phân bổ. CalcLevel=<b>PerSlice</b> đã cho giá trị riêng mỗi dòng nên Allocation tự khóa về None.', vd:'Dòng 2 — HT_TS_CongChuan (PerEmployee) có thể gán Allocation; Dòng 1 — HT_TS_CongThucTe (PerSlice) luôn None'},
+  {loai:'Bắt buộc (Blocking)', text:'Allocation=<b>Prorata</b> bắt buộc chọn <b>ProrataBasis</b> — engine cần biết chia theo tiêu chí HT_ nào (PerSlice).', vd:''},
+  {loai:'Bắt buộc (Blocking)', text:'Allocation=<b>MaxSalaryRow/Accumulate</b> bắt buộc AllowSumPrev=<b>Y</b> (cần so sánh/cộng dồn giá trị giữa các dòng).', vd:''},
+  {loai:'Ràng buộc SQL', text:'Công thức (SQL) chỉ được dùng <b>CASE WHEN</b> với điều kiện là tiêu chí tìm kiếm (TK_*, kiểu NVARCHAR/DATETIME). Không hỗ trợ JOIN, subquery.'},
+  {loai:'Ràng buộc SQL', text:'Kiểu dữ liệu đầu ra của tiêu chí hệ thống luôn là <b>FLOAT</b>.'},
+  {loai:'Định dạng', text:'Mã tiêu chí: chỉ chữ/số/gạch dưới, không dấu, không khoảng trắng, không trùng lặp.'},
+  {loai:'Bắt buộc', text:'Mã tiêu chí, Tên tiếng Việt, Công thức (SQL) là trường bắt buộc.'}
+];
+function showRules() {
+  var html = '<table class="ref-table"><thead><tr><th style="width:130px;">Loại</th><th>Quy tắc</th><th style="width:230px;">Tham khảo ví dụ</th></tr></thead><tbody>';
+  RULES_HT.forEach(function(r){
+    var color = r.loai.indexOf('Blocking')>=0 ? '#dc3545' : (r.loai.indexOf('Tự động')>=0 ? '#0056b3' : '#6c757d');
+    html += '<tr><td><b style="color:'+color+'">'+r.loai+'</b></td><td>'+r.text+'</td><td style="color:#6f42c1;">'+(r.vd||'—')+'</td></tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('modal-rules-body').innerHTML = html;
+  document.getElementById('modal-rules').style.display = 'flex';
+}
+
+// ===== HELP ICON (?) =====
+var HELP_HT = {
+  calcLevel: {
+    title: 'Cấp độ tính (CalcLevel) là gì?',
+    body: '<b>PerSlice:</b> tính riêng theo từng giai đoạn QTLV (công, năng suất... khác nhau mỗi giai đoạn) — mỗi dòng đã có giá trị riêng nên <u>không cần Allocation</u> (tự khóa None).<br><br>'
+      + '<b>PerEmployee:</b> tính 1 lần duy nhất cho cả nhân viên trong kỳ (không tách theo giai đoạn) — <u>cần Allocation</u> (Prorata/MaxSalaryRow/OldStage/LastStageRow/Accumulate) để phân bổ 1 giá trị đó ra nhiều dòng giai đoạn.<br><br>'
+      + '<b>Aggregate:</b> gộp nhiều nhân viên theo group key riêng của function — group theo BP/Ca/Bàn nào và toán tử Sum/Avg/Max/Min do fn quyết định sẵn (không cấu hình ở đây); vẫn <u>cần Allocation</u> nếu NV có nhiều dòng giai đoạn trong kỳ.<br><br>'
+      + '<div class="vd-info">💡 Xem ví dụ: bấm "Xem VD" ở dòng <b>HT_TS_CongThucTe</b> (PerSlice) hoặc <b>HT_PR_LSP_TongLSP_Dept</b> (Aggregate) trong lưới bên dưới.</div>'
+  },
+  sumprev: {
+    title: 'Cho phép SUM tiêu chí trước (AllowSumPrev)?',
+    body: 'Xác định tiêu chí này có cộng dồn (SUM_PREV) giá trị của các tiêu chí có Priority nhỏ hơn hay không.<br><br>'
+      + 'Bắt buộc Y khi Allocation=MaxSalaryRow/Accumulate (cần so sánh độ lớn/cộng dồn). LastStageRow/OldStage chỉ chọn dòng theo vị trí nên không bắt buộc.'
+  },
+  prorataBasis: {
+    title: 'Cơ sở chia tỷ lệ (ProrataBasis) là gì?',
+    body: 'Chỉ định <b>tiêu chí hệ thống (HT_)</b> nào cấp trọng số/tỷ lệ theo từng giai đoạn. Engine sẽ SUM giá trị PerSlice của tiêu chí này qua các dòng để làm mẫu số khi chia Prorata.<br><br>'
+      + 'Chỉ hiển thị các HT_ có CalcLevel=PerSlice (vì cần giá trị khác nhau mỗi giai đoạn để tính tỷ lệ).<br><br>'
+      + 'Không chọn &rarr; engine không biết chia theo gì.'
+  }
+};
+function showHelp(key) {
+  var h = HELP_HT[key];
+  if (!h) return;
+  document.getElementById('modal-help-title').textContent = h.title;
+  document.getElementById('modal-help-body').innerHTML = h.body;
+  document.getElementById('modal-help').style.display = 'flex';
+}
+
+// ===== THAM SỐ HỆ THỐNG (dev-code, truyền sẵn vào mọi fn theo Module) =====
+var SYS_PARAMS = [
+  {module:'HR', name:'EmpID', kieu:'int', mota:'Mã nhân viên — khóa chính mọi bảng nhân sự, luôn truyền được vào fn cần tra NV.'},
+  {module:'HR', name:'FromDate', kieu:'datetime', mota:'Ngày bắt đầu giai đoạn/kỳ đang xử lý (dùng khi ApplyByStage=Y).'},
+  {module:'HR', name:'ToDate', kieu:'datetime', mota:'Ngày kết thúc giai đoạn/kỳ đang xử lý — mặc định DateParamMode của TK_.'},
+  {module:'HR', name:'DeptID', kieu:'int', mota:'Mã bộ phận/đơn vị (cấp bất kỳ) của giai đoạn hiện tại.'},
+  {module:'TS', name:'PRMonth', kieu:'datetime', mota:'Tháng lương đang tính (kỳ chấm công) — dùng lọc dữ liệu công.'},
+  {module:'TS', name:'EmpID', kieu:'int', mota:'Mã nhân viên — dùng tra bảng chấm công/nghỉ phép.'},
+  {module:'PR', name:'NVID', kieu:'int', mota:'Mã nhân viên — alias của EmpID dùng riêng trong các fn thuộc phân hệ Lương (PR).'},
+  {module:'PR', name:'PRMonth', kieu:'datetime', mota:'Tháng lương đang tính — dùng trong mọi fn tính lương (LSP, LNS...).'},
+  {module:'PR', name:'DeptID', kieu:'int', mota:'Mã bộ phận — dùng cho các fn Aggregate theo Bộ phận.'},
+  {module:'INS', name:'EmpID', kieu:'int', mota:'Mã nhân viên — dùng tra hồ sơ bảo hiểm (BHXH/BHYT/BHTN).'},
+  {module:'INS', name:'PRMonth', kieu:'datetime', mota:'Tháng đóng bảo hiểm đang xử lý.'},
+  {module:'PIT', name:'EmpID', kieu:'int', mota:'Mã nhân viên — dùng tra hồ sơ thuế TNCN.'},
+  {module:'PIT', name:'TaxYear', kieu:'int', mota:'Năm tính thuế TNCN (quyết toán theo năm dương lịch).'},
+  {module:'FO', name:'CompanyID', kieu:'int', mota:'Mã pháp nhân/công ty — dùng khi tách sổ theo từng công ty con.'}
+];
+function showSystemParams() {
+  var byModule = {};
+  SYS_PARAMS.forEach(function(p){ (byModule[p.module] = byModule[p.module] || []).push(p); });
+  var html = '';
+  Object.keys(byModule).sort().forEach(function(m){
+    html += '<div style="font-weight:bold;color:#0056b3;margin:10px 0 4px;">Module: ' + m + '</div>';
+    html += '<table class="ref-table"><thead><tr><th style="width:130px;">Tên tham số</th><th style="width:90px;">Kiểu</th><th>Mô tả</th></tr></thead><tbody>';
+    byModule[m].forEach(function(p){
+      html += '<tr><td><code>' + p.name + '</code></td><td>' + p.kieu + '</td><td>' + p.mota + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  });
+  document.getElementById('sysparam-body').innerHTML = html;
+  document.getElementById('modal-sysparam').style.display = 'flex';
+}
+
+function toggleAdvanced() {
+  var body = document.getElementById('set2_advBody');
+  var icon = document.getElementById('set2_advIcon');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    icon.textContent = '▼';
+  } else {
+    body.style.display = 'none';
+    icon.textContent = '►';
+  }
+}
+
+// Param popup
+function openParamPopup() {
+  document.getElementById('pp_module').value = '';
+  document.getElementById('pp_code').value = '';
+  document.getElementById('pp_name').value = '';
+  renderParamGrid(MOCK_PARAM);
+  showModal('set2-param-popup');
+}
+
+function renderParamGrid(data) {
+  var html = '';
+  for (var i = 0; i < data.length; i++) {
+    var p = data[i];
+    html += '<tr>'
+      +'<td style="text-align:left;"><b>'+p.code+'</b></td>'
+      +'<td style="text-align:left;">'+p.name+'</td>'
+      +'<td>'+p.type+'</td>'
+      +'<td>'+p.module+'</td>'
+      +'<td style="text-align:left;">'+p.desc+'</td>'
+      +'<td><button class="btn-ok" style="padding:3px 10px;font-size:11px;" onclick="selectParam(\''+p.code+'\')">Chọn</button></td>'
+      +'</tr>';
+  }
+  if (!data.length) {
+    html = '<tr><td colspan="6" style="color:#999;font-style:italic;">Không tìm thấy Param phù hợp.</td></tr>';
+  }
+  document.getElementById('pp-tbody').innerHTML = html;
+}
+
+function filterParamPopup() {
+  var fm = document.getElementById('pp_module').value;
+  var fc = document.getElementById('pp_code').value.trim().toLowerCase();
+  var fn = document.getElementById('pp_name').value.trim().toLowerCase();
+  var filtered = MOCK_PARAM.filter(function(p) {
+    if (fm && p.module !== fm) return false;
+    if (fc && p.code.toLowerCase().indexOf(fc) < 0) return false;
+    if (fn && p.name.toLowerCase().indexOf(fn) < 0) return false;
+    return true;
+  });
+  renderParamGrid(filtered);
+}
+
+function selectParam(code) {
+  document.getElementById('set2_param').value = code;
+  hideModal('set2-param-popup');
+}
+
+function clearParam() {
+  document.getElementById('set2_param').value = '';
+}
+
+// ===== VÍ DỤ TIÊU CHÍ HỆ THỐNG — context-aware theo row =====
+function showVD_HT(ma){
+  var r = MOCK_HT.find(function(x){ return x.ma===ma; });
+  if(!r) return;
+  var calc=r.calc;
+  var baseTotal=0, sliceV1=800*6200, sliceV2=900*6400;
+  function fmtN(n){ return Math.round(n).toLocaleString('vi-VN'); }
+
+  var emp='<div style="background:#eef2f7;padding:8px 12px;border-radius:4px;margin-bottom:10px;font-size:11px;">'
+    +'<b>NV mẫu:</b> Nguyễn Thị Loan (1022907668) &mdash; Kỳ 05/2026 &mdash; <b>2 giai đoạn QTLV</b><br>'
+    +'GĐ1: CB101 (01/05–15/05, công 12, NS 800, ĐG 6,200) &nbsp;|&nbsp; GĐ2: CB102 (16/05–31/05, công 13, NS 900, ĐG 6,400)</div>';
+
+  var badge='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">'
+    +'<span style="background:#0056b3;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">CalcLevel: '+calc+'</span>'
+    +'<span style="background:#6c757d;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Output: FLOAT</span></div>';
+
+  var title = '&#128270; Ví dụ: '+r.ma+' ('+r.vi+')';
+  var body = emp + badge;
+
+  // --- PHẦN 1: Engine xử lý ---
+  body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:8px 0 4px;">1. Engine xử lý như thế nào?</div>';
+
+  if(calc==='PerSlice'){
+    var v1=800*6200, v2=900*6400;
+    body += '<div class="vd-step">'
+      +'<b>PerSlice</b> → Engine chạy CASE WHEN <span class="op">riêng mỗi giai đoạn</span>. Mỗi dòng dùng TK_* của chính nó.<br><br>'
+      +'<b>SQL:</b> <code>'+r.sql+'</code><br><br>'
+      +'<b>GĐ1:</b> Các TK_* tại GĐ1 (NS=800, ĐG=6200, DuCong=1) → CASE WHEN → <span class="op">'+fmtN(v1)+'</span><br>'
+      +'<b>GĐ2:</b> Các TK_* tại GĐ2 (NS=900, ĐG=6400, DuCong=1) → CASE WHEN → <span class="op">'+fmtN(v2)+'</span>'
+      +'</div>'
+      +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>TK_* đầu vào</th><th>Kết quả '+r.ma+' (FLOAT)</th></tr></thead>'
+      +'<tbody>'
+      +'<tr><td>1</td><td>CB101</td><td>NS=800, ĐG=6,200</td><td class="r hi">'+fmtN(v1)+'</td></tr>'
+      +'<tr><td>2</td><td>CB102</td><td>NS=900, ĐG=6,400</td><td class="r hi">'+fmtN(v2)+'</td></tr>'
+      +'<tr class="sum"><td colspan="3" style="text-align:right;">Tổng</td><td class="r">'+fmtN(v1+v2)+'</td></tr>'
+      +'</tbody></table>';
+  }
+
+  if(calc==='PerEmployee'){
+    var total=500000;
+    baseTotal=total;
+    body += '<div class="vd-step">'
+      +'<b>PerEmployee</b> → Engine chạy CASE WHEN <span class="op">1 lần duy nhất</span> cho cả NV. Không tách theo giai đoạn.<br><br>'
+      +'<b>SQL:</b> <code>'+r.sql+'</code><br><br>'
+      +'<b>Kết quả:</b> 1 giá trị = <span class="op">'+fmtN(total)+'</span> → copy giống nhau cho cả 2 dòng <u>trước khi Allocation xử lý</u> (xem mục 4 bên dưới).'
+      +'</div>'
+      +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Kết quả HT (trước phân bổ)</th><th>Ghi chú</th></tr></thead>'
+      +'<tbody>'
+      +'<tr><td>1</td><td>CB101</td><td class="r dim">'+fmtN(total)+'</td><td>copy</td></tr>'
+      +'<tr><td>2</td><td>CB102</td><td class="r dim">'+fmtN(total)+'</td><td>copy</td></tr>'
+      +'</tbody></table>';
+  }
+
+  if(calc==='Aggregate'){
+    var nv1=4960000, nv2v=4200000, nv3v=3800000;
+    var sumV=nv1+nv2v+nv3v, avgV=Math.round(sumV/3);
+    baseTotal=sumV;
+    body += '<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:8px 10px;font-size:11px;margin-bottom:10px;">'
+      +'&#9888; <b>Aggregate mở rộng phạm vi:</b> Không chỉ tính cho 1 NV mà gộp <b>nhiều NV cùng nhóm</b> — nhóm theo BP/Ca/Bàn/Chức vụ nào và toán tử Sum/Avg/Max/Min do <b>chính function</b> quyết định (fn tự viết SQL GROUP BY, không cấu hình lại ở tiêu chí này).'
+      +'</div>'
+      +'<div class="vd-step">'
+      +'<b>SQL/Fn:</b> <code>'+r.sql+'</code><br><br>'
+      +'<b>Bước 1:</b> Engine truyền EmpID + FromDate/ToDate vào fn.<br>'
+      +'<b>Bước 2:</b> Fn tự tra nhóm của NV (nội bộ, đã hardcode — VD theo Bộ phận, Ca, Bàn tùy tên fn) rồi lấy toàn bộ NV cùng nhóm:<br>'
+      +'&nbsp;&nbsp;Nguyễn Thị Loan: '+fmtN(nv1)+' | Trần Văn Bình: '+fmtN(nv2v)+' | Lê Thị Cẩm: '+fmtN(nv3v)+'<br><br>'
+      +'<b>Bước 3:</b> Fn tự áp toán tử tổng hợp (Sum/Avg/Max/Min) đã viết sẵn, trả về <span class="op">1 giá trị FLOAT</span> — mọi NV cùng nhóm nhận cùng kết quả.'
+      +'</div>'
+      +'<table class="vd-tbl"><thead><tr><th>NV</th><th>Giá trị riêng</th><th>Kết quả '+r.ma+' (do fn tự group + tổng hợp)</th></tr></thead>'
+      +'<tbody>'
+      +'<tr><td>Nguyễn Thị Loan</td><td class="r">'+fmtN(nv1)+'</td><td class="r hi" rowspan="3" style="vertical-align:middle;">'+fmtN(sumV)+' <span style="color:#999;font-weight:normal;">(hoặc Avg/Max/Min tùy fn)</span></td></tr>'
+      +'<tr><td>Trần Văn Bình</td><td class="r">'+fmtN(nv2v)+'</td></tr>'
+      +'<tr><td>Lê Thị Cẩm</td><td class="r">'+fmtN(nv3v)+'</td></tr>'
+      +'</tbody></table>'
+      +'<div class="vd-info">&#128161; Muốn đổi nhóm group (VD từ theo Bàn sang theo Chức vụ) hoặc đổi toán tử (Sum→Avg) &rarr; phải sửa lại fn (Dev), không có field cấu hình riêng ở màn hình này — tránh 2 nguồn sự thật (UI nói 1 đằng, fn chạy 1 nẻo).</div>';
+  }
+
+  // --- PHẦN 2: So sánh nếu đổi CalcLevel ---
+  body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:14px 0 4px;">2. Nếu đổi CalcLevel thì sao?</div>';
+  if(calc==='PerSlice'){
+    body += '<div class="vd-step">'
+      +'<b>Hiện tại (PerSlice):</b> Mỗi dòng tính riêng → kết quả <b>khác nhau</b> nếu TK_* khác.<br>'
+      +'<b>Nếu đổi PerEmployee:</b> Chỉ 1 giá trị cho cả NV → cần Allocation để chia.<br>'
+      +'<b>Nếu đổi Aggregate:</b> Gộp nhiều NV cùng nhóm → cần fn riêng đã hardcode group + toán tử.<br><br>'
+      +'<span style="color:#28a745;font-weight:bold;">&#9989; Khi nào giữ PerSlice?</span> Khi mỗi giai đoạn có dữ liệu đầu vào riêng (NS, đơn giá, công...) và kết quả mỗi dòng phải khác nhau.'
+      +'</div>';
+  } else if(calc==='PerEmployee'){
+    body += '<div class="vd-step">'
+      +'<b>Hiện tại (PerEmployee):</b> 1 giá trị/NV, cần Allocation (ngay tại tiêu chí HT_ này) để phân bổ ra dòng — xem mục 4.<br>'
+      +'<b>Nếu đổi PerSlice:</b> Mỗi dòng tính riêng → Allocation tự khóa None, không cần phân bổ nhưng cần TK_* có ApplyByStage=Y.<br>'
+      +'<b>Nếu đổi Aggregate:</b> Gộp nhiều NV cùng nhóm → cần fn riêng đã hardcode group + toán tử.<br><br>'
+      +'<span style="color:#28a745;font-weight:bold;">&#9989; Khi nào giữ PerEmployee?</span> Khi giá trị không phụ thuộc giai đoạn (phụ cấp cố định, hệ số toàn kỳ...).<br>'
+      +'<span class="warn">&#9888; Lưu ý:</span> PerEmployee <u>nên đi kèm</u> Allocation (Prorata/MaxSalaryRow/OldStage/LastStageRow/Accumulate) để phân bổ ra dòng — nếu để None, mọi dòng nhận nguyên giá trị copy, dễ trùng lặp khi dùng lại ở công thức lương.'
+      +'</div>';
+  } else {
+    body += '<div class="vd-step">'
+      +'<b>Hiện tại (Aggregate):</b> Gộp nhiều NV cùng nhóm (do fn tự định nghĩa), tất cả nhận cùng giá trị.<br>'
+      +'<b>Nếu đổi PerSlice:</b> Chỉ tính cho 1 NV, mỗi dòng riêng.<br>'
+      +'<b>Nếu đổi PerEmployee:</b> Chỉ 1 NV, 1 giá trị/NV.<br><br>'
+      +'<span style="color:#28a745;font-weight:bold;">&#9989; Khi nào giữ Aggregate?</span> Khi cần chỉ tiêu nhóm: tổng lương bàn, bình quân ka, max phòng...<br>'
+      +'<b>Muốn đổi nhóm group hoặc toán tử?</b> Sửa lại fn (Dev) — không có field Scope/Op riêng ở đây.'
+      +'</div>';
+  }
+
+  // --- PHẦN 3: Cách phân bổ (Allocation) ---
+  if (calc !== 'PerSlice') {
+    body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:14px 0 4px;">3. Cách phân bổ (Allocation='+r.alloc+') ra nhiều dòng như thế nào?</div>';
+
+    if (r.alloc === 'None') {
+      body += '<div class="vd-step">'
+        +'<b>Allocation=None</b> → Không phân bổ, <span class="warn">mỗi dòng nhận nguyên giá trị '+fmtN(baseTotal)+'</span> (xem bảng "trước phân bổ" ở mục 1). Chỉ hợp lý khi tiêu chí này chỉ dùng ở đúng 1 dòng hoặc công thức lương tự xử lý trùng lặp.'
+        +'</div>';
+    }
+
+    if (r.alloc === 'Prorata') {
+      var bm = {HT_TS_CongThucTe:{label:'Công thực tế',v1:12,v2:13}, HT_PR_NangSuatTinhLuong:{label:'Sản lượng NS_FINAL',v1:800,v2:900}}[r.prorataBasis];
+      if (!bm) {
+        body += '<div style="background:#f8d7da;border:1px solid #dc3545;border-radius:4px;padding:10px 12px;font-size:11px;">'
+          +'&#10060; <b>Thiếu cấu hình:</b> Allocation=Prorata nhưng chưa chọn ProrataBasis hợp lệ — engine không biết chia theo tiêu chí HT_ nào.'
+          +'</div>';
+      } else {
+        var sumB=bm.v1+bm.v2, p1=bm.v1/sumB, p2=bm.v2/sumB;
+        var pr1=Math.round(baseTotal*p1), pr2=baseTotal-pr1;
+        body += '<div class="vd-step">'
+          +'<b>ProrataBasis='+r.prorataBasis+' ('+bm.label+')</b> — lấy giá trị PerSlice của tiêu chí này làm trọng số chia:<br>'
+          +'&nbsp;&nbsp;GĐ1: '+bm.label+'='+bm.v1+' &nbsp;|&nbsp; GĐ2: '+bm.label+'='+bm.v2+' &nbsp;|&nbsp; Mẫu số='+sumB+'<br><br>'
+          +'GĐ1: '+fmtN(baseTotal)+' × ('+bm.v1+'/'+sumB+') = <span class="op">'+fmtN(pr1)+'</span><br>'
+          +'GĐ2: '+fmtN(baseTotal)+' × ('+bm.v2+'/'+sumB+') = <span class="op">'+fmtN(pr2)+'</span>'
+          +'</div>'
+          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>'+bm.label+'</th><th>Tỷ lệ</th><th>Sau Prorata</th></tr></thead>'
+          +'<tbody>'
+          +'<tr><td>1</td><td>'+bm.v1+'</td><td>'+(p1*100).toFixed(1)+'%</td><td class="r hi">'+fmtN(pr1)+'</td></tr>'
+          +'<tr><td>2</td><td>'+bm.v2+'</td><td>'+(p2*100).toFixed(1)+'%</td><td class="r hi">'+fmtN(pr2)+'</td></tr>'
+          +'<tr class="sum"><td colspan="3" style="text-align:right;">Tổng</td><td class="r">'+fmtN(pr1+pr2)+'</td></tr>'
+          +'</tbody></table>';
+      }
+    }
+
+    if (r.alloc === 'OldStage') {
+      body += '<div class="vd-step">'
+        +'<b>OldStage</b> → Dồn 100% vào dòng <b>giai đoạn đầu tiên</b> (GĐ1 — FromDate sớm nhất), các giai đoạn sau = 0.'
+        +'</div>'
+        +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Kết quả sau Allocation</th></tr></thead>'
+        +'<tbody><tr><td>1</td><td>CB101</td><td class="r hi2">'+fmtN(baseTotal)+'</td></tr>'
+        +'<tr><td>2</td><td>CB102</td><td class="r dim">0</td></tr></tbody></table>';
+    }
+
+    if (r.alloc === 'LastStageRow') {
+      body += '<div class="vd-step">'
+        +'<b>LastStageRow</b> → Dồn 100% vào dòng có <b>ToDate lớn nhất</b> (GĐ2 — 31/05), các giai đoạn trước = 0.'
+        +'</div>'
+        +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Kết quả sau Allocation</th></tr></thead>'
+        +'<tbody><tr><td>1</td><td>CB101</td><td class="r dim">0</td></tr>'
+        +'<tr><td>2</td><td>CB102</td><td class="r hi2">'+fmtN(baseTotal)+'</td></tr></tbody></table>';
+    }
+
+    if (r.alloc === 'MaxSalaryRow') {
+      body += '<div class="vd-step">'
+        +'<b>MaxSalaryRow</b> (SumPrev=Y bắt buộc) → SUM_PREV các tiêu chí Priority nhỏ hơn tại mỗi dòng, so sánh độ lớn:<br>'
+        +'GĐ1: SUM_PREV=<span class="op">'+fmtN(sliceV1)+'</span> &nbsp;|&nbsp; GĐ2: SUM_PREV=<span class="op">'+fmtN(sliceV2)+'</span> → GĐ2 lớn hơn → dồn 100% vào GĐ2.'
+        +'</div>'
+        +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>SUM_PREV</th><th>So sánh</th><th>Kết quả sau Allocation</th></tr></thead>'
+        +'<tbody><tr><td>1</td><td class="r">'+fmtN(sliceV1)+'</td><td>nhỏ hơn</td><td class="r dim">0</td></tr>'
+        +'<tr><td>2</td><td class="r"><b>'+fmtN(sliceV2)+'</b></td><td style="color:#28a745;font-weight:bold;">&#9733; LỚN NHẤT</td><td class="r hi">'+fmtN(baseTotal)+'</td></tr></tbody></table>';
+    }
+
+    if (r.alloc === 'Accumulate') {
+      body += '<div class="vd-step">'
+        +'<b>Accumulate</b> (SumPrev=Y bắt buộc) → cộng dồn (running total) qua các giai đoạn:<br>'
+        +'GĐ1: lũy kế = <span class="op">'+fmtN(baseTotal)+'</span> &nbsp;|&nbsp; GĐ2: lũy kế = '+fmtN(baseTotal)+' + '+fmtN(baseTotal)+' = <span class="op">'+fmtN(baseTotal*2)+'</span>'
+        +'</div>'
+        +'<div class="vd-info">&#9888; Với HT_ PerEmployee (giá trị không đổi mỗi giai đoạn), Accumulate trong 1 kỳ chỉ nhân đôi giá trị — ý nghĩa thực tế thường là lũy kế XUYÊN KỲ (retro), không phải xuyên giai đoạn trong cùng kỳ. Need Confirm.</div>';
+    }
+  }
+
+  // --- PHẦN 4: Dùng trong CASE WHEN ---
+  body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:14px 0 4px;">4. Công thức CASE WHEN (dùng TK_* làm điều kiện)</div>';
+  body += '<div class="vd-step">'
+    +'<b>SQL gốc:</b> <code>'+r.sql+'</code><br><br>'
+    +'<b>Ví dụ CASE WHEN tương đương:</b><br>'
+    +'<code>CASE<br>'
+    +'&nbsp;&nbsp;WHEN [TK_HR_DonViCap5] = \'CB101\' THEN ... <span style="color:#888;">-- điều kiện TK_* (nvarchar)</span><br>'
+    +'&nbsp;&nbsp;WHEN [TK_HR_DuCong] = 1 THEN ...        <span style="color:#888;">-- điều kiện TK_* (int)</span><br>'
+    +'&nbsp;&nbsp;ELSE 0<br>'
+    +'END</code><br><br>'
+    +'→ Điều kiện: <b>TK_*</b> (nvarchar, datetime, int). Kết quả: <b>FLOAT</b>.'
+    +'</div>';
+
+  document.getElementById('modal-vd-ht-title').innerHTML=title;
+  document.getElementById('modal-vd-ht-body').innerHTML=body;
+  document.getElementById('modal-vd-ht').style.display='flex';
+}
+
+// Init
+renderGrid();
+populateProrataBasis();
+syncHtRowBehavior();
+  </script>
+</body>
+</html>

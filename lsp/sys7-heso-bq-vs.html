@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiết Lập Hệ Số, BQ TLSP Cho Vệ Sinh</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .filter-row-inline { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .filter-row-inline label { font-weight: bold; white-space: nowrap; }
+    .filter-row-inline select, .filter-row-inline input[type="text"] { padding: 4px 6px; border: 1px solid #ccc; height: 26px; }
+    table.data-table td, table.data-table th { white-space: nowrap; }
+    .row-nhom td {
+        background-color: #fff9c4 !important; font-weight: bold; color: #7a5c00;
+        text-align: left; padding-left: 10px !important;
+    }
+    .hs-cell { cursor: text; border: 1px dashed #90caf9; background: #e3f2fd; font-weight: bold; text-align: center; }
+    .hs-cell:hover { background: #bbdefb; }
+    .col-warn { color: #d32f2f; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rsaquo; Chức năng &rsaquo; Thiết lập hệ số, BQ TLSP cho vệ sinh</div>
+    <div class="page-title">THIẾT LẬP HỆ SỐ, BQ TLSP ÁP DỤNG CHO GIẶT ĐỒ, VỆ SINH VÀ BXBB</div>
+
+    <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+
+    <div class="info-bar" style="margin-bottom:12px;">
+      RÀNG BUỘC: Hệ số của từng bộ phận Vệ sinh được thiết lập theo nhóm (Đầu vỏ = 100%, Chiên = 95%, trong PX = 90%). Cột <b>BQ Công</b> và <b>BQ TLSP</b> lấy từ kết quả <b>Tính bình quân LSP (BQTL)</b> của kỳ đang chọn. Kết quả thiết lập là đầu vào cho chức năng <b>Tính lương nhóm vệ sinh</b>.
+    </div>
+
+    <!-- ========== PERIOD BAR ========== -->
+    <div class="period-bar" style="flex-wrap: wrap; gap: 10px;">
+        <div class="filter-row-inline">
+            <label style="color:#d32f2f;">Kỳ / Tháng lương</label>
+            <select id="selKy" style="width:140px;"><option>LSP_06_2026</option></select>
+        </div>
+        <div class="filter-row-inline" style="border-left:2px solid #dee2e6; padding-left:15px;">
+            <label>Loại nhóm</label>
+            <select id="selNhom" style="min-width:220px;">
+                <option value="">-- Tất cả --</option>
+                <option value="DV">Nhóm VS đầu vỏ (HS 1.00)</option>
+                <option value="CHIEN">Nhóm VS Chiên (HS 0.95)</option>
+                <option value="PX">Nhóm VS trong PX (HS 0.90)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ========== ACTION BUTTONS ========== -->
+    <div class="actions-bar" style="display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button class="btn-search" onclick="timKiem()">Tìm Kiếm</button>
+        <button class="btn-refresh" onclick="location.reload()">Làm mới</button>
+        <button class="btn-save" onclick="luuThietLap()">Lưu</button>
+        <button class="btn-delete" onclick="xoaDong()">Xóa</button>
+        <button class="btn-export">Xuất dữ liệu</button>
+        <button class="btn-import">Nhập dữ liệu</button>
+    </div>
+
+    <!-- ========== GRID ========== -->
+    <div class="grid-container" style="max-height:520px; overflow:auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:30px;"><input type="checkbox" id="chkAll" onchange="document.querySelectorAll('.chk-row').forEach(c=>c.checked=this.checked)"></th>
+                    <th>TT</th>
+                    <th class="text-left">Mã BP</th>
+                    <th class="text-left">Bộ Phận</th>
+                    <th>Hệ số<br>(áp dụng từ kỳ)</th>
+                    <th class="text-left">Cách tính BQ</th>
+                    <th class="text-left">Ghi chú</th>
+                    <th>BQ Công</th>
+                    <th class="col-money">BQ TLSP (VND)</th>
+                    <th>LĐ kỳ này</th>
+                    <th>LĐ kỳ trước</th>
+                </tr>
+            </thead>
+            <tbody id="tbHeSo"></tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            &#128203; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Tham khảo file QTLSP T07-2026 (Sheet HS). Tham khảo file B.LƯƠNG MPHG T07-2026 (II) Sheet (HS). Cần xác nhận với khách hàng: (1) BP "PXTB Chiên vệ sinh ka 2" hiện chưa có hệ số chính thức (đang để trống "Chưa có" trong file gốc); (2) công thức BQ Công/BQ TLSP tại các dòng nhóm VS bị lỗi #VALUE! trong file Excel gốc - nghi do tham chiếu chéo sheet chưa tính xong, cần làm rõ nguồn dữ liệu trước khi code công thức.</textarea>
+    </div>
+
+  </div><!-- end container -->
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    var HS_ROWS = [
+        { nhom: 'DV', nhomLabel: 'Nhóm VS đầu vỏ = HS 1.00', ma: 'CB1VSDV', ten: 'Chế biến vệ sinh đầu vỏ ka 1', hs: 100, note: '', ldKy: 4, ldTruoc: 4 },
+        { nhom: 'DV', nhomLabel: '', ma: 'CB2VSDV', ten: 'Chế biến vệ sinh đầu vỏ ka 2', hs: 100, note: '', ldKy: 4, ldTruoc: 4 },
+        { nhom: 'CHIEN', nhomLabel: 'Nhóm VS Chiên = HS 0.95', ma: 'TBCH1VS', ten: 'PXTB Chiên vệ sinh ka 1', hs: 95, note: '= 90%+5%', ldKy: 2, ldTruoc: 2 },
+        { nhom: 'CHIEN', nhomLabel: '', ma: '', ten: 'PXTB Chiên vệ sinh ka 2', hs: 95, note: 'Chưa có', warn: true, ldKy: 3, ldTruoc: 3 },
+        { nhom: 'PX', nhomLabel: 'Nhóm VS trong PX = HS 0.90', ma: 'NL1VS', ten: 'Nguyên liệu vệ sinh ka 1', hs: 90, note: '', ldKy: 2, ldTruoc: 2 },
+        { nhom: 'PX', nhomLabel: '', ma: 'NL2VS', ten: 'Nguyên liệu vệ sinh ka 2', hs: 90, note: '', ldKy: 2, ldTruoc: 2 },
+        { nhom: 'PX', nhomLabel: '', ma: 'PC1VS', ten: 'Phân cỡ vệ sinh ka 1', hs: 90, note: '', ldKy: 6, ldTruoc: 6 },
+        { nhom: 'PX', nhomLabel: '', ma: 'PC2VS', ten: 'Phân cỡ vệ sinh ka 2', hs: 90, note: '', ldKy: 6, ldTruoc: 6 },
+        { nhom: 'PX', nhomLabel: '', ma: 'PTO1VS', ten: 'PTO vệ sinh ka 1', hs: 90, note: '', ldKy: 3, ldTruoc: 3 },
+        { nhom: 'PX', nhomLabel: '', ma: 'PTO2VS', ten: 'PTO vệ sinh ka 2', hs: 90, note: '', ldKy: 4, ldTruoc: 4 },
+        { nhom: 'PX', nhomLabel: '', ma: 'CB1VS', ten: 'Chế biến vệ sinh ka 1', hs: 90, note: '', ldKy: 2, ldTruoc: 2 },
+        { nhom: 'PX', nhomLabel: '', ma: 'CB2VS', ten: 'Chế biến vệ sinh ka 2', hs: 90, note: '', ldKy: 2, ldTruoc: 2 },
+        { nhom: 'PX', nhomLabel: '', ma: 'XQ1VS', ten: 'Xiên que vệ sinh ka 1', hs: 90, note: '', ldKy: 1, ldTruoc: 1 },
+        { nhom: 'PX', nhomLabel: '', ma: 'XQ2VS', ten: 'Xiên que vệ sinh ka 2', hs: 90, note: '', ldKy: 1, ldTruoc: 1 },
+        { nhom: 'PX', nhomLabel: '', ma: 'SU1VS', ten: 'Sushi vệ sinh ka 1', hs: 90, note: '', ldKy: 8, ldTruoc: 8 },
+        { nhom: 'PX', nhomLabel: '', ma: 'SU2VS', ten: 'Sushi vệ sinh ka 2', hs: 90, note: '', ldKy: 8, ldTruoc: 8 },
+        { nhom: 'PX', nhomLabel: '', ma: 'BCGT1VS', ten: 'Băng chuyền GTGT vệ sinh ka 1', hs: 90, note: '', ldKy: 3, ldTruoc: 3 },
+        { nhom: 'PX', nhomLabel: '', ma: 'BCGT2VS', ten: 'Băng chuyền GTGT vệ sinh ka 2', hs: 90, note: '', ldKy: 3, ldTruoc: 3 },
+        { nhom: 'PX', nhomLabel: '', ma: 'BCQF1VS', ten: 'Băng chuyền IQF vệ sinh ka 1', hs: 90, note: '', ldKy: 3, ldTruoc: 3 },
+    ];
+    var BQ_CONG = 25.5;
+    var BQ_TLSP = 10218110;
+
+    function fmt(n) { return formatNumber(Math.round(n)); }
+
+    function renderTable(rows) {
+        var tbody = document.getElementById('tbHeSo');
+        var html = '';
+        var stt = 0;
+        rows.forEach(function (r) {
+            if (r.nhomLabel) {
+                html += '<tr class="row-nhom"><td colspan="11">' + r.nhomLabel + '</td></tr>';
+            }
+            stt++;
+            html += '<tr>' +
+                '<td><input type="checkbox" class="chk-row"></td>' +
+                '<td>' + stt + '</td>' +
+                '<td class="text-left">' + (r.ma || '<span class="col-warn">(chưa có mã)</span>') + '</td>' +
+                '<td class="text-left">' + r.ten + '</td>' +
+                '<td class="hs-cell" contenteditable="true" data-ma="' + r.ma + '" onblur="onHsBlur(this)">' + r.hs + '%</td>' +
+                '<td class="text-left">BQ All, trừ BXTP</td>' +
+                '<td class="text-left' + (r.warn ? ' col-warn' : '') + '">' + (r.note || '') + '</td>' +
+                '<td>' + BQ_CONG.toFixed(2) + '</td>' +
+                '<td class="col-money">' + fmt(BQ_TLSP) + '</td>' +
+                '<td>' + r.ldKy.toFixed(2) + '</td>' +
+                '<td>' + r.ldTruoc.toFixed(2) + '</td></tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function timKiem() {
+        var nhom = document.getElementById('selNhom').value;
+        var rows = nhom ? HS_ROWS.filter(function (r) { return r.nhom === nhom; }) : HS_ROWS;
+        renderTable(rows);
+        showAlert('alertBox', 'Đã tìm thấy ' + rows.length + ' bộ phận.', 'success');
+    }
+
+    function onHsBlur(cell) {
+        var v = parseFloat(cell.innerText);
+        if (isNaN(v)) v = 0;
+        if (v < 0) v = 0;
+        if (v > 200) v = 200;
+        cell.innerText = v + '%';
+    }
+
+    function luuThietLap() {
+        confirmAction('Lưu thiết lập Hệ số, BQ TLSP cho các bộ phận Vệ sinh kỳ ' + document.getElementById('selKy').value + '?', function () {
+            showAlert('alertBox', 'Đã lưu thiết lập thành công.', 'success');
+        });
+    }
+
+    function xoaDong() {
+        var chks = document.querySelectorAll('.chk-row:checked');
+        if (!chks.length) { showAlert('alertBox', 'Vui lòng chọn dòng cần xóa.', 'warning'); return; }
+        confirmAction('Bạn có chắc muốn xóa ' + chks.length + ' dòng đã chọn?', function () {
+            chks.forEach(function (c) { c.closest('tr').remove(); });
+            showAlert('alertBox', 'Đã xóa thành công.', 'success');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () { renderTable(HS_ROWS); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tính Bình Quân Cho Vệ Sinh</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* PAGE-SPECIFIC: pg13-binhquan-vs */
+    .btn-calc { background-color: #28a745; }
+    .btn-lock-vs { background-color: #dc3545; }
+    .btn-refresh { background-color: #007bff; }
+    .btn-export { background-color: #fd7e14; }
+    .section-divider { border: none; border-top: 2px dashed #b8daff; margin: 25px 0 15px 0; }
+    .section-title {
+        font-weight: bold; font-size: 14px; color: #0056b3;
+        border-left: 4px solid #0056b3; padding-left: 10px;
+        margin: 15px 0 10px 0; text-transform: uppercase;
+    }
+    .btn-step { position: relative; padding-left: 36px !important; }
+    .btn-step .step-num {
+        position: absolute; left: 0; top: 0; bottom: 0; width: 28px;
+        background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+        font-size: 13px; border-radius: 3px 0 0 3px;
+    }
+    .filter-row-inline { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .filter-row-inline label { font-weight: bold; white-space: nowrap; }
+    .source-check {
+        display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+        border: 1px solid #c3e6cb; background: #d4edda; border-radius: 4px;
+        font-size: 12px; margin-bottom: 10px;
+    }
+    .row-nhom-vs td { background-color: #fff8e1 !important; font-weight: bold; }
+    .badge-nhom {
+        display:inline-block; background:#0056b3; color:#fff; border-radius: 10px;
+        font-size: 10px; padding: 2px 8px; font-weight: bold; white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương sản phẩm &rsaquo; Chức năng &rsaquo; Tính bình quân cho Vệ sinh</div>
+    <div class="page-title">TÍNH BÌNH QUÂN CHO VỆ SINH</div>
+
+    <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+
+    <!-- ========== VALIDATE NGUỒN ========== -->
+    <div class="source-check" id="source-check">
+        <span style="font-size:16px;">&#9989;</span>
+        <span>
+            <b>Kiểm tra nguồn:</b> Kết quả "Tính bình quân LSP (BQTL)" của các bộ phận Chế biến, Xiên que, PTO, Tẩm bột (CB, XQ, PTO, CBTB, TB) kỳ <b>LSP_01_2026</b> đã tính xong.
+            Đây là đầu vào bắt buộc để tính đơn giá bình quân cho nhóm Vệ sinh.
+        </span>
+    </div>
+
+    <!-- ========== PERIOD ========== -->
+    <div class="period-bar" style="flex-wrap: wrap; gap: 10px;">
+        <div class="filter-row-inline">
+            <label style="color:#d32f2f;">Kỳ / Tháng lương</label>
+            <select style="width:140px;"><option>LSP_01_2026</option></select>
+        </div>
+        <div class="filter-row-inline" style="border-left: 2px solid #dee2e6; padding-left: 15px;">
+            <label>Phạm vi bình quân</label>
+            <div class="radio-inline">
+                <label><input type="radio" name="pvbqvs" value="ALL" checked> Tất cả NV</label>
+                <label><input type="radio" name="pvbqvs" value="3T"> Chỉ NV thâm niên &gt; 3 tháng</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ACTION BUTTONS ========== -->
+    <div class="actions-bar" style="display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button class="btn-calc btn-step" onclick="clickTinhBQVS()">
+            <span class="step-num">1</span>Tính bình quân Vệ sinh
+        </button>
+        <button class="btn-lock-vs btn-step" id="btn-khoa-bqvs" onclick="clickKhoaBQVS()" disabled style="opacity:0.5; cursor:not-allowed;">
+            <span class="step-num">2</span>Khóa bình quân Vệ sinh
+        </button>
+        <span style="border-left:2px solid #dee2e6; height:24px;"></span>
+        <button class="btn-refresh" onclick="location.reload()">Làm mới</button>
+        <button class="btn-export">Xuất Excel</button>
+    </div>
+
+    <!-- ========== GRID: NHÓM BQ DÙNG CHO VỆ SINH ========== -->
+    <div class="section-title">ĐƠN GIÁ BÌNH QUÂN CÁC NHÓM DÙNG TRẢ LƯƠNG CHO VỆ SINH</div>
+    <div class="info-bar-blue info-bar" style="font-size:11px; padding:8px 12px; margin-bottom:10px;">
+        <b>Công thức:</b> BQ nhóm = SUM(QTL các BP thành viên) / SUM(Công các BP thành viên) &times; BQ công đủ (gia quyền theo SL bàn).
+        Kết quả của bước này (<b>đơn giá BQ tháng</b>) là đầu vào bắt buộc, sau khi <b>Khóa</b> mới dùng được cho chức năng <b>Tính lương nhóm vệ sinh</b>.
+    </div>
+    <div class="grid-container" style="max-height:300px;">
+        <table class="data-table">
+            <thead><tr>
+                <th>TT</th><th class="text-left">Nhóm bình quân</th>
+                <th class="text-left">Thành phần (BP&times;Ka)</th>
+                <th>BQ công đủ</th>
+                <th class="col-money">Tổng QTL (VND)</th>
+                <th>Tổng công</th>
+                <th class="col-money" style="background-color:#ffcccc;">BQ tháng (VND)</th>
+                <th class="text-left">Dùng trả lương cho</th>
+            </tr></thead>
+            <tbody id="tbNhomVS"></tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            &#128203; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Chức năng này tách riêng bước tính bình quân dành cho nhóm Vệ sinh (trước đây nằm chung trong "Tính bình quân LSP (BQTL)" - Lưới 2). Cần xác nhận với khách hàng: nhóm BQ nào thực sự áp dụng cho Vệ sinh (hiện lấy theo nhomHuong chứa "VS": BQ_CB_XQ_PTO và BQ_MPHG) và có cần tách thêm nhóm riêng cho từng khu vực VS (Bến NL, Phân Cỡ, PTO...) hay dùng chung 1 đơn giá như hiện tại.</textarea>
+    </div>
+
+  </div><!-- end container -->
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    var _daTinhVS = false;
+    var _daKhoaVS = false;
+
+    function getPhamViVS() {
+        var r = document.querySelector('input[name="pvbqvs"]:checked');
+        return r ? r.value : 'ALL';
+    }
+
+    /* Chỉ những nhóm BQ có nhomHuong liên quan tới "VS" (Vệ sinh) */
+    function getNhomVS() {
+        return window.MOCK.lsp.nhomBQ.filter(function (n) {
+            return /VS/i.test(n.nhomHuong || '');
+        });
+    }
+
+    function clickTinhBQVS() {
+        var phamVi = getPhamViVS();
+        var tbody = document.getElementById('tbNhomVS');
+        tbody.innerHTML = '';
+        var nhomVS = getNhomVS();
+
+        nhomVS.forEach(function (n, idx) {
+            var kq = computeBQNhomLSP(n.ma, phamVi);
+            if (!kq) return;
+            var thanhPhan = n.members.join(', ');
+            tbody.innerHTML += '<tr class="row-nhom-vs">' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td class="text-left">' + n.ten + '<br><small style="font-weight:normal;color:#888;">' + n.excelRef + '</small></td>' +
+                '<td class="text-left" style="font-weight:normal; font-size:10px; max-width:220px;">' + thanhPhan + '</td>' +
+                '<td>' + formatNumber(kq.bqCongDu, 2) + '</td>' +
+                '<td class="col-money">' + formatNumber(kq.tongQTL) + '</td>' +
+                '<td>' + formatNumber(kq.tongCong, 1) + '</td>' +
+                '<td class="col-money text-danger" style="font-size:13px;">' + formatNumber(kq.bqThang) + '</td>' +
+                '<td class="text-left"><span class="badge-nhom">' + n.nhomHuong + '</span></td></tr>';
+        });
+
+        _daTinhVS = true;
+        var b = document.getElementById('btn-khoa-bqvs');
+        b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
+        showAlert('alertBox', 'Đã tính bình quân cho ' + nhomVS.length + ' nhóm liên quan Vệ sinh.', 'success');
+    }
+
+    function clickKhoaBQVS() {
+        if (!_daTinhVS) {
+            showAlert('alertBox', 'Vui lòng bấm "Tính bình quân Vệ sinh" trước khi khóa!', 'warning');
+            return;
+        }
+        if (_daKhoaVS) return;
+        confirmAction('Khóa đơn giá Bình quân Vệ sinh kỳ LSP_01_2026?\n\nSau khi khóa, đơn giá BQ sẽ được chốt làm đầu vào cho chức năng "Tính lương nhóm vệ sinh". Muốn tính lại phải Mở khóa.', function () {
+            _daKhoaVS = true;
+            var b = document.getElementById('btn-khoa-bqvs');
+            b.disabled = true; b.style.opacity = '0.5'; b.style.cursor = 'not-allowed'; b.innerHTML = '<span class="step-num">2</span>Đã khóa BQ Vệ sinh';
+            window.MOCK.lsp.bqRun.trangThai = 'Locked';
+            showAlert('alertBox', 'Đã khóa Bình quân Vệ sinh kỳ LSP_01_2026. Có thể chạy tiếp "Tính lương nhóm vệ sinh".', 'success');
+        });
+    }
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bảng Tính Lương Vệ Sinh</title>
+  <title>Tính Lương Nhóm Vệ Sinh</title>
   <link rel="stylesheet" href="../shared/style.css">
   <style>
     /* PAGE-SPECIFIC: pg11-bang-tinh-vs */
@@ -60,8 +60,8 @@
   </div>
   <div class="container">
     <div class="demo-badge">DEMO</div>
-    <div class="breadcrumb">L&#432;&#417;ng &rsaquo; Ch&#7913;c n&#259;ng &rsaquo; B&#7843;ng t&iacute;nh l&#432;&#417;ng v&#7879; sinh</div>
-    <div class="page-title">B&#7842;NG T&Iacute;NH L&#431;&#416;NG V&#7878; SINH (H&#431;&#7902;NG B&Igrave;NH QU&Acirc;N)</div>
+    <div class="breadcrumb">L&#432;&#417;ng &rsaquo; Ch&#7913;c n&#259;ng &rsaquo; T&iacute;nh l&#432;&#417;ng nh&oacute;m v&#7879; sinh</div>
+    <div class="page-title">T&Iacute;NH L&#431;&#416;NG NH&Oacute;M V&#7878; SINH</div>
 
     <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
 
@@ -142,7 +142,9 @@
     <div class="grid-container" style="max-height:520px;">
         <table class="data-table">
             <thead><tr>
-                <th>TT</th><th>M&atilde; NV</th><th class="text-left">H&#7885; t&ecirc;n</th>
+                <th>TT</th>
+                <th>M&atilde; BP</th><th>Nh&oacute;m TL</th><th>BP c&#7845;p 3</th><th>BP c&#7845;p 4</th><th>BP c&#7845;p 5</th>
+                <th>M&atilde; NV</th><th class="text-left">H&#7885; t&ecirc;n</th>
                 <th>Lo&#7841;i VS</th>
                 <th>BQ c&ocirc;ng (K)</th>
                 <th class="col-money">BQ TLSP (L)</th>
@@ -171,7 +173,7 @@
         <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
             &#128203; GHI CH&Uacute; NGHI&#7878;P V&#7908; (d&agrave;nh cho th&#7849;m &#273;&#7883;nh)
         </div>
-        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Tham khảo file B.LƯƠNG MPHG T07-2026 (Sheet Report4_VS, giặt đồ, BXBB).</textarea>
     </div>
 
   </div><!-- end container -->
@@ -244,7 +246,7 @@
         var grandQ = 0, grandT = 0, grandW = 0, grandCong = 0, soNV = 0;
 
         khuVucs.forEach(function (kv) {
-            tbody.innerHTML += '<tr class="row-khu-vuc"><td colspan="18">' + kv + '</td></tr>';
+            tbody.innerHTML += '<tr class="row-khu-vuc"><td colspan="23">' + kv + '</td></tr>';
             var subQ = 0, subT = 0, subW = 0, subCong = 0;
 
             groups[kv].forEach(function (nv, idx) {
@@ -261,6 +263,11 @@
 
                 tbody.innerHTML += '<tr>' +
                     '<td>' + (idx + 1) + '</td>' +
+                    '<td style="font-size:10px;">' + (nv.maBP || '') + '</td>' +
+                    '<td style="font-size:10px;">' + (nv.nhomTL || '') + '</td>' +
+                    '<td style="font-size:10px;">' + (nv.cap3 || '') + '</td>' +
+                    '<td style="font-size:10px;">' + (nv.cap4 || '') + '</td>' +
+                    '<td style="font-size:10px;">' + (nv.cap5 || '') + '</td>' +
                     '<td class="font-weight-bold">' + nv.maNV + '</td>' +
                     '<td class="text-left">' + nv.hoTen + '</td>' +
                     '<td style="font-size:10px;">' + (nv.loaiVS === 'VS_KDV' ? 'Kiểm đầu vỏ' : 'VS thường') + '</td>' +
@@ -281,7 +288,7 @@
 
             grandQ += subQ; grandT += subT; grandW += subW; grandCong += subCong;
             tbody.innerHTML += '<tr class="row-subtotal-vs">' +
-                '<td colspan="9" class="text-right" style="padding-right:10px; color:#0056b3;">TỔNG ' + kv.toUpperCase() + ' (' + groups[kv].length + ' NV):</td>' +
+                '<td colspan="14" class="text-right" style="padding-right:10px; color:#0056b3;">TỔNG ' + kv.toUpperCase() + ' (' + groups[kv].length + ' NV):</td>' +
                 '<td>' + formatNumber(subCong, 1) + '</td>' +
                 '<td class="col-money">' + formatNumber(subQ) + '</td>' +
                 '<td></td><td></td>' +
@@ -291,7 +298,7 @@
         });
 
         tfoot.innerHTML = '<tr style="background-color:#e8ecef; font-weight:bold;">' +
-            '<td colspan="9" class="text-right" style="padding-right:10px;">TỔNG CỘNG TOÀN BỘ VỆ SINH:</td>' +
+            '<td colspan="14" class="text-right" style="padding-right:10px;">TỔNG CỘNG TOÀN BỘ VỆ SINH:</td>' +
             '<td>' + formatNumber(grandCong, 1) + '</td>' +
             '<td class="col-money">' + formatNumber(grandQ) + '</td>' +
             '<td></td><td></td>' +

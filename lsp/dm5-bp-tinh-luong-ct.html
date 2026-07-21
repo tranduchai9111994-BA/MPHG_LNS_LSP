@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Bộ phận tính lương chi tiết</title>
+    <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+<!-- TOP HEADER -->
+<div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+        <span>🇻🇳 VN ⌄</span>
+        <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+        <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+        <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+</div>
+
+<!-- MAIN MENU -->
+<div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+</div>
+
+<div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương Sản Phẩm › Danh mục › Bộ phận tính lương chi tiết</div>
+    <div class="page-title">BỘ PHẬN TÍNH LƯƠNG CHI TIẾT</div>
+    <div id="alertBox" class="alert-box"></div>
+
+    <!-- FORM -->
+    <div class="form-panel">
+        <div style="display:grid;grid-template-columns:160px 1fr 160px 1fr;gap:10px 20px;align-items:center;">
+            <input type="hidden" id="txtEditId">
+
+            <label class="lbl-red">Bộ phận tính lương</label>
+            <select id="selBPTL" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;">
+                <option value="">-- Chọn bộ phận tính lương --</option>
+            </select>
+
+            <label>Sử dụng?</label>
+            <input type="checkbox" id="chkSuDung" checked style="width:16px;height:16px;">
+
+            <label class="lbl-red">Mã chi tiết</label>
+            <input type="text" id="txtMa" maxlength="30" placeholder="VD: BPTL001_CT01" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;">
+
+            <label class="lbl-red">Tên chi tiết</label>
+            <input type="text" id="txtTen" maxlength="150" placeholder="Nhập tên bộ phận tính lương chi tiết" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;">
+
+            <label>Thứ tự sắp xếp</label>
+            <input type="number" id="txtThuTu" min="0" value="0" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;width:80px;">
+
+            <label>Ghi chú</label>
+            <input type="text" id="txtGhiChu" maxlength="200" placeholder="Ghi chú (không bắt buộc)" style="height:26px;padding:3px 6px;border:1px solid #ccc;font-size:12px;grid-column:2/5;">
+        </div>
+    </div>
+
+    <!-- ACTIONS BAR -->
+    <div class="actions-bar">
+        <button class="btn-search" onclick="doSearch()">Tìm Kiếm</button>
+        <button class="btn-refresh" onclick="clearForm()">Làm mới</button>
+        <button class="btn-save2" onclick="saveData()">Lưu</button>
+        <button class="btn-delete" onclick="deleteData()">Xóa</button>
+        <button class="btn-import" onclick="showModal('modal-import')">Nhập dữ liệu</button>
+        <button class="btn-export" onclick="exportCSV()">Xuất dữ liệu</button>
+    </div>
+
+    <!-- DATA GRID -->
+    <div class="grid-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="chkAll" onchange="toggleAllChk()"></th>
+                    <th>STT</th>
+                    <th>Sửa</th>
+                    <th>Mã chi tiết</th>
+                    <th>Tên chi tiết</th>
+                    <th>Bộ phận tính lương</th>
+                    <th>Thứ tự</th>
+                    <th>Sử dụng</th>
+                    <th>Ghi chú</th>
+                    <th>Người tạo</th>
+                    <th>Ngày tạo</th>
+                    <th>Người sửa</th>
+                    <th>Ngày sửa</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+    <!-- MODAL IMPORT -->
+    <div class="modal-overlay" id="modal-import">
+        <div class="modal-box">
+            <div class="modal-hdr cyan"><span>IMPORT BỘ PHẬN TÍNH LƯƠNG CHI TIẾT</span><button class="x" onclick="hideModal('modal-import')">✕</button></div>
+            <div class="modal-body">
+                <p style="font-size:11px;color:#555;margin-bottom:10px;"><strong style="color:red">Lưu ý:</strong> Cột bắt buộc: <b>Mã chi tiết</b>, <b>Tên chi tiết</b> và <b>Bộ phận tính lương (mã cha)</b>.</p>
+                <input type="file" accept=".xlsx,.xls" style="width:100%;border:1px solid #ccc;padding:4px;margin-bottom:8px;">
+                <a href="#" style="font-size:11px;color:#0056b3">Tải template mẫu</a>
+            </div>
+            <div class="modal-ftr">
+                <button class="btn-cancel" onclick="hideModal('modal-import')">Đóng</button>
+                <button class="btn-ok" onclick="hideModal('modal-import');showAlert('alertBox','Import thành công!','success')">Thực hiện Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GHI CHÚ NGHIỆP VỤ -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;"
+            placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Bộ phận tính lương chi tiết là cấp con của Bộ phận tính lương. Mỗi BP tính lương có thể có nhiều BP chi tiết (VD: BPTL001 - PTO có các chi tiết: PTO Tôm Sú, PTO Tôm Thẻ, PTO Nobashi). Dùng để phân tách tính lương theo từng nhóm sản phẩm/công đoạn con trong cùng 1 bộ phận.
+Need Confirm: BP chi tiết có ảnh hưởng đến cách tính Bình quân LSP không? Có cần gắn công đoạn vào BP chi tiết?</textarea>
+    </div>
+</div>
+
+<script src="../shared/mockdata.js"></script>
+<script src="../shared/utils.js"></script>
+<script>
+const CURRENT_USER = 'FPT Admin';
+function nowStr() {
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+let DATA = [
+    { id:1,  ma:'BPTL001_CT01', ten:'PTO Tôm Sú',          bptl:'BPTL001', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:2,  ma:'BPTL001_CT02', ten:'PTO Tôm Thẻ',         bptl:'BPTL001', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:3,  ma:'BPTL001_CT03', ten:'PTO Nobashi',          bptl:'BPTL001', thuTu:3, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:4,  ma:'BPTL002_CT01', ten:'Tẩm bột thường',      bptl:'BPTL002', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:5,  ma:'BPTL002_CT02', ten:'Tẩm bột Tempura',     bptl:'BPTL002', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:6,  ma:'BPTL003_CT01', ten:'Chiên thường',         bptl:'BPTL003', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:7,  ma:'BPTL003_CT02', ten:'Chiên Tempura',        bptl:'BPTL003', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:8,  ma:'BPTL004_CT01', ten:'Chế biến tôm nguyên con', bptl:'BPTL004', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:9,  ma:'BPTL004_CT02', ten:'Chế biến hàng giá trị gia tăng', bptl:'BPTL004', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:10, ma:'BPTL005_CT01', ten:'Sơ chế tôm sú',       bptl:'BPTL005', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:11, ma:'BPTL005_CT02', ten:'Sơ chế tôm thẻ',      bptl:'BPTL005', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:12, ma:'BPTL006_CT01', ten:'Đóng gói thành phẩm',  bptl:'BPTL006', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:13, ma:'BPTL006_CT02', ten:'Đóng gói bao bì',      bptl:'BPTL006', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:14, ma:'BPTL007_CT01', ten:'Kho lạnh cấp đông',    bptl:'BPTL007', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:15, ma:'BPTL007_CT02', ten:'Kho lạnh bảo quản',    bptl:'BPTL007', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:16, ma:'BPTL008_CT01', ten:'Luộc tôm',             bptl:'BPTL008', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:17, ma:'BPTL008_CT02', ten:'Hấp tôm',              bptl:'BPTL008', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:18, ma:'BPTL009_CT01', ten:'GTGT Sushi',            bptl:'BPTL009', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:19, ma:'BPTL009_CT02', ten:'GTGT Ebifry',           bptl:'BPTL009', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:20, ma:'BPTL010_CT01', ten:'Xuất hàng container',   bptl:'BPTL010', thuTu:1, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+    { id:21, ma:'BPTL010_CT02', ten:'Xuất hàng lẻ',          bptl:'BPTL010', thuTu:2, suDung:true, ghiChu:'', nguoiTao:'FPT Admin', ngayTao:'01/06/2026 08:00', nguoiSua:'', ngaySua:'' },
+];
+
+let filteredData = [...DATA];
+let nextId = DATA.length + 1;
+
+function getBPTLMap() {
+    const map = {};
+    (window.MOCK.bpTinhLuong || []).forEach(r => { map[r.ma] = r.ten; });
+    return map;
+}
+
+function loadBPTL() {
+    const sel = document.getElementById('selBPTL');
+    (window.MOCK.bpTinhLuong || []).forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.ma;
+        opt.textContent = `${r.ma} - ${r.ten}`;
+        sel.appendChild(opt);
+    });
+}
+
+function renderGrid() {
+    const bptlMap = getBPTLMap();
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = filteredData.map((r, i) => `
+        <tr>
+            <td style="text-align:center"><input type="checkbox" class="chk-row" value="${r.id}"></td>
+            <td style="text-align:center">${i + 1}</td>
+            <td style="text-align:center"><span class="edit-icon" onclick="startEdit(${r.id})">✎</span></td>
+            <td><b>${r.ma}</b></td>
+            <td style="text-align:left">${r.ten}</td>
+            <td style="text-align:left">${r.bptl ? `${r.bptl} - ${bptlMap[r.bptl] || ''}` : ''}</td>
+            <td style="text-align:center">${r.thuTu}</td>
+            <td style="text-align:center">${r.suDung ? '<span style="color:green;font-weight:bold">✔</span>' : '<span style="color:#ccc;font-weight:bold">✘</span>'}</td>
+            <td>${r.ghiChu}</td>
+            <td>${r.nguoiTao}</td>
+            <td>${r.ngayTao}</td>
+            <td>${r.nguoiSua}</td>
+            <td>${r.ngaySua}</td>
+        </tr>
+    `).join('');
+}
+
+function doSearch() {
+    const bptl = document.getElementById('selBPTL').value;
+    const ma = document.getElementById('txtMa').value.trim().toLowerCase();
+    const ten = document.getElementById('txtTen').value.trim().toLowerCase();
+    filteredData = DATA.filter(r =>
+        (!bptl || r.bptl === bptl) &&
+        (!ma || r.ma.toLowerCase().includes(ma)) &&
+        (!ten || r.ten.toLowerCase().includes(ten))
+    );
+    renderGrid();
+    showAlert('alertBox', `Tìm thấy ${filteredData.length} bản ghi.`, 'success');
+}
+
+function clearForm() {
+    document.getElementById('txtEditId').value = '';
+    document.getElementById('selBPTL').value = '';
+    document.getElementById('txtMa').value = '';
+    document.getElementById('txtMa').removeAttribute('readonly');
+    document.getElementById('txtTen').value = '';
+    document.getElementById('txtThuTu').value = '0';
+    document.getElementById('txtGhiChu').value = '';
+    document.getElementById('chkSuDung').checked = true;
+    filteredData = [...DATA];
+    renderGrid();
+}
+
+function startEdit(id) {
+    const r = DATA.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('txtEditId').value = id;
+    document.getElementById('selBPTL').value = r.bptl || '';
+    document.getElementById('txtMa').value = r.ma;
+    document.getElementById('txtMa').setAttribute('readonly', true);
+    document.getElementById('txtTen').value = r.ten;
+    document.getElementById('txtThuTu').value = r.thuTu;
+    document.getElementById('txtGhiChu').value = r.ghiChu;
+    document.getElementById('chkSuDung').checked = r.suDung;
+    window.scrollTo(0, 0);
+}
+
+function saveData() {
+    const bptl = document.getElementById('selBPTL').value;
+    const ma   = document.getElementById('txtMa').value.trim().toUpperCase();
+    const ten  = document.getElementById('txtTen').value.trim();
+    const thuTu = parseInt(document.getElementById('txtThuTu').value) || 0;
+
+    if (!bptl) { showAlert('alertBox', 'Vui lòng chọn Bộ phận tính lương (cha).', 'error'); return; }
+    if (!ma)   { showAlert('alertBox', 'Vui lòng nhập Mã chi tiết.', 'error'); return; }
+    if (!ten)  { showAlert('alertBox', 'Vui lòng nhập Tên chi tiết.', 'error'); return; }
+
+    const editId = parseInt(document.getElementById('txtEditId').value) || 0;
+
+    if (editId) {
+        const idx = DATA.findIndex(x => x.id === editId);
+        if (idx >= 0) {
+            DATA[idx] = { ...DATA[idx], ten, bptl, thuTu,
+                ghiChu: document.getElementById('txtGhiChu').value,
+                suDung: document.getElementById('chkSuDung').checked,
+                nguoiSua: CURRENT_USER, ngaySua: nowStr()
+            };
+        }
+        showAlert('alertBox', 'Cập nhật thành công.', 'success');
+    } else {
+        if (DATA.find(r => r.ma === ma)) { showAlert('alertBox', `Mã "${ma}" đã tồn tại.`, 'error'); return; }
+        DATA.push({
+            id: nextId++, ma, ten, bptl, thuTu,
+            suDung: document.getElementById('chkSuDung').checked,
+            ghiChu: document.getElementById('txtGhiChu').value,
+            nguoiTao: CURRENT_USER, ngayTao: nowStr(), nguoiSua: '', ngaySua: ''
+        });
+        showAlert('alertBox', 'Thêm mới thành công.', 'success');
+    }
+    filteredData = [...DATA];
+    renderGrid();
+    clearForm();
+}
+
+function deleteData() {
+    const ids = [...document.querySelectorAll('.chk-row:checked')].map(c => parseInt(c.value));
+    if (!ids.length) { showAlert('alertBox', 'Chưa chọn bản ghi nào.', 'error'); return; }
+    if (!confirm(`Xóa ${ids.length} bản ghi?`)) return;
+    DATA = DATA.filter(r => !ids.includes(r.id));
+    filteredData = [...DATA];
+    renderGrid();
+    showAlert('alertBox', `Đã xóa ${ids.length} bản ghi.`, 'success');
+}
+
+function toggleAllChk() {
+    const c = document.getElementById('chkAll').checked;
+    document.querySelectorAll('.chk-row').forEach(x => x.checked = c);
+}
+
+function exportCSV() {
+    const bptlMap = getBPTLMap();
+    const headers = ['Mã chi tiết','Tên chi tiết','BP tính lương','Thứ tự','Sử dụng','Ghi chú'];
+    const rows = filteredData.map(r => [
+        r.ma, r.ten, `${r.bptl} - ${bptlMap[r.bptl]||''}`, r.thuTu, r.suDung?'X':'', r.ghiChu
+    ]);
+    let csv = '﻿' + headers.join(',') + '\n' + rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bp_tinh_luong_chi_tiet.csv';
+    a.click();
+}
+
+loadBPTL();
+renderGrid();
+</script>
+</body>
+</html>

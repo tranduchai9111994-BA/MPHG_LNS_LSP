@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Tạo công thức lương</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .ref-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
+      .ref-table th{background:#e8eef5;color:#333;padding:6px 8px;border:1px solid #ccc;text-align:left;font-weight:bold;}
+      .ref-table td{padding:6px 8px;border:1px solid #ddd;background:#f9fbfd;}
+      .ref-table tr:hover td{background:#eef4fb;}
+      .btn-vd{background:#0056b3;color:#fff;border:none;padding:2px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-weight:bold;}
+      .btn-vd:hover{background:#003d80;}
+      .btn-chitiet{background:#17a2b8;color:#fff;border:none;padding:3px 12px;border-radius:3px;cursor:pointer;font-size:11px;font-weight:bold;}
+      .btn-chitiet:hover{background:#117a8b;}
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+<div>
+  <div class="breadcrumb">Lương › Thiết lập (System) › Thiết lập công thức tính lương › Tạo công thức lương</div>
+  <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;">
+    <span>TẠO CÔNG THỨC LƯƠNG</span>
+    <button onclick="showRules()" style="background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">📋 Quy tắc</button>
+  </div>
+  <div class="info-bar" style="margin-bottom:10px;">
+    Màn hình này lưu <strong>thông tin master</strong> của bộ công thức (Tên, Customer, Ghi chú). Việc ráp/xem các dòng tiêu chí (+−×÷) thực hiện trong popup <strong>[Chi tiết]</strong> của từng công thức bên dưới.
+  </div>
+  <div id="set4-alert" class="alert-box"></div>
+
+  <!-- MODAL: Quy tắc màn hình -->
+  <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="max-width:720px;">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>📋 Quy tắc nghiệp vụ — Tạo công thức lương</span>
+        <button class="x" onclick="document.getElementById('modal-rules').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body" id="modal-rules-body" style="max-height:75vh;overflow-y:auto;"></div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('modal-rules').style.display='none'">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Form -->
+  <div class="form-panel">
+    <div class="form-grid-2col">
+      <label class="lbl-red">Tên Công thức</label>
+      <div class="input-wrap"><input type="text" id="set4_name" maxlength="255" placeholder="Nhập tên công thức..."></div>
+      <label class="lbl-red">Customer</label>
+      <div class="input-wrap">
+        <select id="set4_customer">
+          <option value="MPHG" selected>MPHG</option>
+        </select>
+      </div>
+      <label>Ghi chú</label>
+      <div class="input-wrap"><textarea id="set4_note" maxlength="1000" style="height:55px;" placeholder="Ghi chú..."></textarea></div>
+    </div>
+  </div>
+
+  <!-- Actions Bar (Master) -->
+  <div class="actions-bar">
+    <button class="btn-save2" onclick="set4SaveMaster()">Lưu</button>
+    <button class="btn-refresh" onclick="set4CancelMaster()">Làm mới</button>
+    <button class="btn-import" style="background:#6f42c1;" onclick="copyFormula()">Sao chép</button>
+    <button class="btn-export" onclick="exportMasterData()">Xuất dữ liệu</button>
+  </div>
+
+  <!-- Master List Grid -->
+  <div class="grid-wrap"><table>
+    <thead><tr>
+      <th><input type="checkbox" id="set4m_chkAll" onchange="toggleAllSet4Master(this)"></th>
+      <th>STT</th>
+      <th>✎</th>
+      <th>Mã</th>
+      <th>Tên Công thức</th>
+      <th>Customer</th>
+      <th>Số dòng tiêu chí</th>
+      <th>Ghi chú</th>
+      <th>Chi tiết</th>
+    </tr></thead>
+    <tbody id="set4-master-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- Modal: Chi tiết công thức (lưới dòng tiêu chí) -->
+<div class="modal-overlay" id="set4-detail">
+  <div class="modal-box" style="width:95vw;max-width:1500px;height:92vh;display:flex;flex-direction:column;">
+    <div class="modal-hdr" style="background:#17a2b8;">
+      <span id="set4-detail-title">🔧 CHI TIẾT CÔNG THỨC</span>
+      <button class="x" onclick="hideModal('set4-detail')">✕</button>
+    </div>
+    <div class="modal-body" style="flex:1;overflow-y:auto;">
+      <div id="set4-detail-info" style="margin-bottom:10px;font-size:12px;color:#555;"></div>
+      <div class="actions-bar" style="padding:0;background:transparent;border:none;margin-bottom:10px;">
+        <button class="btn-export" onclick="exportDetailData()">Xuất dữ liệu dòng</button>
+        <button class="btn-import" onclick="openPreview()">Xem trước nhiều dòng</button>
+      </div>
+      <div class="grid-wrap"><table>
+        <thead><tr>
+          <th><input type="checkbox" id="set4_chkAll" onchange="toggleAllSet4Detail(this)"></th>
+          <th>STT</th>
+          <th>Mã tiêu chí</th>
+          <th>Tên tiêu chí</th>
+          <th>STT thứ tự</th>
+          <th style="min-width:280px">Công thức</th>
+          <th>Ghi chú</th>
+        </tr></thead>
+        <tbody id="set4-tbody"></tbody>
+      </table></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="hideModal('set4-detail')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Xem trước nhiều dòng -->
+<div class="modal-overlay" id="set4-preview">
+  <div class="modal-box" style="width:95vw;max-width:1500px;height:92vh;display:flex;flex-direction:column;">
+    <div class="modal-hdr" style="background:#0056b3;">
+      <span>🔍 XEM TRƯỚC KẾT QUẢ NHIỀU DÒNG</span>
+      <button class="x" onclick="hideModal('set4-preview')">✕</button>
+    </div>
+    <div class="modal-body" style="flex:1;overflow-y:auto;">
+      <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+        <label style="margin:0;font-weight:bold;">Nhân viên:</label>
+        <select id="set4_previewEmp" onchange="selectEmployee()" style="padding:4px 6px;border:1px solid #ccc;height:26px;min-width:260px;">
+          <option value="1022907668">1022907668 - Nguyễn Thị Loan</option>
+        </select>
+      </div>
+      <div id="set4-preview-content"></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="hideModal('set4-preview')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="6" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;">Màn hình tách 2 lớp: (1) Master ngoài trang — chỉ lưu Tên/Customer/Ghi chú + danh sách công thức đã tạo; (2) popup [Chi tiết] — nơi ráp các dòng tiêu chí tính toán (TT_) thành 1 bộ công thức, mỗi dòng vẫn nhập công thức dạng text (VD: TT_A × HT_B) như bản trước, chưa có form-builder kéo-thả toán tử.
+Không định nghĩa lại RowClass/Allocation/SumPrev ở đây — đã chốt tại MH "Định nghĩa tiêu chí tính toán" (xem nút Quy tắc ở MH đó).
+[Sao chép]: nhân bản 1 dòng master đã tick (kèm toàn bộ dòng tiêu chí bên trong) thành bộ mới, tự thêm hậu tố "(Copy)".
+[Xuất dữ liệu] ở ngoài: xuất danh sách master đã tick (hoặc toàn bộ nếu không tick). [Xuất dữ liệu dòng] trong popup Chi tiết: xuất các dòng tiêu chí đã tick của riêng công thức đang mở.
+Need Confirm (confirm #7): NV làm nhiều BP trong tháng — sau khi tính từng dòng có gộp tổng theo BP (M25=SUM) không? Bộ công thức có cần versioning?</textarea>
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    // ==================== General Utilities ====================
+    function showModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'flex'; }
+    function hideModal(id) { const e = document.getElementById(id); if(e) e.style.display = 'none'; }
+    function showAlert2(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    // ==================== Mock Data ====================
+    // Mỗi bộ công thức = master (code/name/customer/note) + danh sách dòng tham chiếu
+    // tiêu chí tính toán (TT_). RowClass/Allocation/SumPrev của từng TT_ đã chốt ở
+    // MH Tiêu chí tính toán, không lặp lại/hiển thị toán tử ở đây.
+    const MOCK_FORMULAS = [
+      {
+        code: 'LSP_01',
+        name: 'Lương sản phẩm LSP',
+        customer: 'MPHG',
+        note: '',
+        lines: [
+          { stt:1, ma:'TT_LSP_Base_L0', ten:'Lương gốc L0', order:1, ct:'Σ(HT_PR_NangSuatTinhLuong × HT_PR_LSP_DonGia)' },
+          { stt:2, ma:'TT_LSP_TienL1', ten:'Tiền sau ĐC lần 1', order:2, ct:'TT_LSP_Base_L0 × HT_PR_LSP_HeSo1' },
+          { stt:3, ma:'TT_LSP_HoTroChuyenBan', ten:'Hỗ trợ bàn giao (giai đoạn cũ)', order:3, ct:'500,000 (cố định khi có ≥2 giai đoạn, Allocation=OldStage)' },
+          { stt:4, ma:'TT_LSP_LuongThoiGian', ten:'Lương thời gian', order:4, ct:'HT_TS_CongThucTe × ĐơnGiáNgày' },
+          { stt:5, ma:'TT_LSP_LuongDongBH', ten:'Lương đóng BH', order:5, ct:'MAX(TT_LSP_KetQua_Final theo dòng)' },
+          { stt:6, ma:'TT_LSP_LuyKeLuong', ten:'Lương lũy kế xuyên giai đoạn', order:6, ct:'REF(TT_LSP_Base_L0) cộng dồn' },
+          { stt:7, ma:'TT_LSP_ThuNhapTinhThue', ten:'Thu nhập tính thuế', order:7, ct:'Σ TT_LSP_KetQua_Final' },
+          { stt:8, ma:'TT_LSP_KetQua_Final', ten:'Tổng LSP cuối', order:8, ct:'TT_LSP_TienL3 + HoTro...' },
+        ]
+      }
+    ];
+    let editingMasterCode = '';   // mã công thức đang sửa ở form master (rỗng = đang tạo mới)
+    let detailFormulaCode = '';   // mã công thức đang mở trong popup Chi tiết
+    let currentFormulaLines = []; // dòng tiêu chí của công thức đang mở trong popup Chi tiết
+
+    const MOCK_PREVIEW = {
+      emp: { id:'1022907668', name:'Nguyễn Thị Loan' },
+      slices: [
+        { stage:1, ban:'CB101', from:'01/05/2026', to:'15/05/2026', cong:12, L0:5000000, final:6200000 },
+        { stage:2, ban:'CB102', from:'16/05/2026', to:'31/05/2026', cong:13, L0:5800000, final:7100000 },
+      ]
+    };
+
+    // ==================== QUY TẮC NGHIỆP VỤ (popup) ====================
+    var RULES_FRM = [
+      {loai:'Bắt buộc', text:'Tên Công thức và Customer là trường bắt buộc khi Lưu master.', vd:'Xem dòng LSP_01 trong danh sách master bên dưới.'},
+      {loai:'Bắt buộc', text:'Chỉ được [Sao chép] khi đã chọn (tick) đúng 1 dòng master có sẵn.', vd:'Tick dòng LSP_01 rồi bấm Sao chép — kết quả tự thêm hậu tố "(Copy)".'},
+      {loai:'Kiến trúc', text:'RowClass/Allocation/SumPrev của từng tiêu chí KHÔNG cấu hình lại ở đây — chỉ tham chiếu Mã tiêu chí (TT_) đã tạo sẵn.', vd:'Bấm [Chi tiết] dòng LSP_01 → cột "Mã tiêu chí" chỉ hiển thị tham chiếu, không có cột toán tử.'},
+      {loai:'Kiến trúc', text:'Chiều sinh dòng (theo Quá trình làm việc) đã xác định tại tiêu chí HT_/TT_, không khai báo lại ở màn hình này.'},
+      {loai:'Xuất dữ liệu', text:'Nút Xuất dữ liệu ngoài trang xuất DANH SÁCH MASTER (đã tick hoặc toàn bộ); nút Xuất dữ liệu dòng trong popup Chi tiết chỉ xuất các DÒNG TIÊU CHÍ của công thức đang mở.'}
+    ];
+    function showRules() {
+      var html = '<table class="ref-table"><thead><tr><th style="width:130px;">Loại</th><th>Quy tắc</th><th style="width:220px;">Tham khảo ví dụ</th></tr></thead><tbody>';
+      RULES_FRM.forEach(function(r){
+        var color = r.loai.indexOf('Bắt buộc')>=0 ? '#dc3545' : (r.loai.indexOf('Kiến trúc')>=0 ? '#0056b3' : '#6c757d');
+        html += '<tr><td><b style="color:'+color+'">'+r.loai+'</b></td><td>'+r.text+'</td><td style="color:#6f42c1;">'+(r.vd||'—')+'</td></tr>';
+      });
+      html += '</tbody></table>';
+      document.getElementById('modal-rules-body').innerHTML = html;
+      document.getElementById('modal-rules').style.display = 'flex';
+    }
+
+    // ==================== Render Master List ====================
+    function renderMasterGrid() {
+      const tbody = document.getElementById('set4-master-tbody');
+      if (!MOCK_FORMULAS.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="color:#999;font-style:italic;padding:15px;">Chưa có công thức nào. Nhập thông tin master phía trên rồi bấm Lưu.</td></tr>';
+        return;
+      }
+      let html = '';
+      MOCK_FORMULAS.forEach((f, i) => {
+        html += '<tr data-code="' + f.code + '">';
+        html += '<td><input type="checkbox" class="set4m-chk"></td>';
+        html += '<td>' + (i + 1) + '</td>';
+        html += '<td><span class="edit-icon" onclick="selectMasterEdit(\'' + f.code + '\')">✎</span></td>';
+        html += '<td><b>' + f.code + '</b></td>';
+        html += '<td style="text-align:left;">' + f.name + '</td>';
+        html += '<td>' + f.customer + '</td>';
+        html += '<td>' + f.lines.length + '</td>';
+        html += '<td style="text-align:left;">' + (f.note || '') + '</td>';
+        html += '<td><button class="btn-chitiet" onclick="openDetail(\'' + f.code + '\')">Chi tiết</button></td>';
+        html += '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    // ==================== Master: Sửa / Lưu / Làm mới ====================
+    function selectMasterEdit(code) {
+      const f = MOCK_FORMULAS.find(x => x.code === code);
+      if (!f) return;
+      editingMasterCode = code;
+      document.getElementById('set4_name').value = f.name;
+      document.getElementById('set4_customer').value = f.customer;
+      document.getElementById('set4_note').value = f.note || '';
+      window.scrollTo(0, 0);
+    }
+
+    function set4SaveMaster() {
+      const name = document.getElementById('set4_name').value.trim();
+      const customer = document.getElementById('set4_customer').value;
+      const note = document.getElementById('set4_note').value.trim();
+
+      if (!name) return showAlert2('set4-alert', 'Vui lòng nhập Tên Công thức.', 'error');
+      if (!customer) return showAlert2('set4-alert', 'Vui lòng chọn Customer.', 'error');
+
+      if (editingMasterCode) {
+        const idx = MOCK_FORMULAS.findIndex(f => f.code === editingMasterCode);
+        if (idx >= 0) {
+          MOCK_FORMULAS[idx].name = name;
+          MOCK_FORMULAS[idx].customer = customer;
+          MOCK_FORMULAS[idx].note = note;
+        }
+        showAlert2('set4-alert', 'Đã cập nhật công thức [' + name + '].', 'success');
+      } else {
+        const newCode = 'LSP_' + Date.now();
+        MOCK_FORMULAS.push({ code: newCode, name, customer, note, lines: [] });
+        showAlert2('set4-alert', 'Đã tạo mới công thức [' + name + ']. Bấm [Chi tiết] để thêm dòng tiêu chí.', 'success');
+      }
+      renderMasterGrid();
+      set4CancelMaster();
+    }
+
+    function set4CancelMaster() {
+      document.getElementById('set4_name').value = '';
+      document.getElementById('set4_customer').value = 'MPHG';
+      document.getElementById('set4_note').value = '';
+      editingMasterCode = '';
+    }
+
+    // ==================== Copy (Sao chép) ====================
+    function copyFormula() {
+      const checked = Array.from(document.querySelectorAll('.set4m-chk:checked'));
+      if (checked.length !== 1) {
+        return showAlert2('set4-alert', 'Vui lòng tick chọn đúng 1 công thức trong danh sách để Sao chép.', 'error');
+      }
+      const code = checked[0].closest('tr').getAttribute('data-code');
+      const src = MOCK_FORMULAS.find(f => f.code === code);
+      if (!src) return;
+      const newCode = 'LSP_COPY_' + Date.now();
+      const newFormula = {
+        code: newCode,
+        name: src.name + ' (Copy)',
+        customer: src.customer,
+        note: src.note,
+        lines: JSON.parse(JSON.stringify(src.lines))
+      };
+      MOCK_FORMULAS.push(newFormula);
+      renderMasterGrid();
+      showAlert2('set4-alert', 'Đã sao chép thành bộ công thức mới [' + newFormula.name + '] (' + newFormula.lines.length + ' dòng tiêu chí).', 'success');
+    }
+
+    // ==================== Export Master ====================
+    function toggleAllSet4Master(master) {
+      document.querySelectorAll('.set4m-chk').forEach(c => c.checked = master.checked);
+    }
+
+    function exportMasterData() {
+      if (!MOCK_FORMULAS.length) {
+        return showAlert2('set4-alert', 'Chưa có công thức nào để xuất.', 'error');
+      }
+      const checked = Array.from(document.querySelectorAll('.set4m-chk:checked'));
+      const list = checked.length
+        ? checked.map(c => MOCK_FORMULAS.find(f => f.code === c.closest('tr').getAttribute('data-code')))
+        : MOCK_FORMULAS;
+
+      const header = ['Mã', 'Tên Công thức', 'Customer', 'Số dòng tiêu chí', 'Ghi chú'];
+      const csvLines = [header.join(',')];
+      list.forEach(f => {
+        csvLines.push([f.code, '"' + f.name.replace(/"/g,'""') + '"', f.customer, f.lines.length, '"' + (f.note||'').replace(/"/g,'""') + '"'].join(','));
+      });
+      downloadCsv(csvLines, 'danh_sach_cong_thuc.csv');
+      showAlert2('set4-alert', 'Đã xuất ' + list.length + '/' + MOCK_FORMULAS.length + ' công thức ' + (checked.length ? '(đã chọn)' : '(toàn bộ)') + '.', 'success');
+    }
+
+    function downloadCsv(lines, filename) {
+      const csvContent = '﻿' + lines.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ==================== Popup Chi tiết (dòng tiêu chí) ====================
+    function openDetail(code) {
+      const f = MOCK_FORMULAS.find(x => x.code === code);
+      if (!f) return;
+      detailFormulaCode = code;
+      document.getElementById('set4-detail-title').textContent = '🔧 CHI TIẾT CÔNG THỨC — ' + f.name;
+      document.getElementById('set4-detail-info').innerHTML =
+        '<b>Mã:</b> ' + f.code + ' &nbsp;|&nbsp; <b>Customer:</b> ' + f.customer +
+        (f.note ? ' &nbsp;|&nbsp; <b>Ghi chú:</b> ' + f.note : '');
+      renderDetailGrid(f.lines);
+      showModal('set4-detail');
+    }
+
+    function renderDetailGrid(lines) {
+      const tbody = document.getElementById('set4-tbody');
+      currentFormulaLines = lines || [];
+      if (!lines || lines.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:#999;font-style:italic;padding:15px;">Chưa có dòng tiêu chí nào trong công thức này.</td></tr>';
+        return;
+      }
+      let html = '';
+      lines.forEach((l, i) => {
+        html += '<tr data-idx="' + i + '">';
+        html += '<td><input type="checkbox" class="set4-chk"></td>';
+        html += '<td>' + l.stt + '</td>';
+        html += '<td style="text-align:left;"><b>' + l.ma + '</b></td>';
+        html += '<td style="text-align:left;">' + l.ten + '</td>';
+        html += '<td>' + l.order + '</td>';
+        html += '<td style="text-align:left;font-family:Consolas,monospace;font-size:11px;white-space:normal;">' + l.ct + '</td>';
+        html += '<td></td>';
+        html += '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function toggleAllSet4Detail(master) {
+      document.querySelectorAll('.set4-chk').forEach(c => c.checked = master.checked);
+    }
+
+    function exportDetailData() {
+      if (!currentFormulaLines.length) {
+        return showAlert2('set4-alert', 'Chưa có dòng công thức để xuất.', 'error');
+      }
+      const checked = Array.from(document.querySelectorAll('.set4-chk:checked'));
+      const idxToExport = checked.length
+        ? checked.map(c => parseInt(c.closest('tr').getAttribute('data-idx'), 10))
+        : currentFormulaLines.map((_, i) => i);
+
+      const rows = idxToExport.map(i => currentFormulaLines[i]).filter(Boolean);
+      const header = ['STT', 'Mã tiêu chí', 'Tên tiêu chí', 'STT thứ tự', 'Công thức'];
+      const csvLines = [header.join(',')];
+      rows.forEach(l => {
+        csvLines.push([l.stt, l.ma, '"' + l.ten.replace(/"/g, '""') + '"', l.order, '"' + l.ct.replace(/"/g, '""') + '"'].join(','));
+      });
+      downloadCsv(csvLines, (detailFormulaCode || 'cong_thuc_luong') + '.csv');
+      showAlert2('set4-alert', 'Đã xuất ' + rows.length + '/' + currentFormulaLines.length + ' dòng ' + (checked.length ? '(đã chọn)' : '(toàn bộ)') + '.', 'success');
+    }
+
+    // ==================== Preview Engine ====================
+    function formatNum(n) {
+      if (n === 0) return '0';
+      return n.toLocaleString('vi-VN');
+    }
+
+    function runPreviewEngine(data) {
+      const slices = data.slices;
+      const totalCong = slices.reduce((s, r) => s + r.cong, 0);
+
+      const luongThoiGianTotal = 4000000;
+
+      let luyKeRunning = 0;
+      const results = slices.map((sl, i) => {
+        const row = { ...sl };
+        row.luongThoiGian = Math.round(luongThoiGianTotal * sl.cong / totalCong);
+        row.luongDongBH = 0;
+        row.thuNhapTinhThue = 0;
+        row.hoTroChuyenBan = (i === 0 && slices.length > 1) ? 500000 : 0; // OldStage: dồn vào giai đoạn ĐẦU tiên
+        luyKeRunning += sl.L0;
+        row.luyKeLuong = luyKeRunning;
+        return row;
+      });
+
+      let maxFinalIdx = 0;
+      let maxFinalVal = 0;
+      results.forEach((r, i) => {
+        if (r.final > maxFinalVal) { maxFinalVal = r.final; maxFinalIdx = i; }
+      });
+      const totalFinal = results.reduce((s, r) => s + r.final, 0);
+      results[maxFinalIdx].luongDongBH = totalFinal;
+      results[results.length - 1].thuNhapTinhThue = totalFinal;
+
+      return results;
+    }
+
+    function renderPreviewTable(results) {
+      const container = document.getElementById('set4-preview-content');
+      const totalCong = results.reduce((s, r) => s + r.cong, 0);
+
+      let html = '<div style="margin-bottom:8px;font-size:11px;color:#555;">';
+      html += '<b>Sinh dòng theo Quá trình làm việc:</b> Mỗi dòng = 1 giai đoạn QTLV (đã xác định tại tiêu chí, không cấu hình lại ở đây). ';
+      html += 'Tổng công: <b>' + totalCong + '</b> ngày.</div>';
+
+      html += '<div style="overflow-x:auto;"><table style="font-size:11px;width:100%;">';
+      html += '<thead><tr>';
+      html += '<th>Giai đoạn</th><th>Bàn</th><th>Từ ngày</th><th>Đến ngày</th><th>Công</th>';
+      html += '<th>Lương gốc L0</th><th>LSP Final</th>';
+      html += '<th style="background:#d4edda;">Lương thời gian<br><span style="font-size:9px;font-weight:normal;">(Prorata)</span></th>';
+      html += '<th style="background:#e8f4f8;">Lương đóng BH<br><span style="font-size:9px;font-weight:normal;">(MaxSalaryRow)</span></th>';
+      html += '<th style="background:#fff3cd;">Thu nhập tính thuế<br><span style="font-size:9px;font-weight:normal;">(LastStageRow)</span></th>';
+      html += '<th style="background:#e2d9f3;">Hỗ trợ bàn giao<br><span style="font-size:9px;font-weight:normal;">(OldStage)</span></th>';
+      html += '<th style="background:#d6eaf8;">Lũy kế lương<br><span style="font-size:9px;font-weight:normal;">(Accumulate)</span></th>';
+      html += '</tr></thead><tbody>';
+
+      let sumL0 = 0, sumFinal = 0, sumLTG = 0, sumLDBH = 0, sumTNTT = 0, sumCong = 0, sumHTCB = 0;
+
+      results.forEach(r => {
+        sumCong += r.cong;
+        sumL0 += r.L0;
+        sumFinal += r.final;
+        sumLTG += r.luongThoiGian;
+        sumLDBH += r.luongDongBH;
+        sumTNTT += r.thuNhapTinhThue;
+        sumHTCB += r.hoTroChuyenBan;
+
+        const highlightBH = r.luongDongBH > 0 ? 'background:#e8f4f8;font-weight:bold;color:#0056b3;' : 'color:#ccc;';
+        const highlightTT = r.thuNhapTinhThue > 0 ? 'background:#fff3cd;font-weight:bold;color:#856404;' : 'color:#ccc;';
+        const highlightHTCB = r.hoTroChuyenBan > 0 ? 'background:#e2d9f3;font-weight:bold;color:#6f42c1;' : 'color:#ccc;';
+
+        html += '<tr>';
+        html += '<td>' + r.stage + '</td>';
+        html += '<td>' + r.ban + '</td>';
+        html += '<td>' + r.from + '</td>';
+        html += '<td>' + r.to + '</td>';
+        html += '<td><b>' + r.cong + '</b></td>';
+        html += '<td style="text-align:right;">' + formatNum(r.L0) + '</td>';
+        html += '<td style="text-align:right;font-weight:bold;">' + formatNum(r.final) + '</td>';
+        html += '<td style="text-align:right;background:#f1fdf4;">' + formatNum(r.luongThoiGian) + '</td>';
+        html += '<td style="text-align:right;' + highlightBH + '">' + formatNum(r.luongDongBH) + '</td>';
+        html += '<td style="text-align:right;' + highlightTT + '">' + formatNum(r.thuNhapTinhThue) + '</td>';
+        html += '<td style="text-align:right;' + highlightHTCB + '">' + formatNum(r.hoTroChuyenBan) + '</td>';
+        html += '<td style="text-align:right;background:#d6eaf8;">' + formatNum(r.luyKeLuong) + '</td>';
+        html += '</tr>';
+      });
+
+      html += '<tr style="background:#f8f9fa;font-weight:bold;border-top:2px solid #333;">';
+      html += '<td colspan="4" style="text-align:right;">TỔNG CỘNG</td>';
+      html += '<td>' + sumCong + '</td>';
+      html += '<td style="text-align:right;">' + formatNum(sumL0) + '</td>';
+      html += '<td style="text-align:right;color:#0056b3;">' + formatNum(sumFinal) + '</td>';
+      html += '<td style="text-align:right;background:#d4edda;">' + formatNum(sumLTG) + '</td>';
+      html += '<td style="text-align:right;background:#e8f4f8;">' + formatNum(sumLDBH) + '</td>';
+      html += '<td style="text-align:right;background:#fff3cd;">' + formatNum(sumTNTT) + '</td>';
+      html += '<td style="text-align:right;background:#e2d9f3;">' + formatNum(sumHTCB) + '</td>';
+      html += '<td style="text-align:right;background:#d6eaf8;">' + formatNum(results[results.length-1].luyKeLuong) + '</td>';
+      html += '</tr>';
+
+      html += '</tbody></table></div>';
+
+      html += '<div style="margin-top:12px;padding:10px;background:#fffef0;border:1px dashed #ffd600;font-size:11px;">';
+      html += '<b>Giải thích phân bổ:</b><br>';
+      html += '• <b>Lương thời gian (Prorata):</b> Chia theo tỷ lệ công. ';
+      results.forEach(r => {
+        html += 'GĐ' + r.stage + ': ' + formatNum(r.luongThoiGian) + ' (' + r.cong + '/' + sumCong + '). ';
+      });
+      html += '<br>';
+      html += '• <b>Lương đóng BH (MaxSalaryRow):</b> 100% tập trung vào giai đoạn có LSP Final cao nhất (GĐ' + (results.findIndex(r => r.luongDongBH > 0) + 1) + ').<br>';
+      html += '• <b>Thu nhập tính thuế (LastStageRow):</b> 100% tập trung vào giai đoạn cuối cùng (GĐ' + results.length + ').<br>';
+      html += '• <b>Hỗ trợ bàn giao (OldStage):</b> chỉ phát sinh khi NV có ≥2 giai đoạn, dồn 100% vào giai đoạn ĐẦU tiên (GĐ1) — ngược hướng với LastStageRow.<br>';
+      html += '• <b>Lũy kế lương (Accumulate):</b> cộng dồn Lương gốc L0 từ giai đoạn đầu → giai đoạn cuối = ' + formatNum(results[results.length-1].luyKeLuong) + '.';
+      html += '</div>';
+
+      container.innerHTML = html;
+    }
+
+    function openPreview() {
+      if (!currentFormulaLines.length) {
+        showAlert2('set4-alert', 'Công thức này chưa có dòng tiêu chí để xem trước.', 'error');
+        return;
+      }
+      const results = runPreviewEngine(MOCK_PREVIEW);
+      renderPreviewTable(results);
+      showModal('set4-preview');
+    }
+
+    function selectEmployee() {
+      const results = runPreviewEngine(MOCK_PREVIEW);
+      renderPreviewTable(results);
+    }
+
+    // ==================== Init ====================
+    renderMasterGrid();
+  </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổng Hợp Điều Chỉnh Lương Sản Phẩm</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .btn-calc { background-color: #28a745; }
+    .btn-lock-dc { background-color: #dc3545; }
+    .btn-refresh { background-color: #007bff; }
+    .btn-export { background-color: #fd7e14; }
+    .section-title {
+        font-weight: bold; font-size: 14px; color: #0056b3;
+        border-left: 4px solid #0056b3; padding-left: 10px;
+        margin: 15px 0 10px 0; text-transform: uppercase;
+    }
+    .btn-step { position: relative; padding-left: 36px !important; }
+    .btn-step .step-num {
+        position: absolute; left: 0; top: 0; bottom: 0; width: 28px;
+        background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+        font-size: 13px; border-radius: 3px 0 0 3px;
+    }
+    .source-check {
+        display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+        border: 1px solid #c3e6cb; background: #d4edda; border-radius: 4px;
+        font-size: 12px; margin-bottom: 10px;
+    }
+    .row-cap-ca td { background-color: #eef3ff !important; font-weight: bold; }
+    .row-cap-bp td { background-color: #fff8e1 !important; font-weight: bold; }
+    .row-cap3 td { background-color: #e8f5e9 !important; font-weight: bold; }
+    table.data-table td, table.data-table th { white-space: nowrap; }
+
+    .filter-grid-dc {
+        display: grid;
+        grid-template-columns: 120px 1fr 120px 1fr 120px 1fr;
+        gap: 8px 15px;
+        align-items: center;
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    .filter-grid-dc label { font-weight: bold; white-space: nowrap; font-size: 12px; }
+    .filter-grid-dc select { height: 26px; font-size: 12px; border: 1px solid #ccc; padding: 2px 4px; }
+
+    .grid-container { max-height: 520px; overflow: auto; }
+    .data-table th { position: sticky; top: 0; z-index: 2; }
+    .col-highlight { background-color: #fff3cd !important; }
+    .col-tls { background-color: #e8f5e9 !important; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin ch&agrave;o,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nh&acirc;n s&#7921;</a><a href="#">Th&ocirc;i vi&#7879;c</a><a href="#">Ch&#7845;m c&ocirc;ng</a>
+    <a href="#">B&#7843;o hi&#7875;m</a><a href="#" class="active">L&#432;&#417;ng</a>
+    <a href="#">Th&#432;&#7903;ng</a><a href="#">Thu&#7871;</a><a href="#">H&#7879; th&#7889;ng</a><a href="#">DV c&aacute; nh&acirc;n</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">L&#432;&#417;ng s&#7843;n ph&#7849;m &rsaquo; Ch&#7913;c n&#259;ng &rsaquo; T&#7893;ng h&#7907;p &#273;i&#7873;u ch&#7881;nh</div>
+    <div class="page-title">&#272;I&#7872;U CH&#7880;NH L&#431;&#416;NG TH&#193;NG</div>
+
+    <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+
+    <div class="source-check">
+        <span style="font-size:16px;">&#9989;</span>
+        <span>
+            <b>Ki&#7875;m tra ngu&#7891;n:</b> B&#7843;ng "T&iacute;nh L&#432;&#417;ng S&#7843;n Ph&#7849;m" k&#7923; <b>LSP_06_2026</b> &#273;&atilde; t&iacute;nh xong (QTLSP L0).
+            C&aacute;c thi&#7871;t l&#7853;p "H&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 1 &#8594; 4" cho c&aacute;c b&#7897; ph&#7853;n li&ecirc;n quan &#273;&atilde; &#273;&#432;&#7907;c nh&#7853;p. &#272;&#7911; &#273;i&#7873;u ki&#7879;n t&#7893;ng h&#7907;p &#273;i&#7873;u ch&#7881;nh.
+        </span>
+    </div>
+
+    <!-- ========== FILTER BAR ========== -->
+    <div class="filter-grid-dc">
+        <label>Nh&oacute;m l&#432;&#417;ng</label>
+        <select id="fltNhomLuong">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>NL_CHE_BIEN - Nh&oacute;m l&#432;&#417;ng Ch&#7871; bi&#7871;n</option>
+            <option>NL_PHUC_VU - Nh&oacute;m l&#432;&#417;ng Ph&#7909;c v&#7909;</option>
+        </select>
+
+        <label>Nh&oacute;m t&iacute;nh l&#432;&#417;ng</label>
+        <select id="fltNhomTinhLuong">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>NTL02 - N&#259;ng su&#7845;t</option>
+            <option>NTL01 - H&#7879; s&#7889;</option>
+        </select>
+
+        <label>&#272;&#417;n v&#7883; c&#7845;p 1</label>
+        <select id="fltCap1">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>MPHG - C&ocirc;ng ty MPHG</option>
+        </select>
+
+        <label>&#272;&#417;n v&#7883; c&#7845;p 2</label>
+        <select id="fltCap2">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>Nh&agrave; m&aacute;y Ch&#7871; bi&#7871;n</option>
+        </select>
+
+        <label>&#272;&#417;n v&#7883; c&#7845;p 3</label>
+        <select id="fltCap3">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>TBTB - T&#7849;m b&#7897;t</option>
+            <option>TBCH - Chi&ecirc;n</option>
+            <option>TBNO - Nobashi</option>
+        </select>
+
+        <label>&#272;&#417;n v&#7883; c&#7845;p 4</label>
+        <select id="fltCap4">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>TBTB2 - T&#7849;m b&#7897;t ka 2</option>
+            <option>TBCH1 - Chi&ecirc;n ka 1</option>
+            <option>TBCH2 - Chi&ecirc;n ka 2</option>
+        </select>
+
+        <label>&#272;&#417;n v&#7883; c&#7845;p 5</label>
+        <select id="fltCap5">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>TBTB206</option><option>TBTB207</option><option>TBTB208</option>
+            <option>TBCH101</option><option>TBCH102</option><option>TBCH201</option>
+        </select>
+
+        <label>B&#7897; ph&#7853;n t&iacute;nh l&#432;&#417;ng</label>
+        <select id="fltBPTL">
+            <option value="">-- T&#7845;t c&#7843; --</option>
+            <option>BPTL_CHEBI - Ch&#7871; bi&#7871;n</option>
+            <option>BPTL_PHUCVU - Ph&#7909;c v&#7909;</option>
+        </select>
+    </div>
+
+    <!-- ========== KỲ / THÁNG + ACTION BUTTONS ========== -->
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:0;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <label style="color:#d32f2f; font-weight:bold; white-space:nowrap;">K&#7923; / Th&aacute;ng l&#432;&#417;ng</label>
+            <select id="fltThang" style="width:140px; height:26px; font-size:12px; border:1px solid #ccc;">
+                <option value="LSP_06_2026">LSP_06_2026</option>
+                <option value="LSP_05_2026">LSP_05_2026</option>
+            </select>
+        </div>
+    </div>
+    <div class="actions-bar" style="display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button class="btn-calc btn-step" onclick="clickTongHopDC()">
+            <span class="step-num">1</span>T&iacute;nh t&#7893;ng h&#7907;p &#273;i&#7873;u ch&#7881;nh
+        </button>
+        <button class="btn-lock-dc btn-step" id="btn-khoa-dc" onclick="clickKhoaDC()" disabled style="opacity:0.5; cursor:not-allowed;">
+            <span class="step-num">2</span>Kh&oacute;a t&#7893;ng h&#7907;p
+        </button>
+        <span style="border-left:2px solid #dee2e6; height:24px;"></span>
+        <button class="btn-refresh" onclick="location.reload()">L&agrave;m m&#7899;i</button>
+        <button class="btn-export">Xu&#7845;t Excel</button>
+    </div>
+
+    <div class="collapsible" onclick="toggleCollapse('stepsDC')"><span>&#9660; Xem c&aacute;c b&#432;&#7899;c t&iacute;nh to&aacute;n (DC-00 &#8594; DC-05)</span></div>
+    <div id="stepsDC" class="content">
+        <table class="steps-table">
+            <tr><th>B&#432;&#7899;c</th><th>M&atilde;</th><th>T&ecirc;n</th><th>Input</th><th>Output / C&ocirc;ng th&#7913;c</th></tr>
+            <tr><td>0</td><td>DC-00</td><td>L&#7845;y QTLSP g&#7889;c</td><td>T&iacute;nh L&#432;&#417;ng S&#7843;n Ph&#7849;m</td><td>QTLSP L0 = SUM(TLSP) theo B&#7897; ph&#7853;n c&#7845;p 5 (Ti&#7871;n tr&igrave;nh &times; Ka)</td></tr>
+            <tr><td>1</td><td>DC-01</td><td>&Aacute;p h&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 1</td><td>QTLSP L0, H&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 1</td><td>QTLSP L1 = QTLSP L0 &times; (1 + %&#272;C l&#7847;n 1 c&#7911;a BP)</td></tr>
+            <tr><td>2</td><td>DC-02</td><td>&Aacute;p h&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 2</td><td>QTLSP L1, H&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 2</td><td>QTLSP L2 = QTLSP L1 &times; (1 + %&#272;C l&#7847;n 2 c&#7911;a BP)</td></tr>
+            <tr><td>3</td><td>DC-03</td><td>&Aacute;p h&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 3</td><td>QTLSP L2, H&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 3</td><td>QTLSP L3 = QTLSP L2 &times; (1 + %&#272;C l&#7847;n 3 c&#7911;a BP)</td></tr>
+            <tr><td>4</td><td>DC-04</td><td>C&#7897;ng QTL H&#7895; tr&#7907;, &aacute;p l&#7847;n 4</td><td>QTLSP L3, QTL H&#7895; tr&#7907;, H&#7879; s&#7889; &#273;i&#7873;u ch&#7881;nh l&#7847;n 4</td><td>QTLSP L4 = (QTLSP L3 + QTL H&#7895; tr&#7907;) &times; (1 + %&#272;C l&#7847;n 4 c&#7911;a BP)</td></tr>
+            <tr><td>5</td><td>DC-05</td><td>T&iacute;nh QTL 5% v&agrave; QTL &#272;i&#7873;u h&ograve;a</td><td>QTLSP L4</td><td>QTL 5% = QTLSP L4 &times; 5%; QTL &#272;H = qu&#7929; &#273;i&#7873;u h&ograve;a gi&#7919;a c&aacute;c Ka (n&#7871;u c&oacute; ch&ecirc;nh l&#7879;ch)</td></tr>
+        </table>
+    </div>
+
+    <!-- ========== GRID ========== -->
+    <div class="section-title">T&#7892;NG H&#7906;P &#272;I&#7872;U CH&#7880;NH L&#431;&#416;NG S&#7842;N PH&#7848;M THEO B&#7896; PH&#7852;N</div>
+    <div class="grid-container">
+        <table class="data-table" id="tblDC">
+            <thead>
+                <tr>
+                    <th rowspan="2">TT</th>
+                    <th rowspan="2">MSNV</th>
+                    <th rowspan="2" class="text-left">B&#7897; Ph&#7853;n</th>
+                    <th rowspan="2">Nh&oacute;m TL</th>
+                    <th rowspan="2">Ti&#7871;n tr&igrave;nh</th>
+                    <th rowspan="2">BP c&#7845;p 3</th>
+                    <th rowspan="2">BP c&#7845;p 4</th>
+                    <th rowspan="2">BP c&#7845;p 5</th>
+                    <th colspan="2" style="background:#dce6f1;">QTLS</th>
+                    <th rowspan="2" class="col-money">T&#7893;ng c&ocirc;ng</th>
+                    <th colspan="5" style="background:#e2efda;">BQ LS</th>
+                    <th colspan="5" style="background:#fce4d6;">QTL</th>
+                    <th rowspan="2" class="col-money col-highlight">QTLSP L4</th>
+                    <th colspan="4" style="background:#d9e2f3;">TLS</th>
+                </tr>
+                <tr>
+                    <th style="background:#dce6f1;">QTLS</th>
+                    <th style="background:#dce6f1;">QTLS HL</th>
+                    <th style="background:#e2efda;">BQ L0</th>
+                    <th style="background:#e2efda;">BQ L1</th>
+                    <th style="background:#e2efda;">BQ L2</th>
+                    <th style="background:#e2efda;">BQ L3</th>
+                    <th style="background:#e2efda;">BQ L4</th>
+                    <th style="background:#fce4d6;">QTLSP L0</th>
+                    <th style="background:#fce4d6;">QTLSP L1</th>
+                    <th style="background:#fce4d6;">QTLSP L2</th>
+                    <th style="background:#fce4d6;">QTLSP L3</th>
+                    <th style="background:#fce4d6;">QTL H&#7895; tr&#7907;</th>
+                    <th style="background:#d9e2f3;">TLSP</th>
+                    <th style="background:#d9e2f3;">H&#7895; tr&#7907;</th>
+                    <th style="background:#d9e2f3;">QTL 5%</th>
+                    <th style="background:#d9e2f3;">QTL &#272;H</th>
+                </tr>
+            </thead>
+            <tbody id="tbDC"></tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+            &#128203; GHI CH&Uacute; NGHI&#7878;P V&#7908; (d&agrave;nh cho th&#7849;m &#273;&#7883;nh)
+        </div>
+        <textarea rows="4" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;white-space:pre-wrap;" placeholder="BA nh&#7853;p ghi ch&uacute;, open points, &#273;i&#7875;m c&#7847;n x&aacute;c nh&#7853;n v&#7899;i kh&aacute;ch h&agrave;ng...">Tham kh&#7843;o B.L&#432;&#417;ng MPHG T07-2026 (sheet Report2_DC).
+
+Cho ph&eacute;p group theo &#272;&#417;n v&#7883; c&#7845;p 3, c&#7845;p 4, c&#7845;p 5. M&#7895;i c&#7845;p c&oacute; d&ograve;ng t&#7893;ng (subtotal) t&#432;&#417;ng &#7913;ng.</textarea>
+        <div style="text-align:right;margin-top:6px;">
+          <button class="btn-save2" style="font-size:11px;padding:4px 14px;">&#128190; L&#432;u ghi ch&uacute;</button>
+        </div>
+    </div>
+
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    var _daTinhDC = false;
+    var _daKhoaDC = false;
+
+    var DC_ROWS = [
+        { msnv:'M0201N010204701', bp:'B&#259;ng chuy&#7873;n GTGT ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOGT', cap3:'BOGT', cap4:'BOGT1', cap5:'BOGT1S', ld:34, cong:762.7, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:283850210, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N010204C11N', bp:'B&#259;ng chuy&#7873;n Nobashi ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOGT', cap3:'BOGT', cap4:'BOGT1', cap5:'BOGT1S', ld:47, cong:1031.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:389268351, l1:428217186, l2:428217186, l3:423897587, htTro:0, l4:423897587, tlsp:202244, htTro2:0, qtl5:0, qtlDh:31200, cls:'' },
+        { msnv:'M0201N010204C11H', bp:'B&#259;ng chuy&#7873;n Sushi ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOGT', cap3:'BOGT', cap4:'BOGT1', cap5:'BOGT1S', ld:0, cong:2033, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:954745542, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:31400, cls:'' },
+        { msnv:'', bp:'B&#259;ng chuy&#7873;n IQF ka 1', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:88, cong:0, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-ca' },
+        { msnv:'M0201N0102040B1', bp:'B&#259;ng chuy&#7873;n IQF 08 ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOQF', cap3:'BOQF', cap4:'BOQF1', cap5:'BOQF1S', ld:23, cong:671.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:316387221, l1:316387221, l2:316387221, l3:316636432, htTro:0, l4:316636432, tlsp:2496705, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102040B2', bp:'B&#259;ng chuy&#7873;n IQF 09 ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOQF', cap3:'BOQF', cap4:'BOQF1', cap5:'BOQF1S2', ld:31, cong:661.7, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:311540872, l1:311540872, l2:311540872, l3:271381465, htTro:0, l4:271381465, tlsp:2470700, htTro2:0, qtl5:0, qtlDh:41600, cls:'' },
+        { msnv:'M0201N0102040B3', bp:'B&#259;ng chuy&#7873;n IQF 09 ka 1 b', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOQF', cap3:'BOQF', cap4:'BOQF1', cap5:'BOQF1S3', ld:34, cong:700.5, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:326021444, l1:326021444, l2:326021444, l3:288899888, htTro:0, l4:288899888, tlsp:252041, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'', bp:'B&#259;ng chuy&#7873;n GTGT ka 2', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:0, cong:0, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-ca' },
+        { msnv:'M0201N020204G01', bp:'B&#259;ng chuy&#7873;n Nobashi ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOGT', cap3:'BOGT', cap4:'BOGT2', cap5:'BOGT2S', ld:82, cong:1646, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:201000193, l1:303180213, l2:303180213, l3:321673724, htTro:0, l4:321673724, tlsp:9131, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N020204C21N', bp:'B&#259;ng chuy&#7873;n Sushi ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOGT', cap3:'BOGT', cap4:'BOGT2', cap5:'BOGT2S2', ld:47, cong:1017.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:353149803, l1:388464744, l2:388464744, l3:414059038, htTro:0, l4:414059038, tlsp:184411, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'', bp:'B&#259;ng chuy&#7873;n IQF ka 2', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:93, cong:2172, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:423855448, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:9745162, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-ca' },
+        { msnv:'M0201N020204I01', bp:'B&#259;ng chuy&#7873;n IQF 05 ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOQF', cap3:'BOQF', cap4:'BOQF2', cap5:'BOQF2S1', ld:31, cong:726.8, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:306806235, l1:306806235, l2:306806235, l3:290625331, htTro:0, l4:290625331, tlsp:23265, htTro2:0, qtl5:0, qtlDh:215, cls:'' },
+        { msnv:'M0201N020204I02', bp:'B&#259;ng chuy&#7873;n IQF 07 ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOQF', cap3:'BOQF', cap4:'BOQF2', cap5:'BOQF2S2', ld:31, cong:692.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:296822539, l1:296822539, l2:296822539, l3:275655903, htTro:0, l4:275655903, tlsp:3371197, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N020204I03', bp:'B&#259;ng chuy&#7873;n IQF 10 ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'BOQF', cap3:'BOQF', cap4:'BOQF2', cap5:'BOQF2S3', ld:31, cong:742.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:316145606, l1:316145606, l2:316145606, l3:293707701, htTro:0, l4:293707701, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'', bp:'B&#259;ng chuy&#7873;n BBCN', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:8, cong:104.6, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:14715715, l1:16181284, l2:16181284, l3:24533163, htTro:0, l4:24533163, tlsp:19305, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-ca' },
+        { msnv:'', bp:'B&#259;ng chuy&#7873;n GTGT', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:344, cong:7811, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:17032727, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap3' },
+        { msnv:'', bp:'B&#259;ng chuy&#7873;n', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:392, cong:7915, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:18047392, htTro2:0, qtl5:0, qtlDh:15709, cls:'row-cap-bp' },
+        { msnv:'', bp:'X&#7871;p h&#7897;p', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:0, cong:0, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:490527236, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-bp' },
+        { msnv:'M0201N0102041H01', bp:'X&#7871;p h&#7897;p 01 ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'XH', cap3:'XH', cap4:'XH1', cap5:'XH1S1', ld:45, cong:871.2, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:221316626, l1:283066658, l2:283066658, l3:440041054, htTro:0, l4:440041054, tlsp:643120, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102041H02', bp:'X&#7871;p h&#7897;p 01 ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'XH', cap3:'XH', cap4:'XH2', cap5:'XH2S1', ld:42, cong:343.6, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:226203004, l1:306398517, l2:306398517, l3:432517193, htTro:0, l4:432517193, tlsp:643955, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'', bp:'C&#7845;p &#273;&ocirc;ng', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:0, cong:832, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:256556417, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-bp' },
+        { msnv:'M0201N01020C0101', bp:'C&#7845;p &#273;&ocirc;ng 01 ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'CD', cap3:'CD', cap4:'CD1', cap5:'CD1S1', ld:16, cong:380.9, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:130341426, l1:130341426, l2:130341426, l3:130341426, htTro:0, l4:130341426, tlsp:130937, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N02020C0201', bp:'C&#7845;p &#273;&ocirc;ng 01 ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'CD', cap3:'CD', cap4:'CD2', cap5:'CD2S1', ld:20, cong:450.6, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:126603451, l1:126603451, l2:126603451, l3:126603451, htTro:0, l4:126603451, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'', bp:'T&#7893;ng c&#7845;p 3 (BC,Co,XH)', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:479, cong:0, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap3' },
+        { msnv:'', bp:'QUAY', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:0, cong:0, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-bp' },
+        { msnv:'M0201N010205QV01', bp:'Quay ph&#7909;c v&#7909; ka 1', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'QU', cap3:'QU', cap4:'QU1PV', cap5:'QU1PV1', ld:19, cong:455.4, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:173386106, l1:166622340, l2:166622340, l3:173815063, htTro:0, l4:173815063, tlsp:1356408, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N020205QV02', bp:'Quay ph&#7909;c v&#7909; ka 2', nhomTL:'Nhi&#7879;t su&#7845;t', tienTrinh:'QU', cap3:'QU', cap4:'QU2', cap5:'QU2PV', ld:19, cong:443.5, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:150897860, l1:165365306, l2:165365306, l3:171613623, htTro:0, l4:171613623, tlsp:132462, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'', bp:'Nobashi', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:0, cong:0, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-bp' },
+        { msnv:'', bp:'Nobashi ka 1', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:324, cong:7050, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:2447241544, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-ca' },
+        { msnv:'M0201N0102030N01', bp:'Nobashi t&#7843;i 01 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S1', ld:44, cong:865.1, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:259753148, l1:349703148, l2:304226106, l3:305605267, htTro:0, l4:305605267, tlsp:16752490, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030N02', bp:'Nobashi t&#7843;i 02 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S2', ld:34, cong:766.5, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:287974704, l1:287974704, l2:302373435, l3:309770352, htTro:0, l4:309770352, tlsp:17102558, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030N03', bp:'Nobashi t&#7843;i 03 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S3', ld:35, cong:753.1, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:260305515, l1:255661639, l2:258451084, l3:265855634, htTro:0, l4:265855634, tlsp:17815958, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030N04', bp:'Nobashi t&#7843;i 04 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S4', ld:32, cong:708.3, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:265567639, l1:265567639, l2:265567639, l3:302652462, htTro:0, l4:302652462, tlsp:16325965, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030N05', bp:'Nobashi t&#7843;i 05 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S5', ld:34, cong:752.4, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:204101200, l1:284101200, l2:230530260, l3:302652462, htTro:0, l4:302652462, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030N06', bp:'Nobashi t&#7843;i 06 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S6', ld:40, cong:891.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:345621815, l1:345621815, l2:345621815, l3:354836943, htTro:0, l4:354836943, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030N07', bp:'Nobashi t&#7843;i 07 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S7', ld:38, cong:851.1, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:306926018, l1:306926018, l2:363529515, l3:365639731, htTro:0, l4:365639731, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030N08', bp:'Nobashi t&#7843;i 08 ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1S8', ld:41, cong:312.1, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:364473477, l1:364473477, l2:364473477, l3:365639731, htTro:0, l4:365639731, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0102030NPV', bp:'Nobashi ph&#7909;c v&#7909; ka 1', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO1', cap5:'NO1PV', ld:28, cong:656.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:270151130, l1:270151130, l2:283658886, l3:292075610, htTro:0, l4:292075610, tlsp:15723744, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'', bp:'Nobashi ka 2', nhomTL:'', tienTrinh:'', cap3:'', cap4:'', cap5:'', ld:397, cong:7954, qtls:0, qtlsHL:0, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:0, l1:0, l2:0, l3:0, htTro:0, l4:0, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'row-cap-ca' },
+        { msnv:'M0201N0202030N01', bp:'Nobashi t&#7843;i 01 ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2S1', ld:33, cong:784.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:304307034, l1:304307034, l2:320192443, l3:316300206, htTro:0, l4:316300206, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0202030N02', bp:'Nobashi t&#7843;i 02 ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2S2', ld:33, cong:784.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:304307034, l1:276753422, l2:276753422, l3:303880842, htTro:0, l4:303880842, tlsp:15475405, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0202030N03', bp:'Nobashi t&#7843;i 03 ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2S3', ld:34, cong:770.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:276834243, l1:270838243, l2:270838243, l3:283843515, htTro:0, l4:283843515, tlsp:15815315, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0202030N04', bp:'Nobashi t&#7843;i 04 ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2S4', ld:33, cong:730.0, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:239181060, l1:239181060, l2:234380361, l3:230751300, htTro:0, l4:230751300, tlsp:15515300, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0202030N05', bp:'Nobashi t&#7843;i 05 ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2S5', ld:33, cong:756.1, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:284101200, l1:284101200, l2:230530260, l3:343061855, htTro:0, l4:343061855, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0202030N06', bp:'Nobashi t&#7843;i 06 ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2S6', ld:36, cong:866.7, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:313828815, l1:313828815, l2:347635256, l3:343061855, htTro:0, l4:343061855, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0202030N07', bp:'Nobashi t&#7843;i 07 ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2S7', ld:36, cong:866.7, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:302000060, l1:302000060, l2:303028815, l3:334442688, htTro:0, l4:334442688, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+        { msnv:'M0201N0202030NPV', bp:'Nobashi ph&#7909;c v&#7909; ka 2', nhomTL:'N&#259;ng su&#7845;t', tienTrinh:'NO', cap3:'NO', cap4:'NO2', cap5:'NO2PV', ld:36, cong:826.9, qtls:1, qtlsHL:1, bqL0:0, bqL1:0, bqL2:0, bqL3:0, bqL4:0, l0:304629398, l1:304629398, l2:304629398, l3:306429398, htTro:0, l4:306429398, tlsp:0, htTro2:0, qtl5:0, qtlDh:0, cls:'' },
+    ];
+
+    function fmt(n) {
+        if (n === '' || n === null || n === undefined || n === 0) return '-';
+        return formatNumber(Math.round(n));
+    }
+
+    function renderGrid() {
+        var tbody = document.getElementById('tbDC');
+        var html = '';
+        DC_ROWS.forEach(function (r, idx) {
+            html += '<tr class="' + r.cls + '">' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td style="font-size:10px;">' + (r.msnv || '') + '</td>' +
+                '<td class="text-left" style="' + (r.cls ? '' : 'font-weight:normal;') + '">' + r.bp + '</td>' +
+                '<td>' + (r.nhomTL || '') + '</td>' +
+                '<td>' + (r.tienTrinh || '') + '</td>' +
+                '<td>' + (r.cap3 || '') + '</td>' +
+                '<td>' + (r.cap4 || '') + '</td>' +
+                '<td>' + (r.cap5 || '') + '</td>' +
+                '<td>' + (r.qtls || '-') + '</td>' +
+                '<td>' + (r.qtlsHL || '-') + '</td>' +
+                '<td class="col-money">' + (r.cong ? formatNumber(r.cong, r.cong % 1 === 0 ? 0 : 1) : '-') + '</td>' +
+                '<td class="col-money">' + fmt(r.bqL0) + '</td>' +
+                '<td class="col-money">' + fmt(r.bqL1) + '</td>' +
+                '<td class="col-money">' + fmt(r.bqL2) + '</td>' +
+                '<td class="col-money">' + fmt(r.bqL3) + '</td>' +
+                '<td class="col-money">' + fmt(r.bqL4) + '</td>' +
+                '<td class="col-money">' + fmt(r.l0) + '</td>' +
+                '<td class="col-money">' + fmt(r.l1) + '</td>' +
+                '<td class="col-money">' + fmt(r.l2) + '</td>' +
+                '<td class="col-money">' + fmt(r.l3) + '</td>' +
+                '<td class="col-money">' + fmt(r.htTro) + '</td>' +
+                '<td class="col-money col-highlight">' + fmt(r.l4) + '</td>' +
+                '<td class="col-money col-tls">' + fmt(r.tlsp) + '</td>' +
+                '<td class="col-money col-tls">' + fmt(r.htTro2) + '</td>' +
+                '<td class="col-money col-tls">' + fmt(r.qtl5) + '</td>' +
+                '<td class="col-money col-tls">' + fmt(r.qtlDh) + '</td>' +
+                '</tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function clickTongHopDC() {
+        renderGrid();
+        _daTinhDC = true;
+        var b = document.getElementById('btn-khoa-dc');
+        b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
+        showAlert('alertBox', '&#272;&atilde; t&iacute;nh t&#7893;ng h&#7907;p &#273;i&#7873;u ch&#7881;nh cho ' + DC_ROWS.length + ' d&ograve;ng b&#7897; ph&#7853;n (d&#7919; li&#7879;u minh h&#7885;a).', 'success');
+    }
+
+    function clickKhoaDC() {
+        if (!_daTinhDC) {
+            showAlert('alertBox', 'Vui l&ograve;ng b&#7845;m "T&iacute;nh t&#7893;ng h&#7907;p &#273;i&#7873;u ch&#7881;nh" tr&#432;&#7899;c khi kh&oacute;a!', 'warning');
+            return;
+        }
+        if (_daKhoaDC) return;
+        confirmAction('Kh&oacute;a k&#7871;t qu&#7843; T&#7893;ng h&#7907;p &#273;i&#7873;u ch&#7881;nh k&#7923; LSP_06_2026?\n\nSau khi kh&oacute;a, QTLSP L4 s&#7869; &#273;&#432;&#7907;c ch&#7889;t l&agrave;m &#273;&#7847;u v&agrave;o cho c&aacute;c b&#432;&#7899;c t&iacute;nh ti&#7871;p theo.', function () {
+            _daKhoaDC = true;
+            var b = document.getElementById('btn-khoa-dc');
+            b.disabled = true; b.style.opacity = '0.5'; b.style.cursor = 'not-allowed';
+            b.innerHTML = '<span class="step-num">2</span>&#272;&atilde; kh&oacute;a t&#7893;ng h&#7907;p';
+            showAlert('alertBox', '&#272;&atilde; kh&oacute;a T&#7893;ng h&#7907;p &#273;i&#7873;u ch&#7881;nh k&#7923; LSP_06_2026.', 'success');
+        });
+    }
+
+    renderGrid();
+  </script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Báo cáo tiền lương sản phẩm (Biểu mẫu 3)</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 20px 0; letter-spacing: 1px; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+
+      .table-header th { background: #f4d03f; color: #333; padding: 6px 8px; text-align: center; font-size: 11px; border: 1px solid #cfd8dc; }
+      .table-header .ref { display:block; font-size: 9px; font-weight: normal; color: #8a7000; }
+      .table-row td { padding: 6px 8px; font-size: 12px; border: 1px solid #cfd8dc; white-space: nowrap; }
+      .row-cap3 td { background: #d9ead3; font-weight: bold; }
+      .row-cap2 td { background: #cfe2f3; font-weight: bold; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương Sản Phẩm › Báo cáo › Báo cáo tiền lương sản phẩm (Biểu mẫu 3)</div>
+      <div class="bc-title">BÁO CÁO TIỀN LƯƠNG THÁNG</div>
+      <div id="bc3-alert" class="alert-box"></div>
+
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label>Công ty</label>
+          <select id="bc3_congty">
+            <option value="">-- Chọn --</option>
+            <option value="CT1">Công Ty Cổ Phần Thủy Sản Minh Phú Hậu Giang</option>
+          </select>
+
+          <label>Đơn vị cấp 1</label>
+          <select id="bc3_dv1">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất">Sản xuất</option>
+          </select>
+
+          <label>Đơn vị cấp 2</label>
+          <select id="bc3_dv2">
+            <option value="">-- Chọn --</option>
+            <option value="Sản xuất MPHG">Sản xuất MPHG</option>
+          </select>
+
+          <label>Bộ phận bảng kê</label>
+          <select id="bc3_bpbk"><option value="">-- Chọn --</option></select>
+
+          <label>Bộ phận tính lương</label>
+          <select id="bc3_bptl"><option value="">-- Chọn --</option></select>
+
+          <label>Nhóm tính lương</label>
+          <select id="bc3_ntl"><option value="">-- Chọn --</option></select>
+
+          <label class="lbl-red">Tháng (*)</label>
+          <input type="text" id="bc3_thang" placeholder="MM/YYYY" maxlength="7" value="06/2026">
+
+          <label>Từ ngày</label>
+          <input type="date" id="bc3_tungay">
+
+          <label>Đến ngày</label>
+          <input type="date" id="bc3_denngay">
+        </div>
+      </div>
+
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc3Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="showAlert3('bc3-alert', 'Tính năng xuất Excel đang hoàn thiện.', 'info')">Xuất Excel</button>
+      </div>
+
+      <div class="grid-wrap" style="height:450px; overflow-x: auto; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse; min-width: 1500px;">
+          <thead>
+            <tr class="table-header">
+              <th>TT</th>
+              <th>Cấp</th>
+              <th>Bộ Phận</th>
+              <th>Ngày Công<br>Chuẩn<span class="ref">(36)</span></th>
+              <th>BQ TLSP<span class="ref">(22)</span></th>
+              <th>BQ 5%<span class="ref">(23)</span></th>
+              <th>BQ TLSP<br>+5%</th>
+              <th>BQ ĐH<span class="ref">(25)</span></th>
+              <th>Tổng<br>Công</th>
+              <th>Tổng<br>L.Động<span class="ref">(7)</span></th>
+              <th>Tổng<br>QTLSP<span class="ref">(14)</span></th>
+              <th>Tổng<br>QTL 5%<span class="ref">(15)</span></th>
+              <th>Tổng<br>QĐH<span class="ref">(16)</span></th>
+              <th>Ghi chú</th>
+              <th>SL<br>tài/bàn</th>
+            </tr>
+          </thead>
+          <tbody id="bc3-tbody">
+            <tr class="table-row"><td colspan="15" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+          📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;
+          font-size:12px;background:#fffef0;resize:vertical;"
+          placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Cần xác nhận với khách hàng: (1) tên đầy đủ cột "Ngày Công Chuẩn" (nguồn: cột D sheet Report3_BQihrp bị thu hẹp độ rộng, chỉ hiển thị "Đơn/Cô"); (2) ý nghĩa các số tham chiếu (36),(22),(23),(25),(7),(14),(15),(16) dưới tiêu đề cột - nghi là số thứ tự cột nguồn dùng để đối chiếu công thức; (3) quy tắc phân cấp Bộ phận: Cấp 4 = theo ca (ka1/ka2), Cấp 3 = tổng hợp bộ phận, Cấp 2 = tổng hợp nhóm bộ phận (VD "Chế biến + Xiên que").</textarea>
+        <div style="text-align:right;margin-top:6px;">
+          <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert3(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      bc3Search();
+    });
+
+    function bc3Row(tt, cap, bp, ngayCong, bqTlsp, bq5, bqTlsp5, bqDh, tongCong, tongLd, tongQtlsp, tongQtl5, tongQdh, ghiChu, slTaiBan) {
+      const fmt = n => (n === '' || n === null || n === undefined) ? '-' : Number(n).toLocaleString('en-US');
+      const cls = cap === 3 ? 'row-cap3' : (cap === 2 ? 'row-cap2' : '');
+      return `<tr class="table-row${cls ? ' ' + cls : ''}">
+        <td style="text-align:center;">${tt}</td>
+        <td style="text-align:center;">${cap}</td>
+        <td>${bp}</td>
+        <td style="text-align:center;">${ngayCong === '' ? '-' : ngayCong}</td>
+        <td style="text-align:right;">${fmt(bqTlsp)}</td>
+        <td style="text-align:right;">${fmt(bq5)}</td>
+        <td style="text-align:right;">${fmt(bqTlsp5)}</td>
+        <td style="text-align:right;">${fmt(bqDh)}</td>
+        <td style="text-align:right;">${fmt(tongCong)}</td>
+        <td style="text-align:right;">${fmt(tongLd)}</td>
+        <td style="text-align:right;">${fmt(tongQtlsp)}</td>
+        <td style="text-align:right;">${fmt(tongQtl5)}</td>
+        <td style="text-align:right;">${fmt(tongQdh)}</td>
+        <td style="text-align:center;">${ghiChu || ''}</td>
+        <td style="text-align:center;">${slTaiBan === '' ? '' : slTaiBan}</td>
+      </tr>`;
+    }
+
+    function bc3Search() {
+      const thang = document.getElementById('bc3_thang').value.trim();
+      if (!thang) {
+        showAlert3('bc3-alert', 'Vui lòng nhập Tháng tính lương (bắt buộc nhập).', 'error');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) {
+        showAlert3('bc3-alert', 'Định dạng tháng không hợp lệ. Vui lòng nhập MM/YYYY (Ví dụ: 06/2026).', 'error');
+        return;
+      }
+      const tbody = document.getElementById('bc3-tbody');
+
+      tbody.innerHTML =
+        bc3Row(1, 4, 'Nguyên liệu phục vụ ka 1', '25.0', 11071249, 68203, 11139452, '', 725.2, 35, 321154793, 1978444, '', 'K1', 1) +
+        bc3Row(2, 4, 'Nguyên liệu phục vụ ka 2', '26.0', 10792080, 68110, 10860190, '', 782.7, 34, 324883116, 2050361, '', 'K2', 1) +
+        bc3Row(3, 3, 'Nguyên liệu phục vụ', '25.5', 10925106, 68131, 10993236, '', 1507.9, 69, 646037909, 4028804, '', '', '') +
+        bc3Row(4, 4, 'Phân cỡ ka 1', '25.0', 10563713, 74361, 10638074, '', 3461.0, 161, 1462440467, 10294566, '', 'K1', 7) +
+        bc3Row(5, 4, 'Phân cỡ ka 2', '26.0', 11098240, 87044, 11185284, '', 3507.2, 155, 1497067269, 11741550, '', 'K2', 7) +
+        bc3Row(6, 3, 'Phân cỡ', '25.5', 10830264, 80641, 10910905, '', 6968.2, 316, 2959507736, 22036117, '', '', '') +
+        bc3Row(7, 4, 'Chế biến ka 1', '25.0', 9932416, 534566, 10466982, '', 4399.2, 199, 1747787332, 94066552, '', '', '') +
+        bc3Row(8, 4, 'Chế biến ka 2', '26.0', 10137575, 539374, 10676950, '', 4323.6, 184, 1685800801, 89693815, '', '', '') +
+        bc3Row(9, 4, 'Chế biến BBCN', '25.0', 6268661, '', 6268661, '', 154.6, 10, 38765398, '', '', '', '') +
+        bc3Row(10, 3, 'Chế biến', '25.5', 10037660, 537200, 10574860, '', 8722.8, 383, 3433588133, 183760367, '', '', '') +
+        bc3Row(11, 4, 'Xiên Que ka 1', '-', '', '', '', '', '', '', '', '', '', '', '') +
+        bc3Row(12, 4, 'Xiên Que ka 2', '-', '', '', '', '', '', '', '', '', '', '', '') +
+        bc3Row(13, 3, 'Xiên Que', '-', '', '', '', '', '', '', '', '', '', '', '') +
+        bc3Row(14, 2, 'Chế biến + Xiên que', '25.5', 10037660, 537200, 10574860, '', 8722.8, 383, 3433588133, 183760367, '', 'K1', 7) +
+        bc3Row(15, 4, 'PTO ka 1', '25.0', 10637670, 141802, 10779472, '', 7030.4, 334, 2991482988, 39877125, '', 'K1', 6) +
+        bc3Row(16, 4, 'PTO ka 2', '26.0', 10900107, 126848, 11026955, '', 7008.1, 327, 2938040049, 34190903, '', 'K2', 6) +
+        bc3Row(17, 3, 'PTO', '25.5', 10770584, 134540, 10905123, '', 14038.5, 661, 5929523036, 74068028, '', '', '');
+
+      showAlert3('bc3-alert', 'Đã tải báo cáo tiền lương sản phẩm (dữ liệu minh họa).', 'success');
+    }
+  </script>
+</body>
+</html>

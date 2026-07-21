@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Tính Các Khoản Tiền Công</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .table-header th { background: #1e3a5f; color: white; padding: 6px 8px; text-align: center; font-size: 11px; border: 1px solid #cfd8dc; white-space: nowrap; }
+    .table-header.grp-tg th { background: #37474f; }
+    .grp-top-tg { background: #37474f !important; color: #fff !important; }
+    .table-header.grp-luong th { background: #2e7d32; }
+    .table-header.grp-ot th { background: #e65100; }
+    .table-header.grp-phucap th { background: #1565c0; }
+    .table-header.grp-bh th { background: #6a1b9a; }
+    .table-header.grp-thue th { background: #c62828; }
+    .table-header.grp-tru th { background: #ad1457; }
+    .table-header.grp-thuclinh th { background: #00695c; }
+    .grp-top-luong { background: #2e7d32 !important; color: #fff !important; }
+    .grp-top-ot { background: #e65100 !important; color: #fff !important; }
+    .grp-top-pc { background: #1565c0 !important; color: #fff !important; }
+    .grp-top-bh { background: #6a1b9a !important; color: #fff !important; }
+    .grp-top-thue { background: #c62828 !important; color: #fff !important; }
+    .grp-top-tru { background: #ad1457 !important; color: #fff !important; }
+    .grp-top-tl { background: #00695c !important; color: #fff !important; }
+    .table-row td { padding: 5px 6px; font-size: 11px; border: 1px solid #e0e0e0; }
+    .table-row:nth-child(even) { background: #fafafa; }
+    .table-row:hover { background: #f1f8ff; }
+    .row-dept { background: #e8f5e9 !important; font-weight: bold; }
+    .row-dept td { border-top: 2px solid #4caf50; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .col-neg { color: #c62828; }
+    .col-pos { color: #2e7d32; font-weight: bold; }
+    .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+    .form-grid-3col label { font-size: 12px; color: #333; }
+    .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+    .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+    .ref-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:6px; }
+    .ref-table th { background:#e8eef5; color:#333; padding:6px 8px; border:1px solid #ccc; text-align:left; font-weight:bold; }
+    .ref-table td { padding:6px 8px; border:1px solid #ddd; background:#f9fbfd; }
+    .ref-table tr:hover td { background:#eef4fb; }
+    .ref-table td.info-row { font-style:italic; color:#888; background:#f5f5f5; }
+    .btn-formula { background:#17a2b8; color:#fff; border:none; padding:3px 10px; border-radius:3px; cursor:pointer; font-size:10.5px; font-weight:bold; white-space:nowrap; }
+    .btn-formula:hover { background:#117a8b; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin ch&agrave;o,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nh&acirc;n s&#7921;</a><a href="#">Th&ocirc;i vi&#7879;c</a><a href="#">Ch&#7845;m c&ocirc;ng</a>
+    <a href="#">B&#7843;o hi&#7875;m</a><a href="#" class="active">L&#432;&#417;ng</a>
+    <a href="#">Th&#432;&#7903;ng</a><a href="#">Thu&#7871;</a><a href="#">H&#7879; th&#7889;ng</a><a href="#">DV c&aacute; nh&acirc;n</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">L&#432;&#417;ng s&#7843;n ph&#7849;m &rsaquo; Ch&#7913;c n&#259;ng &rsaquo; B&#7843;ng t&iacute;nh c&aacute;c kho&#7843;n ti&#7873;n c&ocirc;ng</div>
+    <div class="page-title">B&#7842;NG T&Iacute;NH C&Aacute;C KHO&#7842;N TI&#7872;N C&Ocirc;NG</div>
+
+    <div id="alertBox" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px 25px; border-radius: 4px; font-weight: bold; color: white; background-color: #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+
+    <div class="info-bar" style="margin-bottom:12px;">
+      R&Agrave;NG BU&#7896;C: B&#7843;ng t&iacute;nh l&#432;&#417;ng t&#7893;ng h&#7907;p theo t&#7915;ng nh&acirc;n vi&ecirc;n, bao g&#7891;m: L&#432;&#417;ng SP, OT, Ph&#7909; c&#7845;p, B&#7843;o hi&#7875;m, Thu&#7871; TNCN, C&aacute;c kho&#7843;n tr&#7915; v&agrave; Th&#7921;c l&#297;nh. D&#7919; li&#7879;u l&#7845;y t&#7915; k&#7871;t qu&#7843; <strong>T&iacute;nh l&#432;&#417;ng s&#7843;n ph&#7849;m</strong> v&agrave; d&#7919; li&#7879;u ch&#7845;m c&ocirc;ng, b&#7843;o hi&#7875;m, thu&#7871;.
+    </div>
+
+    <!-- FILTER -->
+    <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+      <div class="form-grid-3col">
+        <label class="lbl-red">Th&aacute;ng (*)</label>
+        <input type="text" id="txt_thang" placeholder="MM/YYYY" maxlength="7" value="06/2026">
+        <label>C&ocirc;ng ty</label>
+        <select><option>C&ocirc;ng Ty CP Th&#7911;y S&#7843;n Minh Ph&uacute; H&#7853;u Giang</option></select>
+        <label>B&#7897; ph&#7853;n</label>
+        <select id="sel_bp"><option value="">-- T&#7845;t c&#7843; --</option><option value="BC_MPHG">BC Madoorbi KA1</option><option value="TCD_XH">TC&#272; X&#7871;p H&#7897;p</option><option value="TCD_CD">TC&#272; C&#7845;p &#272;&ocirc;ng</option></select>
+        <label>M&atilde; nh&acirc;n vi&ecirc;n</label>
+        <input type="text" id="txt_manv">
+        <label>T&ecirc;n nh&acirc;n vi&ecirc;n</label>
+        <input type="text" id="txt_tennv">
+        <label></label><div></div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions-bar" style="text-align:center; display:flex; justify-content:center; background:transparent; border:none; padding:0; margin-bottom:15px;">
+      <button class="btn-search" onclick="doSearch()" style="margin-right:10px;">T&igrave;m Ki&#7871;m</button>
+      <button class="btn-refresh" onclick="location.reload()" style="margin-right:10px;">L&agrave;m m&#7899;i</button>
+      <button class="btn-export">Xu&#7845;t Excel</button>
+    </div>
+
+    <!-- DATA GRID -->
+    <div style="overflow-x:auto; max-height:520px; overflow-y:auto; border:1px solid #ccc;">
+      <table style="width:100%; border-collapse:collapse; min-width:2200px;" id="tblMain">
+        <thead>
+          <!-- ROW 1: Group headers -->
+          <tr class="table-header">
+            <th rowspan="2" style="width:35px; position:sticky; left:0; z-index:3;">TT</th>
+            <th rowspan="2" style="width:90px; position:sticky; left:35px; z-index:3;">M&atilde; NV</th>
+            <th rowspan="2" style="width:150px; position:sticky; left:125px; z-index:3;">H&#7885; v&agrave; T&ecirc;n</th>
+            <th rowspan="2" style="width:120px;">B&#7897; ph&#7853;n</th>
+            <th rowspan="2" style="width:150px;">C&ocirc;ng th&#7913;c</th>
+            <th rowspan="2" style="width:45px;">C&ocirc;ng</th>
+            <th colspan="5" class="grp-top-tg">TH&#7900;I GIAN L&Agrave;M VI&#7878;C (TG LV)</th>
+            <th colspan="3" class="grp-top-luong">TI&#7872;N L&#431;&#416;NG</th>
+            <th colspan="3" class="grp-top-ot">OT (T&#258;NG CA)</th>
+            <th colspan="5" class="grp-top-pc">PH&#7908; C&#7844;P</th>
+            <th rowspan="2" class="grp-top-luong" style="width:90px;">T&#7892;NG<br>THU NH&#7852;P</th>
+            <th colspan="3" class="grp-top-bh">B&#7842;O HI&#7874;M</th>
+            <th rowspan="2" class="grp-top-thue" style="width:80px;">THU&#7870;<br>TNCN</th>
+            <th colspan="3" class="grp-top-tru">KHO&#7842;N TR&#7914;</th>
+            <th rowspan="2" class="grp-top-tl" style="width:100px;">TH&#7920;C<br>L&#296;NH</th>
+          </tr>
+          <!-- ROW 2: Sub headers -->
+          <tr class="table-header">
+            <!-- TG LV -->
+            <th class="grp-top-tg" style="width:55px;">Gi&#7901;</th>
+            <th class="grp-top-tg" style="width:60px;">Th&ecirc;m<br>gi&#7901;</th>
+            <th class="grp-top-tg" style="width:60px;">Th&#432;&#7901;ng</th>
+            <th class="grp-top-tg" style="width:50px;">Ca</th>
+            <th class="grp-top-tg" style="width:60px;">Ca &#273;&ecirc;m</th>
+            <!-- TIEN LUONG -->
+            <th class="grp-top-luong" style="width:80px;">Trong gi&#7901;</th>
+            <th class="grp-top-luong" style="width:80px;">T&#259;ng &#273;&ecirc;m</th>
+            <th class="grp-top-luong" style="width:85px;">C&#7897;ng L&#432;&#417;ng</th>
+            <!-- OT -->
+            <th class="grp-top-ot" style="width:80px;">T&#259;ng ca<br>ng&agrave;y</th>
+            <th class="grp-top-ot" style="width:80px;">T&#259;ng ca<br>&#273;&ecirc;m</th>
+            <th class="grp-top-ot" style="width:85px;">C&#7897;ng OT</th>
+            <!-- PHU CAP -->
+            <th class="grp-top-pc" style="width:70px;">&Acirc;n ca</th>
+            <th class="grp-top-pc" style="width:70px;">X&#259;ng xe</th>
+            <th class="grp-top-pc" style="width:70px;">&#272;i&#7879;n<br>tho&#7841;i</th>
+            <th class="grp-top-pc" style="width:70px;">&#272;&#7897;c h&#7841;i</th>
+            <th class="grp-top-pc" style="width:80px;">C&#7897;ng PC</th>
+            <!-- BAO HIEM -->
+            <th class="grp-top-bh" style="width:70px;">BHXH<br>8%</th>
+            <th class="grp-top-bh" style="width:70px;">BHYT<br>1.5%</th>
+            <th class="grp-top-bh" style="width:70px;">BHTN<br>1%</th>
+            <!-- KHOAN TRU -->
+            <th class="grp-top-tru" style="width:80px;">T&#7841;m &#7913;ng</th>
+            <th class="grp-top-tru" style="width:70px;">Kh&aacute;c</th>
+            <th class="grp-top-tru" style="width:85px;">C&#7897;ng Tr&#7915;</th>
+          </tr>
+        </thead>
+        <tbody id="tbMain">
+          <tr><td colspan="31" style="text-align:center; padding:30px; color:#888;">Ch&#432;a c&oacute; d&#7919; li&#7879;u. Vui l&ograve;ng nh&#7845;n <b>T&igrave;m Ki&#7871;m</b>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- MODAL: Chi tiết tiêu chí tính toán -->
+    <div class="modal-overlay" id="modal-formula-detail" style="display:none;justify-content:center;align-items:center;">
+      <div class="modal-box wide" style="width:90vw;max-width:1000px;height:92vh;display:flex;flex-direction:column;">
+        <div class="modal-hdr" style="background:#17a2b8;">
+          <span id="mfd-title">Chi tiết tiêu chí</span>
+          <button class="x" onclick="document.getElementById('modal-formula-detail').style.display='none'">&#10005;</button>
+        </div>
+        <div class="modal-body" style="flex:1;overflow-y:auto;">
+          <div id="mfd-info" style="margin-bottom:10px;font-size:12px;color:#555;"></div>
+          <table class="ref-table">
+            <thead><tr><th style="width:45px;">STT</th><th>M&atilde; ti&ecirc;u ch&iacute;</th><th>T&ecirc;n ti&ecirc;u ch&iacute;</th><th style="width:130px;text-align:right;">Gi&aacute; tr&#7883;</th></tr></thead>
+            <tbody id="mfd-tbody"></tbody>
+          </table>
+        </div>
+        <div class="modal-ftr">
+          <button class="btn-cancel" onclick="document.getElementById('modal-formula-detail').style.display='none'">&#272;&oacute;ng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GHI CHU -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        &#128203; GHI CH&Uacute; NGHI&#7878;P V&#7908; (d&agrave;nh cho th&#7849;m &#273;&#7883;nh)
+      </div>
+      <textarea rows="9" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;white-space:pre-wrap;" placeholder="BA nh&#7853;p ghi ch&uacute;, open points...">Tham kh&#7843;o file B.LUONG MPHG T07-2026 (II) Sheet Report5_BangtinhKhoanTC.
+
+B&#7843;ng t&iacute;nh l&#432;&#417;ng t&#7893;ng h&#7907;p: L&#432;&#417;ng SP l&#7845;y t&#7915; k&#7871;t qu&#7843; T&iacute;nh L&#432;&#417;ng S&#7843;n Ph&#7849;m (pg2). TG LV, OT, Ph&#7909; c&#7845;p, B&#7843;o hi&#7875;m, Thu&#7871; l&agrave; d&#7919; li&#7879;u gi&#7843; &#273;&#7883;nh (mock). C&#7847;n x&aacute;c nh&#7853;n ngu&#7891;n d&#7919; li&#7879;u th&#7921;c t&#7871; v&#7899;i kh&aacute;ch h&agrave;ng.
+
+Quy t&#7855;c ph&acirc;n b&#7893; khi 1 NV c&oacute; nhi&#7873;u d&ograve;ng ch&#7845;m c&ocirc;ng/l&#432;&#417;ng trong k&#7923;:
+- BHXH: tr&iacute;ch cho d&ograve;ng c&oacute; s&#7889; ti&#7873;n l&#7899;n nh&#7845;t.
+- Kho&#7843;n tr&#7915;: tr&iacute;ch cho d&ograve;ng c&oacute; s&#7889; ti&#7873;n l&#7899;n nh&#7845;t.
+- Thu&#7871;: tr&iacute;ch cho d&ograve;ng c&oacute; s&#7889; ti&#7873;n l&#7899;n nh&#7845;t.
+- Kho&#7843;n c&#7897;ng: tr&iacute;ch cho d&ograve;ng n&agrave;o c&#361;ng &#273;&#432;&#7907;c.</textarea>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    var MOCK_BANG_LUONG = [
+      { bp:"BC Madoorbi KA1", rows:[
+        { ma:"1022908326", ten:"Lnh.Myhng.Phuong", cong:25.5, luongTG:5444000, luongTD:0, otNgay:0, otDem:0, pcAn:663000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022908329", ten:"Huynh.Th.Yen", cong:25.0, luongTG:5068000, luongTD:0, otNgay:0, otDem:0, pcAn:650000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022903838", ten:"Nguyen.Cong.Tri", cong:25.0, luongTG:5068000, luongTD:0, otNgay:0, otDem:0, pcAn:650000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:500000, truKhac:0 },
+        { ma:"1022911030", ten:"Pich.Van.Thi", cong:25.0, luongTG:0, luongTD:0, otNgay:0, otDem:0, pcAn:650000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022910385", ten:"Nguyen.Th.Di.Hien", cong:26.0, luongTG:5665000, luongTD:0, otNgay:0, otDem:0, pcAn:676000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022911026", ten:"Huynh.Nhu.Thanh", cong:25.0, luongTG:5163000, luongTD:0, otNgay:0, otDem:0, pcAn:650000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022904025", ten:"Nguyen.Th.Anh.Hoa", cong:25.5, luongTG:5163000, luongTD:0, otNgay:0, otDem:0, pcAn:663000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022903154", ten:"La.Thanh.Lich", cong:26.0, luongTG:0, luongTD:0, otNgay:0, otDem:0, pcAn:676000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022904037", ten:"Luong.Minh.Huy.Vu", cong:25.0, luongTG:0, luongTD:0, otNgay:0, otDem:0, pcAn:650000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022904531", ten:"Vuon.Th.Nhi.Loan", cong:22.0, luongTG:5163000, luongTD:0, otNgay:0, otDem:0, pcAn:572000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+      ]},
+      { bp:"TCD Xep Hop", rows:[
+        { ma:"1022910141", ten:"Linh.Nguyen.Minh.Vin", cong:25.0, luongTG:5163000, luongTD:0, otNgay:0, otDem:0, pcAn:650000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022904565", ten:"Tran.Vu.Vu.Luyen", cong:25.0, luongTG:5163000, luongTD:0, otNgay:0, otDem:0, pcAn:650000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022905835", ten:"Thai.Nhi.Ong.Chaen", cong:23.5, luongTG:0, luongTD:0, otNgay:0, otDem:0, pcAn:611000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022908445", ten:"Huynh.Thanh.Lam", cong:23.0, luongTG:6275000, luongTD:0, otNgay:0, otDem:0, pcAn:598000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:1000000, truKhac:0 },
+      ]},
+      { bp:"TCD Cap Dong", rows:[
+        { ma:"1022916131", ten:"Tran.Th.Kim.Luyen.M06", cong:26.0, luongTG:5451000, luongTD:0, otNgay:0, otDem:0, pcAn:676000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022916047", ten:"Vi.Nhon.Gioi.M06", cong:11.0, luongTG:5475000, luongTD:0, otNgay:0, otDem:0, pcAn:286000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022916281", ten:"Chan.Thi.Ly.M06", cong:14.0, luongTG:5475000, luongTD:0, otNgay:0, otDem:0, pcAn:364000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+        { ma:"1022915241", ten:"Tri.Thien.Anh.M06", cong:26.0, luongTG:5451000, luongTD:0, otNgay:0, otDem:0, pcAn:676000, pcXang:0, pcDT:0, pcDocHai:0, mucBH:4960000, tamUng:0, truKhac:0 },
+      ]}
+    ];
+
+    // Công thức lương được gán theo Bộ phận tính lương (cơ cấu tổ chức).
+    // Ánh xạ tương ứng với công thức tạo ở MH "Tạo công thức lương" (set4).
+    var DEPT_FORMULA = {
+      "BC Madoorbi KA1": { code: "LSP_01", name: "Lương sản phẩm LSP" },
+      "TCD Xep Hop":     { code: "LSP_01", name: "Lương sản phẩm LSP" },
+      "TCD Cap Dong":    { code: "LSP_01", name: "Lương sản phẩm LSP" }
+    };
+    var ROW_DATA = []; // lưu lại toàn bộ giá trị đã tính của từng dòng để tra cứu chi tiết
+
+    function fmt(n) { return formatNumber(Math.round(n)); }
+    function fmtOrDash(n) { return n === 0 ? '-' : fmt(n); }
+
+    function doSearch() {
+      var tbody = document.getElementById('tbMain');
+      tbody.innerHTML = '';
+      var stt = 0;
+      var grandTongTN = 0, grandThucLinh = 0;
+      ROW_DATA = [];
+
+      MOCK_BANG_LUONG.forEach(function(grp) {
+        var grpTongTN = 0, grpThucLinh = 0;
+
+        grp.rows.forEach(function(r) {
+          stt++;
+          var gioLV = r.cong * 8;
+          var themGio = 0;
+          var gioThuong = r.cong;
+          var gioCa = 0;
+          var gioCaDem = 0;
+          var congLuong = r.luongTG + r.luongTD;
+          var congOT = r.otNgay + r.otDem;
+          var congPC = r.pcAn + r.pcXang + r.pcDT + r.pcDocHai;
+          var tongTN = congLuong + congOT + congPC;
+
+          var bhxh = Math.round(r.mucBH * 0.08);
+          var bhyt = Math.round(r.mucBH * 0.015);
+          var bhtn = Math.round(r.mucBH * 0.01);
+          var tongBH = bhxh + bhyt + bhtn;
+
+          var thuNhapTinhThue = tongTN - tongBH - 11000000;
+          var thue = 0;
+          if (thuNhapTinhThue > 0) thue = Math.round(thuNhapTinhThue * 0.05);
+
+          var tongTru = tongBH + thue + r.tamUng + r.truKhac;
+          var thucLinh = tongTN - tongTru;
+
+          grpTongTN += tongTN;
+          grpThucLinh += thucLinh;
+
+          var rowIdx = ROW_DATA.length;
+          var formula = DEPT_FORMULA[grp.bp] || { code: '(chưa gán)', name: '(Chưa gán công thức)' };
+          ROW_DATA.push({
+            ma: r.ma, ten: r.ten, bp: grp.bp, formula: formula,
+            luongTG: r.luongTG, luongTD: r.luongTD, congLuong: congLuong,
+            otNgay: r.otNgay, otDem: r.otDem, congOT: congOT,
+            pcAn: r.pcAn, pcXang: r.pcXang, pcDT: r.pcDT, pcDocHai: r.pcDocHai, congPC: congPC,
+            tongTN: tongTN, bhxh: bhxh, bhyt: bhyt, bhtn: bhtn, thue: thue,
+            tamUng: r.tamUng, truKhac: r.truKhac, tongTru: tongTru, thucLinh: thucLinh
+          });
+
+          tbody.innerHTML +=
+            '<tr class="table-row">' +
+            '<td class="text-center" style="position:sticky;left:0;background:inherit;z-index:1;">' + stt + '</td>' +
+            '<td style="position:sticky;left:35px;background:inherit;z-index:1;font-weight:bold;">' + r.ma + '</td>' +
+            '<td class="text-left" style="position:sticky;left:125px;background:inherit;z-index:1;white-space:nowrap;">' + r.ten + '</td>' +
+            '<td class="text-left">' + grp.bp + '</td>' +
+            '<td class="text-center"><button class="btn-formula" onclick="openFormulaDetail(' + rowIdx + ')">' + formula.name + '</button></td>' +
+            '<td class="text-center">' + r.cong + '</td>' +
+            '<td class="text-right">' + fmt(gioLV) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(themGio) + '</td>' +
+            '<td class="text-right">' + fmt(gioThuong) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(gioCa) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(gioCaDem) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.luongTG) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.luongTD) + '</td>' +
+            '<td class="text-right" style="font-weight:bold;">' + fmtOrDash(congLuong) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.otNgay) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.otDem) + '</td>' +
+            '<td class="text-right" style="font-weight:bold;">' + fmtOrDash(congOT) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.pcAn) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.pcXang) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.pcDT) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.pcDocHai) + '</td>' +
+            '<td class="text-right" style="font-weight:bold;">' + fmtOrDash(congPC) + '</td>' +
+            '<td class="text-right col-pos">' + fmt(tongTN) + '</td>' +
+            '<td class="text-right col-neg">' + fmt(bhxh) + '</td>' +
+            '<td class="text-right col-neg">' + fmt(bhyt) + '</td>' +
+            '<td class="text-right col-neg">' + fmt(bhtn) + '</td>' +
+            '<td class="text-right col-neg">' + fmtOrDash(thue) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.tamUng) + '</td>' +
+            '<td class="text-right">' + fmtOrDash(r.truKhac) + '</td>' +
+            '<td class="text-right col-neg" style="font-weight:bold;">' + fmt(tongTru) + '</td>' +
+            '<td class="text-right col-pos" style="font-size:12px;">' + fmt(thucLinh) + '</td>' +
+            '</tr>';
+        });
+
+        grandTongTN += grpTongTN;
+        grandThucLinh += grpThucLinh;
+
+        tbody.innerHTML +=
+          '<tr class="table-row row-dept">' +
+          '<td colspan="3" class="text-center" style="position:sticky;left:0;background:#e8f5e9;z-index:1;">C&#7897;ng ' + grp.bp + '</td>' +
+          '<td></td>' +
+          '<td></td>' +
+          '<td class="text-center">' + grp.rows.reduce(function(s,r){return s+r.cong;},0) + '</td>' +
+          '<td colspan="16"></td>' +
+          '<td class="text-right col-pos">' + fmt(grpTongTN) + '</td>' +
+          '<td colspan="7"></td>' +
+          '<td class="text-right col-pos" style="font-size:12px;">' + fmt(grpThucLinh) + '</td>' +
+          '</tr>';
+      });
+
+      tbody.innerHTML +=
+        '<tr style="background:#fff3cd; font-weight:bold; font-size:12px;">' +
+        '<td colspan="3" class="text-center" style="position:sticky;left:0;background:#fff3cd;z-index:1;">T&#7892;NG C&#7896;NG</td>' +
+        '<td colspan="3"></td>' +
+        '<td colspan="16"></td>' +
+        '<td class="text-right col-pos">' + fmt(grandTongTN) + '</td>' +
+        '<td colspan="7"></td>' +
+        '<td class="text-right col-pos">' + fmt(grandThucLinh) + '</td>' +
+        '</tr>';
+
+      showAlert('alertBox', 'Hi&#7875;n th&#7883; ' + stt + ' nh&acirc;n vi&ecirc;n t&#7915; ' + MOCK_BANG_LUONG.length + ' b&#7897; ph&#7853;n.', 'success');
+    }
+
+    // Tra cứu chi tiết tiêu chí tính toán + giá trị của 1 dòng, không cần lên SQL.
+    // Tiêu chí tính toán (TT_) luôn trả FLOAT — Bộ phận/Bàn/Ca (NVARCHAR) là dữ liệu
+    // của tiêu chí tìm kiếm (TK_) nên chỉ hiển thị ở dòng thông tin đầu, KHÔNG liệt kê
+    // như 1 dòng TT_ trong bảng bên dưới.
+    function openFormulaDetail(idx) {
+      var r = ROW_DATA[idx];
+      if (!r) return;
+
+      document.getElementById('mfd-title').textContent = '🔧 Chi tiết tiêu chí — ' + r.formula.name;
+      document.getElementById('mfd-info').innerHTML =
+        '<b>NV:</b> ' + r.ten + ' (' + r.ma + ') &nbsp;|&nbsp; <b>Bộ phận (TK_):</b> ' + r.bp + ' &nbsp;|&nbsp; <b>Mã công thức:</b> ' + r.formula.code;
+
+      var items = [
+        { ma: 'TT_BPTC_LuongTrongGio', ten: 'Lương trong giờ', val: r.luongTG },
+        { ma: 'TT_BPTC_LuongTangDem', ten: 'Lương tăng đêm', val: r.luongTD },
+        { ma: 'TT_BPTC_CongLuong', ten: 'Cộng Lương (Summary)', val: r.congLuong, bold: true },
+        { ma: 'TT_BPTC_OTNgay', ten: 'Tăng ca ngày', val: r.otNgay },
+        { ma: 'TT_BPTC_OTDem', ten: 'Tăng ca đêm', val: r.otDem },
+        { ma: 'TT_BPTC_CongOT', ten: 'Cộng OT (Summary)', val: r.congOT, bold: true },
+        { ma: 'TT_BPTC_PC_AnCa', ten: 'Phụ cấp ăn ca', val: r.pcAn },
+        { ma: 'TT_BPTC_PC_XangXe', ten: 'Phụ cấp xăng xe', val: r.pcXang },
+        { ma: 'TT_BPTC_PC_DienThoai', ten: 'Phụ cấp điện thoại', val: r.pcDT },
+        { ma: 'TT_BPTC_PC_DocHai', ten: 'Phụ cấp độc hại', val: r.pcDocHai },
+        { ma: 'TT_BPTC_CongPC', ten: 'Cộng Phụ cấp (Summary)', val: r.congPC, bold: true },
+        { ma: 'TT_BPTC_TongThuNhap', ten: 'Tổng thu nhập (Summary)', val: r.tongTN, bold: true, highlight: 'pos' },
+        { ma: 'TT_BPTC_BHXH', ten: 'BHXH 8%', val: r.bhxh },
+        { ma: 'TT_BPTC_BHYT', ten: 'BHYT 1.5%', val: r.bhyt },
+        { ma: 'TT_BPTC_BHTN', ten: 'BHTN 1%', val: r.bhtn },
+        { ma: 'TT_BPTC_ThueTNCN', ten: 'Thuế TNCN', val: r.thue },
+        { ma: 'TT_BPTC_TamUng', ten: 'Tạm ứng', val: r.tamUng },
+        { ma: 'TT_BPTC_TruKhac', ten: 'Trừ khác', val: r.truKhac },
+        { ma: 'TT_BPTC_CongTru', ten: 'Cộng khoản Trừ (Summary)', val: r.tongTru, bold: true, highlight: 'neg' },
+        { ma: 'TT_BPTC_ThucLinh', ten: 'Thực lĩnh (Summary/Final)', val: r.thucLinh, bold: true, highlight: 'pos' }
+      ];
+
+      var html = '';
+      items.forEach(function(it, i) {
+        var valDisplay = it.info ? it.val : fmtOrDash(it.val);
+        var style = it.bold ? 'font-weight:bold;' : '';
+        if (it.highlight === 'pos') style += 'color:#2e7d32;';
+        if (it.highlight === 'neg') style += 'color:#c62828;';
+        html += '<tr' + (it.info ? '' : '') + '>' +
+          '<td>' + (i + 1) + '</td>' +
+          '<td' + (it.info ? ' class="info-row"' : '') + '><b>' + it.ma + '</b></td>' +
+          '<td' + (it.info ? ' class="info-row"' : '') + '>' + it.ten + (it.info ? ' <span style="font-size:10px;">(Info — không tính tiền)</span>' : '') + '</td>' +
+          '<td style="text-align:right;' + style + '">' + valDisplay + '</td>' +
+          '</tr>';
+      });
+      document.getElementById('mfd-tbody').innerHTML = html;
+      document.getElementById('modal-formula-detail').style.display = 'flex';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() { doSearch(); });
+  </script>
+</body>
+</html>

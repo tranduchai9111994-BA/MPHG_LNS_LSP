@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Bảng tính các khoản tiền công tháng</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .bc-title { text-transform: uppercase; font-size: 20px; font-weight: bold; color: #003366; text-align: center; margin: 10px 0 2px 0; letter-spacing: 1px; }
+      .bc-subtitle { text-transform: uppercase; font-size: 14px; font-weight: bold; color: #d32f2f; text-align: center; margin: 0 0 18px 0; }
+      .form-grid-3col { display: grid; grid-template-columns: 120px 1fr 120px 1fr 120px 1fr; gap: 8px 12px; align-items: center; }
+      .form-grid-3col label { font-size: 12px; color: #333; font-weight: normal; }
+      .form-grid-3col .lbl-red { color: #d32f2f; font-weight: bold; }
+      .form-grid-3col input, .form-grid-3col select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; width: 100%; box-sizing: border-box; }
+
+      .table-header th { background: #f4d03f; color: #333; padding: 5px 6px; text-align: center; font-size: 10.5px; border: 1px solid #cfd8dc; }
+      .table-row td { padding: 5px 6px; font-size: 11px; border: 1px solid #cfd8dc; white-space: nowrap; }
+      .row-group td { background: #eee; font-weight: bold; }
+      .row-subtotal td { background: #d9ead3; font-weight: bold; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div>
+      <div class="breadcrumb">Lương Sản Phẩm › Báo cáo › Bảng tính các khoản tiền công tháng</div>
+      <div class="bc-title">Bảng tính các khoản tiền công tháng</div>
+      <div class="bc-subtitle">Tiền lương và thu nhập được nhận</div>
+      <div id="bc5-alert" class="alert-box"></div>
+
+      <div class="form-panel" style="background:#f7f9fc; border:1px solid #dbe2e8; padding: 15px; margin-bottom: 15px;">
+        <div class="form-grid-3col">
+          <label>Mã nhân viên</label>
+          <input type="text" id="bc5_manv">
+
+          <label>Tên nhân viên</label>
+          <div style="display:flex;gap:4px;">
+            <input type="text" id="bc5_tennv" style="flex:1;">
+            <button style="padding:2px 8px;cursor:pointer;">...</button>
+          </div>
+
+          <label>Công ty</label>
+          <select id="bc5_congty">
+            <option value="">-- Chọn --</option>
+            <option value="CT1">Công Ty Cổ Phần Thủy Sản Minh Phú Hậu Giang</option>
+          </select>
+
+          <label>Bộ phận bảng kê</label>
+          <select id="bc5_bpbk"><option value="">-- Chọn --</option></select>
+
+          <label>Bộ phận tính lương</label>
+          <select id="bc5_bptl"><option value="">-- Chọn --</option></select>
+
+          <label>Nhóm tính lương</label>
+          <select id="bc5_ntl"><option value="">-- Chọn --</option></select>
+
+          <label class="lbl-red">Tháng (*)</label>
+          <input type="text" id="bc5_thang" placeholder="MM/YYYY" maxlength="7" value="06/2026">
+
+          <label>Từ ngày</label>
+          <input type="date" id="bc5_tungay">
+
+          <label>Đến ngày</label>
+          <input type="date" id="bc5_denngay">
+        </div>
+        <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
+            <label style="font-size:12px; margin-right:20px;">Tình trạng</label>
+            <label style="font-size:12px; margin-right:15px;"><input type="radio" name="bc5_tinhtrang" checked> Đang làm việc</label>
+            <label style="font-size:12px; margin-right:15px;"><input type="radio" name="bc5_tinhtrang"> Thôi việc</label>
+            <label style="font-size:12px;"><input type="radio" name="bc5_tinhtrang"> Tất cả</label>
+        </div>
+      </div>
+
+      <div class="actions-bar" style="text-align:center; display: flex; justify-content: center; background: transparent; border: none; padding: 0; margin-bottom: 20px;">
+        <button class="btn-search" onclick="bc5Search()" style="margin-right: 10px;">Tìm Kiếm</button>
+        <button class="btn-export" onclick="showAlert5('bc5-alert', 'Tính năng xuất Excel đang hoàn thiện.', 'info')">Xuất Excel</button>
+      </div>
+
+      <div class="grid-wrap" style="height:450px; overflow-x: auto; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse; min-width: 2800px;">
+          <thead>
+            <tr class="table-header">
+              <th rowspan="3">STT</th>
+              <th rowspan="3">Mã KH<br>(Chấm công)</th>
+              <th rowspan="3">Mã NV<br>(Cũ)</th>
+              <th rowspan="3">Mã Số<br>BCGT</th>
+              <th rowspan="3">Họ Và Tên</th>
+              <th rowspan="3">%</th>
+              <th rowspan="3">Ngày<br>Công<br>Làm Việc</th>
+              <th rowspan="3">Số Phần<br>Ăn Cơm</th>
+              <th rowspan="3">Tiền<br>Ăn Cơm</th>
+              <th colspan="4" style="color:red; background:#ffe6e6;">Tiền lương (TLương)</th>
+              <th rowspan="3" style="background:#c6e0b4;color:#000;">Tổng<br>TLương</th>
+              <th rowspan="3">TLương<br>Làm TL</th>
+              <th rowspan="3">Hỗ Trợ<br>(VR, LĐ, Nợ)</th>
+              <th rowspan="3">Hỗ trợ 5%<br>(Su,TB,Ch)</th>
+              <th rowspan="3">TLương<br>ĐH+ĐL<br>+C.tác</th>
+              <th rowspan="3">TL Lễ<br>Làm lại</th>
+              <th rowspan="3">Hỗ trợ<br>Đi lại</th>
+              <th rowspan="3">Bù =<br>Thiếu vắng</th>
+              <th rowspan="3">Hệ Số<br>BH</th>
+              <th colspan="5" style="color:red; background:#ffe6e6;">Thời gian làm việc (TG LV)</th>
+              <th rowspan="3">Tổng<br>Tgian<br>Ngừng Việc</th>
+              <th rowspan="3">TG<br>Ngừng<br>Việc</th>
+            </tr>
+            <tr class="table-header" style="background:#f4b084; color:#000;">
+              <th>Trong<br>Giờ</th>
+              <th>Tăng<br>Đêm</th>
+              <th>Tăng<br>Ca</th>
+              <th>Tăng<br>Ca Đêm</th>
+              <th>Giờ</th>
+              <th>Thêm<br>Giờ</th>
+              <th>Thường</th>
+              <th>Ca</th>
+              <th>Ca đêm</th>
+            </tr>
+            <tr class="table-header" style="background:#e2efda; color:#000;">
+              <th>1</th><th>2</th><th>3</th><th>4</th>
+              <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+            </tr>
+          </thead>
+          <tbody id="bc5-tbody">
+            <tr class="table-row"><td colspan="28" style="text-align:center;padding:20px;color:#888;">Chưa có dữ liệu. Vui lòng chọn tham số và nhấn Tìm Kiếm.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+        <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+          📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+        </div>
+        <textarea rows="4" style="width:100%;border:1px dashed #ffd600;padding:8px;
+          font-size:12px;background:#fffef0;resize:vertical;"
+          placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Đây là báo cáo có độ phức tạp cao (nguồn: sheet Report5_BangtinhKhoanTC, file B.LUONG MPHG T07-2026 (II).xlsx) với ~29 cột, tiêu đề bị ngắt dòng qua nhiều cấp (3 dòng header) và cột rất hẹp nên nhiều nhãn cột chỉ đọc được từng phần. Cần xác nhận với khách hàng: (1) tên đầy đủ và công thức của từng cột TLương/Hỗ trợ/TG LV; (2) ý nghĩa hậu tố "NO" trong Mã KH (VD "1022911795NO") - nghi là dòng "Nợ/Tạm ứng" tách riêng với dòng lương chính của cùng 1 nhân viên; (3) quy tắc gộp dòng TỔNG theo nhóm bộ phận (BC MPHG, TCĐ Xếp Hộp, Cấp Đông, Quay, Nobashi, CB Tầm Bột). Dữ liệu mẫu bên dưới lấy theo số liệu đọc được ở các dòng dễ đọc nhất trong ảnh; các dòng bị che bởi watermark "Page 2" (nhóm Nobashi, CB Tầm Bột) chỉ mang tính minh họa gần đúng.</textarea>
+        <div style="text-align:right;margin-top:6px;">
+          <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+    function showAlert5(id, msg, type) {
+      const b = document.getElementById(id);
+      if(!b) return;
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      bc5Search();
+    });
+
+    function bc5Row(cells, cls) {
+      const fmt = v => (v === '' || v === null || v === undefined) ? '-' : (typeof v === 'number' ? Number(v).toLocaleString('en-US') : v);
+      return '<tr class="table-row' + (cls ? ' ' + cls : '') + '">' +
+        cells.map((c, i) => '<td style="text-align:' + (i <= 4 ? (i === 4 ? 'left' : 'center') : 'right') + ';">' + fmt(c) + '</td>').join('') +
+        '</tr>';
+    }
+
+    function bc5Search() {
+      const thang = document.getElementById('bc5_thang').value.trim();
+      if (!thang) {
+        showAlert5('bc5-alert', 'Vui lòng nhập Tháng tính lương (bắt buộc nhập).', 'error');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{4}$/.test(thang)) {
+        showAlert5('bc5-alert', 'Định dạng tháng không hợp lệ. Vui lòng nhập MM/YYYY (Ví dụ: 06/2026).', 'error');
+        return;
+      }
+      const tbody = document.getElementById('bc5-tbody');
+
+      tbody.innerHTML =
+        '<tr class="table-row row-group"><td colspan="28">CHI TIẾT NHÂN VIÊN (mẫu minh họa)</td></tr>' +
+        bc5Row([26, '1022911795NO', 1022911795, 'BCGT1NO', 'Nguyễn Phan Quỳnh Như ck', '-', 19.0, 6, 120000, 4924565, '-', 1760359, 948999, 7633923, '-', 436926, '-', '-', '-', 51154, '-', '-', 1.050, 150.27, 0.37, '-', '-', 150.64, 6.00]) +
+        bc5Row([18, '1022911795NO', 1022911795, 'BCGT1NO', 'Nguyễn Phan Quỳnh Như', '-', 1.0, '-', '-', 256506, '-', '-', '-', 256506, '-', 12825, '-', '-', '-', 2692, '-', '-', 1.050, 6.95, '-', '-', '-', 6.95, 0.50]) +
+        '<tr class="table-row row-group"><td colspan="28">TỔNG HỢP THEO NHÓM BỘ PHẬN</td></tr>' +
+        bc5Row([1, '', '', 352, 'TỔNG BC MPHG (NO, SU...)', '-', 7915.2, 6562, 131240000, 1990561872, 243312957, 605863334, 373850489, 3213588652, '-', 18007892, '-', 42674538, '-', 115130, '-', '-', '-', 59367, 2443, 3161, 13, 64985, 2337], 'row-subtotal') +
+        bc5Row([2, '', '', 87, 'TỔNG TCĐ XẾP HỘP', '-', 1870.8, 1590, 31800000, 345459589, 72715197, 102832819, 51337413, 572345018, '-', 124126704, 947577, 8322038, '-', '-', '-', '-', '-', 13389, 584, 1418, 6, 15397, 540], 'row-subtotal') +
+        bc5Row([3, '', '', 36, 'TỔNG TCĐ CẤP ĐÔNG', '-', 831.5, 912, 18240000, 168531335, 38125202, 48226810, 17801199, 272684546, '-', 39832638, 350432, 3840423, '-', '-', '-', '-', '-', 5947, 260, 627, 2, 6837, 242], 'row-subtotal') +
+        bc5Row([4, '', '', 38, 'TỔNG TCĐ QUAY', '-', 904.9, 1023, 20460000, 184354716, 41024360, 97120144, 31697477, 354196697, '-', 2479870, '-', 4329115, '-', '-', '-', '-', '-', 6482, 291, 684, '-', 7461, 264], 'row-subtotal') +
+        bc5Row([5, '', '', 647, 'TỔNG TCĐ NOBASHI *', '-', '~14397.7', '~9227', '~194540000', '~1206931238', '-', '~787070', '-', '~1990310', '-', '~301376275', '-', '~76715460', '-', '-', '-', '-', '-', '~113786', '~4471', '-', '-', '~118857', '-'], 'row-subtotal') +
+        bc5Row([6, '', '', 340, 'TỔNG TCĐ CB TẦM BỘT *', '-', '~7054.5', '~5145', '~103900000', '~545734296', '~386614966', '-', '~296227368', '~14737800', '-', '-', '~32972577', '-', '-', '-', '-', '-', '-', '~53588', '~3187', '-', '-', '~57576', '-'], 'row-subtotal');
+
+      showAlert5('bc5-alert', 'Đã tải bảng tính các khoản tiền công tháng (dữ liệu minh họa; dòng có dấu * ước tính do ảnh nguồn bị che watermark).', 'success');
+    }
+  </script>
+</body>
+</html>
