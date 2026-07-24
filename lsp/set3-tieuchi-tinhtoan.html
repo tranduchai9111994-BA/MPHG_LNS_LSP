@@ -31,9 +31,9 @@
         background: #fafbfc;
         display: block;
       }
-      .ref-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
-      .ref-table th { background: #e8eef5; color: #333; padding: 5px 8px; border: 1px solid #ccc; text-align: left; font-weight: bold; }
-      .ref-table td { padding: 4px 8px; border: 1px solid #ddd; background: #f9fbfd; }
+      .ref-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; white-space: normal; }
+      .ref-table th { background: #e8eef5; color: #333; padding: 5px 8px; border: 1px solid #ccc; text-align: left; font-weight: bold; white-space: normal; }
+      .ref-table td { padding: 4px 8px; border: 1px solid #ddd; background: #f9fbfd; white-space: normal; word-break: break-word; }
       .ref-table tr:hover td { background: #eef4fb; }
       .ref-table-wrap {
         background: #f0f4f8;
@@ -50,9 +50,9 @@
       }
       .btn-vd { background:#0056b3; color:#fff; border:none; border-radius:3px; padding:2px 10px; font-size:10px; cursor:pointer; font-weight:bold; }
       .btn-vd:hover { background:#004494; }
-      .vd-tbl { width:100%; border-collapse:collapse; font-size:11px; margin:8px 0; }
-      .vd-tbl th { background:#e8eef5; padding:5px 8px; border:1px solid #ccc; font-weight:bold; color:#333; text-align:center; }
-      .vd-tbl td { padding:4px 8px; border:1px solid #ddd; text-align:center; }
+      .vd-tbl { width:100%; border-collapse:collapse; font-size:11px; margin:8px 0; white-space:normal; }
+      .vd-tbl th { background:#e8eef5; padding:5px 8px; border:1px solid #ccc; font-weight:bold; color:#333; text-align:center; white-space:normal; }
+      .vd-tbl td { padding:4px 8px; border:1px solid #ddd; text-align:center; white-space:normal; word-break:break-word; }
       .vd-tbl td.r { text-align:right; font-family:Consolas,monospace; }
       .vd-tbl tr.sum td { font-weight:bold; background:#eef2f7; border-top:2px solid #999; }
       .vd-tbl td.hi { background:#d4edda; font-weight:bold; color:#155724; }
@@ -65,6 +65,15 @@
       .vd-info { background:#e8f4f8; border-left:3px solid #0056b3; padding:6px 10px; font-size:11px; margin-top:8px; color:#004085; }
       .help-icon { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#6c757d; color:#fff; font-size:11px; font-weight:bold; cursor:pointer; margin-left:5px; vertical-align:middle; user-select:none; }
       .help-icon:hover { background:#0056b3; }
+      /* Grid set3 — column widths & alignment */
+      .set3-grid { min-width:1320px; table-layout:fixed; }
+      .set3-grid th, .set3-grid td { vertical-align:top; font-size:11px; }
+      .set3-grid td.c-ma      { font-family:Consolas,monospace; font-weight:bold; color:#0056b3; word-break:break-all; }
+      .set3-grid td.c-en      { color:#555; word-break:break-word; }
+      .set3-grid td.c-vi      { word-break:break-word; }
+      .set3-grid td.c-note    { color:#555; word-break:break-word; white-space:normal; }
+      .set3-grid td.c-center  { text-align:center; }
+      .set3-grid td.c-meta    { text-align:center; color:#666; word-break:break-word; }
     </style>
 </head>
 <body>
@@ -96,20 +105,19 @@
     </span>
   </div>
   <div class="info-bar" style="margin-bottom:10px;">
-    ĐẶC ĐIỂM: Tiêu chí tính toán là <strong>cấu hình thuộc tính</strong> (RowClass, Allocation, SumPrev, Priority) — <strong>không chứa công thức</strong>.
-    Việc ráp công thức (+−×÷) thực hiện ở MH <strong>Tạo công thức lương</strong>.
-    Công thức lương được gán cho cơ cấu tổ chức ở MH <strong>Gán công thức lương cho cơ cấu</strong>.
+    ĐẶC ĐIỂM: Tiêu chí tính toán chỉ khai báo <strong>Mã/Tên/Rank</strong> — <strong>không chứa công thức</strong>. RowClass, Allocation, cơ sở Prorata cấu hình theo từng dòng công thức ở MH <strong>Tạo công thức lương</strong>.
+    Xem chi tiết tại <a href="javascript:void(0)" onclick="showRules()" style="color:#0056b3;font-weight:bold;">&#128220; Quy tắc</a>.
   </div>
   <div id="set3-alert" class="alert-box"></div>
 
   <!-- MODAL: Quy tắc màn hình -->
   <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
-    <div class="modal-box wide" style="max-width:720px;">
+    <div class="modal-box wide" style="width:92vw;max-width:1100px;">
       <div class="modal-hdr" style="background:#6f42c1;">
         <span>&#128220; Quy tắc nghiệp vụ — Định nghĩa tiêu chí tính toán</span>
         <button class="x" onclick="document.getElementById('modal-rules').style.display='none'">&#10005;</button>
       </div>
-      <div class="modal-body" id="modal-rules-body" style="max-height:75vh;overflow-y:auto;"></div>
+      <div class="modal-body" id="modal-rules-body" style="max-height:75vh;overflow-y:auto;padding:14px 18px;"></div>
       <div class="modal-ftr">
         <button class="btn-cancel" onclick="document.getElementById('modal-rules').style.display='none'">Đóng</button>
       </div>
@@ -135,20 +143,6 @@
     </div>
   </div>
 
-  <!-- MODAL: Help icon (?) -->
-  <div class="modal-overlay" id="modal-help" style="display:none;justify-content:center;align-items:center;">
-    <div class="modal-box wide" style="max-width:600px;">
-      <div class="modal-hdr" style="background:#6c757d;">
-        <span id="modal-help-title">Giải thích</span>
-        <button class="x" onclick="document.getElementById('modal-help').style.display='none'">&#10005;</button>
-      </div>
-      <div class="modal-body" id="modal-help-body" style="max-height:65vh;overflow-y:auto;"></div>
-      <div class="modal-ftr">
-        <button class="btn-cancel" onclick="document.getElementById('modal-help').style.display='none'">Đóng</button>
-      </div>
-    </div>
-  </div>
-
   <!-- FORM PANEL -->
   <div class="form-panel">
     <div class="form-grid-2col">
@@ -161,8 +155,8 @@
       <label>Tên tiếng Anh</label>
       <div class="input-wrap"><input type="text" id="set3_tenEN" maxlength="255" placeholder="Tên tiếng Anh..."></div>
 
-      <label class="lbl-red">Thứ tự sắp xếp</label>
-      <div class="input-wrap"><input type="number" id="set3_thuTu" min="0" value="0" style="width:100px;"></div>
+      <label class="lbl-red">Rank (Độ ưu tiên)</label>
+      <div class="input-wrap"><input type="number" id="set3_rank" min="1" value="1" style="width:80px;" title="Cùng Rank = xử lý đồng thời"><div class="input-note">Cùng Rank = chạy đồng thời</div></div>
 
       <label>Ghi chú</label>
       <div class="input-wrap"><textarea id="set3_note" maxlength="1000" style="height:55px;"></textarea></div>
@@ -172,73 +166,6 @@
 
       <label></label>
       <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="set3_use" checked> Sử dụng</label>
-    </div>
-  </div>
-
-  <!-- COLLAPSIBLE: Hành vi dòng (LSP) -->
-  <div style="margin-top:12px;">
-    <div class="collapsible-header" onclick="toggleAdvanced()">
-      <span class="arrow open" id="adv-arrow">&#9654;</span>
-      &#128295; Hành vi dòng (LSP)
-    </div>
-    <div class="adv-section-body" id="adv-body">
-      <div class="form-grid-2col">
-        <label class="lbl-red">Phân loại (RowClass)<span class="help-icon" onclick="showHelp('rowClass')">?</span></label>
-        <div class="input-wrap">
-          <select id="set3_rowClass" onchange="onRowClassChange()">
-            <option value="Detail" selected>Detail</option>
-            <option value="Summary">Summary</option>
-          </select>
-        </div>
-
-        <label>Cho phép SUM tiêu chí trước (AllowSumPrev)<span class="help-icon" onclick="showHelp('sumprev')">?</span></label>
-        <div class="input-wrap">
-          <select id="set3_sumPrev">
-            <option value="N" selected>N</option>
-            <option value="Y">Y</option>
-          </select>
-        </div>
-
-        <label class="lbl-red">Cách phân bổ (Allocation)</label>
-        <div class="input-wrap">
-          <select id="set3_alloc" onchange="onAllocChange()">
-            <option value="None" selected>None</option>
-            <option value="Prorata">Prorata</option>
-            <option value="OldStage">OldStage</option>
-            <option value="MaxSalaryRow">MaxSalaryRow</option>
-            <option value="LastStageRow">LastStageRow</option>
-            <option value="Accumulate">Accumulate</option>
-          </select>
-        </div>
-
-        <label id="lbl_prorataBasis">Cơ sở chia tỷ lệ (ProrataBasis)<span class="help-icon" onclick="showHelp('prorataBasis')">?</span></label>
-        <div class="input-wrap">
-          <select id="set3_prorataBasis" disabled>
-            <option value="">(Chỉ áp dụng khi Allocation=Prorata)</option>
-            <option value="HT_TS_CongThucTe">HT_TS_CongThucTe - Công thực tế</option>
-            <option value="HT_TS_CongChuan">HT_TS_CongChuan - Công chuẩn tháng</option>
-            <option value="HT_PR_NangSuatTinhLuong">HT_PR_NangSuatTinhLuong - Sản lượng NS_FINAL</option>
-          </select>
-        </div>
-
-        <label class="lbl-red">Độ ưu tiên (Priority)</label>
-        <div class="input-wrap"><input type="number" id="set3_prio" min="0" value="0" style="width:100px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- REFERENCE TABLE: Allocation -->
-  <!-- MODAL: Ví dụ chi tiết -->
-  <div class="modal-overlay" id="modal-vd" style="display:none;justify-content:center;align-items:center;">
-    <div class="modal-box wide" style="width:95vw;max-width:1300px;height:92vh;display:flex;flex-direction:column;">
-      <div class="modal-hdr" style="background:#0056b3;">
-        <span id="modal-vd-title">Ví dụ chi tiết</span>
-        <button class="x" onclick="document.getElementById('modal-vd').style.display='none'">&#10005;</button>
-      </div>
-      <div class="modal-body" id="modal-vd-body" style="flex:1;overflow-y:auto;"></div>
-      <div class="modal-ftr">
-        <button class="btn-cancel" onclick="document.getElementById('modal-vd').style.display='none'">Đóng</button>
-      </div>
     </div>
   </div>
 
@@ -252,28 +179,22 @@
   </div>
 
   <!-- DATA GRID -->
-  <div class="grid-wrap"><table>
+  <div class="grid-wrap"><table class="set3-grid">
     <thead><tr>
-      <th><input type="checkbox" id="set3MasterChk" onchange="toggleAll('set3MasterChk','.set3-chk')"></th>
-      <th>STT</th>
-      <th>&#9998;</th>
-      <th>Mã</th>
-      <th>Tên tiếng Anh</th>
-      <th>Tên tiếng Việt</th>
-      <th>Ghi chú</th>
-      <th>Thứ tự</th>
-      <th>RowClass</th>
-      <th>SUM trước</th>
-      <th>Allocation</th>
-      <th>Cơ sở Prorata</th>
-      <th>Priority</th>
-      <th>Ví dụ</th>
-      <th>Sử dụng</th>
-      <th>Mã hóa</th>
-      <th>Người tạo</th>
-      <th>Ngày tạo</th>
-      <th>Người sửa</th>
-      <th>Ngày sửa</th>
+      <th style="width:32px;"><input type="checkbox" id="set3MasterChk" onchange="toggleAll('set3MasterChk','.set3-chk')"></th>
+      <th style="width:40px;">STT</th>
+      <th style="width:40px;">&#9998;</th>
+      <th style="width:150px;">Mã</th>
+      <th style="width:130px;">Tên tiếng Anh</th>
+      <th style="width:180px;">Tên tiếng Việt</th>
+      <th style="width:230px;">Ghi chú</th>
+      <th style="width:55px;">Rank</th>
+      <th style="width:65px;">Sử dụng</th>
+      <th style="width:65px;">Mã hóa</th>
+      <th style="width:85px;">Người tạo</th>
+      <th style="width:100px;">Ngày tạo</th>
+      <th style="width:85px;">Người sửa</th>
+      <th style="width:100px;">Ngày sửa</th>
     </tr></thead>
     <tbody id="set3-tbody"></tbody>
   </table></div>
@@ -284,9 +205,9 @@
       <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
         &#128203; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
       </div>
-      <textarea rows="5" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">RowClass: Detail (tính per-dòng) / Summary (gộp nhiều dòng) — cả 2 đều trả về FLOAT. Tiêu chí tính toán (TT_) không bao giờ trả NVARCHAR/DATETIME (VD: Bàn, Ca) — đó là của tiêu chí tìm kiếm (TK_); TT_ chỉ được CASE WHEN tham chiếu TK_/HT_ để xử lý điều kiện. (Đã bỏ RowClass=Info vì không có nhu cầu nghiệp vụ thực tế nào cần dùng — tránh giữ lại thuộc tính không cần thiết.)
-Allocation quyết định khi NV nhiều dòng: Prorata=chia theo công, OldStage=dồn giai đoạn cũ (đầu kỳ), LastStageRow=dồn giai đoạn cuối (thuế/khoản trừ), MaxSalaryRow=dồn dòng lương cao nhất (BH), Accumulate=lũy kế. Priority = thứ tự engine tính.
-Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nhau chọn dòng nào? (2) Accumulate trong kỳ hay xuyên kỳ (retro)? (3) auto-resolve dependency theo Priority?</textarea>
+      <textarea rows="4" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;" placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...">Tiêu chí TT_ chỉ khai báo Mã/Tên/Rank — không chứa công thức, không cấu hình RowClass/Allocation ở đây.
+RowClass (Detail/Summary), Allocation (None/Prorata/MaxSalaryRow/LastStageRow/OldStage/Accumulate) và Cơ sở chia tỷ lệ (ProrataBasis) cấu hình theo TỪNG DÒNG công thức ở MH Tạo công thức lương — vì chỉ khi ráp công thức mới biết dòng đó lấy chi tiết hay tổng hợp.
+Rank xử lý: cùng Rank = xử lý đồng thời. Chỉ tham chiếu được tiêu chí có Rank nhỏ hơn.</textarea>
     </div>
   </div>
 
@@ -294,18 +215,87 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
   <script src="../shared/utils.js"></script>
   <script>
     // ===== MOCK DATA =====
+    // ===== SCHEMA MOCK_TT (Phase 2) =====
+    // Field mới (Q8=A):
+    //   formula : string — biểu thức tính (operator + tham chiếu HT_/TT_/param; có thể gọi function scalar)
+    //   deps    : string[] — danh sách mã tiêu chí phụ thuộc (auto-check circular)
+    //   kieu    : string — SQL data type (mặc định 'decimal(18,2)')
+    //   crossRow: bool — true = tính 1 lần/NV (không có row context), replicate mọi dòng GĐ
+    // Xoá 2 mock cũ (Q7=Y): TT_LSP_LuongDongBH, TT_LSP_LuyKeLuong (không map cột Report5).
+    // Giữ mã TT_LSP_KetQua_Final (không rename ở Phase 2 — chỉ note trong summary).
     const MOCK_TT = [
-      {ma:'TT_LSP_Base_L0', en:'Base L0', vi:'Lương gốc L0', prio:10, rowClass:'Detail', alloc:'None', sumPrev:'N', used:true, thuTu:1, note:'', maHoa:false},
-      {ma:'TT_LSP_TienL1', en:'After L1', vi:'Tiền sau ĐC lần 1', prio:20, rowClass:'Detail', alloc:'None', sumPrev:'N', used:true, thuTu:2, note:'', maHoa:false},
-      {ma:'TT_LSP_TienL2', en:'After L2', vi:'Tiền sau ĐC lần 2', prio:30, rowClass:'Detail', alloc:'None', sumPrev:'N', used:true, thuTu:3, note:'', maHoa:false},
-      {ma:'TT_LSP_TienL3', en:'After L3', vi:'Tiền sau ĐC lần 3', prio:40, rowClass:'Detail', alloc:'None', sumPrev:'N', used:true, thuTu:4, note:'', maHoa:false},
-      {ma:'TT_LSP_HoTroChuyenBan', en:'Station handover support', vi:'Hỗ trợ bàn giao (giai đoạn cũ)', prio:45, rowClass:'Detail', alloc:'OldStage', sumPrev:'N', used:true, thuTu:5, note:'Dồn vào giai đoạn CŨ trước khi chuyển bàn — không cần SUM_PREV vì chỉ là 1 khoản cố định', maHoa:false},
-      {ma:'TT_LSP_LuongThoiGian', en:'Time salary', vi:'Lương thời gian (ngày công)', prio:50, rowClass:'Detail', alloc:'Prorata', prorataBasis:'HT_TS_CongThucTe', sumPrev:'N', used:true, thuTu:6, note:'', maHoa:false},
-      {ma:'TT_LSP_LuongDongBH', en:'Insurance base', vi:'Lương đóng bảo hiểm', prio:60, rowClass:'Summary', alloc:'MaxSalaryRow', sumPrev:'Y', used:true, thuTu:7, note:'', maHoa:false},
-      {ma:'TT_LSP_KhoanTruThang', en:'Monthly deduction', vi:'Khoản trừ tháng (tạm ứng, kỷ luật...)', prio:62, rowClass:'Summary', alloc:'MaxSalaryRow', sumPrev:'Y', used:true, thuTu:8, note:'Gán theo tháng cho NV (không theo giai đoạn) — mặc định trích dòng lương cao nhất; đổi Allocation=OldStage/LastStageRow nếu quy tắc là trích dòng cũ/mới', maHoa:false},
-      {ma:'TT_LSP_LuyKeLuong', en:'Cumulative salary', vi:'Lương lũy kế xuyên giai đoạn', prio:65, rowClass:'Summary', alloc:'Accumulate', sumPrev:'Y', used:true, thuTu:9, note:'', maHoa:false},
-      {ma:'TT_LSP_ThuNhapTinhThue', en:'Taxable income', vi:'Thu nhập tính thuế', prio:70, rowClass:'Summary', alloc:'LastStageRow', sumPrev:'Y', used:true, thuTu:10, note:'', maHoa:false},
-      {ma:'TT_LSP_KetQua_Final', en:'Final result', vi:'Tổng LSP cuối cùng', prio:99, rowClass:'Summary', alloc:'None', sumPrev:'Y', used:true, thuTu:11, note:'', maHoa:false},
+      // ===== TT_ cũ (giữ mã, bổ sung 3 field) =====
+      {ma:'TT_LSP_Base_L0', en:'Base L0', vi:'Lương gốc L0', rank:10, used:true, note:'Base = LuongTrongGio ban đầu (trước điều chỉnh HS lần 1)', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_TrongGio * PR.HT_PR_LSP_DonGia', deps:['HT_TG_TrongGio','HT_PR_LSP_DonGia']},
+      {ma:'TT_LSP_TienL1', en:'After L1', vi:'Tiền sau ĐC lần 1', rank:20, used:true, note:'', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_Base_L0 * PR.HT_PR_LSP_HeSo1', deps:['TT_LSP_Base_L0','HT_PR_LSP_HeSo1']},
+      {ma:'TT_LSP_TienL2', en:'After L2', vi:'Tiền sau ĐC lần 2', rank:30, used:true, note:'', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_TienL1 * PR.HT_PR_LSP_HeSo2', deps:['TT_LSP_TienL1','HT_PR_LSP_HeSo2']},
+      {ma:'TT_LSP_TienL3', en:'After L3', vi:'Tiền sau ĐC lần 3', rank:40, used:true, note:'', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_TienL2 * PR.HT_PR_LSP_HeSo3', deps:['TT_LSP_TienL2','HT_PR_LSP_HeSo3']},
+      {ma:'TT_LSP_TienL4', en:'After L4', vi:'Tiền sau ĐC lần 4', rank:50, used:true, note:'Bổ sung Phase 2 (Q1=Y — 4 lần điều chỉnh)', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_TienL3 * PR.HT_PR_LSP_HeSo4', deps:['TT_LSP_TienL3','HT_PR_LSP_HeSo4']},
+      {ma:'TT_LSP_HoTroChuyenBan', en:'Station handover support', vi:'Hỗ trợ bàn giao (giai đoạn cũ)', rank:45, used:true, note:'Dồn vào giai đoạn CŨ trước khi chuyển bàn — chỉ là 1 khoản cố định', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_LSP_LuongThoiGian', en:'Time salary', vi:'Lương thời gian (ngày công)', rank:50, used:true, note:'Legacy — không map Report5. Cân nhắc rename hoặc remove ở Phase 3.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_LSP_KhoanTruThang', en:'Monthly deduction', vi:'Khoản trừ tháng (tạm ứng, kỷ luật...)', rank:62, used:true, note:'Gán theo tháng cho NV (không theo giai đoạn) — mặc định trích dòng lương cao nhất; đổi Allocation=OldStage/LastStageRow nếu quy tắc là trích dòng cũ/mới', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_PR_KhoanTruThang', deps:['HT_PR_KhoanTruThang']},
+      {ma:'TT_LSP_ThuNhapTinhThue', en:'Taxable income', vi:'Thu nhập tính thuế (legacy)', rank:70, used:false, note:'⚠ DEPRECATED — thay bằng TT_TNChiuThueTNCN (Phase 2). Set used=false, chờ Phase 3 quyết định xoá.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_LSP_KetQua_Final', en:'Final result', vi:'Tổng LSP cuối cùng', rank:99, used:true, note:'Map Report5 C63 (Chuyển ATM). Cân nhắc rename thành TT_ThucNhan cho rõ nghĩa (Phase 3).', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_TongCong - PR.@Prev_TT_Tru_BHXH_YT_TN - PR.@Prev_TT_Tru_An - PR.@Prev_TT_ThuTNCN - PR.@Prev_TT_TienQuyTT', deps:['TT_TongCong','TT_Tru_BHXH_YT_TN','TT_Tru_An','TT_ThuTNCN','TT_TienQuyTT']},
+
+      // ===== BỔ SUNG PHASE 2 — B. Lương SP (5 items — map Report5 C09-C13) =====
+      {ma:'TT_LSP_LuongTrongGio', en:'Salary in-hours', vi:'TLương SP Trong Giờ', rank:22, used:true, note:'Map Report5 C09. = TT_LSP_TienL4 (sau khi qua 4 lần ĐC) — hoặc gán trực tiếp = TienL4 nếu không có bước ĐC riêng.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_TienL4', deps:['TT_LSP_TienL4']},
+      {ma:'TT_LSP_TienKaDem', en:'Night shift salary', vi:'TLương SP Ka Đêm', rank:22, used:true, note:'Map Report5 C10.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_KaDem * PR.HT_PR_LSP_DonGia * 1.3', deps:['HT_TG_KaDem','HT_PR_LSP_DonGia']},
+      {ma:'TT_LSP_TienTangKa', en:'Overtime salary', vi:'TLương SP Tăng Ka', rank:22, used:true, note:'Map Report5 C11. Hệ số 1.5 = OT ngày thường.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_ThemThuong * PR.HT_PR_LSP_DonGia * 1.5', deps:['HT_TG_ThemThuong','HT_PR_LSP_DonGia']},
+      {ma:'TT_LSP_TienTangKaDem', en:'Night overtime salary', vi:'TLương SP Tăng Ka Đêm', rank:22, used:true, note:'Map Report5 C12. Hệ số 2.0 = OT đêm.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_ThemCaDem * PR.HT_PR_LSP_DonGia * 2.0', deps:['HT_TG_ThemCaDem','HT_PR_LSP_DonGia']},
+      {ma:'TT_LSP_TongTLSP', en:'Total product salary', vi:'Tổng cộng TLSP', rank:25, used:true, note:'Map Report5 C13.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_LuongTrongGio + PR.@Prev_TT_LSP_TienKaDem + PR.@Prev_TT_LSP_TienTangKa + PR.@Prev_TT_LSP_TienTangKaDem', deps:['TT_LSP_LuongTrongGio','TT_LSP_TienKaDem','TT_LSP_TienTangKa','TT_LSP_TienTangKaDem']},
+
+      // ===== C. Hỗ trợ & bù (6 items — Red Flag #2 skip C19/C21 dự trù) =====
+      {ma:'TT_HTCNMoi', en:'New CN support', vi:'HT CN mới', rank:35, used:true, note:'Map Report5 C14.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_HR_HTCNMoi_Bonus', deps:['HT_HR_HTCNMoi_Bonus']},
+      {ma:'TT_HTQCSX', en:'QCSX support', vi:'% theo QCSX', rank:35, used:true, note:'Map Report5 C15. = % QCSX × Lương cơ bản.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_HR_HTQCSX_PhanTram * PR.HT_HR_LuongCoBan', deps:['HT_HR_HTQCSX_PhanTram','HT_HR_LuongCoBan']},
+      {ma:'TT_TL_DHDL_CongTac', en:'Travel salary', vi:'TL ĐH+DL Công tác', rank:35, used:true, note:'Map Report5 C16. Lương những ngày đi công tác/du lịch.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_TL_Le_01_05', en:'Holiday 01-05 salary', vi:'TL Lễ 01-05', rank:35, used:true, note:'Map Report5 C17. Lương Lễ 30/4 - 1/5.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TS_CongNghiLe_1 * PR.HT_HR_LuongCoBan / PR.HT_TS_CongChuan', deps:['HT_TS_CongNghiLe_1','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_HT_DiLai', en:'Travel support', vi:'Hỗ trợ đi lại', rank:35, used:true, note:'Map Report5 C18. Hỗ trợ phí đi lại (khoản cố định/kỳ).', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_Bu_TLTTVung', en:'Region min-salary top-up', vi:'Bù TL Tối thiểu Vùng', rank:35, used:true, note:'Map Report5 C20. Bù nếu lương thực < mức tối thiểu vùng.', maHoa:false, kieu:'decimal(18,2)', formula:'CASE WHEN PR.@Prev_TT_LSP_TongTLSP < PR.HT_HR_LuongToiThieuVung THEN PR.HT_HR_LuongToiThieuVung - PR.@Prev_TT_LSP_TongTLSP ELSE 0 END', deps:['TT_LSP_TongTLSP','HT_HR_LuongToiThieuVung']},
+
+      // ===== E. TL Thời gian (9 items — map Report5 C31-C39) =====
+      {ma:'TT_TL_An', en:'Meal salary', vi:'TL Ăn', rank:32, used:true, note:'Map Report5 C31. = Số phần cơm × đơn giá cơm.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TS_SoPhanAn * 25000', deps:['HT_TS_SoPhanAn']},
+      {ma:'TT_TL_TG_TrongGio', en:'Time in-hour salary', vi:'TL TG Trong Giờ', rank:32, used:true, note:'Map Report5 C32.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_TrongGio * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8)', deps:['HT_TG_TrongGio','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_TL_TG_ThemThuong', en:'OT regular salary', vi:'TL TG Thêm Thường', rank:32, used:true, note:'Map Report5 C33.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_ThemThuong * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8) * 1.5', deps:['HT_TG_ThemThuong','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_TL_TG_KaDem', en:'Night shift time salary', vi:'TL TG Ca Đêm', rank:32, used:true, note:'Map Report5 C34.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_KaDem * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8) * 1.3', deps:['HT_TG_KaDem','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_TL_TG_ThemCaDem', en:'Night OT time salary', vi:'TL TG Thêm Ca Đêm', rank:32, used:true, note:'Map Report5 C35.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_ThemCaDem * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8) * 2.0', deps:['HT_TG_ThemCaDem','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_TL_TG_ThemDemLe', en:'Holiday night OT salary', vi:'TL TG Thêm ca Đêm Lễ', rank:32, used:true, note:'Map Report5 C36.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_ThemDemLe * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8) * 3.9', deps:['HT_TG_ThemDemLe','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_TL_TG_NgayLe', en:'Holiday time salary', vi:'TL TG Ngày Lễ', rank:32, used:true, note:'Map Report5 C37.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_NgayLe * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8) * 3.0', deps:['HT_TG_NgayLe','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_TL_NgungGiuaCa', en:'Pause salary', vi:'TL Ngừng Giữa Ca', rank:32, used:true, note:'Map Report5 C38. Lương ngừng giữa ca (do lỗi máy, chờ nguyên liệu...).', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_NgungGiuaCa * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8)', deps:['HT_TG_NgungGiuaCa','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_TL_NgungViec', en:'Idle salary', vi:'TL Ngừng Việc', rank:32, used:true, note:'Map Report5 C39.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_TG_NgungViec * PR.HT_HR_LuongCoBan / (PR.HT_TS_CongChuan * 8) * 0.7', deps:['HT_TG_NgungViec','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+
+      // ===== F. Bổ sung (15 khoản + 1 tổng — map Report5 C40-C54, Red Flag #5) =====
+      {ma:'TT_BS_Khac', en:'Other bonus', vi:'Bổ sung khác', rank:35, used:true, note:'Map Report5 C40.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_TL_Le', en:'Holiday bonus', vi:'TL Lễ (bổ sung)', rank:35, used:true, note:'Map Report5 C41. Phần lễ tính riêng ngoài công.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_Bu_TL_T13_TN_CuoiTang', en:'T13 + wedding/funeral bonus', vi:'Bù TL T13 + TN Cưới/Tang', rank:35, used:true, note:'Map Report5 C42.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_HT_PhaXang', en:'Ferry+gas support', vi:'Hỗ trợ Phà + Xăng', rank:35, used:true, note:'Map Report5 C43. Cố định theo NV/kỳ.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_Thuong_ChuyenCan', en:'Attendance bonus', vi:'Thưởng Chuyên Cần', rank:35, used:true, note:'Map Report5 C44. Nếu đủ công thì thưởng. (deps đã đổi TK_HR_DuCong → HT_HR_DuCong do rule TK_=string/datetime only.)', maHoa:false, kieu:'decimal(18,2)', formula:'CASE WHEN PR.HT_HR_DuCong = 1 THEN 500000 ELSE 0 END', deps:['HT_HR_DuCong']},
+      {ma:'TT_BS_TL_PhepNam', en:'Annual leave salary', vi:'TL Phép Năm', rank:35, used:true, note:'Map Report5 C45. = Số ngày phép × lương ngày.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_HR_PhepNam_DaHuong * PR.HT_HR_LuongCoBan / PR.HT_TS_CongChuan', deps:['HT_HR_PhepNam_DaHuong','HT_HR_LuongCoBan','HT_TS_CongChuan']},
+      {ma:'TT_BS_HT_KinhNguyet', en:'Menstrual support', vi:'HT Kinh Nguyệt', rank:35, used:true, note:'Map Report5 C46.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_HT_BauConNho', en:'Pregnancy/small child support', vi:'HT Bà bầu / Con Nhỏ', rank:35, used:true, note:'Map Report5 C47.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_HT_ConNho_6Tuoi', en:'Under 6yo support', vi:'HT Con Nhỏ ≤6 Tuổi', rank:35, used:true, note:'Map Report5 C48.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_HocNoiQuy', en:'Rules training', vi:'Học Nội Quy', rank:35, used:true, note:'Map Report5 C49.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_HTCNMoi_KSK', en:'New CN health-check support', vi:'HT CN mới KSK', rank:35, used:true, note:'Map Report5 C50.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_HR_HTCNMoi_KSK', deps:['HT_HR_HTCNMoi_KSK']},
+      {ma:'TT_BS_HTComLeKa3', en:'Holiday+Ka3 meal support', vi:'HT Cơm Lễ + Ka3', rank:35, used:true, note:'Map Report5 C51.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_TL_BanHang', en:'Sales salary', vi:'TL bán hàng', rank:35, used:true, note:'Map Report5 C52.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_TL_HDQT', en:'Board bonus', vi:'TL hội đồng QT', rank:35, used:true, note:'Map Report5 C53.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_BS_TL_Khac_CD', en:'Other regular salary', vi:'TL Khác CĐ', rank:35, used:true, note:'Map Report5 C54.', maHoa:false, kieu:'decimal(18,2)', formula:'', deps:[]},
+      {ma:'TT_TongBoSung', en:'Total additional', vi:'Tổng bổ sung', rank:40, used:true, note:'SUM 15 khoản bổ sung C40-C54.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_BS_Khac + PR.@Prev_TT_BS_TL_Le + PR.@Prev_TT_BS_Bu_TL_T13_TN_CuoiTang + PR.@Prev_TT_BS_HT_PhaXang + PR.@Prev_TT_BS_Thuong_ChuyenCan + PR.@Prev_TT_BS_TL_PhepNam + PR.@Prev_TT_BS_HT_KinhNguyet + PR.@Prev_TT_BS_HT_BauConNho + PR.@Prev_TT_BS_HT_ConNho_6Tuoi + PR.@Prev_TT_BS_HocNoiQuy + PR.@Prev_TT_BS_HTCNMoi_KSK + PR.@Prev_TT_BS_HTComLeKa3 + PR.@Prev_TT_BS_TL_BanHang + PR.@Prev_TT_BS_TL_HDQT + PR.@Prev_TT_BS_TL_Khac_CD', deps:['TT_BS_Khac','TT_BS_TL_Le','TT_BS_Bu_TL_T13_TN_CuoiTang','TT_BS_HT_PhaXang','TT_BS_Thuong_ChuyenCan','TT_BS_TL_PhepNam','TT_BS_HT_KinhNguyet','TT_BS_HT_BauConNho','TT_BS_HT_ConNho_6Tuoi','TT_BS_HocNoiQuy','TT_BS_HTCNMoi_KSK','TT_BS_HTComLeKa3','TT_BS_TL_BanHang','TT_BS_TL_HDQT','TT_BS_TL_Khac_CD']},
+
+      // ===== G. Tổng cộng & khoản trừ (5 items — map Report5 C55-C62) =====
+      {ma:'TT_TongCong', en:'Grand total', vi:'TỔNG CỘNG', rank:55, used:true, note:'Map Report5 C55. = TongTLSP + Sum(TL_TG_*) + Sum(Hỗ trợ) + TongBoSung.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_TongTLSP + PR.@Prev_TT_TL_An + PR.@Prev_TT_TL_TG_TrongGio + PR.@Prev_TT_TL_TG_ThemThuong + PR.@Prev_TT_TL_TG_KaDem + PR.@Prev_TT_TL_TG_ThemCaDem + PR.@Prev_TT_TL_TG_ThemDemLe + PR.@Prev_TT_TL_TG_NgayLe + PR.@Prev_TT_TL_NgungGiuaCa + PR.@Prev_TT_TL_NgungViec + PR.@Prev_TT_HTCNMoi + PR.@Prev_TT_HTQCSX + PR.@Prev_TT_TL_DHDL_CongTac + PR.@Prev_TT_TL_Le_01_05 + PR.@Prev_TT_HT_DiLai + PR.@Prev_TT_Bu_TLTTVung + PR.@Prev_TT_TongBoSung', deps:['TT_LSP_TongTLSP','TT_TL_An','TT_TL_TG_TrongGio','TT_TL_TG_ThemThuong','TT_TL_TG_KaDem','TT_TL_TG_ThemCaDem','TT_TL_TG_ThemDemLe','TT_TL_TG_NgayLe','TT_TL_NgungGiuaCa','TT_TL_NgungViec','TT_HTCNMoi','TT_HTQCSX','TT_TL_DHDL_CongTac','TT_TL_Le_01_05','TT_HT_DiLai','TT_Bu_TLTTVung','TT_TongBoSung']},
+      {ma:'TT_Tru_BHXH_YT_TN', en:'BHXH+YT+TN deduction', vi:'Trừ BHXH + YT + TN', rank:60, used:true, note:'Map Report5 C56. = HeSoBHXH × LuongCoBan × 10.5% (BHXH 8% + BHYT 1.5% + BHTN 1%). ⚠ Đã fix typo unified `HT_HR_HeSoBHXH` (chuẩn convention prefix HR).', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_HR_HeSoBHXH * PR.HT_HR_LuongCoBan * 0.105', deps:['HT_HR_HeSoBHXH','HT_HR_LuongCoBan']},
+      {ma:'TT_Tru_An', en:'Meal deduction', vi:'Trừ Ăn', rank:60, used:true, note:'Map Report5 C57. = Số phần cơm × đơn giá NV đóng góp.', maHoa:false, kieu:'decimal(18,2)', formula:'CASE WHEN PR.HT_TS_ChoTienAn = 1 THEN 0 ELSE PR.HT_TS_SoPhanAn * 5000 END', deps:['HT_TS_ChoTienAn','HT_TS_SoPhanAn']},
+      {ma:'TT_TienQuyTT', en:'Charity fund', vi:'Tiền Quỹ Tình Thương', rank:60, used:true, note:'Map Report5 C60.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.HT_PR_QuyTinhThuong', deps:['HT_PR_QuyTinhThuong']},
+      {ma:'TT_TNChiuThueTNCN', en:'Taxable income', vi:'TN chịu thuế TNCN', rank:65, used:true, note:'Map Report5 C66. = TongCong - BHXH - miễn trừ (lễ, ăn giữa ca...).', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_TongCong - PR.@Prev_TT_Tru_BHXH_YT_TN - PR.@Prev_TT_TL_An - PR.@Prev_TT_TL_Le_01_05', deps:['TT_TongCong','TT_Tru_BHXH_YT_TN','TT_TL_An','TT_TL_Le_01_05']},
+
+      // ===== H. Tổng nhận & thuế (4 items) — TT_LSP_KetQua_Final đã map C63 ở trên =====
+      {ma:'TT_KhongATM', en:'Non-ATM payment', vi:'Không ATM (tiền mặt)', rank:90, used:true, note:'Map Report5 C64. Trường hợp trả tiền mặt.', maHoa:false, kieu:'decimal(18,2)', formula:'0', deps:[]},
+      {ma:'TT_KyNhan', en:'Sign-receipt', vi:'Ký nhận', rank:92, used:true, note:'Map Report5 C65. = ChuyểnATM + KhôngATM.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_LSP_KetQua_Final + PR.@Prev_TT_KhongATM', deps:['TT_LSP_KetQua_Final','TT_KhongATM']},
+      {ma:'TT_TinhLuongT13', en:'T13 salary calc', vi:'Tính lương T13 (nội tuyến)', rank:70, used:true, note:'Map Report5 C67. Q4=B: TT_ nội tuyến trong kỳ. Tích luỹ 1/12 tổng lương năm để dự phòng chi T13 cuối năm.', maHoa:false, kieu:'decimal(18,2)', formula:'PR.@Prev_TT_TongCong / 12', deps:['TT_TongCong']},
+
+      // ===== CROSS-ROW TT_ (3 items — engine đặc biệt, crossRow:true) =====
+      {ma:'TT_AGG_ThueTNCN_Ky', en:'Period tax total', vi:'AGG — Thuế TNCN cả kỳ', rank:75, used:true, crossRow:true, note:'Cross-row aggregate: tính thuế 1 lần cho cả kỳ dựa trên SUM TN chịu thuế. Sử dụng function bổ sung #28 PIT_fnCalcThue. ⚠ Cần bổ sung function catalog + param @TaxYear vào set0.', maHoa:false, kieu:'decimal(18,2)', formula:'dbo.PIT_fnCalcThue(PR.@Prev_HT_AGG_SumTNChiuThueKy, @TaxYear, PR.HT_PIT_GiamTru)', deps:['HT_AGG_SumTNChiuThueKy','HT_PIT_GiamTru']},
+      {ma:'TT_ThuTNCN', en:'PIT per-row', vi:'Thuế TNCN (phân bổ ngược per-row)', rank:78, used:true, note:'Map Report5 C59. Phân bổ thuế cả kỳ theo tỷ lệ TN chịu thuế của từng dòng GĐ. Nếu SUM = 0 → tránh chia zero, gán 0.', maHoa:false, kieu:'decimal(18,2)', formula:'CASE WHEN PR.@Prev_HT_AGG_SumTNChiuThueKy = 0 THEN 0 ELSE PR.@Prev_TT_AGG_ThueTNCN_Ky * (PR.@Prev_TT_TNChiuThueTNCN / PR.@Prev_HT_AGG_SumTNChiuThueKy) END', deps:['TT_AGG_ThueTNCN_Ky','TT_TNChiuThueTNCN','HT_AGG_SumTNChiuThueKy']},
+      {ma:'TT_Row_TrichBH', en:'BH deduction row-flag', vi:'Trích BH (dòng lương max)', rank:78, used:true, note:'Alternative TT_Tru_BHXH_YT_TN: chỉ trích BH ở dòng có lương gộp MAX (auto cap min(LuongMax, PR_fnGetTranBHVung theo vùng)), các dòng khác = 0. ⚠ Đã fix typo unified `HT_HR_HeSoBHXH`.', maHoa:false, kieu:'decimal(18,2)', formula:'dbo.PR_fnGetTrichBH_RowV2(@EmpID, @KyID, @LuotDong)', deps:['HT_HR_HeSoBHXH','HT_AGG_MaxLuongGopKy']},
     ];
 
     const CURRENT_USER = 'FPT Admin';
@@ -322,26 +312,20 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
       let html = '';
       list.forEach(function(r, i) {
         html += '<tr data-ma="' + r.ma + '">'
-          + '<td><input type="checkbox" class="set3-chk"></td>'
-          + '<td style="text-align:center;">' + (i+1) + '</td>'
-          + '<td><span class="edit-icon" onclick="set3Edit(this)">&#9998;</span></td>'
-          + '<td><b>' + r.ma + '</b></td>'
-          + '<td>' + r.en + '</td>'
-          + '<td>' + r.vi + '</td>'
-          + '<td>' + (r.note || '') + '</td>'
-          + '<td style="text-align:center;">' + r.thuTu + '</td>'
-          + '<td style="text-align:center;">' + r.rowClass + '</td>'
-          + '<td style="text-align:center;">' + r.sumPrev + '</td>'
-          + '<td style="text-align:center;">' + r.alloc + '</td>'
-          + '<td style="text-align:center;' + (r.alloc==='Prorata' ? 'color:#0056b3;font-weight:bold;' : 'color:#ccc;') + '">' + (r.prorataBasis || (r.alloc==='Prorata' ? '&#9888; chưa chọn' : '—')) + '</td>'
-          + '<td style="text-align:center;">' + r.prio + '</td>'
-          + '<td style="text-align:center;"><button class="btn-vd" onclick="showVD(\'' + r.ma + '\')">Xem VD</button></td>'
-          + '<td style="text-align:center;color:' + (r.used ? 'green' : '#ccc') + ';font-weight:bold">' + (r.used ? '&#10004;' : '&#10008;') + '</td>'
-          + '<td style="text-align:center;color:' + (r.maHoa ? 'green' : '#ccc') + ';font-weight:bold">' + (r.maHoa ? '&#10004;' : '&#10008;') + '</td>'
-          + '<td>' + (r.nguoiTao || CURRENT_USER) + '</td>'
-          + '<td>' + (r.ngayTao || nowStr()) + '</td>'
-          + '<td>' + (r.nguoiSua || '') + '</td>'
-          + '<td>' + (r.ngaySua || '') + '</td>'
+          + '<td class="c-center"><input type="checkbox" class="set3-chk"></td>'
+          + '<td class="c-center">' + (i+1) + '</td>'
+          + '<td class="c-center"><span class="edit-icon" onclick="set3Edit(this)">&#9998;</span></td>'
+          + '<td class="c-ma">' + r.ma + '</td>'
+          + '<td class="c-en">' + r.en + '</td>'
+          + '<td class="c-vi">' + r.vi + '</td>'
+          + '<td class="c-note">' + (r.note || '') + '</td>'
+          + '<td class="c-center">' + r.rank + '</td>'
+          + '<td class="c-center" style="color:' + (r.used ? 'green' : '#ccc') + ';font-weight:bold">' + (r.used ? '&#10004;' : '&#10008;') + '</td>'
+          + '<td class="c-center" style="color:' + (r.maHoa ? 'green' : '#ccc') + ';font-weight:bold">' + (r.maHoa ? '&#10004;' : '&#10008;') + '</td>'
+          + '<td class="c-meta">' + (r.nguoiTao || CURRENT_USER) + '</td>'
+          + '<td class="c-meta">' + (r.ngayTao || nowStr()) + '</td>'
+          + '<td class="c-meta">' + (r.nguoiSua || '') + '</td>'
+          + '<td class="c-meta">' + (r.ngaySua || '') + '</td>'
           + '</tr>';
       });
       tbody.innerHTML = html;
@@ -353,47 +337,12 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
       document.getElementById('set3_ma').readOnly = false;
       document.getElementById('set3_tenVI').value = '';
       document.getElementById('set3_tenEN').value = '';
-      document.getElementById('set3_thuTu').value = '0';
+      document.getElementById('set3_rank').value = '1';
       document.getElementById('set3_note').value = '';
       document.getElementById('set3_maHoa').checked = false;
       document.getElementById('set3_use').checked = true;
-      document.getElementById('set3_rowClass').value = 'Detail';
-      document.getElementById('set3_alloc').value = 'None';
-      document.getElementById('set3_prorataBasis').value = '';
-      document.getElementById('set3_sumPrev').value = 'N';
-      document.getElementById('set3_prio').value = '0';
       document.getElementById('set3-alert').style.display = 'none';
-      syncRowBehaviorUI();
     }
-
-    // ===== ĐỒNG BỘ SumPrev / Allocation / ProrataBasis =====
-    // Ngăn setup mâu thuẫn ngay từ UI: Allocation cần so sánh độ lớn hoặc cộng dồn
-    // qua nhiều dòng (MaxSalaryRow, Accumulate) bắt buộc SumPrev=Y. LastStageRow/OldStage
-    // chỉ chọn dòng theo vị trí (đầu/cuối kỳ) nên không bắt buộc.
-    function syncRowBehaviorUI() {
-      const allocEl = document.getElementById('set3_alloc');
-      const sumPrevEl = document.getElementById('set3_sumPrev');
-      const basisEl = document.getElementById('set3_prorataBasis');
-      const alloc = allocEl.value;
-      // Chỉ MaxSalaryRow/Accumulate cần SUM_PREV để so sánh độ lớn hoặc cộng dồn.
-      // LastStageRow/OldStage chỉ chọn dòng theo VỊ TRÍ (đầu/cuối kỳ), không bắt buộc SumPrev.
-      const needsSumPrev = ['MaxSalaryRow', 'Accumulate'].indexOf(alloc) >= 0;
-      if (needsSumPrev) {
-        sumPrevEl.value = 'Y';
-        sumPrevEl.disabled = true;
-      } else {
-        sumPrevEl.disabled = false;
-      }
-
-      if (alloc === 'Prorata') {
-        basisEl.disabled = false;
-      } else {
-        basisEl.disabled = true;
-        basisEl.value = '';
-      }
-    }
-    function onRowClassChange() { syncRowBehaviorUI(); }
-    function onAllocChange() { syncRowBehaviorUI(); }
 
     // ===== EDIT =====
     function set3Edit(el) {
@@ -406,16 +355,10 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
       document.getElementById('set3_ma').readOnly = true;
       document.getElementById('set3_tenVI').value = item.vi;
       document.getElementById('set3_tenEN').value = item.en;
-      document.getElementById('set3_thuTu').value = item.thuTu;
+      document.getElementById('set3_rank').value = item.rank;
       document.getElementById('set3_note').value = item.note || '';
       document.getElementById('set3_maHoa').checked = item.maHoa;
       document.getElementById('set3_use').checked = item.used;
-      document.getElementById('set3_rowClass').value = item.rowClass;
-      document.getElementById('set3_alloc').value = item.alloc;
-      document.getElementById('set3_prorataBasis').value = item.prorataBasis || '';
-      document.getElementById('set3_sumPrev').value = item.sumPrev;
-      document.getElementById('set3_prio').value = item.prio;
-      syncRowBehaviorUI();
 
       window.scrollTo(0, 0);
     }
@@ -425,23 +368,15 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
       const ma = document.getElementById('set3_ma').value.trim();
       const vi = document.getElementById('set3_tenVI').value.trim();
       const en = document.getElementById('set3_tenEN').value.trim();
-      const thuTu = parseInt(document.getElementById('set3_thuTu').value, 10);
       const note = document.getElementById('set3_note').value.trim();
       const maHoa = document.getElementById('set3_maHoa').checked;
       const used = document.getElementById('set3_use').checked;
-      const rowClass = document.getElementById('set3_rowClass').value;
-      const alloc = document.getElementById('set3_alloc').value;
-      const prorataBasis = document.getElementById('set3_prorataBasis').value;
-      const sumPrev = document.getElementById('set3_sumPrev').value;
-      const prio = parseInt(document.getElementById('set3_prio').value, 10);
+      const rank = parseInt(document.getElementById('set3_rank').value, 10);
       const isEdit = document.getElementById('set3_ma').readOnly;
 
       // Required fields
       if (!ma || !vi) {
         return showAlert2('set3-alert', 'Vui lòng nhập đầy đủ các trường bắt buộc (màu đỏ).', 'error');
-      }
-      if (isNaN(thuTu)) {
-        return showAlert2('set3-alert', 'Thứ tự sắp xếp phải là số.', 'error');
       }
 
       // Validate: Mã format
@@ -449,32 +384,9 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
         return showAlert2('set3-alert', 'Mã tiêu chí không hợp lệ. Phải viết liền không dấu, không khoảng trắng.', 'error');
       }
 
-      // Validate: Priority >= 0
-      if (isNaN(prio) || prio < 0) {
-        return showAlert2('set3-alert', 'Độ ưu tiên phải &#8805; 0', 'error');
-      }
-
-      // Constraint: Prorata only valid for Detail
-      if (alloc === 'Prorata' && rowClass !== 'Detail') {
-        return showAlert2('set3-alert', '<b>Lỗi (Blocking):</b> Prorata chỉ áp dụng cho tiêu chí Chi tiết (RowClass=Detail).', 'error');
-      }
-
-      // Constraint: Prorata requires ProrataBasis
-      if (alloc === 'Prorata' && !prorataBasis) {
-        return showAlert2('set3-alert', '<b>Lỗi (Blocking):</b> Allocation=Prorata phải chọn Cơ sở chia tỷ lệ (ProrataBasis) — tiêu chí HT_ dùng làm trọng số chia theo từng giai đoạn.', 'error');
-      }
-
-      // Constraint: MaxSalaryRow/Accumulate cần so sánh độ lớn hoặc cộng dồn
-      // qua nhiều dòng -> bắt buộc phải SUM_PREV trước (SumPrev=Y). LastStageRow/OldStage
-      // chỉ chọn dòng theo vị trí (đầu/cuối kỳ) nên không bắt buộc.
-      if (['MaxSalaryRow', 'Accumulate'].indexOf(alloc) >= 0 && sumPrev !== 'Y') {
-        return showAlert2('set3-alert', '<b>Lỗi (Blocking):</b> Allocation=' + alloc + ' cần SUM_PREV để so sánh/cộng dồn giá trị giữa các dòng — bắt buộc AllowSumPrev=Y.', 'error');
-      }
-
-      // Suggestion: Summary -> AllowSumPrev=Y
-      if (rowClass === 'Summary' && sumPrev === 'N') {
-        showAlert2('set3-alert', '<b>Gợi ý:</b> RowClass=Summary thường nên bật AllowSumPrev=Y để gộp kết quả các tiêu chí trước.', 'warning');
-        // Non-blocking, continue saving
+      // Validate: Rank >= 1
+      if (isNaN(rank) || rank < 1) {
+        return showAlert2('set3-alert', 'Rank (Độ ưu tiên) phải &#8805; 1', 'error');
       }
 
       // Check duplicate ma (new only)
@@ -485,11 +397,11 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
         }
       }
 
-      // Mock circular dependency check: if formula references criteria with Priority >= current
+      // Mock circular dependency check: if formula references criteria with Rank >= current
       if (isEdit) {
-        const higherPrio = MOCK_TT.filter(r => r.ma !== ma && r.prio >= prio);
-        if (higherPrio.length > 0 && alloc !== 'None') {
-          showAlert2('set3-alert', '<b>Cảnh báo:</b> Có ' + higherPrio.length + ' tiêu chí có Priority &#8805; ' + prio + '. Kiểm tra dependency tránh vòng lặp.', 'warning');
+        const higherRank = MOCK_TT.filter(r => r.ma !== ma && r.rank >= rank);
+        if (higherRank.length > 0) {
+          showAlert2('set3-alert', '<b>Cảnh báo:</b> Có ' + higherRank.length + ' tiêu chí có Rank &#8805; ' + rank + '. Kiểm tra dependency tránh vòng lặp.', 'warning');
         }
       }
 
@@ -499,22 +411,17 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
         if (idx >= 0) {
           MOCK_TT[idx].vi = vi;
           MOCK_TT[idx].en = en;
-          MOCK_TT[idx].thuTu = thuTu;
           MOCK_TT[idx].note = note;
           MOCK_TT[idx].maHoa = maHoa;
           MOCK_TT[idx].used = used;
-          MOCK_TT[idx].rowClass = rowClass;
-          MOCK_TT[idx].alloc = alloc;
-          MOCK_TT[idx].prorataBasis = alloc === 'Prorata' ? prorataBasis : '';
-          MOCK_TT[idx].sumPrev = sumPrev;
-          MOCK_TT[idx].prio = prio;
+          MOCK_TT[idx].rank = rank;
           MOCK_TT[idx].nguoiSua = CURRENT_USER;
           MOCK_TT[idx].ngaySua = nowStr();
         }
       } else {
         MOCK_TT.push({
-          ma: ma, vi: vi, en: en, thuTu: thuTu, note: note, maHoa: maHoa,
-          used: used, rowClass: rowClass, alloc: alloc, prorataBasis: alloc === 'Prorata' ? prorataBasis : '', sumPrev: sumPrev, prio: prio,
+          ma: ma, vi: vi, en: en, note: note, maHoa: maHoa,
+          used: used, rank: rank,
           nguoiTao: CURRENT_USER, ngayTao: nowStr(), nguoiSua: '', ngaySua: ''
         });
       }
@@ -526,52 +433,28 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
 
     // ===== QUY TẮC NGHIỆP VỤ (popup) =====
     var RULES_TT = [
-      {loai:'Bắt buộc (Blocking)', text:'Allocation=<b>Prorata</b> chỉ áp dụng khi RowClass=Detail.', vd:'Dòng 6 — TT_LSP_LuongThoiGian'},
-      {loai:'Bắt buộc (Blocking)', text:'Allocation=<b>Prorata</b> phải chọn Cơ sở chia tỷ lệ (ProrataBasis) — tiêu chí HT_ nào cấp trọng số per-slice. Không có thì engine không biết chia theo gì.', vd:'Dòng 6 — TT_LSP_LuongThoiGian (cột "Cơ sở Prorata" = HT_TS_CongThucTe)'},
-      {loai:'Bắt buộc (Blocking)', text:'Allocation &isin; {<b>MaxSalaryRow, Accumulate</b>} bắt buộc AllowSumPrev=Y vì cần SUM_PREV để so sánh độ lớn/cộng dồn qua nhiều dòng. UI tự set và khóa Y khi chọn 1 trong 2 loại này. <b>LastStageRow/OldStage</b> chỉ chọn dòng theo vị trí (đầu/cuối kỳ) nên KHÔNG bắt buộc SumPrev=Y.', vd:'Dòng 7, 8 (MaxSalaryRow), Dòng 9 (Accumulate) đều SUM trước=Y; Dòng 5 (OldStage) và Dòng 10 (LastStageRow) không bắt buộc'},
-      {loai:'Gợi ý (Non-blocking)', text:'RowClass=<b>Summary</b> nên bật AllowSumPrev=Y để gộp kết quả các tiêu chí Priority nhỏ hơn — hệ thống chỉ cảnh báo, không chặn lưu.', vd:'Dòng 11 — TT_LSP_KetQua_Final'},
+      {loai:'Kiến trúc', text:'Tiêu chí tính toán (TT_) chỉ khai báo <b>Mã/Tên/Rank</b> — <b>không chứa công thức, không cấu hình RowClass/Allocation ở đây</b>. RowClass, Allocation, Cơ sở Prorata cấu hình theo từng dòng công thức ở MH <b>Tạo công thức lương</b> — vì chỉ khi ráp công thức mới xác định được dòng đó lấy chi tiết hay tổng hợp.', vd:'Bấm mở "Tạo công thức lương" — mỗi dòng có cột RowClass/Allocation riêng'},
+      {loai:'Best practice — Tách tiêu chí đệm',
+       text:'&#8226; Khi công thức lương phức tạp (nhiều CASE lồng, nhiều bước điều chỉnh, nhiều tham chiếu chéo) → BA nên chủ động <b>tách thành nhiều tiêu chí TT_ trung gian</b> thay vì gom cả cục vào 1 công thức.<br>'
+          + '&#8226; <b>Naming convention</b> gợi ý: <code>TT_&lt;Nghiệp vụ&gt;_Base</code> (khối gốc) → <code>TT_&lt;Nghiệp vụ&gt;_Adj</code> (khối điều chỉnh) → <code>TT_&lt;Nghiệp vụ&gt;_Final</code> (kết quả cuối). VD: <code>TT_LSP_TienL1</code> = Base; <code>TT_LSP_TienL2</code> = Adj lần 1; <code>TT_LSP_KetQua_Final</code> = Final.<br>'
+          + '&#8226; <b>Lợi ích</b>: (1) audit rõ từng bước tính trên báo cáo; (2) reuse tiêu chí đệm cho các bộ công thức khác nhau; (3) dễ test/QA nghiệp vụ từng bước; (4) đổi 1 phần không phá cả cây công thức.<br>'
+          + '&#8226; <b>Trade-off</b>: nhiều tiêu chí hơn → phải đặt Rank chuẩn (Base &lt; Adj &lt; Final) để engine chạy đúng thứ tự. Cùng Rank = chạy đồng thời, không tham chiếu được nhau.',
+       vd:'Data mock hiện đang minh họa pattern này: TT_LSP_Base_L0 (Rank 10) → TT_LSP_TienL1 (Rank 20) → TT_LSP_TienL2 (Rank 30) → ... → TT_LSP_KetQua_Final (Rank 99).'},
       {loai:'Định dạng', text:'Mã tiêu chí: chỉ chữ/số/gạch dưới, không dấu, không khoảng trắng, không trùng lặp.'},
-      {loai:'Định dạng', text:'Độ ưu tiên (Priority) &ge; 0.'},
-      {loai:'Cảnh báo (mock)', text:'Khi sửa tiêu chí, nếu có tiêu chí khác Priority &ge; tiêu chí đang sửa và Allocation&ne;None &rarr; cảnh báo khả năng vòng lặp phụ thuộc (circular dependency), không chặn.'}
+      {loai:'Định dạng', text:'Rank (Độ ưu tiên) &ge; 1.'},
+      {loai:'Cảnh báo (mock)', text:'Khi sửa tiêu chí, nếu có tiêu chí khác Rank &ge; tiêu chí đang sửa &rarr; cảnh báo khả năng vòng lặp phụ thuộc (circular dependency), không chặn.'}
     ];
     function showRules() {
-      var html = '<table class="ref-table"><thead><tr><th style="width:130px;">Loại</th><th>Quy tắc</th><th style="width:230px;">Tham khảo ví dụ</th></tr></thead><tbody>';
+      var html = '<table class="ref-table" style="table-layout:fixed;width:100%;"><thead><tr><th style="width:16%;">Loại</th><th style="width:54%;">Quy tắc</th><th style="width:30%;">Tham khảo ví dụ</th></tr></thead><tbody>';
       RULES_TT.forEach(function(r){
         var color = r.loai.indexOf('Blocking')>=0 ? '#dc3545' : (r.loai.indexOf('Gợi ý')>=0 ? '#e67e22' : '#6c757d');
-        html += '<tr><td><b style="color:'+color+'">'+r.loai+'</b></td><td>'+r.text+'</td><td style="color:#6f42c1;">'+(r.vd||'—')+'</td></tr>';
+        html += '<tr><td style="vertical-align:top;word-break:break-word;"><b style="color:'+color+'">'+r.loai+'</b></td>'
+          +'<td style="vertical-align:top;line-height:1.6;word-break:break-word;">'+r.text+'</td>'
+          +'<td style="vertical-align:top;color:#6f42c1;line-height:1.6;word-break:break-word;">'+(r.vd||'—')+'</td></tr>';
       });
       html += '</tbody></table>';
       document.getElementById('modal-rules-body').innerHTML = html;
       document.getElementById('modal-rules').style.display = 'flex';
-    }
-
-    // ===== HELP ICON (?) =====
-    var HELP_TT = {
-      rowClass: {
-        title: 'Phân loại (RowClass) là gì?',
-        body: '<b>Detail:</b> tính ra 1 số tiền riêng cho từng dòng giai đoạn QTLV (VD: Lương gốc L0).<br><br>'
-          + '<b>Summary:</b> gộp/tổng hợp từ các dòng Detail phía trước (VD: Tổng LSP cuối).<br><br>'
-          + '<div class="vd-info">&#9888; Tiêu chí tính toán (TT_) luôn trả <b>FLOAT</b>. Chỉ tiêu chí tìm kiếm (TK_) mới trả NVARCHAR/DATETIME (VD: Bàn, Ca). TT_ được phép CASE WHEN tham chiếu TK_/HT_ để xử lý điều kiện, nhưng đầu ra vẫn là FLOAT.</div>'
-      },
-      sumprev: {
-        title: 'Cho phép SUM tiêu chí trước (AllowSumPrev)?',
-        body: 'Xác định <b>TRƯỚC</b> khi chọn Allocation: tiêu chí này có cộng dồn (SUM_PREV) giá trị của các tiêu chí có Priority nhỏ hơn hay không.<br><br>'
-          + 'Chỉ bắt buộc Y khi Allocation=MaxSalaryRow/Accumulate (cần so sánh độ lớn/cộng dồn). LastStageRow/OldStage chỉ chọn dòng theo vị trí nên không bắt buộc.<br><br>'
-          + '<div class="vd-info">&#128161; Xem ví dụ: dòng <b>TT_LSP_LuongDongBH</b> (STT 7) có SUM trước=Y — bấm "Xem VD" để thấy bước SUM_PREV trước khi so sánh MaxSalaryRow.</div>'
-      },
-      prorataBasis: {
-        title: 'Cơ sở chia tỷ lệ (ProrataBasis) là gì?',
-        body: 'Chỉ định <b>tiêu chí hệ thống (HT_)</b> nào cấp trọng số/tỷ lệ theo từng giai đoạn (VD: Công thực tế, Sản lượng...). Engine sẽ SUM giá trị PerSlice của tiêu chí này qua các dòng để làm mẫu số khi chia Prorata.<br><br>'
-          + 'Không chọn &rarr; engine không biết chia theo gì (Công chuẩn? Công thực tế? Phép?).<br><br>'
-          + '<div class="vd-info">&#128161; Xem ví dụ: dòng <b>TT_LSP_LuongThoiGian</b> (STT 6) — bấm "Xem VD" để thấy cách chọn HT_TS_CongChuan (PerEmployee) sẽ luôn ra tỷ lệ 50/50, khác với HT_TS_CongThucTe (PerSlice).</div>'
-      }
-    };
-    function showHelp(key) {
-      var h = HELP_TT[key];
-      if (!h) return;
-      document.getElementById('modal-help-title').textContent = h.title;
-      document.getElementById('modal-help-body').innerHTML = h.body;
-      document.getElementById('modal-help').style.display = 'flex';
     }
 
     // ===== THAM SỐ HỆ THỐNG (dev-code, truyền sẵn vào mọi fn theo Module) =====
@@ -629,8 +512,6 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
     function set3Search() {
       const ma = document.getElementById('set3_ma').value.trim().toUpperCase();
       const vi = document.getElementById('set3_tenVI').value.trim().toUpperCase();
-      const rowClass = document.getElementById('set3_rowClass').value;
-      const alloc = document.getElementById('set3_alloc').value;
 
       let filtered = MOCK_TT.filter(function(r) {
         if (ma && r.ma.toUpperCase().indexOf(ma) < 0) return false;
@@ -644,241 +525,6 @@ Need Confirm: (1) MaxSalaryRow so theo TT_ nào (L0/L4/Final)? 2 dòng bằng nh
       } else {
         showAlert2('set3-alert', 'Tìm thấy ' + filtered.length + ' tiêu chí.', 'success');
       }
-    }
-
-    // ===== TOGGLE COLLAPSIBLE =====
-    function toggleAdvanced() {
-      const body = document.getElementById('adv-body');
-      const arrow = document.getElementById('adv-arrow');
-      if (body.style.display === 'none') {
-        body.style.display = 'block';
-        arrow.classList.add('open');
-      } else {
-        body.style.display = 'none';
-        arrow.classList.remove('open');
-      }
-    }
-
-    // ===== VÍ DỤ CHI TIẾT ALLOCATION =====
-    var VD_EMP = {name:'Nguyễn Thị Loan', id:'1022907668', ky:'05/2026'};
-    var VD_SLICES = [
-      {gd:1, ban:'CB101', from:'01/05/2026', to:'15/05/2026', cong:12, ns:800, dg:6200},
-      {gd:2, ban:'CB102', from:'16/05/2026', to:'31/05/2026', cong:13, ns:900, dg:6400}
-    ];
-    function fmtN(n){ return Math.round(n).toLocaleString('vi-VN'); }
-
-    function vdHeader(){
-      return '<div style="background:#eef2f7;padding:8px 12px;border-radius:4px;margin-bottom:10px;font-size:11px;">'
-        +'<b>NV mẫu:</b> '+VD_EMP.name+' ('+VD_EMP.id+') &mdash; Kỳ '+VD_EMP.ky+' &mdash; <b>2 giai đoạn QTLV</b>'
-        +'</div>'
-        +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Từ ngày</th><th>Đến ngày</th><th>Công</th><th>Năng suất</th><th>Đơn giá</th></tr></thead>'
-        +'<tbody>'
-        +'<tr><td>1</td><td>CB101</td><td>01/05</td><td>15/05</td><td><b>12</b></td><td class="r">800</td><td class="r">6,200</td></tr>'
-        +'<tr><td>2</td><td>CB102</td><td>16/05</td><td>31/05</td><td><b>13</b></td><td class="r">900</td><td class="r">6,400</td></tr>'
-        +'<tr class="sum"><td colspan="4" style="text-align:right;">Tổng</td><td><b>25</b></td><td></td><td></td></tr>'
-        +'</tbody></table>';
-    }
-
-    function showVD(ma){
-      var row = MOCK_TT.find(function(x){ return x.ma===ma; });
-      if(!row) return;
-      var allocMap = {'None':'none','Prorata':'prorata','MaxSalaryRow':'maxsal','LastStageRow':'laststage','Accumulate':'accumulate','OldStage':'oldstage'};
-      var type = allocMap[row.alloc] || 'none';
-
-      // Badge setup
-      var badgeHtml = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">'
-        +'<span style="background:#0056b3;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">'+row.ma+'</span>'
-        +'<span style="background:#6c757d;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">RowClass: '+row.rowClass+'</span>'
-        +'<span style="background:'+(row.sumPrev==='Y'?'#28a745':'#6c757d')+';color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">SumPrev: '+row.sumPrev+'</span>'
-        +'<span style="background:#e67e22;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Allocation: '+row.alloc+'</span>'
-        +(row.alloc==='Prorata' ? '<span style="background:'+(row.prorataBasis?'#6f42c1':'#dc3545')+';color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">ProrataBasis: '+(row.prorataBasis||'CHƯA CHỌN')+'</span>' : '')
-        +'<span style="background:#17a2b8;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Priority: '+row.prio+'</span>'
-        +'</div>';
-
-      var title = '', body = vdHeader() + badgeHtml;
-      var L0_1=800*6200, L0_2=900*6400;
-
-      if(type==='none'){
-        title = '&#128196; Ví dụ: Allocation = None (Lương gốc L0)';
-        body += '<div class="vd-step">'
-          +'<b>Tiêu chí:</b> TT_LSP_Base_L0 &mdash; RowClass=Detail, Allocation=None, SumPrev=N<br>'
-          +'<b>Công thức:</b> NS × ĐơnGiá (tính riêng mỗi dòng)<br><br>'
-          +'<b>Bước 1:</b> Engine tính per-dòng theo Priority ASC:<br>'
-          +'&nbsp;&nbsp;GĐ1: <span class="op">800 × 6,200 = '+fmtN(L0_1)+'</span><br>'
-          +'&nbsp;&nbsp;GĐ2: <span class="op">900 × 6,400 = '+fmtN(L0_2)+'</span><br><br>'
-          +'<b>Bước 2:</b> Allocation=None → <b>giữ nguyên</b>, không phân bổ lại.'
-          +'</div>'
-          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Công</th><th>NS</th><th>Đơn giá</th><th>Kết quả L0</th></tr></thead>'
-          +'<tbody>'
-          +'<tr><td>1</td><td>CB101</td><td>12</td><td class="r">800</td><td class="r">6,200</td><td class="r"><b>'+fmtN(L0_1)+'</b></td></tr>'
-          +'<tr><td>2</td><td>CB102</td><td>13</td><td class="r">900</td><td class="r">6,400</td><td class="r"><b>'+fmtN(L0_2)+'</b></td></tr>'
-          +'<tr class="sum"><td colspan="5" style="text-align:right;">Tổng</td><td class="r">'+fmtN(L0_1+L0_2)+'</td></tr>'
-          +'</tbody></table>'
-          +'<div class="vd-info">&#9989; Mỗi dòng có NS và ĐơnGiá riêng → kết quả khác nhau. None phù hợp khi dữ liệu đầu vào đã tách sẵn per-slice.</div>';
-      }
-
-      if(type==='prorata'){
-        title = '&#128200; Ví dụ: Allocation = Prorata (Lương thời gian)';
-        var total = 4000000;
-        var basis = row.prorataBasis;
-
-        if(!basis){
-          body += '<div style="background:#f8d7da;border:1px solid #dc3545;border-radius:4px;padding:10px 12px;font-size:11px;">'
-            +'&#10060; <b>Thiếu cấu hình:</b> Allocation=Prorata nhưng <b>chưa chọn Cơ sở chia tỷ lệ (ProrataBasis)</b>.<br><br>'
-            +'Engine <u>không thể</u> tự suy luận nên chia theo Công chuẩn, Công thực tế, Phép hay Sản lượng &mdash; phải khai báo rõ tiêu chí HT_ nào cấp trọng số cho từng dòng. Vui lòng vào form, chọn Allocation=Prorata rồi chọn 1 giá trị ở <b>"Cơ sở chia tỷ lệ (ProrataBasis)"</b> trước khi Lưu.'
-            +'</div>';
-        } else {
-          var basisMeta = {
-            'HT_TS_CongThucTe': {label:'Công thực tế', unit:'công', field:'cong'},
-            'HT_TS_CongChuan':  {label:'Công chuẩn tháng', unit:'công', field:'congchuan'},
-            'HT_PR_NangSuatTinhLuong': {label:'Sản lượng NS_FINAL', unit:'kg/sp', field:'ns'}
-          };
-          var bm = basisMeta[basis] || basisMeta['HT_TS_CongThucTe'];
-          // Lấy giá trị theo GĐ tùy field được chọn làm cơ sở
-          var v1, v2;
-          if(bm.field === 'cong'){ v1 = VD_SLICES[0].cong; v2 = VD_SLICES[1].cong; }
-          else if(bm.field === 'ns'){ v1 = VD_SLICES[0].ns; v2 = VD_SLICES[1].ns; }
-          else { v1 = 26; v2 = 26; } // CongChuan: PerEmployee -> cùng 1 giá trị mọi giai đoạn
-          var sumV = v1 + v2;
-          var pct1 = v1/sumV, pct2 = v2/sumV;
-          var r1 = Math.round(total * pct1), r2 = total - r1;
-
-          body += '<div class="vd-step">'
-            +'<b>Tiêu chí:</b> TT_LSP_LuongThoiGian &mdash; RowClass=Detail, Allocation=Prorata, <span class="op">ProrataBasis='+basis+'</span>, SumPrev=N<br>'
-            +'<b>Công thức:</b> CôngChuẩn × ĐơnGiáNgày = 1 tổng duy nhất cho cả NV (chưa tách theo giai đoạn)<br><br>'
-            +'<b>Bước 1:</b> Engine tính tổng (1 giá trị / NV):<br>'
-            +'&nbsp;&nbsp;Tổng = <span class="op">26 ngày × 153,846 đ/ngày = '+fmtN(total)+'</span><br><br>'
-            +'<b>Bước 2:</b> Allocation=Prorata → lấy giá trị PerSlice của tiêu chí <b>'+basis+' ('+bm.label+')</b> làm trọng số, SUM qua các dòng làm mẫu số:<br>'
-            +'&nbsp;&nbsp;GĐ1: '+bm.label+' = '+v1+' '+bm.unit+' &nbsp;|&nbsp; GĐ2: '+bm.label+' = '+v2+' '+bm.unit+' &nbsp;|&nbsp; Mẫu số = '+sumV+'<br><br>'
-            +'<b>Bước 3:</b> Chia tỷ lệ:<br>'
-            +'&nbsp;&nbsp;GĐ1: '+fmtN(total)+' × <span class="op">('+v1+' / '+sumV+') = '+(pct1*100).toFixed(1)+'%</span> → <b>'+fmtN(r1)+'</b><br>'
-            +'&nbsp;&nbsp;GĐ2: '+fmtN(total)+' × <span class="op">('+v2+' / '+sumV+') = '+(pct2*100).toFixed(1)+'%</span> → <b>'+fmtN(r2)+'</b><br><br>'
-            +'<b>Kiểm tra:</b> '+fmtN(r1)+' + '+fmtN(r2)+' = '+fmtN(r1+r2)+' &#9989; khớp tổng ban đầu.'
-            +'</div>'
-            +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>'+bm.label+'</th><th>Tỷ lệ</th><th>Trước Prorata</th><th>Sau Prorata</th></tr></thead>'
-            +'<tbody>'
-            +'<tr><td>1</td><td>CB101</td><td><b>'+v1+'</b></td><td>'+v1+'/'+sumV+' = '+(pct1*100).toFixed(1)+'%</td><td class="r dim">'+fmtN(total)+'</td><td class="r hi">'+fmtN(r1)+'</td></tr>'
-            +'<tr><td>2</td><td>CB102</td><td><b>'+v2+'</b></td><td>'+v2+'/'+sumV+' = '+(pct2*100).toFixed(1)+'%</td><td class="r dim">'+fmtN(total)+'</td><td class="r hi">'+fmtN(r2)+'</td></tr>'
-            +'<tr class="sum"><td colspan="4" style="text-align:right;">Tổng</td><td class="r">'+fmtN(total)+'</td><td class="r">'+fmtN(r1+r2)+'</td></tr>'
-            +'</tbody></table>'
-            +'<div class="vd-info">&#128161; <b>Khi nào dùng:</b> Khi có 1 giá trị tổng (lương thời gian, phụ cấp cố định...) cần chia theo trọng số PerSlice của tiêu chí đã chọn ở ProrataBasis. Đảm bảo tổng không đổi.</div>'
-            +(bm.field==='congchuan' ? '<div class="vd-info" style="background:#fff3cd;border-color:#ffc107;">&#9888; <b>Lưu ý nghiệp vụ:</b> HT_TS_CongChuan là tiêu chí <b>PerEmployee</b> (1 giá trị cố định cho cả NV, không đổi theo giai đoạn) → chọn làm ProrataBasis sẽ luôn ra tỷ lệ chia đều 50/50 bất kể GĐ nào nhiều công hơn. Muốn chia theo công thực tế mỗi GĐ phải chọn HT_TS_CongThucTe (PerSlice).</div>' : '');
-        }
-      }
-
-      if(type==='maxsal'){
-        title = '&#128737; Ví dụ: Allocation = MaxSalaryRow (' + row.vi + ')';
-        var L1_1=L0_1*1.05, L1_2=L0_2*1.05;
-        var L3_1=L1_1*1.05, L3_2=L1_2*1.05;
-        var ltg1=1920000, ltg2=2080000;
-        var sum1=L0_1+L1_1+L3_1+ltg1, sum2=L0_2+L1_2+L3_2+ltg2;
-        var totalBH=sum1+sum2;
-        var maxsalMeaning = {
-          'TT_LSP_LuongDongBH': 'BH đóng trên mức lương cao nhất. NV làm 2 bàn nhưng BH chỉ tính 1 lần trên bàn có lương cao hơn → tránh đóng trùng.',
-          'TT_LSP_KhoanTruThang': 'Khoản trừ (tạm ứng, kỷ luật...) gán theo tháng cho NV — không tách theo giai đoạn nên trích 1 lần vào dòng có lương cao nhất, đảm bảo đủ khả năng khấu trừ và không trích trùng ở cả 2 dòng.'
-        };
-        var meaning = maxsalMeaning[row.ma] || 'Dồn 100% giá trị vào dòng có SUM_PREV cao nhất, các dòng khác = 0, tránh tính trùng khi NV có nhiều giai đoạn trong kỳ.';
-        body += '<div class="vd-step">'
-          +'<b>Tiêu chí:</b> '+row.ma+' &mdash; RowClass=Summary, Allocation=MaxSalaryRow, <span class="warn">SumPrev=Y</span><br>'
-          +'<b>Công thức:</b> SUM_PREV() — cộng tất cả tiêu chí có Priority nhỏ hơn<br><br>'
-          +'<b>Bước 1:</b> Tính SUM_PREV() cho mỗi dòng:<br>'
-          +'&nbsp;&nbsp;GĐ1: L0('+fmtN(L0_1)+') + L1('+fmtN(L1_1)+') + L3('+fmtN(L3_1)+') + LTG('+fmtN(ltg1)+')<br>'
-          +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="op">'+fmtN(sum1)+'</span><br>'
-          +'&nbsp;&nbsp;GĐ2: L0('+fmtN(L0_2)+') + L1('+fmtN(L1_2)+') + L3('+fmtN(L3_2)+') + LTG('+fmtN(ltg2)+')<br>'
-          +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="op">'+fmtN(sum2)+'</span><br><br>'
-          +'<b>Bước 2:</b> Tổng = '+fmtN(sum1)+' + '+fmtN(sum2)+' = <b>'+fmtN(totalBH)+'</b><br><br>'
-          +'<b>Bước 3:</b> MaxSalaryRow → so sánh SUM_PREV giữa các dòng:<br>'
-          +'&nbsp;&nbsp;GĐ1 = '+fmtN(sum1)+' &lt; GĐ2 = '+fmtN(sum2)+' → <b>Dồn 100% vào GĐ2</b>'
-          +'</div>'
-          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>SUM_PREV</th><th>So sánh</th><th>Kết quả</th></tr></thead>'
-          +'<tbody>'
-          +'<tr><td>1</td><td>CB101</td><td class="r">'+fmtN(sum1)+'</td><td>nhỏ hơn</td><td class="r dim">0</td></tr>'
-          +'<tr><td>2</td><td>CB102</td><td class="r"><b>'+fmtN(sum2)+'</b></td><td style="color:#28a745;font-weight:bold;">&#9733; LỚN NHẤT</td><td class="r hi">'+fmtN(totalBH)+'</td></tr>'
-          +'<tr class="sum"><td colspan="4" style="text-align:right;">Tổng</td><td class="r">'+fmtN(totalBH)+'</td></tr>'
-          +'</tbody></table>'
-          +'<div class="vd-info">&#128737; <b>Ý nghĩa nghiệp vụ:</b> '+meaning+'<br>'
-          +'<b>Tie-break:</b> Nếu 2 dòng bằng nhau → chọn dòng có ToDate lớn hơn (Need Confirm).<br>'
-          +'<b>Muốn đổi rule?</b> Nếu quy tắc thực tế là "trích dòng cũ" (đầu kỳ) thay vì "dòng lương cao nhất" — đổi Allocation sang <b>OldStage</b> (không cần SumPrev=Y). Nếu là "trích dòng mới/cuối kỳ" — đổi sang <b>LastStageRow</b>. Cả 2 không cần đổi gì khác ở tiêu chí này.</div>';
-      }
-
-      if(type==='laststage'){
-        title = '&#128176; Ví dụ: Allocation = LastStageRow (Thuế TNCN)';
-        var L1_1=L0_1*1.05, L1_2=L0_2*1.05;
-        var L3_1=L1_1*1.05, L3_2=L1_2*1.05;
-        var ltg1=1920000, ltg2=2080000;
-        var sp1=L0_1+L1_1+L3_1+ltg1;
-        var sp2_noBH=L0_2+L1_2+L3_2+ltg2;
-        var totalBH_val=sp1+sp2_noBH;
-        var sp1_full=sp1+0;
-        var sp2_full=sp2_noBH+totalBH_val;
-        var totalThue=sp1_full+sp2_full;
-        body += '<div class="vd-step">'
-          +'<b>Tiêu chí:</b> TT_LSP_ThuNhapTinhThue &mdash; RowClass=Summary, Allocation=LastStageRow, <span class="warn">SumPrev=Y</span><br>'
-          +'<b>Công thức:</b> SUM_PREV() — bao gồm cả kết quả P60 (BH đã tính trước)<br><br>'
-          +'<b>Bước 1:</b> SUM_PREV() tại P70 (bao gồm P10→P60):<br>'
-          +'&nbsp;&nbsp;GĐ1: L0+L1+L3+LTG + <span class="warn">BH=0</span> = <span class="op">'+fmtN(sp1_full)+'</span><br>'
-          +'&nbsp;&nbsp;GĐ2: L0+L1+L3+LTG + <span class="warn">BH='+fmtN(totalBH_val)+'</span> = <span class="op">'+fmtN(sp2_full)+'</span><br><br>'
-          +'<b>Bước 2:</b> Tổng = '+fmtN(totalThue)+'<br><br>'
-          +'<b>Bước 3:</b> LastStageRow → tìm dòng có <b>ToDate lớn nhất</b>:<br>'
-          +'&nbsp;&nbsp;GĐ1 ToDate = 15/05 &lt; GĐ2 ToDate = <b>31/05</b> → <b>Dồn 100% vào GĐ2</b>'
-          +'</div>'
-          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>ToDate</th><th>SUM_PREV</th><th>Có BH?</th><th>Kết quả Thuế</th></tr></thead>'
-          +'<tbody>'
-          +'<tr><td>1</td><td>CB101</td><td>15/05</td><td class="r">'+fmtN(sp1_full)+'</td><td>BH = 0</td><td class="r dim">0</td></tr>'
-          +'<tr><td>2</td><td>CB102</td><td><b>31/05</b></td><td class="r">'+fmtN(sp2_full)+'</td><td style="color:#e67e22;">BH = '+fmtN(totalBH_val)+'</td><td class="r hi2">'+fmtN(totalThue)+'</td></tr>'
-          +'<tr class="sum"><td colspan="5" style="text-align:right;">Tổng</td><td class="r">'+fmtN(totalThue)+'</td></tr>'
-          +'</tbody></table>'
-          +'<div class="vd-info">&#128176; <b>Ý nghĩa nghiệp vụ:</b> Thuế TNCN tính 1 lần/tháng, dồn vào giai đoạn cuối kỳ. GĐ2 nhận toàn bộ nghĩa vụ thuế.<br>'
-          +'<b>Lưu ý quan trọng:</b> SUM_PREV ở P70 <u>bao gồm cả P60</u> (BH). GĐ1 có BH=0, GĐ2 có BH='+fmtN(totalBH_val)+' → SUM_PREV của 2 dòng chênh lệch rất lớn.</div>';
-      }
-
-      if(type==='accumulate'){
-        title = '&#128202; Ví dụ: Allocation = Accumulate (Lũy kế lương)';
-        body += '<div class="vd-step">'
-          +'<b>Tiêu chí:</b> TT_LSP_LuyKeLuong &mdash; RowClass=Summary, Allocation=Accumulate, SumPrev=Y<br>'
-          +'<b>Công thức:</b> REF(\'TT_LSP_Base_L0\') — lấy giá trị L0 của dòng hiện tại<br><br>'
-          +'<b>Bước 1:</b> Tính giá trị gốc mỗi dòng:<br>'
-          +'&nbsp;&nbsp;GĐ1: L0 = <span class="op">'+fmtN(L0_1)+'</span><br>'
-          +'&nbsp;&nbsp;GĐ2: L0 = <span class="op">'+fmtN(L0_2)+'</span><br><br>'
-          +'<b>Bước 2:</b> Accumulate → <b>cộng dồn từ dòng đầu</b> (running total):<br>'
-          +'&nbsp;&nbsp;GĐ1: lũy kế = <span class="op">'+fmtN(L0_1)+'</span><br>'
-          +'&nbsp;&nbsp;GĐ2: lũy kế = '+fmtN(L0_1)+' + '+fmtN(L0_2)+' = <span class="op">'+fmtN(L0_1+L0_2)+'</span>'
-          +'</div>'
-          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>L0 (giá trị gốc)</th><th>Lũy kế (Accumulate)</th></tr></thead>'
-          +'<tbody>'
-          +'<tr><td>1</td><td>CB101</td><td class="r">'+fmtN(L0_1)+'</td><td class="r hi">'+fmtN(L0_1)+'</td></tr>'
-          +'<tr><td>2</td><td>CB102</td><td class="r">'+fmtN(L0_2)+'</td><td class="r hi">'+fmtN(L0_1+L0_2)+'</td></tr>'
-          +'</tbody></table>'
-          +'<div style="font-size:11px;font-weight:bold;margin:10px 0 4px;color:#0056b3;">Ví dụ mở rộng: NV có 3 giai đoạn</div>'
-          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Giá trị gốc</th><th>Công thức lũy kế</th><th>Lũy kế</th></tr></thead>'
-          +'<tbody>'
-          +'<tr><td>1</td><td class="r">3,000,000</td><td>3,000,000</td><td class="r hi">3,000,000</td></tr>'
-          +'<tr><td>2</td><td class="r">4,000,000</td><td>3,000,000 + 4,000,000</td><td class="r hi">7,000,000</td></tr>'
-          +'<tr><td>3</td><td class="r">2,500,000</td><td>7,000,000 + 2,500,000</td><td class="r hi">9,500,000</td></tr>'
-          +'</tbody></table>'
-          +'<div class="vd-info">&#128202; <b>Ý nghĩa nghiệp vụ:</b> Theo dõi tổng lương lũy kế qua các giai đoạn. Dùng cho báo cáo lũy tiến, kiểm soát ngưỡng (VD: lương lũy kế vượt mức X thì tính thuế bậc cao hơn).<br>'
-          +'<b>Need Confirm:</b> Lũy kế trong kỳ hay xuyên kỳ (retro)?</div>';
-      }
-
-      if(type==='oldstage'){
-        title = '&#128260; Ví dụ: Allocation = OldStage';
-        body += '<div class="vd-step">'
-          +'<b>Tiêu chí:</b> TT_LSP_HoTroChuyenBan &mdash; RowClass=Detail, Allocation=OldStage, SumPrev=N<br>'
-          +'<b>Tình huống:</b> NV chuyển bàn giữa tháng, công ty hỗ trợ 500,000đ bàn giao — trả cho giai đoạn CŨ trước khi rời đi<br><br>'
-          +'<b>OldStage:</b> Gán toàn bộ giá trị vào dòng <b>giai đoạn đầu tiên</b> (GĐ1 — bàn cũ CB101, sắp xếp theo FromDate ASC). Các giai đoạn sau = 0.'
-          +'</div>'
-          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Loại</th><th>Hỗ trợ bàn giao</th></tr></thead>'
-          +'<tbody>'
-          +'<tr><td>1</td><td>CB101</td><td style="color:#e67e22;font-weight:bold;">GĐ CŨ (đầu tiên)</td><td class="r hi2">500,000</td></tr>'
-          +'<tr><td>2</td><td>CB102</td><td>GĐ sau</td><td class="r dim">0</td></tr>'
-          +'</tbody></table>'
-          +'<div class="vd-info">&#128260; <b>Ý nghĩa nghiệp vụ:</b> Dùng cho khoản gắn với giai đoạn ĐẦU kỳ (hỗ trợ bàn giao, phụ cấp tại vị trí cũ...). Chỉ phát sinh khi NV có &ge;2 giai đoạn. NV có 3+ GĐ: chỉ GĐ đầu tiên nhận giá trị, các GĐ giữa/cuối = 0.<br>'
-          +'<b>Muốn dồn vào GĐ CUỐI thay vì đầu?</b> Dùng <b>LastStageRow</b> (xem ví dụ ở TT_LSP_ThuNhapTinhThue hoặc TT_LSP_KhoanTruThang) — không cần thêm Allocation "NewStage" riêng vì LastStageRow đã phủ đúng ý nghĩa "dồn vào giai đoạn mới nhất/cuối cùng".</div>';
-      }
-
-      document.getElementById('modal-vd-title').innerHTML = title;
-      document.getElementById('modal-vd-body').innerHTML = body;
-      document.getElementById('modal-vd').style.display = 'flex';
     }
 
     // ===== INIT =====

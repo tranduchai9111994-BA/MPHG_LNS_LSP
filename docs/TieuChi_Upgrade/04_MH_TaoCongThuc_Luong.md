@@ -41,9 +41,8 @@ window.MOCK_FORMULA = {
     {stt:1, ma:'TT_LSP_Base_L0', ten:'Lương gốc L0', order:1, ct:'Σ(HT_PR_NangSuatTinhLuong × HT_PR_LSP_DonGia)', loaiTinh:'Detail / None'},
     {stt:2, ma:'TT_LSP_TienL1', ten:'Tiền sau ĐC lần 1', order:2, ct:'TT_LSP_Base_L0 × HT_PR_LSP_HeSo1', loaiTinh:'Detail / None'},
     {stt:3, ma:'TT_LSP_LuongThoiGian', ten:'Lương thời gian', order:3, ct:'HT_TS_CongThucTe × ĐơnGiáNgày', loaiTinh:'Detail / Prorata'},
-    {stt:4, ma:'TT_LSP_LuongDongBH', ten:'Lương đóng BH', order:4, ct:'MAX(TT_LSP_KetQua_Final theo dòng)', loaiTinh:'Summary / MaxSalaryRow'},
-    {stt:5, ma:'TT_LSP_ThuNhapTinhThue', ten:'Thu nhập tính thuế', order:5, ct:'Σ TT_LSP_KetQua_Final', loaiTinh:'Summary / LastStageRow'},
-    {stt:6, ma:'TT_LSP_KetQua_Final', ten:'Tổng LSP cuối', order:6, ct:'TT_LSP_TienL3 + HoTro...', loaiTinh:'Summary / None'},
+    {stt:4, ma:'TT_TNChiuThueTNCN', ten:'Thu nhập chịu thuế TNCN', order:4, ct:'Σ TT_LSP_KetQua_Final', loaiTinh:'Summary / LastStageRow'},
+    {stt:5, ma:'TT_LSP_KetQua_Final', ten:'Tổng LSP cuối', order:5, ct:'TT_LSP_TienL3 + HoTro...', loaiTinh:'Summary / None'},
   ]
 };
 ```

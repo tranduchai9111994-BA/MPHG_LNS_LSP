@@ -60,8 +60,7 @@ window.MOCK_TT = [
   {ma:'TT_LSP_TienL2', en:'After L2', vi:'Tiền sau ĐC lần 2', prio:30, rowClass:'Detail', alloc:'None', sumPrev:'N', used:true},
   {ma:'TT_LSP_TienL3', en:'After L3', vi:'Tiền sau ĐC lần 3', prio:40, rowClass:'Detail', alloc:'None', sumPrev:'N', used:true},
   {ma:'TT_LSP_LuongThoiGian', en:'Time salary', vi:'Lương thời gian (ngày công)', prio:50, rowClass:'Detail', alloc:'Prorata', sumPrev:'N', used:true},
-  {ma:'TT_LSP_LuongDongBH', en:'Insurance base', vi:'Lương đóng bảo hiểm', prio:60, rowClass:'Summary', alloc:'MaxSalaryRow', sumPrev:'Y', used:true},
-  {ma:'TT_LSP_ThuNhapTinhThue', en:'Taxable income', vi:'Thu nhập tính thuế', prio:70, rowClass:'Summary', alloc:'LastStageRow', sumPrev:'Y', used:true},
+  {ma:'TT_TNChiuThueTNCN', en:'Taxable income (PIT)', vi:'Thu nhập chịu thuế TNCN', prio:70, rowClass:'Summary', alloc:'LastStageRow', sumPrev:'Y', used:true},
   {ma:'TT_LSP_KetQua_Final', en:'Final result', vi:'Tổng LSP cuối cùng', prio:99, rowClass:'Summary', alloc:'None', sumPrev:'Y', used:true},
 ];
 ```

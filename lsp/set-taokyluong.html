@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Tạo kỳ lương (mở rộng)</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      /* ===== Multi-select combobox ===== */
+      .ms-wrap { position: relative; width: 100%; }
+      .ms-input {
+        min-height: 26px; padding: 3px 24px 3px 4px; border: 1px solid var(--color-border);
+        background: #fff; cursor: pointer; display: flex; flex-wrap: wrap; gap: 3px;
+        align-items: center; box-sizing: border-box; font-size: 12px;
+      }
+      .ms-input.disabled { background: #f0f0f0; cursor: not-allowed; opacity: 0.7; }
+      .ms-input:focus-within { border-color: var(--color-input-focus); }
+      .ms-placeholder { color: #999; font-style: italic; padding: 2px 4px; }
+      .ms-caret {
+        position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+        color: #666; pointer-events: none; font-size: 10px;
+      }
+      .ms-chip {
+        display: inline-flex; align-items: center; gap: 4px;
+        background: #e7f3ff; color: #0056b3; border: 1px solid #b8daff;
+        border-radius: 3px; padding: 1px 5px; font-size: 11px; line-height: 1.4;
+      }
+      .ms-chip .rm {
+        cursor: pointer; color: #0056b3; font-weight: bold; font-size: 12px;
+        padding: 0 2px; border-radius: 2px;
+      }
+      .ms-chip .rm:hover { background: #0056b3; color: #fff; }
+      .ms-chip-more {
+        background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6;
+        border-radius: 3px; padding: 1px 5px; font-size: 10px; font-style: italic;
+      }
+      .ms-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0; z-index: 100;
+        max-height: 280px; display: flex; flex-direction: column;
+        background: #fff; border: 1px solid #b0b0b0; border-top: none;
+        box-shadow: 0 3px 8px rgba(0,0,0,.15);
+      }
+      .ms-search {
+        padding: 6px 8px; border-bottom: 1px solid #e0e0e0; background: #fafafa;
+      }
+      .ms-search input {
+        width: 100%; padding: 4px 6px; border: 1px solid #ccc; font-size: 11px; box-sizing: border-box;
+      }
+      .ms-list { flex: 1; overflow-y: auto; }
+      .ms-item {
+        padding: 5px 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0;
+        line-height: 1.4; font-size: 12px; display: flex; align-items: center; gap: 6px;
+      }
+      .ms-item:hover { background: #e7f3ff; }
+      .ms-item.selected { background: #d4edda; }
+      .ms-item input[type="checkbox"] { margin: 0; }
+      .ms-item .code { color: #0056b3; font-family: Consolas, monospace; font-size: 11px; font-weight: bold; }
+      .ms-item .name { color: #333; }
+      .ms-item .parent { color: #999; font-size: 10px; margin-left: auto; }
+      .ms-empty { padding: 12px; color: #999; font-style: italic; text-align: center; font-size: 11px; }
+      .ms-footer {
+        padding: 5px 10px; background: #f8f9fa; border-top: 1px solid #e0e0e0;
+        display: flex; justify-content: space-between; align-items: center; font-size: 11px;
+      }
+      .ms-footer button {
+        background: none; border: none; color: #0056b3; cursor: pointer; font-size: 11px; padding: 0 4px;
+      }
+      .ms-footer button:hover { text-decoration: underline; }
+      /* ===== Grid ===== */
+      .kl-grid { table-layout: fixed; min-width: 1700px; }
+      .kl-grid th, .kl-grid td {
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .kl-badge {
+        display: inline-block; background: #e7f3ff; color: #0056b3;
+        border: 1px solid #b8daff; border-radius: 3px; padding: 1px 6px;
+        font-size: 10px; font-weight: bold; cursor: help;
+      }
+      .kl-badge-empty {
+        display: inline-block; color: #ccc; font-style: italic; font-size: 10px;
+      }
+      /* ===== Rules modal ===== */
+      .ref-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; table-layout: fixed; }
+      .ref-table th { background: #e8eef5; color: #333; padding: 6px 8px; border: 1px solid #ccc; text-align: left; font-weight: bold; }
+      .ref-table td { padding: 6px 8px; border: 1px solid #ddd; background: #f9fbfd; vertical-align: top; text-align: left; line-height: 1.55; }
+      .ref-table td code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-family: Consolas, monospace; font-size: 11px; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="breadcrumb">Lương › Chức năng LSP › Tạo kỳ lương (mở rộng)</div>
+    <div class="page-title" style="position:relative;text-align:center;">
+      <span>TẠO KỲ LƯƠNG SẢN PHẨM (MỞ RỘNG)</span>
+      <span style="position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:8px;">
+        <button onclick="showRules()" style="background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">&#128203; Quy tắc</button>
+      </span>
+    </div>
+
+    <div id="kl-alert" class="alert-box"></div>
+
+    <!-- MODAL: Quy tắc nghiệp vụ -->
+    <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
+      <div class="modal-box wide" style="width:92vw;max-width:1100px;">
+        <div class="modal-hdr" style="background:#6f42c1;">
+          <span>&#128203; Quy tắc nghiệp vụ — Tạo kỳ lương (mở rộng)</span>
+          <button class="x" onclick="document.getElementById('modal-rules').style.display='none'">&#10005;</button>
+        </div>
+        <div class="modal-body" id="modal-rules-body" style="max-height:75vh;overflow-y:auto;padding:14px 18px;"></div>
+        <div class="modal-ftr">
+          <button class="btn-cancel" onclick="document.getElementById('modal-rules').style.display='none'">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FORM PANEL ===== -->
+    <div class="form-panel">
+      <div class="form-grid-2col">
+        <label class="lbl-red">Tên kỳ lương</label>
+        <div class="input-wrap" style="grid-column:2/5;">
+          <input type="text" id="kl_ten" maxlength="200" placeholder="VD: Kỳ 05/2026 - LSP MPHG">
+        </div>
+
+        <label class="lbl-red">Tháng</label>
+        <div class="input-wrap">
+          <select id="kl_thang" onchange="autoFillDateRange()">
+            <option value="">-- Chọn tháng --</option>
+            <option value="1">01</option><option value="2">02</option><option value="3">03</option>
+            <option value="4">04</option><option value="5">05</option><option value="6">06</option>
+            <option value="7">07</option><option value="8">08</option><option value="9">09</option>
+            <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+          </select>
+        </div>
+        <label>Năm</label>
+        <div class="input-wrap">
+          <input type="number" id="kl_nam" min="2020" max="2100" value="2026" style="width:100px;" onchange="autoFillDateRange()">
+        </div>
+
+        <label class="lbl-red">Từ ngày</label>
+        <div class="input-wrap"><input type="date" id="kl_tuNgay"></div>
+        <label class="lbl-red">Đến ngày</label>
+        <div class="input-wrap"><input type="date" id="kl_denNgay"></div>
+
+        <label>Bộ phận áp dụng<br><span style="font-weight:normal;color:#999;font-size:10px;">(cơ cấu)</span></label>
+        <div class="input-wrap" style="grid-column:2/5;"><div id="ms_bophan"></div></div>
+
+        <label>Nhóm TL cấp 1</label>
+        <div class="input-wrap"><div id="ms_ntl1"></div></div>
+        <label>Nhóm TL cấp 2</label>
+        <div class="input-wrap"><div id="ms_ntl2"></div></div>
+
+        <label>Nhóm TL cấp 3</label>
+        <div class="input-wrap"><div id="ms_ntl3"></div></div>
+        <label>Bộ phận tính lương (BPTL)</label>
+        <div class="input-wrap"><div id="ms_bptl"></div></div>
+
+        <label>Ghi chú</label>
+        <div class="input-wrap" style="grid-column:2/5;">
+          <input type="text" id="kl_ghichu" maxlength="500" placeholder="Ghi chú thêm (tùy chọn)">
+        </div>
+
+        <label><span class="lbl-icon">&#128188;</span> Ghi chú nghiệp vụ</label>
+        <div class="input-wrap" style="grid-column:2/5;">
+          <textarea id="kl_ghichuNghiepVu" rows="3" maxlength="1000" style="width:100%;box-sizing:border-box;resize:vertical;font-size:12px;padding:4px 6px;border:1px solid var(--color-border);"
+            placeholder="VD: Kỳ này bổ sung thưởng Tết cho toàn bộ NV BPTL Chế biến, không áp dụng cho VS."></textarea>
+        </div>
+
+        <label><span class="lbl-icon" style="color:#e67e22;">&#9888;</span> Ghi chú xử lý ngoại lệ</label>
+        <div class="input-wrap" style="grid-column:2/5;">
+          <textarea id="kl_ghichuNgoaiLe" rows="3" maxlength="1000" style="width:100%;box-sizing:border-box;resize:vertical;font-size:12px;padding:4px 6px;border:1px solid #ffd600;background:#fffbe6;"
+            placeholder="VD: NV 1022906420 được thanh toán tay ngày 15/07 do lỗi bank, cần đối chiếu."></textarea>
+        </div>
+
+        <label><span class="lbl-icon" style="color:#6c757d;">&#128295;</span> Ghi chú kỹ thuật/audit<br><span style="font-weight:normal;color:#999;font-size:10px;">(dành cho IT/dev)</span></label>
+        <div class="input-wrap" style="grid-column:2/5;">
+          <textarea id="kl_ghichuKyThuat" rows="2" maxlength="1000" style="width:100%;box-sizing:border-box;resize:vertical;font-size:12px;padding:4px 6px;border:1px solid #ccc;background:#f5f5f5;color:#495057;font-family:Consolas,monospace;"
+            placeholder="VD: Chạy lại tính lương lần 2 do phát hiện sai công thức TT_LSP_TienL2. Đã fix ở set4."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ACTIONS ===== -->
+    <div class="actions-bar">
+      <button class="btn-search" onclick="klSearch()">Tìm Kiếm</button>
+      <button class="btn-refresh" onclick="klClear()">Làm mới</button>
+      <button class="btn-save2" onclick="klSave()">Lưu / Sửa</button>
+      <button class="btn-delete" onclick="klDelete()">Xóa</button>
+      <button class="btn-export" onclick="klExport()">Xuất Excel</button>
+    </div>
+
+    <!-- ===== GRID ===== -->
+    <div class="grid-wrap" style="max-height:520px;overflow-y:auto;">
+      <table class="kl-grid">
+        <colgroup>
+          <col style="width:34px;">
+          <col style="width:42px;">
+          <col style="width:38px;">
+          <col style="width:200px;">
+          <col style="width:52px;">
+          <col style="width:95px;">
+          <col style="width:95px;">
+          <col style="width:120px;">
+          <col style="width:105px;">
+          <col style="width:105px;">
+          <col style="width:105px;">
+          <col style="width:105px;">
+          <col style="width:160px;">
+          <col style="width:95px;">
+          <col style="width:105px;">
+          <col style="width:95px;">
+          <col style="width:105px;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="kl_chkAll" onchange="toggleAll('kl_chkAll','.kl-chk')"></th>
+            <th>STT</th>
+            <th>Sửa</th>
+            <th>Tên kỳ</th>
+            <th>Tháng</th>
+            <th>Từ ngày</th>
+            <th>Đến ngày</th>
+            <th>Bộ phận áp dụng</th>
+            <th>NTL cấp 1</th>
+            <th>NTL cấp 2</th>
+            <th>NTL cấp 3</th>
+            <th>BPTL</th>
+            <th>Ghi chú</th>
+            <th>Người tạo</th>
+            <th>Ngày tạo</th>
+            <th>Người sửa</th>
+            <th>Ngày sửa</th>
+          </tr>
+        </thead>
+        <tbody id="kl-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ===== GHI CHÚ NGHIỆP VỤ ===== -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        &#128203; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="4" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;box-sizing:border-box;"
+        placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng...
+- Q1: Tháng lương có cần kèm Năm không? (default: có cả 2)
+- Q2: Bộ phận áp dụng có filter theo Công ty không? (default: không, tất cả)
+- Q3: Cho phép 2 kỳ cùng tháng khác BPTL không? (default: có)
+- Q4: Xuất Excel format thế nào? (default: alert mockup)"></textarea>
+      <div style="margin-top:10px;padding:8px 12px;background:#e7f5ff;border-left:3px solid #0d6efd;border-radius:3px;font-size:11.5px;color:#1c3a5b;">
+        &#128241;&#128188; <b>Follow-up giai đoạn 2 (ESS + Mobile):</b> Sau khi tạo kỳ + tính lương xong (set7) + khóa kỳ,
+        HR bấm <i>Publish ESS/Mobile</i> để NV xem lương/phiếu lương qua Web Dịch vụ cá nhân và Mobile app MPHG.
+        Chi tiết xem tại <a href="set7-tinhluong-thang.html#ghichu-ess-mobile" style="color:#0d6efd;font-weight:bold;">set7 &#8250; Follow-up ESS/Mobile</a>.
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script src="../shared/xlsx-export.js"></script>
+  <script>
+  'use strict';
+
+  const CURRENT_USER = 'FPT Admin';
+
+  function nowStr() {
+    var d = new Date();
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()
+      + ' ' + pad(d.getHours())+':'+pad(d.getMinutes());
+  }
+
+  // ==========================================================
+  // MOCK DATA — local cho màn này (không edit shared/mockdata.js)
+  // ==========================================================
+
+  // 1) Cơ cấu tổ chức 5 cấp: Cty > NM > PX > Ca > Bàn
+  //    Path đầy đủ tránh phải ghép nhiều lần
+  const MOCK_BOPHAN_COCAU = [
+    { ma:'MPHG',        ten:'Cty MPHG',                cap:1, parent:'' },
+    { ma:'NM_CM',       ten:'NM Cà Mau',               cap:2, parent:'MPHG' },
+    { ma:'NM_HG',       ten:'NM Hậu Giang',            cap:2, parent:'MPHG' },
+    { ma:'PX_CM_A',     ten:'PX A (NM CM)',            cap:3, parent:'NM_CM' },
+    { ma:'PX_CM_B',     ten:'PX B (NM CM)',            cap:3, parent:'NM_CM' },
+    { ma:'PX_HG_A',     ten:'PX A (NM HG)',            cap:3, parent:'NM_HG' },
+    { ma:'CA_CM_A_S',   ten:'Ca sáng (PX A - CM)',     cap:4, parent:'PX_CM_A' },
+    { ma:'CA_CM_A_C',   ten:'Ca chiều (PX A - CM)',    cap:4, parent:'PX_CM_A' },
+    { ma:'CA_CM_B_S',   ten:'Ca sáng (PX B - CM)',     cap:4, parent:'PX_CM_B' },
+    { ma:'CA_HG_A_S',   ten:'Ca sáng (PX A - HG)',     cap:4, parent:'PX_HG_A' },
+    { ma:'BAN_CB101',   ten:'Bàn CB101',               cap:5, parent:'CA_CM_A_S' },
+    { ma:'BAN_CB102',   ten:'Bàn CB102',               cap:5, parent:'CA_CM_A_S' },
+    { ma:'BAN_CB103',   ten:'Bàn CB103',               cap:5, parent:'CA_CM_A_C' },
+    { ma:'BAN_CB201',   ten:'Bàn CB201',               cap:5, parent:'CA_CM_B_S' },
+    { ma:'BAN_HG101',   ten:'Bàn HG101',               cap:5, parent:'CA_HG_A_S' },
+    { ma:'BAN_HG102',   ten:'Bàn HG102',               cap:5, parent:'CA_HG_A_S' }
+  ];
+
+  // 2) Nhóm TL 3 cấp — parent-child qua field `parent`
+  const MOCK_NHOMTL_L1 = [
+    { ma:'NTL_A', ten:'Nhóm A - Chế biến chính' },
+    { ma:'NTL_B', ten:'Nhóm B - PTO & Tẩm bột' },
+    { ma:'NTL_C', ten:'Nhóm C - Hỗ trợ' }
+  ];
+  const MOCK_NHOMTL_L2 = [
+    { ma:'NTL_A1', ten:'A1 - Sơ chế',        parent:'NTL_A' },
+    { ma:'NTL_A2', ten:'A2 - Phân cỡ',       parent:'NTL_A' },
+    { ma:'NTL_A3', ten:'A3 - Đóng gói',      parent:'NTL_A' },
+    { ma:'NTL_B1', ten:'B1 - PTO ca sáng',   parent:'NTL_B' },
+    { ma:'NTL_B2', ten:'B2 - PTO ca chiều',  parent:'NTL_B' },
+    { ma:'NTL_B3', ten:'B3 - Tẩm bột',       parent:'NTL_B' },
+    { ma:'NTL_C1', ten:'C1 - Vệ sinh',        parent:'NTL_C' },
+    { ma:'NTL_C2', ten:'C2 - Kho lạnh',       parent:'NTL_C' }
+  ];
+  const MOCK_NHOMTL_L3 = [
+    { ma:'NTL_A1a', ten:'A1a - Lặt đầu',        parent:'NTL_A1' },
+    { ma:'NTL_A1b', ten:'A1b - Bóc vỏ',         parent:'NTL_A1' },
+    { ma:'NTL_A2a', ten:'A2a - Phân size tay',  parent:'NTL_A2' },
+    { ma:'NTL_A2b', ten:'A2b - Phân size máy',  parent:'NTL_A2' },
+    { ma:'NTL_A3a', ten:'A3a - Đóng vỉ',        parent:'NTL_A3' },
+    { ma:'NTL_B1a', ten:'B1a - PTO đầu ca S',   parent:'NTL_B1' },
+    { ma:'NTL_B2a', ten:'B2a - PTO đầu ca C',   parent:'NTL_B2' },
+    { ma:'NTL_B3a', ten:'B3a - Tẩm bột lăn',    parent:'NTL_B3' },
+    { ma:'NTL_B3b', ten:'B3b - Tẩm bột nhúng',  parent:'NTL_B3' },
+    { ma:'NTL_C1a', ten:'C1a - VS khuôn viên',  parent:'NTL_C1' },
+    { ma:'NTL_C2a', ten:'C2a - Kho lạnh -18',   parent:'NTL_C2' }
+  ];
+
+  // 3) BPTL — 8 bộ phận tính lương
+  const MOCK_BPTL = [
+    { ma:'BPTL_001', ten:'PTO' },
+    { ma:'BPTL_002', ten:'Tẩm bột' },
+    { ma:'BPTL_003', ten:'Chiên' },
+    { ma:'BPTL_004', ten:'Chế biến' },
+    { ma:'BPTL_005', ten:'Sơ chế' },
+    { ma:'BPTL_006', ten:'Đóng gói' },
+    { ma:'BPTL_007', ten:'Kho lạnh' },
+    { ma:'BPTL_008', ten:'Vệ sinh' }
+  ];
+
+  // 4) Kỳ lương mẫu
+  var MOCK_KY_LUONG = [
+    {
+      id:1, ten:'Kỳ 03/2026 - LSP MPHG',       thang:3,  nam:2026,
+      tuNgay:'2026-03-01', denNgay:'2026-03-31',
+      bophan:['NM_CM','BAN_CB101','BAN_CB102'],
+      ntl1:['NTL_A'], ntl2:['NTL_A1','NTL_A2'], ntl3:['NTL_A1a'],
+      bptl:['BPTL_001','BPTL_004'],
+      ghichu:'Kỳ thử nghiệm cấu hình mới',
+      ghichuNghiepVu:'Kỳ này bổ sung thưởng Tết cho toàn bộ NV BPTL Chế biến, không áp dụng cho VS. Đã confirm với HRBP ngày 25/02/2026.',
+      ghichuNgoaiLe:'',
+      ghichuKyThuat:'',
+      nguoiTao:'FPT Admin', ngayTao:'01/03/2026 08:00', nguoiSua:'', ngaySua:''
+    },
+    {
+      id:2, ten:'Kỳ 04/2026 - LSP MPHG',       thang:4,  nam:2026,
+      tuNgay:'2026-04-01', denNgay:'2026-04-30',
+      bophan:['MPHG'],
+      ntl1:['NTL_A','NTL_B'], ntl2:[], ntl3:[],
+      bptl:['BPTL_001','BPTL_002','BPTL_004'],
+      ghichu:'',
+      ghichuNghiepVu:'',
+      ghichuNgoaiLe:'NV 1022906420 được thanh toán tay ngày 15/04 do lỗi bank, cần đối chiếu lại với KT.',
+      ghichuKyThuat:'Chạy lại tính lương lần 2 do phát hiện sai công thức TT_LSP_TienL2. Đã fix ở set4 ngày 03/04.',
+      nguoiTao:'FPT Admin', ngayTao:'01/04/2026 08:15',
+      nguoiSua:'FPT Admin', ngaySua:'03/04/2026 10:20'
+    },
+    {
+      id:3, ten:'Kỳ 05/2026 - PTO Cà Mau',     thang:5,  nam:2026,
+      tuNgay:'2026-05-01', denNgay:'2026-05-31',
+      bophan:['NM_CM'],
+      ntl1:['NTL_B'], ntl2:['NTL_B1','NTL_B2'], ntl3:['NTL_B1a','NTL_B2a'],
+      bptl:['BPTL_001'],
+      ghichu:'Kỳ riêng BPTL PTO — scope hẹp',
+      ghichuNghiepVu:'PTO Cà Mau thí điểm cách tính lương theo sản lượng thực + hệ số ca. Nếu ổn sẽ nhân rộng sang NM Hậu Giang từ Q3/2026.',
+      ghichuNgoaiLe:'',
+      ghichuKyThuat:'',
+      nguoiTao:'FPT Admin', ngayTao:'01/05/2026 07:45', nguoiSua:'', ngaySua:''
+    },
+    {
+      id:4, ten:'Kỳ 05/2026 - Vệ sinh MPHG',   thang:5,  nam:2026,
+      tuNgay:'2026-05-01', denNgay:'2026-05-31',
+      bophan:['MPHG'],
+      ntl1:['NTL_C'], ntl2:['NTL_C1'], ntl3:[],
+      bptl:['BPTL_008'],
+      ghichu:'Kỳ song song 05/2026 khác BPTL',
+      ghichuNghiepVu:'',
+      ghichuNgoaiLe:'',
+      ghichuKyThuat:'',
+      nguoiTao:'FPT Admin', ngayTao:'01/05/2026 07:50', nguoiSua:'', ngaySua:''
+    }
+  ];
+
+  // ==========================================================
+  // MULTI-SELECT COMBOBOX — pattern chip + dropdown checkbox
+  // ==========================================================
+  var MS_STATE = {}; // MS_STATE[key] = { selected:[values], options:[{v,t,parent,extra}], onChange, placeholder, disabled, showParent }
+
+  function msInit(key, cfg) {
+    MS_STATE[key] = {
+      selected: cfg.selected || [],
+      options: cfg.options || [],
+      onChange: cfg.onChange || null,
+      placeholder: cfg.placeholder || '-- Chọn --',
+      disabled: !!cfg.disabled,
+      showParent: !!cfg.showParent,
+      search: ''
+    };
+    msRender(key);
+  }
+
+  function msSetOptions(key, options) {
+    if (!MS_STATE[key]) return;
+    MS_STATE[key].options = options;
+    // Loại bỏ selected không còn trong options
+    var valid = options.map(function(o){ return o.v; });
+    MS_STATE[key].selected = MS_STATE[key].selected.filter(function(v){ return valid.indexOf(v) >= 0; });
+    msRender(key);
+  }
+
+  function msSetDisabled(key, disabled) {
+    if (!MS_STATE[key]) return;
+    MS_STATE[key].disabled = !!disabled;
+    if (disabled) msClose(key);
+    msRender(key);
+  }
+
+  function msSetSelected(key, values) {
+    if (!MS_STATE[key]) return;
+    MS_STATE[key].selected = (values || []).slice();
+    msRender(key);
+  }
+
+  function msGetSelected(key) {
+    return MS_STATE[key] ? MS_STATE[key].selected.slice() : [];
+  }
+
+  function msRender(key) {
+    var s = MS_STATE[key]; if (!s) return;
+    var host = document.getElementById('ms_' + key);
+    if (!host) return;
+
+    var chips = '';
+    var maxShow = 3;
+    var selLabels = s.selected.map(function(v){
+      var o = s.options.filter(function(x){ return x.v === v; })[0];
+      return o ? { v:v, label:o.t } : { v:v, label:v };
+    });
+    if (s.selected.length === 0) {
+      chips = '<span class="ms-placeholder">' + s.placeholder + '</span>';
+    } else {
+      selLabels.slice(0, maxShow).forEach(function(x){
+        chips += '<span class="ms-chip">' + escapeHtml(x.label)
+          + (s.disabled ? '' : ' <span class="rm" onclick="event.stopPropagation();msRemove(\''+key+'\',\''+x.v+'\')">&times;</span>')
+          + '</span>';
+      });
+      if (s.selected.length > maxShow) {
+        var moreLabels = selLabels.slice(maxShow).map(function(x){ return x.label; }).join(', ');
+        chips += '<span class="ms-chip-more" title="'+escapeHtml(moreLabels)+'">+' + (s.selected.length - maxShow) + ' khác</span>';
+      }
+    }
+
+    var dropHtml = '';
+    var openId = 'ms_' + key + '_open';
+    var isOpen = document.getElementById(openId);
+    if (isOpen && !s.disabled) {
+      var q = (s.search || '').toLowerCase().trim();
+      var items = s.options.filter(function(o){
+        if (!q) return true;
+        var hay = (o.v + ' ' + o.t + ' ' + (o.parent||'') + ' ' + (o.extra||'')).toLowerCase();
+        return hay.indexOf(q) >= 0;
+      });
+      var listHtml = '';
+      if (items.length === 0) {
+        listHtml = '<div class="ms-empty">Không có kết quả phù hợp</div>';
+      } else {
+        items.forEach(function(o){
+          var checked = s.selected.indexOf(o.v) >= 0;
+          listHtml += '<div class="ms-item' + (checked ? ' selected' : '') + '" onclick="msToggle(\''+key+'\',\''+o.v+'\')">'
+            + '<input type="checkbox"' + (checked ? ' checked' : '') + ' onclick="event.stopPropagation()">'
+            + '<span class="code">' + escapeHtml(o.v) + '</span>'
+            + '<span class="name">' + escapeHtml(o.t) + '</span>'
+            + (s.showParent && o.parent ? '<span class="parent">↑ ' + escapeHtml(o.parent) + '</span>' : '')
+            + '</div>';
+        });
+      }
+      dropHtml =
+        '<div class="ms-dropdown" onclick="event.stopPropagation()">'
+        + '<div class="ms-search"><input type="text" placeholder="Gõ để lọc..." '
+        +   'value="' + escapeHtml(s.search) + '" oninput="msSearchInput(\''+key+'\', this.value)" autofocus>'
+        + '</div>'
+        + '<div class="ms-list">' + listHtml + '</div>'
+        + '<div class="ms-footer">'
+        +   '<span>Đã chọn: <b>' + s.selected.length + '</b> / ' + s.options.length + '</span>'
+        +   '<span>'
+        +     '<button onclick="msSelectAll(\''+key+'\')">Chọn tất cả (lọc)</button>'
+        +     '<button onclick="msClear(\''+key+'\')">Bỏ tất cả</button>'
+        +   '</span>'
+        + '</div>'
+        + '</div>';
+    }
+
+    host.innerHTML =
+      '<div class="ms-wrap">'
+      + '<div class="ms-input' + (s.disabled ? ' disabled' : '') + '" '
+      +   'onclick="' + (s.disabled ? '' : 'msOpen(\''+key+'\')') + '">'
+      +   chips
+      + '</div>'
+      + '<span class="ms-caret">&#9662;</span>'
+      + dropHtml
+      + '</div>';
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function msOpen(key) {
+    if (!MS_STATE[key] || MS_STATE[key].disabled) return;
+    // Đóng dropdown khác nếu đang mở
+    Object.keys(MS_STATE).forEach(function(k){ if (k !== key) msClose(k); });
+    // Đánh dấu open bằng cách gắn 1 hidden marker (msRender check)
+    var flag = document.createElement('span');
+    flag.id = 'ms_' + key + '_open';
+    flag.style.display = 'none';
+    document.body.appendChild(flag);
+    MS_STATE[key].search = '';
+    msRender(key);
+  }
+
+  function msClose(key) {
+    var flag = document.getElementById('ms_' + key + '_open');
+    if (flag) flag.parentNode.removeChild(flag);
+    if (MS_STATE[key]) MS_STATE[key].search = '';
+    msRender(key);
+  }
+
+  function msToggle(key, val) {
+    var s = MS_STATE[key]; if (!s || s.disabled) return;
+    var i = s.selected.indexOf(val);
+    if (i >= 0) s.selected.splice(i, 1);
+    else s.selected.push(val);
+    msRender(key);
+    if (typeof s.onChange === 'function') s.onChange(s.selected.slice());
+  }
+
+  function msRemove(key, val) {
+    var s = MS_STATE[key]; if (!s || s.disabled) return;
+    var i = s.selected.indexOf(val);
+    if (i >= 0) s.selected.splice(i, 1);
+    msRender(key);
+    if (typeof s.onChange === 'function') s.onChange(s.selected.slice());
+  }
+
+  function msClear(key) {
+    var s = MS_STATE[key]; if (!s || s.disabled) return;
+    s.selected = [];
+    msRender(key);
+    if (typeof s.onChange === 'function') s.onChange([]);
+  }
+
+  function msSelectAll(key) {
+    var s = MS_STATE[key]; if (!s || s.disabled) return;
+    var q = (s.search || '').toLowerCase().trim();
+    var items = s.options.filter(function(o){
+      if (!q) return true;
+      var hay = (o.v + ' ' + o.t + ' ' + (o.parent||'')).toLowerCase();
+      return hay.indexOf(q) >= 0;
+    });
+    items.forEach(function(o){ if (s.selected.indexOf(o.v) < 0) s.selected.push(o.v); });
+    msRender(key);
+    if (typeof s.onChange === 'function') s.onChange(s.selected.slice());
+  }
+
+  function msSearchInput(key, val) {
+    if (!MS_STATE[key]) return;
+    MS_STATE[key].search = val;
+    msRender(key);
+    // Refocus search input sau khi re-render
+    setTimeout(function(){
+      var host = document.getElementById('ms_' + key);
+      if (host) {
+        var input = host.querySelector('.ms-search input');
+        if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+      }
+    }, 0);
+  }
+
+  // Click ngoài để đóng dropdown
+  document.addEventListener('mousedown', function(e){
+    Object.keys(MS_STATE).forEach(function(k){
+      var host = document.getElementById('ms_' + k);
+      if (host && !host.contains(e.target)) msClose(k);
+    });
+  });
+
+  // ==========================================================
+  // CASCADE: NTL cấp 1 → cấp 2 → cấp 3
+  // ==========================================================
+  function ntl1Options() {
+    return MOCK_NHOMTL_L1.map(function(x){ return { v:x.ma, t:x.ten }; });
+  }
+  function ntl2Options(parents) {
+    return MOCK_NHOMTL_L2
+      .filter(function(x){ return parents.indexOf(x.parent) >= 0; })
+      .map(function(x){ return { v:x.ma, t:x.ten, parent:x.parent }; });
+  }
+  function ntl3Options(parents) {
+    return MOCK_NHOMTL_L3
+      .filter(function(x){ return parents.indexOf(x.parent) >= 0; })
+      .map(function(x){ return { v:x.ma, t:x.ten, parent:x.parent }; });
+  }
+
+  function onNtl1Change(sel) {
+    // Cấp 1 có ≥1 chọn → enable cấp 2, filter options
+    if (sel.length === 0) {
+      msSetOptions('ntl2', []);
+      msSetOptions('ntl3', []);
+      msSetDisabled('ntl2', true);
+      msSetDisabled('ntl3', true);
+    } else {
+      msSetDisabled('ntl2', false);
+      msSetOptions('ntl2', ntl2Options(sel));
+      // Cascade cấp 3: nếu cấp 2 còn selection sau khi filter, giữ; else clear cấp 3
+      onNtl2Change(msGetSelected('ntl2'));
+    }
+  }
+  function onNtl2Change(sel) {
+    if (sel.length === 0) {
+      msSetOptions('ntl3', []);
+      msSetDisabled('ntl3', true);
+    } else {
+      msSetDisabled('ntl3', false);
+      msSetOptions('ntl3', ntl3Options(sel));
+    }
+  }
+
+  // ==========================================================
+  // FORM: Save / Edit / Clear / Delete / Search / Export
+  // ==========================================================
+  var _editingId = null;
+
+  function klClear() {
+    _editingId = null;
+    document.getElementById('kl_ten').value = '';
+    document.getElementById('kl_thang').value = '';
+    document.getElementById('kl_nam').value = '2026';
+    document.getElementById('kl_tuNgay').value = '';
+    document.getElementById('kl_denNgay').value = '';
+    document.getElementById('kl_ghichu').value = '';
+    document.getElementById('kl_ghichuNghiepVu').value = '';
+    document.getElementById('kl_ghichuNgoaiLe').value = '';
+    document.getElementById('kl_ghichuKyThuat').value = '';
+    msSetSelected('bophan', []);
+    msSetSelected('ntl1', []);
+    msSetSelected('ntl2', []);
+    msSetSelected('ntl3', []);
+    msSetSelected('bptl', []);
+    onNtl1Change([]);
+    // Reset data-date cho date inputs
+    document.querySelectorAll('#kl_tuNgay, #kl_denNgay').forEach(function(i){ i.setAttribute('data-date',''); });
+    var alertBox = document.getElementById('kl-alert');
+    if (alertBox) alertBox.style.display = 'none';
+  }
+
+  function klSave() {
+    var ten = document.getElementById('kl_ten').value.trim();
+    var thang = parseInt(document.getElementById('kl_thang').value, 10);
+    var nam = parseInt(document.getElementById('kl_nam').value, 10);
+    var tuNgay = document.getElementById('kl_tuNgay').value;
+    var denNgay = document.getElementById('kl_denNgay').value;
+    var ghichu = document.getElementById('kl_ghichu').value.trim();
+    var ghichuNghiepVu = document.getElementById('kl_ghichuNghiepVu').value.trim();
+    var ghichuNgoaiLe  = document.getElementById('kl_ghichuNgoaiLe').value.trim();
+    var ghichuKyThuat  = document.getElementById('kl_ghichuKyThuat').value.trim();
+
+    var bophan = msGetSelected('bophan');
+    var ntl1 = msGetSelected('ntl1');
+    var ntl2 = msGetSelected('ntl2');
+    var ntl3 = msGetSelected('ntl3');
+    var bptl = msGetSelected('bptl');
+
+    // Validation blocking
+    if (!ten) return showAlert('kl-alert', '<b>Lỗi:</b> Vui lòng nhập <b>Tên kỳ lương</b>.', 'error', 0);
+    if (!thang || thang < 1 || thang > 12)
+      return showAlert('kl-alert', '<b>Lỗi:</b> Vui lòng chọn <b>Tháng</b> (1-12).', 'error', 0);
+    if (!nam || nam < 2020 || nam > 2100)
+      return showAlert('kl-alert', '<b>Lỗi:</b> <b>Năm</b> không hợp lệ (2020-2100).', 'error', 0);
+    if (!tuNgay) return showAlert('kl-alert', '<b>Lỗi:</b> Vui lòng chọn <b>Từ ngày</b>.', 'error', 0);
+    if (!denNgay) return showAlert('kl-alert', '<b>Lỗi:</b> Vui lòng chọn <b>Đến ngày</b>.', 'error', 0);
+    if (new Date(denNgay) < new Date(tuNgay))
+      return showAlert('kl-alert', '<b>Lỗi:</b> <b>Đến ngày</b> phải &ge; <b>Từ ngày</b>.', 'error', 0);
+
+    // Duplicate tên kỳ (case-insensitive)
+    var dupe = MOCK_KY_LUONG.filter(function(r){
+      return r.ten.toLowerCase() === ten.toLowerCase() && r.id !== _editingId;
+    });
+    if (dupe.length > 0)
+      return showAlert('kl-alert', '<b>Lỗi:</b> Tên kỳ [<i>'+escapeHtml(ten)+'</i>] đã tồn tại. Vui lòng đổi tên khác.', 'error', 0);
+
+    // Scope: ít nhất 1 BP HOẶC 1 NTL cấp 1
+    if (bophan.length === 0 && ntl1.length === 0)
+      return showAlert('kl-alert', '<b>Lỗi:</b> Phải chọn ít nhất 1 <b>Bộ phận áp dụng</b> HOẶC 1 <b>Nhóm TL cấp 1</b> để xác định scope tính lương.', 'error', 0);
+
+    if (_editingId != null) {
+      // Update
+      var row = MOCK_KY_LUONG.filter(function(r){ return r.id === _editingId; })[0];
+      if (row) {
+        row.ten = ten; row.thang = thang; row.nam = nam;
+        row.tuNgay = tuNgay; row.denNgay = denNgay;
+        row.bophan = bophan; row.ntl1 = ntl1; row.ntl2 = ntl2; row.ntl3 = ntl3; row.bptl = bptl;
+        row.ghichu = ghichu;
+        row.ghichuNghiepVu = ghichuNghiepVu;
+        row.ghichuNgoaiLe  = ghichuNgoaiLe;
+        row.ghichuKyThuat  = ghichuKyThuat;
+        row.nguoiSua = CURRENT_USER; row.ngaySua = nowStr();
+      }
+      showAlert('kl-alert', 'Đã cập nhật kỳ lương [<b>'+escapeHtml(ten)+'</b>] thành công.', 'success');
+    } else {
+      var newId = MOCK_KY_LUONG.reduce(function(mx,r){ return r.id>mx?r.id:mx; }, 0) + 1;
+      MOCK_KY_LUONG.push({
+        id: newId, ten: ten, thang: thang, nam: nam,
+        tuNgay: tuNgay, denNgay: denNgay,
+        bophan: bophan, ntl1: ntl1, ntl2: ntl2, ntl3: ntl3, bptl: bptl,
+        ghichu: ghichu,
+        ghichuNghiepVu: ghichuNghiepVu,
+        ghichuNgoaiLe:  ghichuNgoaiLe,
+        ghichuKyThuat:  ghichuKyThuat,
+        nguoiTao: CURRENT_USER, ngayTao: nowStr(),
+        nguoiSua: '', ngaySua: ''
+      });
+      showAlert('kl-alert', 'Đã tạo kỳ lương [<b>'+escapeHtml(ten)+'</b>] thành công.', 'success');
+    }
+
+    renderGrid();
+    klClear();
+  }
+
+  function klEdit(id) {
+    var row = MOCK_KY_LUONG.filter(function(r){ return r.id === id; })[0];
+    if (!row) return;
+    _editingId = id;
+    document.getElementById('kl_ten').value = row.ten;
+    document.getElementById('kl_thang').value = row.thang;
+    document.getElementById('kl_nam').value = row.nam;
+    document.getElementById('kl_tuNgay').value = row.tuNgay;
+    document.getElementById('kl_denNgay').value = row.denNgay;
+    document.getElementById('kl_ghichu').value = row.ghichu || '';
+    document.getElementById('kl_ghichuNghiepVu').value = row.ghichuNghiepVu || '';
+    document.getElementById('kl_ghichuNgoaiLe').value  = row.ghichuNgoaiLe  || '';
+    document.getElementById('kl_ghichuKyThuat').value  = row.ghichuKyThuat  || '';
+
+    msSetSelected('bophan', row.bophan || []);
+    msSetSelected('ntl1', row.ntl1 || []);
+    // Cascade: reset cấp 2/3, sau đó enable + set nếu có parent
+    if ((row.ntl1||[]).length > 0) {
+      msSetDisabled('ntl2', false);
+      msSetOptions('ntl2', ntl2Options(row.ntl1));
+      msSetSelected('ntl2', row.ntl2 || []);
+      if ((row.ntl2||[]).length > 0) {
+        msSetDisabled('ntl3', false);
+        msSetOptions('ntl3', ntl3Options(row.ntl2));
+        msSetSelected('ntl3', row.ntl3 || []);
+      } else {
+        msSetOptions('ntl3', []);
+        msSetDisabled('ntl3', true);
+      }
+    } else {
+      msSetOptions('ntl2', []);
+      msSetDisabled('ntl2', true);
+      msSetOptions('ntl3', []);
+      msSetDisabled('ntl3', true);
+    }
+    msSetSelected('bptl', row.bptl || []);
+
+    // Trigger data-date để hiển thị format dd/mm/yyyy
+    ['kl_tuNgay','kl_denNgay'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el && el.value) el.dispatchEvent(new Event('change'));
+    });
+
+    window.scrollTo(0, 0);
+    showAlert('kl-alert', 'Đang sửa kỳ [<b>'+escapeHtml(row.ten)+'</b>]. Nhấn <b>Lưu / Sửa</b> để cập nhật hoặc <b>Làm mới</b> để hủy.', 'warning');
+  }
+
+  function klDelete() {
+    var chks = document.querySelectorAll('.kl-chk:checked');
+    if (chks.length === 0)
+      return showAlert('kl-alert', '<b>Lưu ý:</b> Vui lòng chọn ít nhất 1 kỳ (tick checkbox) để xóa.', 'warning', 0);
+    if (!confirm('Bạn có chắc muốn xóa ' + chks.length + ' kỳ lương đã chọn?')) return;
+    var idsToRemove = [];
+    chks.forEach(function(c){ idsToRemove.push(parseInt(c.getAttribute('data-id'), 10)); });
+    MOCK_KY_LUONG = MOCK_KY_LUONG.filter(function(r){ return idsToRemove.indexOf(r.id) < 0; });
+    renderGrid();
+    showAlert('kl-alert', 'Đã xóa ' + idsToRemove.length + ' kỳ lương.', 'success');
+    // Nếu đang sửa 1 dòng trong nhóm xóa → clear form
+    if (idsToRemove.indexOf(_editingId) >= 0) klClear();
+  }
+
+  function klSearch() {
+    var keyword = document.getElementById('kl_ten').value.trim().toLowerCase();
+    var thang = document.getElementById('kl_thang').value;
+    var filtered = MOCK_KY_LUONG.filter(function(r){
+      if (keyword && r.ten.toLowerCase().indexOf(keyword) < 0) return false;
+      if (thang && String(r.thang) !== String(thang)) return false;
+      return true;
+    });
+    renderGrid(filtered);
+    showAlert('kl-alert', 'Tìm được <b>'+filtered.length+'</b> kỳ khớp bộ lọc.', 'success');
+  }
+
+  // ==========================================================
+  // AUTO-FILL Từ ngày / Đến ngày theo Tháng + Năm
+  //   - Nếu 1 trong 2 field đang RỖNG → fill cả 2.
+  //   - Nếu cả 2 đang mang giá trị "day-1 → last-day" của 1 tháng nào đó
+  //     (dấu vết auto-fill trước đó) → override an toàn.
+  //   - Nếu user đã sửa tay (không match pattern trên) → GIỮ NGUYÊN,
+  //     hiện gợi ý nhỏ để user tự bấm nút "🔄 Tự tính" nếu muốn.
+  //   Rule: hỗ trợ case cross-month (kỳ retro) đã document trong Quy tắc.
+  // ==========================================================
+  function _isAutoFilledRange(from, to) {
+    if (!from || !to) return false;
+    var pf = from.split('-'), pt = to.split('-');
+    if (pf.length !== 3 || pt.length !== 3) return false;
+    if (pf[0] !== pt[0] || pf[1] !== pt[1]) return false; // khác tháng/năm → user tự đặt
+    if (pf[2] !== '01') return false;
+    var y = parseInt(pf[0], 10), m = parseInt(pf[1], 10);
+    var last = new Date(y, m, 0).getDate();
+    return parseInt(pt[2], 10) === last;
+  }
+
+  function _computeRange(nam, thang) {
+    var lastDay = new Date(nam, thang, 0).getDate();
+    var mm = String(thang).padStart(2, '0');
+    return {
+      from: nam + '-' + mm + '-01',
+      to:   nam + '-' + mm + '-' + String(lastDay).padStart(2, '0')
+    };
+  }
+
+  function autoFillDateRange() {
+    var thang = parseInt(document.getElementById('kl_thang').value, 10);
+    var nam   = parseInt(document.getElementById('kl_nam').value, 10);
+    if (!thang || !nam) return;
+    var elFrom = document.getElementById('kl_tuNgay');
+    var elTo   = document.getElementById('kl_denNgay');
+    var curFrom = elFrom.value, curTo = elTo.value;
+
+    var bothEmpty      = !curFrom && !curTo;
+    var wasAutoFilled  = _isAutoFilledRange(curFrom, curTo);
+
+    if (!bothEmpty && !wasAutoFilled) {
+      // User đã sửa tay (VD: cross-month cho kỳ retro) → không override
+      showAlert('kl-alert',
+        '<b>Chú ý:</b> Đã đổi Tháng/Năm nhưng <b>Từ/Đến ngày</b> đang do bạn set tay ('
+        + fmtDateISO(curFrom) + ' → ' + fmtDateISO(curTo) + ') — không auto override.<br>'
+        + 'Nếu muốn reset về full tháng, hãy xóa 1 trong 2 ô rồi đổi lại Tháng.',
+        'warning', 4000);
+      return;
+    }
+
+    var r = _computeRange(nam, thang);
+    elFrom.value = r.from;
+    elTo.value   = r.to;
+  }
+
+  function klExport() {
+    // Build data enriched — map array mã code → chuỗi "Mã - Tên" cho readable.
+    var joinLabel = function (arr, labelFn) {
+      if (!arr || arr.length === 0) return '';
+      return arr.map(function (m) { return m + ' - ' + labelFn(m); }).join('; ');
+    };
+    var data = MOCK_KY_LUONG.map(function (r) {
+      return {
+        ten:     r.ten,
+        thang:   String(r.thang).padStart(2, '0'),
+        nam:     r.nam,
+        tuNgay:  fmtDateISO(r.tuNgay),
+        denNgay: fmtDateISO(r.denNgay),
+        bpApDung: joinLabel(r.bophan, labelBoPhan),
+        ntlCap1: joinLabel(r.ntl1, function (m) { return labelNtl(m, MOCK_NHOMTL_L1); }),
+        ntlCap2: joinLabel(r.ntl2, function (m) { return labelNtl(m, MOCK_NHOMTL_L2); }),
+        ntlCap3: joinLabel(r.ntl3, function (m) { return labelNtl(m, MOCK_NHOMTL_L3); }),
+        bptl:    joinLabel(r.bptl, labelBptl),
+        ghiChu:  r.ghichu || '',
+        ghiChuNghiepVu: r.ghichuNghiepVu || '',
+        ghiChuNgoaiLe:  r.ghichuNgoaiLe  || '',
+        nguoiTao: r.nguoiTao || '', ngayTao: r.ngayTao || '',
+        nguoiSua: r.nguoiSua || '', ngaySua: r.ngaySua || ''
+      };
+    });
+
+    if (typeof XLSXExport === 'undefined') {
+      alert('Helper XLSXExport chưa load. Vui lòng reload trang.');
+      return;
+    }
+    XLSXExport.export({
+      filename: 'DanhSach_KyLuong_' + new Date().toISOString().slice(0, 10),
+      sheetName: 'Kỳ lương',
+      columns: [
+        { key: 'ten',            header: 'Tên kỳ',         width: 32 },
+        { key: 'thang',          header: 'Tháng',          width: 8  },
+        { key: 'nam',            header: 'Năm',            width: 8  },
+        { key: 'tuNgay',         header: 'Từ ngày',        width: 12 },
+        { key: 'denNgay',        header: 'Đến ngày',       width: 12 },
+        { key: 'bpApDung',       header: 'BP áp dụng',     width: 40 },
+        { key: 'ntlCap1',        header: 'NTL Cấp 1',      width: 24 },
+        { key: 'ntlCap2',        header: 'NTL Cấp 2',      width: 30 },
+        { key: 'ntlCap3',        header: 'NTL Cấp 3',      width: 30 },
+        { key: 'bptl',           header: 'BPTL',           width: 30 },
+        { key: 'ghiChu',         header: 'Ghi chú',        width: 40 },
+        { key: 'ghiChuNghiepVu', header: 'GC nghiệp vụ',   width: 40 },
+        { key: 'ghiChuNgoaiLe',  header: 'GC ngoại lệ',    width: 40 },
+        { key: 'nguoiTao',       header: 'Người tạo',      width: 14 },
+        { key: 'ngayTao',        header: 'Ngày tạo',       width: 16 },
+        { key: 'nguoiSua',       header: 'Người sửa',      width: 14 },
+        { key: 'ngaySua',        header: 'Ngày sửa',       width: 16 }
+      ],
+      data: data
+    });
+    showAlert('kl-alert', 'Đang xuất <b>' + data.length + '</b> kỳ lương ra Excel...', 'success');
+  }
+
+  // ==========================================================
+  // GRID RENDER
+  // ==========================================================
+  function labelBoPhan(ma) {
+    var x = MOCK_BOPHAN_COCAU.filter(function(o){ return o.ma === ma; })[0];
+    return x ? x.ten : ma;
+  }
+  function labelNtl(ma, arr) {
+    var x = arr.filter(function(o){ return o.ma === ma; })[0];
+    return x ? x.ten : ma;
+  }
+  function labelBptl(ma) {
+    var x = MOCK_BPTL.filter(function(o){ return o.ma === ma; })[0];
+    return x ? x.ten : ma;
+  }
+
+  function badgeCell(arr, labelFn) {
+    if (!arr || arr.length === 0) return '<span class="kl-badge-empty">—</span>';
+    var full = arr.map(function(m){ return m + ' - ' + labelFn(m); }).join('\n');
+    var label = arr.length + ' items';
+    if (arr.length === 1) label = arr[0];
+    return '<span class="kl-badge" title="'+escapeHtml(full)+'">'+escapeHtml(label)+'</span>';
+  }
+
+  function fmtDateISO(s) {
+    if (!s) return '';
+    var p = s.split('-');
+    return p.length === 3 ? (p[2]+'/'+p[1]+'/'+p[0]) : s;
+  }
+
+  function ghiChuIconCell(r) {
+    var items = [
+      { lbl:'Ghi chú',        v:(r.ghichu||'').trim() },
+      { lbl:'Nghiệp vụ',      v:(r.ghichuNghiepVu||'').trim() },
+      { lbl:'Ngoại lệ',       v:(r.ghichuNgoaiLe||'').trim() },
+      { lbl:'Kỹ thuật/audit', v:(r.ghichuKyThuat||'').trim() }
+    ].filter(function(x){ return x.v.length > 0; });
+    if (items.length === 0) return '<span class="kl-badge-empty">—</span>';
+    var tip = items.map(function(x){
+      var preview = x.v.length > 100 ? x.v.slice(0,100) + '…' : x.v;
+      return '• ' + x.lbl + ': ' + preview;
+    }).join('\n');
+    return '<span class="kl-badge" style="cursor:help;" title="'+escapeHtml(tip)+'">&#128196; '+items.length+'</span>';
+  }
+
+  function renderGrid(data) {
+    var tbody = document.getElementById('kl-tbody');
+    var rows = data || MOCK_KY_LUONG;
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="17" style="text-align:center;color:#999;font-style:italic;padding:20px;">Không có kỳ lương nào.</td></tr>';
+      return;
+    }
+    var html = '';
+    rows.forEach(function(r, i){
+      html += '<tr>'
+        + '<td><input type="checkbox" class="kl-chk" data-id="'+r.id+'"></td>'
+        + '<td>'+(i+1)+'</td>'
+        + '<td><span class="edit-icon" onclick="klEdit('+r.id+')">&#9998;</span></td>'
+        + '<td style="text-align:left;" title="'+escapeHtml(r.ten)+'"><b>'+escapeHtml(r.ten)+'</b></td>'
+        + '<td>'+String(r.thang).padStart(2,'0')+'/'+r.nam+'</td>'
+        + '<td>'+fmtDateISO(r.tuNgay)+'</td>'
+        + '<td>'+fmtDateISO(r.denNgay)+'</td>'
+        + '<td>'+badgeCell(r.bophan, labelBoPhan)+'</td>'
+        + '<td>'+badgeCell(r.ntl1, function(m){ return labelNtl(m, MOCK_NHOMTL_L1); })+'</td>'
+        + '<td>'+badgeCell(r.ntl2, function(m){ return labelNtl(m, MOCK_NHOMTL_L2); })+'</td>'
+        + '<td>'+badgeCell(r.ntl3, function(m){ return labelNtl(m, MOCK_NHOMTL_L3); })+'</td>'
+        + '<td>'+badgeCell(r.bptl, labelBptl)+'</td>'
+        + '<td style="text-align:center;">'+ghiChuIconCell(r)+'</td>'
+        + '<td>'+escapeHtml(r.nguoiTao||'')+'</td>'
+        + '<td>'+escapeHtml(r.ngayTao||'')+'</td>'
+        + '<td>'+escapeHtml(r.nguoiSua||'')+'</td>'
+        + '<td>'+escapeHtml(r.ngaySua||'')+'</td>'
+        + '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  // ==========================================================
+  // QUY TẮC NGHIỆP VỤ (modal)
+  // ==========================================================
+  var RULES = [
+    { loai:'Khái niệm',
+      text:'&#8226; <b>Kỳ lương</b> là scope tính lương cho 1 khoảng thời gian, giới hạn theo <b>Bộ phận áp dụng</b> (cơ cấu 5 cấp), <b>Nhóm TL 3 cấp</b> và/hoặc <b>BPTL</b>.<br>'
+        + '&#8226; Tên kỳ đề xuất: <code>Kỳ MM/YYYY - [Scope]</code>. VD: <code>Kỳ 05/2026 - LSP MPHG</code>.<br>'
+        + '&#8226; Kỳ được dùng làm filter mặc định trong các màn hình <i>Tính lương SP</i>, <i>Bình quân TLSP</i>, <i>Bảng tính lương</i>.'
+    },
+    { loai:'Bắt buộc (Blocking)',
+      text:'&#8226; <b>Tên kỳ, Tháng, Năm, Từ ngày, Đến ngày</b>: bắt buộc.<br>'
+        + '&#8226; <b>Đến ngày</b> phải &ge; <b>Từ ngày</b>.<br>'
+        + '&#8226; <b>Tên kỳ</b> không trùng (case-insensitive).<br>'
+        + '&#8226; Phải chọn ít nhất <b>1 Bộ phận áp dụng</b> HOẶC <b>1 Nhóm TL cấp 1</b> để đảm bảo scope tính lương xác định.'
+    },
+    { loai:'Cascade Nhóm TL 3 cấp',
+      text:'&#8226; <b>Cấp 1</b> luôn enabled.<br>'
+        + '&#8226; <b>Cấp 2</b> enabled khi cấp 1 có ≥1 chọn; options filter theo cấp 1 đã chọn (parent-child).<br>'
+        + '&#8226; <b>Cấp 3</b> enabled khi cấp 2 có ≥1 chọn; options filter theo cấp 2 đã chọn.<br>'
+        + '&#8226; Khi clear cấp 1 → tự động clear cấp 2 + cấp 3. Tương tự cascade cấp 2 → cấp 3.'
+    },
+    { loai:'Bộ phận áp dụng (cơ cấu 5 cấp)',
+      text:'&#8226; Hierarchy: <code>Cty MPHG → Nhà máy → Phân xưởng → Ca → Bàn</code>.<br>'
+        + '&#8226; Có thể chọn nhiều item ở nhiều cấp (mix). VD: chọn <code>NM_CM</code> + 2 bàn cụ thể <code>BAN_HG101</code>/<code>BAN_HG102</code>.<br>'
+        + '&#8226; Nếu chọn 1 cấp cao (VD Cty) → toàn bộ children thuộc cấp đó được coi là "áp dụng" (engine mở rộng cấp con khi tính lương). <b>Note</b>: mockup không hiện tick tự động cấp con — BA cần xác nhận rule khi triển khai.'
+    },
+    { loai:'Song song 2 kỳ cùng tháng',
+      text:'&#8226; Cho phép 2 kỳ cùng tháng khác BPTL — hiện chỉ check trùng tên kỳ, KHÔNG check overlap scope.<br>'
+        + '&#8226; <b>Red flag</b>: nếu 1 NV thuộc cả 2 BPTL đồng thời, có thể bị tính lương 2 lần. Cần rule "scope không overlap" khi triển khai thật.'
+    },
+    { loai:'Cross-month case',
+      text:'&#8226; Cho phép Từ ngày/Đến ngày vượt qua tháng đã chọn (VD Tháng=5 nhưng Từ ngày=15/04). Dùng cho kỳ trễ, kỳ retro.<br>'
+        + '&#8226; Không có validation warning — BA cần xem xét từng case cụ thể.'
+    },
+    { loai:'Best practice',
+      text:'&#8226; Đặt tên kỳ theo pattern <code>Kỳ MM/YYYY - [Scope]</code> để dễ filter báo cáo.<br>'
+        + '&#8226; Nếu có nhiều BPTL độc lập → nên <b>tách kỳ theo BPTL</b> để tránh scope lồng nhau, dễ audit và mở khóa từng phần.<br>'
+        + '&#8226; Chỉ chọn <b>Cấp 3</b> khi thật sự cần scope hẹp; đa số case chỉ dùng cấp 1 + BPTL là đủ.<br>'
+        + '&#8226; Ghi chú kỳ nên nêu rõ mục đích (test / chính thức / retro) để người khác hiểu.'
+    },
+    { loai:'Chú ý',
+      text:'&#8226; Đây là màn hình <b>mở rộng</b> so với <code>pg1 - Tạo kỳ Lương Sản Phẩm</code>. Nếu chỉ cần tạo kỳ đơn giản (2 combo Nhóm lương + Nhóm TL), dùng <code>pg1</code>.<br>'
+        + '&#8226; Xóa kỳ chỉ xóa metadata; nếu đã có phiên tính lương gắn với kỳ, cần xử lý riêng (chưa cover trong màn này).'
+    }
+  ];
+
+  function showRules() {
+    var html = '<table class="ref-table" style="table-layout:fixed;width:100%;"><thead><tr>'
+      + '<th style="width:22%;">Loại</th><th>Chi tiết</th></tr></thead><tbody>';
+    RULES.forEach(function(r){
+      var color = r.loai.indexOf('Blocking') >= 0 ? '#dc3545'
+        : r.loai === 'Cascade Nhóm TL 3 cấp' ? '#0056b3'
+        : r.loai.indexOf('Song song') >= 0 ? '#e67e22'
+        : r.loai === 'Best practice' ? '#28a745'
+        : r.loai === 'Chú ý' ? '#6f42c1'
+        : '#6c757d';
+      html += '<tr><td><b style="color:'+color+'">'+r.loai+'</b></td><td>'+r.text+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('modal-rules-body').innerHTML = html;
+    document.getElementById('modal-rules').style.display = 'flex';
+  }
+
+  // ==========================================================
+  // INIT
+  // ==========================================================
+  function initAll() {
+    // 1) Bộ phận áp dụng — hiển thị "Cấp N: Tên (parent)" để phân biệt
+    var bpOptions = MOCK_BOPHAN_COCAU.map(function(x){
+      var prefix = ['','', '· ', '· · ', '· · · ', '· · · · '][x.cap] || '';
+      return { v:x.ma, t:prefix + x.ten + ' [cấp ' + x.cap + ']', parent: x.parent };
+    });
+    msInit('bophan', {
+      options: bpOptions, placeholder: '-- Chọn bộ phận (multi-select) --', showParent: true
+    });
+
+    // 2) Nhóm TL cấp 1
+    msInit('ntl1', {
+      options: ntl1Options(), placeholder: '-- Chọn Nhóm TL cấp 1 --', onChange: onNtl1Change
+    });
+    // 3) Nhóm TL cấp 2 — disabled ban đầu
+    msInit('ntl2', {
+      options: [], placeholder: '(chọn cấp 1 trước)', onChange: onNtl2Change, disabled: true, showParent: true
+    });
+    // 4) Nhóm TL cấp 3 — disabled ban đầu
+    msInit('ntl3', {
+      options: [], placeholder: '(chọn cấp 2 trước)', disabled: true, showParent: true
+    });
+    // 5) BPTL
+    msInit('bptl', {
+      options: MOCK_BPTL.map(function(x){ return { v:x.ma, t:x.ten }; }),
+      placeholder: '-- Chọn BPTL (multi-select) --'
+    });
+
+    renderGrid();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
+  </script>
+</body>
+</html>

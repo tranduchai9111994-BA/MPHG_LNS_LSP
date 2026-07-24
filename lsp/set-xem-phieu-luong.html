@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Xem phiếu lương (Telerik-style preview)</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* ================== PAGE HEADER + QUY TAC BUTTON ================== */
+    .page-title-row { position:relative; text-align:center; }
+    .btn-quy-tac {
+      position:absolute; right:0; top:50%; transform:translateY(-50%);
+      background:#6f42c1; color:#fff; border:none; border-radius:4px;
+      padding:6px 14px; font-size:12px; font-weight:bold; cursor:pointer;
+    }
+    .btn-quy-tac:hover { background:#5a349a; }
+
+    /* ================== FILTER PANEL ================== */
+    .xpl-filter { display: grid; grid-template-columns: 110px 1fr 110px 1fr 110px 1fr; gap: 8px 12px; align-items: center; padding: 10px 12px; }
+    .xpl-filter label { font-size: 12px; color: #333; text-align: right; }
+    .xpl-filter label.lbl-red { color: #d32f2f; font-weight: bold; }
+    .xpl-filter select, .xpl-filter input[type="text"] { width: 100%; height: 28px; padding: 3px 6px; border: 1px solid #ccc; font-size: 12px; }
+    .xpl-actions { display: flex; gap: 8px; justify-content: center; margin: 10px 0 6px 0; flex-wrap: wrap; }
+    .xpl-actions button { padding: 7px 18px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: #fff; }
+    .btn-xem { background: #28a745; }
+    .btn-xem:hover { background: #218838; }
+
+    /* ================== TELERIK-STYLE VIEWER ================== */
+    .telerik-viewer { background: #eaeaea; border: 1px solid #b0b0b0; padding: 0; margin-top: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+    .telerik-toolbar { background: linear-gradient(#f0f0f0, #d9d9d9); border-bottom: 1px solid #a0a0a0; padding: 5px 10px; display: flex; gap: 6px; align-items: center; font-size: 11px; }
+    .telerik-toolbar button { background: #fff; border: 1px solid #b0b0b0; border-radius: 2px; padding: 3px 10px; font-size: 11px; cursor: pointer; color: #333; }
+    .telerik-toolbar button:hover:not(:disabled) { background: #e6f2ff; border-color: #0056b3; }
+    .telerik-toolbar button:disabled { color: #aaa; cursor: not-allowed; background: #f5f5f5; }
+    .telerik-toolbar .tb-sep { width: 1px; height: 18px; background: #a0a0a0; margin: 0 4px; }
+    .telerik-toolbar .tb-zoom { display: flex; gap: 2px; align-items: center; }
+    .telerik-toolbar .tb-info { margin-left: auto; color: #555; font-size: 10px; font-style: italic; }
+    .telerik-toolbar .page-indicator { font-weight: bold; padding: 0 8px; }
+
+    .telerik-canvas { background: #eaeaea; padding: 20px; min-height: 400px; display: flex; flex-direction: column; align-items: center; overflow: auto; }
+    .telerik-empty { color: #888; font-size: 14px; padding: 60px 20px; text-align: center; }
+
+    /* ================== A4 PHIẾU LƯƠNG PAGE ================== */
+    .phieu-lung-page {
+      background: #fff; width: 794px; min-height: 1123px; padding: 30px 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: "Times New Roman", Times, serif;
+      color: #000; font-size: 12px; line-height: 1.35; box-sizing: border-box;
+      margin-bottom: 20px; position: relative;
+    }
+    /* Multi-page: chỉ show trang active khi preview; khi print show tất cả */
+    .phieu-lung-page:not(.active) { display: none; }
+
+    .pl-header { display: grid; grid-template-columns: 60px 130px 1fr; gap: 10px; align-items: center; padding-bottom: 6px; }
+    .pl-logo { width: 55px; height: auto; border: 1px solid #ddd; background: #fafafa; display: block; }
+    .pl-brand-text { text-align: left; }
+    .pl-brand-name { color: #d32f2f; font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+    .pl-brand-tagline { color: #d32f2f; font-size: 8px; letter-spacing: 3px; }
+    .pl-corp { text-align: center; font-weight: bold; font-size: 13px; line-height: 1.4; }
+
+    .pl-title { text-align: center; font-size: 15px; font-weight: bold; margin: 12px 0 14px 0; letter-spacing: 0.5px; }
+    .pl-title .ph { color: #0056b3; }
+
+    .pl-meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 10px; font-size: 12px; }
+    .pl-meta-row .pl-mlabel { display: inline-block; min-width: 90px; }
+    .pl-meta-row .pl-mval { font-weight: bold; }
+
+    .pl-detail-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 11px; }
+    .pl-detail-table th, .pl-detail-table td { border: 1px solid #000; padding: 4px 6px; }
+    .pl-detail-table thead th { background: #fff3cd; text-align: center; font-weight: bold; }
+    .pl-detail-table thead tr:nth-child(2) th { background: #fff8dc; font-size: 10px; }
+    .pl-detail-table td.c-label { text-align: left; }
+    .pl-detail-table td.c-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .pl-detail-table td.c-money { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+    .pl-detail-table td.c-full { text-align: right; font-weight: bold; }
+    .pl-detail-table td.c-full-label { text-align: left; font-weight: bold; font-style: italic; }
+
+    .pl-section-title { font-weight: bold; margin: 10px 0 4px 0; font-size: 12px; }
+    .pl-2col-list { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 20px; font-size: 11px; padding: 2px 0; }
+    .pl-2col-list .pl-item { display: grid; grid-template-columns: 24px 1fr auto 30px; gap: 4px; align-items: baseline; }
+    .pl-2col-list .pl-idx { text-align: right; }
+    .pl-2col-list .pl-name { color: #000; }
+    .pl-2col-list .pl-val { text-align: right; font-weight: bold; font-variant-numeric: tabular-nums; }
+    .pl-2col-list .pl-unit { color: #333; }
+
+    .pl-total-row {
+      background: #fff3cd; border: 1px solid #000; padding: 6px 10px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: bold; margin: 8px 0; font-size: 12px;
+    }
+    .pl-total-row .pl-val { color: #d32f2f; font-size: 13px; font-variant-numeric: tabular-nums; }
+
+    .pl-tien-nhan-row {
+      background: #fff8dc; border: 1px solid #000; padding: 6px 10px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+      font-weight: bold; margin: 6px 0; font-size: 12px;
+    }
+    .pl-tien-nhan-row .pl-val { font-weight: bold; color: #b8860b; }
+
+    .pl-footer-note { margin-top: 10px; padding-top: 6px; text-align: center; font-size: 10px; font-style: italic; border-top: 1px solid #ccc; }
+    .pl-footer-note .sgf { display: block; background: #ffe066; margin-top: 6px; padding: 6px; font-weight: bold; font-style: normal; letter-spacing: 3px; font-size: 12px; }
+
+    /* ================== PRINT ================== */
+    @media print {
+      body * { visibility: hidden; }
+      .telerik-canvas, .telerik-canvas * { visibility: visible; }
+      .telerik-canvas { position: absolute; left: 0; top: 0; padding: 0; background: #fff; }
+      .phieu-lung-page {
+        display: block !important;     /* Bỏ ẩn — in tất cả trang */
+        box-shadow: none; margin: 0 auto;
+        page-break-after: always;
+        transform: none !important;    /* Bỏ zoom */
+      }
+      .phieu-lung-page:last-child { page-break-after: auto; }
+      .telerik-toolbar { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Phiếu lương › Xem phiếu lương (preview)</div>
+    <div class="page-title page-title-row">
+      <span>XEM PHIẾU LƯƠNG — TELERIK-STYLE PREVIEW</span>
+      <button class="btn-quy-tac" onclick="openQuyTacModal()">❓ Quy tắc</button>
+    </div>
+
+    <div class="info-bar" style="margin-bottom:10px;">
+      📄 <b>Mỗi dòng lương = 1 phiếu = 1 trang A4</b>. NV có N dòng → viewer hiện N trang, dùng ◀/▶ để chuyển. Data per-row lấy từ <b>set7 (Tính lương)</b>. Chi tiết quy tắc → bấm <b>❓ Quy tắc</b> ở góc phải.
+    </div>
+
+    <div id="alertBox" class="alert-box"></div>
+
+    <!-- ================== FILTER ================== -->
+    <div class="form-panel">
+      <div class="xpl-filter">
+        <label class="lbl-red">Kỳ lương</label>
+        <select id="fltKy"></select>
+
+        <label class="lbl-red">Template PL</label>
+        <select id="fltTemplate"></select>
+
+        <label class="lbl-red">Nhân viên</label>
+        <select id="fltNV"></select>
+      </div>
+    </div>
+
+    <div class="xpl-actions">
+      <button class="btn btn-xem" onclick="onXem()">👁 Xem phiếu</button>
+    </div>
+
+    <!-- ================== TELERIK VIEWER ================== -->
+    <div class="telerik-viewer">
+      <div class="telerik-toolbar">
+        <button id="btnPrev" onclick="goPage(-1)" title="Trang trước">◀ Previous</button>
+        <span class="page-indicator">Page <b id="pgCur">–</b> / <b id="pgTot">–</b></span>
+        <button id="btnNext" onclick="goPage(1)" title="Trang sau">Next ▶</button>
+        <span class="tb-sep"></span>
+        <div class="tb-zoom">
+          <button onclick="setZoom(-10)" title="Zoom out">🔍 −</button>
+          <span id="zoomLbl" style="min-width:44px;text-align:center;font-weight:bold;">100%</span>
+          <button onclick="setZoom(10)" title="Zoom in">🔍 +</button>
+        </div>
+        <span class="tb-sep"></span>
+        <button onclick="onPdf()">📥 PDF</button>
+        <button onclick="window.print()">🖨 In</button>
+        <span class="tb-info">Telerik-style ReportViewer (mockup UI) — 1 dòng lương = 1 trang A4</span>
+      </div>
+
+      <div class="telerik-canvas" id="canvas">
+        <div class="telerik-empty">
+          👉 Chọn <b>Nhân viên</b> + <b>Template PL</b>, sau đó bấm <b>👁 Xem phiếu</b> để render.
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== GHI CHÚ NGHIỆP VỤ ================== -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="Xác nhận với KH: (1) Layout phiếu lương Millennium giữ nguyên như mẫu Word. (2) NV nhiều dòng = nhiều trang A4 (mỗi trang là 1 phiếu độc lập). (3) BH/Thuế cross-row đã được engine set7 tính đúng per-row (dòng MAX trích, dòng phụ = 0). (4) Toolbar PDF/In là mockup — giai đoạn 2 tích hợp Telerik ReportServer thật."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== MODAL QUY TẮC ================== -->
+  <div class="modal-overlay" id="quyTacModal" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:88vw;max-width:820px;">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>❓ Quy tắc — Xem phiếu lương</span>
+        <button class="x" onclick="closeQuyTacModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 18px;font-size:12px;line-height:1.55;">
+        <h4 style="color:#0056b3;margin:0 0 6px 0;">1. Logic multi-page (1 dòng = 1 trang A4)</h4>
+        <p>Mỗi <b>dòng lương</b> của NV (kết quả tính từ set7) được render thành <b>1 trang A4 độc lập</b>. Nếu NV có N dòng lương (kiêm nhiệm BPTL, làm 2 ca, gộp cấu trúc org…) → viewer hiện <b>N trang</b>, HR dùng nút ◀ Previous / Next ▶ để chuyển. Khi bấm 🖨 In → in tất cả N trang, mỗi trang tự động page-break.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">2. Data source</h4>
+        <p>Lấy trực tiếp từ bảng kết quả tính lương của set7:</p>
+        <pre style="background:#f4f5f7;padding:8px 12px;border-left:3px solid #0056b3;font-family:Consolas,monospace;font-size:11px;margin:6px 0;">SELECT * FROM SalaryResult
+WHERE MaNV = ? AND KyID = ?
+ORDER BY luot ASC;</pre>
+        <p>Mỗi record trả về = 1 dòng lương = 1 trang phiếu. Header meta của phiếu (<code>TK_BoPhan</code>, <code>HT_HeSoBHXH</code>, <code>TotalIncome</code>, <code>TruBHXH</code>, <code>TruThueTNCN</code>, <code>NetIncome</code>) đều là <b>per-row value</b>, không concat / không aggregate.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">3. Cross-row BH/Thuế đã handle ở set7</h4>
+        <p>Với NV nhiều dòng, engine set7 đã áp dụng rule pháp lý:</p>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li><b>BHXH/BHYT/BHTN</b>: chỉ trích <b>1 lần</b> ở dòng có <code>HT_HeSoBHXH</code> MAX (thường là dòng ký HĐLĐ chính). Các dòng phụ có <code>TT_TruBHXH = 0</code> — hiển thị "0 đ" bình thường, không gạch chữ, không note.</li>
+          <li><b>Thuế TNCN</b>: chỉ tính <b>1 lần</b> trên <code>SUM(TN chịu thuế)</code> toàn kỳ, gán vào dòng MAX. Dòng phụ = 0 đ.</li>
+        </ul>
+        <p>→ Viewer <b>chỉ hiển thị lại</b> giá trị đã tính, không tính lại logic cross-row.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">4. Legal note</h4>
+        <p>Theo <b>Nghị định 145/2020/NĐ-CP</b> điều 54, phiếu lương phải thể hiện đầy đủ: (1) tiền lương, (2) tiền lương làm thêm giờ / ca đêm, (3) khoản thu nhập khác, (4) các khoản trích, (5) tiền lương thực nhận. Layout hiện tại đã đảm bảo đầy đủ 5 nhóm thông tin này ở mỗi phiếu.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">5. Toolbar</h4>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li><b>◀ / ▶</b>: chuyển trang (disabled khi ở đầu / cuối).</li>
+          <li><b>Zoom</b>: 50% – 200%, không ảnh hưởng khi In (in luôn 100%).</li>
+          <li><b>📥 PDF</b> / <b>🖨 In</b>: mockup UI. Giai đoạn 2 tích hợp Telerik ReportServer batch-export tất cả pages ra 1 file PDF.</li>
+        </ul>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="closeQuyTacModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+'use strict';
+
+/* ================== MOCK DATA ================== */
+
+const MOCK_KY_LUONG = [
+  { ma: 'KY_202605_LSP', ten: 'Kỳ 05/2026 - LSP', thang: '05/2026' },
+  { ma: 'KY_202604_LSP', ten: 'Kỳ 04/2026 - LSP', thang: '04/2026' },
+  { ma: 'KY_202603_LSP', ten: 'Kỳ 03/2026 - LSP', thang: '03/2026' }
+];
+
+const MOCK_TEMPLATE = {
+  PL_01: { ma:'PL_01', ten:'Phiếu lương MPHG chế biến', nguonDL:'MPHG_LSP' },
+  PL_02: { ma:'PL_02', ten:'Phiếu lương MPHG vệ sinh',  nguonDL:'MPHG_LSP' },
+  PL_03: { ma:'PL_03', ten:'Phiếu lương Millennium chuẩn', nguonDL:'MILLENNIUM' }
+};
+
+const MOCK_NV_LIST = [
+  { maNV:'1022906001', hoTen:'NV 1 dòng - Bình thường',              rows: 1 },
+  { maNV:'1022906002', hoTen:'NV nhiều dòng - Kiêm 2 BPTL',          rows: 2 },
+  { maNV:'1022906003', hoTen:'NV lương cao - Vượt trần BH',          rows: 1 },
+  { maNV:'1022906004', hoTen:'NV thôi việc 15/07 - TT phép',         rows: 1 },
+  { maNV:'1022906005', hoTen:'NV mới vào 10/07 - HT CN mới',         rows: 1 },
+  { maNV:'1022906006', hoTen:'NV nghỉ thai sản - Nợ BH tháng',       rows: 1 },
+  { maNV:'1022906007', hoTen:'NV ca đêm + tăng ca lễ',               rows: 1 },
+  { maNV:'1022906008', hoTen:'NV nhiều khoản trừ - Quỹ TT + phạt',   rows: 1 },
+  { maNV:'1022906009', hoTen:'NV bán hàng - Có hoa hồng',            rows: 1 },
+  { maNV:'1022906010', hoTen:'NV 3 phụ thuộc - Giảm trừ thuế cao',   rows: 1 }
+];
+
+function mkRow(o) {
+  const base = {
+    luot: 1, TK_ThangLuong:'05/2026', EmpName:'', EmpCode:'',
+    TK_BoPhan:'', HT_PhepNamCheDo:0, HT_PhepNamDaHuong:0, HT_HeSoBHXH:0,
+    HT_TGTrongGio:0, TT_DonGiaTLTGTrongGio:0, TT_TLTGTrongGio:0,
+    HT_TGThemThuong:0, TT_DonGiaTLTGThemThuong:0, TT_TLTGThemThuong:0,
+    HT_TGCaDem:0, TT_DonGiaTLTGCaDem:0, TT_TLTGCaDem:0,
+    HT_TGThemCaDem:0, TT_DonGiaTLTGThemCaDem:0, TT_TLTGThemCaDem:0,
+    HT_TGLe:0, TT_DonGiaTLTGLe:0, TT_TLTGLe:0,
+    HT_TGNghiGiuaCa:0, TT_DonGiaTLNghiGiuaCa:0, TT_TLNghiGiuaCa:0,
+    HT_TGNgungViec:0, TT_DonGiaTLNgungViec:0, TT_TLNgungViec:0,
+    HT_TGThemCaDemLe:0, TT_DonGiaTLTGThemCaDemLe:0, TT_TLTGThemCaDemLe:0,
+    TT_CacKhoanBoSungKhac:0, TT_TLNghiLeTetVaKONL:0,
+    TT_TienAn:0, HT_KSK_SH:0, HT_HocNoiQuiy:0, HT_BuTLHieuHyTNLD:0,
+    TT_PhepNam:0, HT_PC_VSKNPhuNu:0, HT_BanHangDauNuoc:0, HT_HDQT:0,
+    TT_ComPGD:0, HT_PC_6Tuoi:0, HT_ThaiSanConNho:0, HT_XangXePha:0,
+    TotalIncome:0, TT_TruBHXH:0, HT_TruCom:0, HT_QuyTinhThuong:0,
+    TT_TruThueTNCN:0, HT_TienNhaDenNuocVS:0, HT_TruMuonQuyTuongTro:0,
+    NetIncome:0, TT_KATM:0, HT_LuongToiThieuVung:4160000
+  };
+  return Object.assign(base, o);
+}
+
+const MOCK_PHIEU_DATA = {
+  '1022906001': [ mkRow({
+    EmpName:'NV 1 dòng - Bình thường', EmpCode:'1022906001',
+    TK_BoPhan:'CB101 - Chế biến tải 01 ka 1',
+    HT_PhepNamCheDo:14, HT_PhepNamDaHuong:2, HT_HeSoBHXH:1.103,
+    HT_TGTrongGio:162.56, TT_DonGiaTLTGTrongGio:35000, TT_TLTGTrongGio:5689600,
+    HT_TGCaDem:20, TT_DonGiaTLTGCaDem:42000, TT_TLTGCaDem:840000,
+    HT_TGLe:8, TT_DonGiaTLTGLe:70000, TT_TLTGLe:560000,
+    HT_TGNghiGiuaCa:10.4, TT_DonGiaTLNghiGiuaCa:35000, TT_TLNghiGiuaCa:364000,
+    TT_CacKhoanBoSungKhac:246400, TT_TLNghiLeTetVaKONL:0,
+    TT_TienAn:625000, HT_KSK_SH:100000, TT_ComPGD:150000, HT_PC_6Tuoi:1250000,
+    TT_PhepNam:200000, HT_XangXePha:100000,
+    TotalIncome:10125000, TT_TruBHXH:479474, HT_TruCom:625000, TT_TruThueTNCN:0,
+    NetIncome:9020526, TT_KATM:0
+  }) ],
+
+  '1022906002': [
+    mkRow({
+      luot:1, EmpName:'NV nhiều dòng - Kiêm 2 BPTL', EmpCode:'1022906002-01',
+      TK_BoPhan:'CB101 - Chế biến tải 01 ka 1',
+      HT_PhepNamCheDo:14, HT_PhepNamDaHuong:3, HT_HeSoBHXH:1.103,
+      HT_TGTrongGio:96, TT_DonGiaTLTGTrongGio:35000, TT_TLTGTrongGio:3705120,
+      HT_TGCaDem:12, TT_DonGiaTLTGCaDem:42000, TT_TLTGCaDem:504000,
+      HT_TGNghiGiuaCa:6, TT_DonGiaTLNghiGiuaCa:35000, TT_TLNghiGiuaCa:210000,
+      TT_CacKhoanBoSungKhac:180880,
+      TT_TienAn:360000, HT_KSK_SH:60000, TT_PhepNam:180000,
+      TotalIncome:6200000, TT_TruBHXH:430000, HT_TruCom:360000, TT_TruThueTNCN:0,
+      NetIncome:5410000, TT_KATM:0
+    }),
+    mkRow({
+      luot:2, EmpName:'NV nhiều dòng - Kiêm 2 BPTL', EmpCode:'1022906002-02',
+      TK_BoPhan:'VS-01 - Vệ sinh Xưởng 01',
+      HT_PhepNamCheDo:14, HT_PhepNamDaHuong:3, HT_HeSoBHXH:0,
+      HT_TGTrongGio:70.4, TT_DonGiaTLTGTrongGio:32000, TT_TLTGTrongGio:2252800,
+      HT_TGThemThuong:8, TT_DonGiaTLTGThemThuong:48000, TT_TLTGThemThuong:384000,
+      TT_CacKhoanBoSungKhac:163200,
+      TT_TienAn:264000, HT_XangXePha:80000,
+      TotalIncome:4500000, TT_TruBHXH:0,
+      HT_TruCom:264000, TT_TruThueTNCN:0,
+      NetIncome:4236000, TT_KATM:0
+    })
+  ],
+
+  '1022906003': [ mkRow({
+    EmpName:'NV lương cao - Vượt trần BH', EmpCode:'1022906003',
+    TK_BoPhan:'TP01 - Trưởng phòng Kế toán',
+    HT_PhepNamCheDo:16, HT_PhepNamDaHuong:5, HT_HeSoBHXH:1.500,
+    HT_TGTrongGio:180, TT_DonGiaTLTGTrongGio:400000, TT_TLTGTrongGio:72000000,
+    HT_TGLe:16, TT_DonGiaTLTGLe:800000, TT_TLTGLe:12800000,
+    TT_CacKhoanBoSungKhac:5000000,
+    TT_TienAn:625000, HT_HDQT:3000000, HT_BanHangDauNuoc:1200000, HT_XangXePha:500000,
+    TotalIncome:95125000, TT_TruBHXH:8710000, HT_TruCom:625000,
+    TT_TruThueTNCN:14380000, HT_QuyTinhThuong:100000,
+    NetIncome:71310000, TT_KATM:0
+  }) ],
+
+  '1022906004': [ mkRow({
+    EmpName:'NV thôi việc 15/07 - TT phép', EmpCode:'1022906004',
+    TK_BoPhan:'KCS01 - Kiểm soát chất lượng 01',
+    HT_PhepNamCheDo:12, HT_PhepNamDaHuong:8, HT_HeSoBHXH:1.103,
+    HT_TGTrongGio:88, TT_DonGiaTLTGTrongGio:43000, TT_TLTGTrongGio:3784000,
+    TT_PhepNam:1200000, TT_CacKhoanBoSungKhac:4300000,
+    TT_TienAn:264000, HT_HocNoiQuiy:0,
+    TotalIncome:9548000, TT_TruBHXH:250000, HT_TruCom:264000, TT_TruThueTNCN:0,
+    NetIncome:9034000, TT_KATM:0
+  }) ],
+
+  '1022906005': [ mkRow({
+    EmpName:'NV mới vào 10/07 - HT CN mới', EmpCode:'1022906005',
+    TK_BoPhan:'CB102 - Chế biến tải 01 ka 2',
+    HT_PhepNamCheDo:14, HT_PhepNamDaHuong:0, HT_HeSoBHXH:1.103,
+    HT_TGTrongGio:136, TT_DonGiaTLTGTrongGio:35000, TT_TLTGTrongGio:4760000,
+    TT_CacKhoanBoSungKhac:200000,
+    TT_TienAn:408000, HT_KSK_SH:200000, TT_ComPGD:100000,
+    TotalIncome:5668000, TT_TruBHXH:350000, HT_TruCom:408000, TT_TruThueTNCN:0,
+    NetIncome:4910000, TT_KATM:0
+  }) ],
+
+  '1022906006': [ mkRow({
+    EmpName:'NV nghỉ thai sản - Nợ BH tháng', EmpCode:'1022906006',
+    TK_BoPhan:'CB101 - Chế biến tải 01 ka 1',
+    HT_PhepNamCheDo:14, HT_PhepNamDaHuong:12, HT_HeSoBHXH:1.103,
+    TotalIncome:0, TT_TruBHXH:630000, HT_TruCom:0, TT_TruThueTNCN:0,
+    NetIncome:-630000, TT_KATM:0
+  }) ],
+
+  '1022906007': [ mkRow({
+    EmpName:'NV ca đêm + tăng ca lễ', EmpCode:'1022906007',
+    TK_BoPhan:'CB102 - Chế biến tải 01 ka 2',
+    HT_PhepNamCheDo:14, HT_PhepNamDaHuong:1, HT_HeSoBHXH:1.103,
+    HT_TGTrongGio:120, TT_DonGiaTLTGTrongGio:35000, TT_TLTGTrongGio:4200000,
+    HT_TGCaDem:40, TT_DonGiaTLTGCaDem:52000, TT_TLTGCaDem:2080000,
+    HT_TGThemCaDem:12, TT_DonGiaTLTGThemCaDem:70000, TT_TLTGThemCaDem:840000,
+    HT_TGLe:16, TT_DonGiaTLTGLe:70000, TT_TLTGLe:1120000,
+    HT_TGThemCaDemLe:6, TT_DonGiaTLTGThemCaDemLe:120000, TT_TLTGThemCaDemLe:720000,
+    TT_CacKhoanBoSungKhac:350000,
+    TT_TienAn:576000, TT_ComPGD:150000, HT_KSK_SH:50000,
+    TotalIncome:12500000, TT_TruBHXH:450000, HT_TruCom:576000, TT_TruThueTNCN:0,
+    NetIncome:11474000, TT_KATM:0
+  }) ],
+
+  '1022906008': [ mkRow({
+    EmpName:'NV nhiều khoản trừ - Quỹ TT + phạt', EmpCode:'1022906008',
+    TK_BoPhan:'TP01 - Trưởng phòng Kế toán',
+    HT_PhepNamCheDo:14, HT_PhepNamDaHuong:4, HT_HeSoBHXH:1.103,
+    HT_TGTrongGio:170, TT_DonGiaTLTGTrongGio:42000, TT_TLTGTrongGio:7140000,
+    HT_TGCaDem:12, TT_DonGiaTLTGCaDem:52000, TT_TLTGCaDem:624000,
+    TT_CacKhoanBoSungKhac:736000,
+    TT_TienAn:528000, HT_KSK_SH:100000, HT_XangXePha:100000,
+    TotalIncome:8500000, TT_TruBHXH:480000, HT_TruCom:528000,
+    TT_TruThueTNCN:150000, HT_QuyTinhThuong:200000, HT_TruMuonQuyTuongTro:122000,
+    NetIncome:7020000, TT_KATM:0
+  }) ],
+
+  '1022906009': [ mkRow({
+    EmpName:'NV bán hàng - Có hoa hồng', EmpCode:'1022906009',
+    TK_BoPhan:'TP01 - Phòng Kinh doanh',
+    HT_PhepNamCheDo:14, HT_PhepNamDaHuong:3, HT_HeSoBHXH:1.103,
+    HT_TGTrongGio:170, TT_DonGiaTLTGTrongGio:47000, TT_TLTGTrongGio:7990000,
+    TT_CacKhoanBoSungKhac:0,
+    TT_TienAn:625000, HT_BanHangDauNuoc:3500000, HT_XangXePha:400000, TT_ComPGD:150000,
+    TotalIncome:15000000, TT_TruBHXH:520000, HT_TruCom:625000, TT_TruThueTNCN:0,
+    NetIncome:13855000, TT_KATM:0
+  }) ],
+
+  '1022906010': [ mkRow({
+    EmpName:'NV 3 phụ thuộc - Giảm trừ thuế cao', EmpCode:'1022906010',
+    TK_BoPhan:'KCS01 - Kiểm soát chất lượng 01',
+    HT_PhepNamCheDo:14, HT_PhepNamDaHuong:2, HT_HeSoBHXH:1.103,
+    HT_TGTrongGio:200, TT_DonGiaTLTGTrongGio:120000, TT_TLTGTrongGio:24000000,
+    TT_CacKhoanBoSungKhac:1000000,
+    TT_TienAn:625000, HT_PC_6Tuoi:1250000, HT_ThaiSanConNho:800000, HT_XangXePha:300000,
+    TotalIncome:25000000, TT_TruBHXH:2085000, HT_TruCom:625000, TT_TruThueTNCN:40000,
+    HT_QuyTinhThuong:100000,
+    NetIncome:22150000, TT_KATM:0
+  }) ]
+};
+
+/* ================== UTILITIES ================== */
+function fmtN(v) {
+  if (v === null || v === undefined) return '0';
+  const n = Number(v);
+  if (isNaN(n) || n === 0) return '0';
+  return n.toLocaleString('vi-VN');
+}
+function fmtH(v) {
+  if (!v) return '0';
+  return Number(v).toLocaleString('vi-VN', { maximumFractionDigits: 2 });
+}
+function fmtHS(v) {
+  if (!v) return '0';
+  return Number(v).toLocaleString('vi-VN', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+}
+function showAlert(msg, type) {
+  const b = document.getElementById('alertBox');
+  b.className = 'alert-box alert-' + (type || 'success');
+  b.innerHTML = msg;
+  b.style.display = 'block';
+  if (type !== 'error') setTimeout(() => b.style.display = 'none', 4000);
+}
+
+/* ================== QUY TAC MODAL ================== */
+function openQuyTacModal() { document.getElementById('quyTacModal').style.display = 'flex'; }
+function closeQuyTacModal() { document.getElementById('quyTacModal').style.display = 'none'; }
+
+/* ================== INIT SELECTS ================== */
+function initSelects() {
+  const kySel = document.getElementById('fltKy');
+  kySel.innerHTML = MOCK_KY_LUONG.map(k =>
+    `<option value="${k.ma}">${k.ma} - ${k.ten}</option>`).join('');
+  kySel.value = 'KY_202605_LSP';
+
+  const tplSel = document.getElementById('fltTemplate');
+  tplSel.innerHTML = Object.values(MOCK_TEMPLATE).map(t =>
+    `<option value="${t.ma}">${t.ma} - ${t.ten}</option>`).join('');
+  tplSel.value = 'PL_01';
+
+  const nvSel = document.getElementById('fltNV');
+  nvSel.innerHTML = '<option value="">-- Chọn NV --</option>' +
+    MOCK_NV_LIST.map(nv =>
+      `<option value="${nv.maNV}">${nv.maNV} - ${nv.hoTen}${nv.rows>1 ? ' — '+nv.rows+' dòng':''}</option>`
+    ).join('');
+  nvSel.value = '1022906001';
+}
+
+/* ================== RENDER PHIẾU (Millennium replica) ================== */
+const GRID_ROWS = [
+  ['1. Trong giờ',                'HT_TGTrongGio',    'TT_DonGiaTLTGTrongGio',    'TT_TLTGTrongGio'],
+  ['2. Ngoài giờ',                'HT_TGThemThuong',  'TT_DonGiaTLTGThemThuong',  'TT_TLTGThemThuong'],
+  ['3. Ca đêm',                   'HT_TGCaDem',       'TT_DonGiaTLTGCaDem',       'TT_TLTGCaDem'],
+  ['4. Tăng ca đêm',              'HT_TGThemCaDem',   'TT_DonGiaTLTGThemCaDem',   'TT_TLTGThemCaDem'],
+  ['5. Làm Lễ',                   'HT_TGLe',          'TT_DonGiaTLTGLe',          'TT_TLTGLe'],
+  ['6. Nghỉ giữa ca',             'HT_TGNghiGiuaCa',  'TT_DonGiaTLNghiGiuaCa',    'TT_TLNghiGiuaCa'],
+  ['7. Ngừng việc',               'HT_TGNgungViec',   'TT_DonGiaTLNgungViec',     'TT_TLNgungViec'],
+  ['8. Tăng ca đêm Lễ',           'HT_TGThemCaDemLe', 'TT_DonGiaTLTGThemCaDemLe', 'TT_TLTGThemCaDemLe']
+];
+const GRID_ROWS_FULL = [
+  ['9. Các khoản bổ sung khác',           null, null, 'TT_CacKhoanBoSungKhac'],
+  ['10. Tiền lương ngày nghỉ Lễ, Tết',    null, null, 'TT_TLNghiLeTetVaKONL']
+];
+
+const THU_NHAP_ITEMS = [
+  ['1. Tiền cơm công ty cho',       'TT_TienAn'],
+  ['2. Hỗ trợ khác + KSK',          'HT_KSK_SH'],
+  ['3. Học nội quy công ty',        'HT_HocNoiQuiy'],
+  ['4. Hiếu hỷ, TNLĐ',              'HT_BuTLHieuHyTNLD'],
+  ['5. Phép năm',                   'TT_PhepNam'],
+  ['6. Phụ cấp VSKN phụ nữ',        'HT_PC_VSKNPhuNu'],
+  ['7. Bán hàng',                   'HT_BanHangDauNuoc'],
+  ['8. Tiền lương HĐQT',            'HT_HDQT'],
+  ['9. Hỗ trợ cơm',                 'TT_ComPGD'],
+  ['10. Phụ cấp nuôi con 1-6 tuổi', 'HT_PC_6Tuoi'],
+  ['11. Bà bầu con nhỏ',            'HT_ThaiSanConNho'],
+  ['12. Thưởng chuyên cần',         'HT_XangXePha']
+];
+
+const KHOAN_TRU_ITEMS = [
+  ['1. Trừ Bảo hiểm',        'TT_TruBHXH'],
+  ['2. Trừ Tiền cơm',        'HT_TruCom'],
+  ['3. Trừ Quỹ tình thương', 'HT_QuyTinhThuong'],
+  ['4. Trừ thuế TNCN',       'TT_TruThueTNCN'],
+  ['5. Trừ điện, nước, vs',  'HT_TienNhaDenNuocVS'],
+  ['6. Trừ tiền mượn Quỹ TT','HT_TruMuonQuyTuongTro']
+];
+
+function renderPhieuHeader(r) {
+  return `
+    <div class="pl-header">
+      <div>
+        <img class="pl-logo" src="../assets/mp-logo.png" alt="MP"
+             onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=&quot;width:55px;height:55px;background:#d32f2f;color:#fff;text-align:center;line-height:55px;font-weight:bold;&quot;>MP</div>'">
+      </div>
+      <div class="pl-brand-text">
+        <div class="pl-brand-name">MINH PHÚ<sup style="font-size:8px;">®</sup></div>
+        <div class="pl-brand-tagline">SHARING GOOD FOOD</div>
+      </div>
+      <div class="pl-corp">
+        TẬP ĐOÀN THUỶ SẢN MINH PHÚ<br>
+        CÔNG TY CP THUỶ SẢN MINH PHÚ - HẬU GIANG
+      </div>
+    </div>
+    <div class="pl-title">PHIẾU LƯƠNG THÁNG <span class="ph">«${r.TK_ThangLuong}»</span></div>
+    <div class="pl-meta-row">
+      <div>
+        <span class="pl-mlabel">Họ tên:</span> <span class="pl-mval">${r.EmpName}</span><br>
+        <span class="pl-mlabel">Mã bộ phận:</span> <span class="pl-mval">${r.TK_BoPhan}</span><br>
+        <span class="pl-mlabel">Phép năm:</span> <span class="pl-mval">${r.HT_PhepNamCheDo}</span>
+      </div>
+      <div>
+        <span class="pl-mlabel">Mã nhân viên:</span> <span class="pl-mval">${r.EmpCode}</span><br>
+        <span class="pl-mlabel">Đơn vị:</span> <span class="pl-mval">Minh Phú Hậu Giang</span><br>
+        <span class="pl-mlabel">Phép năm đã hưởng:</span> <span class="pl-mval">${r.HT_PhepNamDaHuong}</span>
+      </div>
+    </div>`;
+}
+
+function renderPhieuBody(r) {
+  const gridHtml = GRID_ROWS.map(([lbl, fA, fB, fC]) => `
+    <tr>
+      <td class="c-label">${lbl}</td>
+      <td class="c-num">${fmtH(r[fA])}</td>
+      <td class="c-num">${fmtN(r[fB])}</td>
+      <td class="c-money">${fmtN(r[fC])}</td>
+    </tr>`).join('') +
+    GRID_ROWS_FULL.map(([lbl, fA, fB, fC]) => `
+    <tr>
+      <td class="c-full-label" colspan="3">${lbl}</td>
+      <td class="c-full">${fmtN(r[fC])}</td>
+    </tr>`).join('');
+
+  const thuNhap1 = THU_NHAP_ITEMS.slice(0,6).map(([lbl,f]) => `
+    <div class="pl-item"><span></span><span class="pl-name">${lbl}:</span>
+      <span class="pl-val">${fmtN(r[f])}</span><span class="pl-unit">đồng</span></div>`).join('');
+  const thuNhap2 = THU_NHAP_ITEMS.slice(6).map(([lbl,f]) => `
+    <div class="pl-item"><span></span><span class="pl-name">${lbl}:</span>
+      <span class="pl-val">${fmtN(r[f])}</span><span class="pl-unit">đồng</span></div>`).join('');
+
+  const khoanTru1 = KHOAN_TRU_ITEMS.slice(0,3).map(([lbl,f]) => `
+    <div class="pl-item"><span></span><span class="pl-name">${lbl}:</span>
+      <span class="pl-val">${fmtN(r[f])}</span><span class="pl-unit">đồng</span></div>`).join('');
+  const khoanTru2 = KHOAN_TRU_ITEMS.slice(3).map(([lbl,f]) => `
+    <div class="pl-item"><span></span><span class="pl-name">${lbl}:</span>
+      <span class="pl-val">${fmtN(r[f])}</span><span class="pl-unit">đồng</span></div>`).join('');
+
+  return `
+    <table class="pl-detail-table">
+      <thead>
+        <tr>
+          <th style="width:38%;">Chi tiết</th>
+          <th style="width:18%;">Thời gian (giờ)</th>
+          <th style="width:22%;">Đơn giá (đồng/giờ)</th>
+          <th style="width:22%;">Tiền lương (đồng)</th>
+        </tr>
+        <tr>
+          <th>HS Bảo hiểm: ${fmtHS(r.HT_HeSoBHXH)}</th>
+          <th>(A)</th><th>(B)</th><th>(C)=(A)*(B)*HSBH</th>
+        </tr>
+      </thead>
+      <tbody>${gridHtml}</tbody>
+    </table>
+
+    <div class="pl-section-title">Các khoản thu nhập khác:</div>
+    <div class="pl-2col-list">${thuNhap1}${thuNhap2}</div>
+
+    <div class="pl-total-row">
+      <span>TỔNG TIỀN LƯƠNG VÀ THU NHẬP ĐƯỢC NHẬN:</span>
+      <span class="pl-val">${fmtN(r.TotalIncome)} đồng</span>
+    </div>
+
+    <div class="pl-section-title">Các khoản phải trừ:</div>
+    <div class="pl-2col-list">${khoanTru1}${khoanTru2}</div>
+
+    <div class="pl-tien-nhan-row">
+      <span>1. TIỀN LÃNH THẺ ATM: <span class="pl-val">${fmtN(r.NetIncome)}</span> đồng</span>
+      <span>2. TIỀN MẶT: <span class="pl-val">${fmtN(r.TT_KATM)}</span> đồng</span>
+    </div>
+
+    <div class="pl-footer-note">
+      *Mức lương tối thiểu vùng: <b>${fmtN(r.HT_LuongToiThieuVung)}</b> đồng<br>
+      *Mọi thắc mắc anh/chị vui lòng liên hệ Bộ phận lao động tiền lương!
+      <span class="sgf">SHARING GOOD FOOD</span>
+    </div>`;
+}
+
+/* ================== MULTI-PAGE STATE ================== */
+let currentPageIdx = 0;
+let totalPages = 0;
+let zoom = 100;
+
+function updateToolbar() {
+  document.getElementById('pgCur').textContent = totalPages > 0 ? (currentPageIdx + 1) : '–';
+  document.getElementById('pgTot').textContent = totalPages > 0 ? totalPages : '–';
+  document.getElementById('btnPrev').disabled = (currentPageIdx <= 0);
+  document.getElementById('btnNext').disabled = (currentPageIdx >= totalPages - 1);
+}
+
+function showPage(idx) {
+  const pages = document.querySelectorAll('#canvas .phieu-lung-page');
+  pages.forEach((p, i) => p.classList.toggle('active', i === idx));
+  currentPageIdx = idx;
+  updateToolbar();
+}
+
+function goPage(delta) {
+  const next = currentPageIdx + delta;
+  if (next < 0 || next >= totalPages) return;
+  showPage(next);
+}
+
+/* ================== MAIN RENDER ================== */
+function onXem() {
+  const maNV = document.getElementById('fltNV').value;
+  if (!maNV) { showAlert('❌ Vui lòng chọn Nhân viên', 'error'); return; }
+
+  const rows = MOCK_PHIEU_DATA[maNV];
+  if (!rows || rows.length === 0) {
+    showAlert('❌ Không có dữ liệu phiếu lương cho NV này', 'error'); return;
+  }
+
+  const canvas = document.getElementById('canvas');
+  const pagesHtml = rows.map(r =>
+    `<div class="phieu-lung-page">${renderPhieuHeader(r)}${renderPhieuBody(r)}</div>`
+  ).join('');
+  canvas.innerHTML = pagesHtml;
+
+  totalPages = rows.length;
+  currentPageIdx = 0;
+  showPage(0);
+  applyZoom();
+}
+
+/* ================== ZOOM ================== */
+function setZoom(delta) {
+  zoom = Math.max(50, Math.min(200, zoom + delta));
+  document.getElementById('zoomLbl').textContent = zoom + '%';
+  applyZoom();
+}
+function applyZoom() {
+  const pages = document.querySelectorAll('#canvas .phieu-lung-page');
+  pages.forEach(p => {
+    p.style.transform = `scale(${zoom/100})`;
+    p.style.transformOrigin = 'top center';
+  });
+}
+
+/* ================== ACTIONS ================== */
+function onPdf() {
+  alert('[Mockup] 📥 Tải PDF\n\nGiai đoạn 2: tích hợp Telerik ReportServer → export tất cả ' +
+    (totalPages || '?') + ' trang thành 1 file PDF.');
+}
+
+/* ================== BOOT ================== */
+document.addEventListener('DOMContentLoaded', function() {
+  initSelects();
+  updateToolbar();
+});
+</script>
+</body>
+</html>

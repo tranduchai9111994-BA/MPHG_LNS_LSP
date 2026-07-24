@@ -103,8 +103,7 @@ window.MOCK_LSP_EMP = {
 
 - Sinh **2 dòng** (2 giai đoạn QTLV).
 - `TT_LSP_LuongThoiGian` (Prorata): dòng1 = total×12/25, dòng2 = total×13/25.
-- `TT_LSP_LuongDongBH` (MaxSalaryRow): dồn 100% vào dòng có Final lớn hơn; dòng còn lại = 0.
-- `TT_LSP_ThuNhapTinhThue` (LastStageRow): dồn 100% vào dòng `to='2026-05-31'`; dòng còn lại = 0.
+- `TT_TNChiuThueTNCN` (LastStageRow): dồn 100% vào dòng `to='2026-05-31'`; dòng còn lại = 0.
 - Tổng các dòng của tiêu chí Detail = giá trị nếu tính gộp 1 dòng (đảm bảo không thất thoát).
 
 ## 6. QA test note

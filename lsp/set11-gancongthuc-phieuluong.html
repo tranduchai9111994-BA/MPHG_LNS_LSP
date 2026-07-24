@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Gán công thức DL cho phiếu lương</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .filter-row { display:flex; gap:15px; align-items:center; flex-wrap:wrap; padding:10px 15px; }
+    .filter-row label { font-size:12px; color:#333; font-weight:bold; }
+    .filter-row select { min-width:280px; height:26px; font-size:12px; border:1px solid #ccc; padding:2px 6px; }
+    .badge-mphg { display:inline-block; background:#17a2b8; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; margin-left:6px; }
+    .badge-mill { display:inline-block; background:#6c757d; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; margin-left:6px; }
+    .badge-new  { display:inline-block; background:#dc3545; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:8px; margin-left:4px; vertical-align:middle; }
+
+    /* Grid gán CT */
+    .gct-grid { min-width:1100px; }
+    .gct-grid th, .gct-grid td { font-size:11px; vertical-align:middle; }
+    .gct-grid td.col-en { font-family:Consolas,monospace; font-weight:bold; color:#0056b3; }
+    .gct-grid td.col-vn { }
+    .gct-grid td.col-ct { font-family:Consolas,monospace; font-size:10px; background:#fafafa; color:#555; white-space:normal; word-break:break-word; }
+    .gct-grid td.col-picker { text-align:center; }
+    .gct-grid .btn-picker { background:#0056b3; color:#fff; border:none; padding:2px 8px; font-size:11px; cursor:pointer; border-radius:3px; font-weight:bold; }
+    .gct-grid .btn-picker:hover { background:#003d7a; }
+    .cell-input { width:100%; box-sizing:border-box; border:1px solid #eee; background:transparent; font-size:11px; padding:2px 4px; }
+    .cell-input:focus { border-color:#0056b3; background:#fff; }
+
+    /* MPHG banner */
+    .mphg-banner { padding:8px 12px; margin: 8px 0; border-radius:4px; font-size:11px; }
+    .mphg-banner.on  { background:#e8f7fa; border-left:4px solid #17a2b8; color:#0c5460; }
+    .mphg-banner.off { background:#f4f5f7; border-left:4px solid #6c757d; color:#495057; }
+
+    /* Modal picker */
+    .picker-modal { width:900px; max-width:95vw; max-height:88vh; display:flex; flex-direction:column; }
+    .picker-tabs { display:flex; border-bottom:2px solid #ffd600; background:#fdfdfd; }
+    .picker-tab { padding:8px 16px; font-size:12px; font-weight:bold; cursor:pointer; color:#555; border-right:1px solid #eee; position:relative; }
+    .picker-tab.active { background:#ffd600; color:#333; }
+    .picker-tab.disabled { color:#bbb; cursor:not-allowed; background:#fafafa; }
+    .picker-tab .badge-new { position:relative; top:-1px; }
+    .picker-subtabs { display:flex; gap:0; padding: 6px 8px 0; background:#f4f5f7; border-bottom:1px solid #ddd; }
+    .picker-subtab { padding:5px 12px; font-size:11px; cursor:pointer; color:#555; background:#fff; border:1px solid #ddd; border-bottom:none; border-radius:3px 3px 0 0; margin-right:3px; }
+    .picker-subtab.active { background:#17a2b8; color:#fff; font-weight:bold; border-color:#17a2b8; }
+    .picker-search { padding:8px 12px; background:#fbfbfb; border-bottom:1px solid #eee; }
+    .picker-search input { width:100%; padding:5px 8px; border:1px solid #ccc; font-size:12px; height:28px; box-sizing:border-box; }
+    .picker-list { flex:1 1 auto; overflow-y:auto; padding: 0 12px; }
+    .picker-list table { width:100%; border-collapse:collapse; font-size:11px; }
+    .picker-list th { position:sticky; top:0; background:#f4d03f; padding:6px 8px; text-align:left; border-bottom:1px solid #ddd; }
+    .picker-list td { padding:5px 8px; border-bottom:1px solid #f0f0f0; }
+    .picker-list tr { cursor:pointer; }
+    .picker-list tr:hover { background:#f1f8ff; }
+    .picker-list td.ma { font-family:Consolas,monospace; font-weight:bold; color:#0056b3; }
+
+    /* Tooltip for disabled tab */
+    .tab-tooltip { display:none; position:absolute; top:100%; left:0; background:#333; color:#fff; padding:6px 10px; font-size:10px; border-radius:3px; white-space:nowrap; z-index:100; font-weight:normal; margin-top:2px; }
+    .picker-tab.disabled:hover .tab-tooltip { display:block; }
+
+    .source-info { padding: 8px 12px; background:#fffbf0; border-bottom:1px solid #ffe08a; font-size:11px; color:#856404; }
+
+    /* Quy tac */
+    .page-title-row { position:relative; text-align:center; }
+    .btn-quy-tac {
+      position:absolute; right:0; top:50%; transform:translateY(-50%);
+      background:#6f42c1; color:#fff; border:none; border-radius:4px;
+      padding:6px 14px; font-size:12px; font-weight:bold; cursor:pointer;
+    }
+    .btn-quy-tac:hover { background:#5a349a; }
+    .quy-tac-note { background:#eaf6ea; border-left:4px solid #28a745; padding:8px 12px; margin: 8px 0; font-size:11.5px; color:#155724; }
+    .quy-tac-note a { color:#0056b3; font-weight:bold; cursor:pointer; text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Phiếu lương › Gán công thức dữ liệu (PL)</div>
+    <div class="page-title page-title-row">
+      <span>GÁN CÔNG THỨC DỮ LIỆU CHO PHIẾU LƯƠNG</span>
+      <button class="btn-quy-tac" onclick="openQuyTacModal()">❓ Quy tắc</button>
+    </div>
+
+    <div class="quy-tac-note">
+      📄 Công thức gán được apply <b>per-row</b> (mỗi dòng lương của NV = 1 trang phiếu độc lập).
+      <a onclick="openQuyTacModal()">Xem quy tắc chi tiết →</a>
+    </div>
+
+    <div id="alertBox" class="alert-box"></div>
+
+    <div class="form-panel">
+      <div class="filter-row">
+        <label class="text-red" style="color:#d32f2f;">Template phiếu lương</label>
+        <select id="cboTemplate" onchange="onTemplateChange()"></select>
+        <span id="tplSourceBadge"></span>
+      </div>
+    </div>
+
+    <div id="mphgBanner" class="mphg-banner off"></div>
+
+    <div class="actions-bar" style="justify-content:center;text-align:center;">
+      <button class="btn btn-search"  onclick="onFilter()">🔍 Tìm Kiếm</button>
+      <button class="btn btn-refresh" onclick="loadRows()">↻ Làm mới</button>
+      <button class="btn btn-save"    onclick="onSaveAll()">💾 Lưu tất cả</button>
+      <button class="btn btn-delete"  onclick="onDelete()">🗑 Xóa dòng chọn</button>
+      <button class="btn btn-add"     onclick="onAddRow()">+ Thêm cột</button>
+    </div>
+
+    <div class="grid-wrap" style="margin-top:8px;overflow-x:auto;">
+      <table class="gct-grid" style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width:30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+            <th style="width:40px;">STT</th>
+            <th style="width:180px;">Tên tiếng Anh</th>
+            <th style="width:220px;">Tên tiếng Việt</th>
+            <th>Công thức</th>
+            <th style="width:220px;">Ghi chú</th>
+            <th style="width:60px;">Chọn tiêu chí</th>
+          </tr>
+        </thead>
+        <tbody id="gctBody"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="Điểm cần confirm với khách hàng...">- Test scenario 3: chọn PL_01 (MPHG_LSP) → bấm [...] → modal có 2 tab, Millennium + MPHG.
+- Test scenario 4: chọn PL_03 (Millennium) → bấm [...] → tab MPHG BỊ DISABLE, tooltip hiện guide.
+- Test 5: PL_05 (record cũ không có nguonDL) → treat as Millennium, không lỗi.</textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal chọn tiêu chí — 2 tabs -->
+  <div class="modal-overlay" id="modal-picker" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box picker-modal">
+      <div class="modal-hdr" style="background:#0056b3;color:#fff;">
+        📋 CHỌN TIÊU CHÍ CHO CỘT PHIẾU LƯƠNG — <span id="pickerColName" style="font-family:Consolas,monospace;"></span>
+        <button class="x" onclick="closePicker()">✕</button>
+      </div>
+
+      <div id="pickerSourceInfo" class="source-info"></div>
+
+      <div class="picker-tabs">
+        <div class="picker-tab active" data-tab="MILL" onclick="switchTab('MILL')">
+          📊 Tiêu chí Millennium core
+        </div>
+        <div class="picker-tab" id="tabMPHG" data-tab="MPHG" onclick="switchTab('MPHG')">
+          🆕 Tiêu chí MPHG LSP <span class="badge-new">MỚI</span>
+          <div class="tab-tooltip" id="tabMPHGTooltip">
+            Chọn Nguồn DL = MPHG LSP (ở màn Định nghĩa template) để dùng tab này
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-tabs for MPHG (hidden when MILL) -->
+      <div class="picker-subtabs" id="subtabsMPHG" style="display:none;">
+        <div class="picker-subtab active" data-sub="SET7" onclick="switchSubtab('SET7')">Cột grid Tính lương (set7)</div>
+        <div class="picker-subtab" data-sub="HT" onclick="switchSubtab('HT')">HT_ (Số liệu hệ thống — set2)</div>
+        <div class="picker-subtab" data-sub="TT" onclick="switchSubtab('TT')">TT_ (Tính toán — set3)</div>
+      </div>
+
+      <div class="picker-search">
+        <input type="text" id="pickerSearch" placeholder="🔍 Nhập mã hoặc tên để tìm..." oninput="renderPickerList()">
+      </div>
+
+      <div class="picker-list">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:180px;">Mã</th>
+              <th>Tên tiếng Việt</th>
+              <th style="width:180px;">Tên tiếng Anh</th>
+              <th style="width:70px;">Loại</th>
+            </tr>
+          </thead>
+          <tbody id="pickerBody"></tbody>
+        </table>
+      </div>
+
+      <div class="modal-ftr">
+        <button class="btn btn-cancel" onclick="closePicker()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL QUY TAC ============ -->
+  <div class="modal-overlay" id="quyTacModal" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:88vw;max-width:820px;">
+      <div class="modal-hdr" style="background:#6f42c1;color:#fff;">
+        <span>❓ Quy tắc — Gán công thức dữ liệu cho phiếu lương</span>
+        <button class="x" onclick="closeQuyTacModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 18px;font-size:12px;line-height:1.55;">
+        <h4 style="color:#0056b3;margin:0 0 6px 0;">1. Rule gán công thức per-row</h4>
+        <p>Mỗi cột trong template phiếu lương gán 1 tham số (hoặc biểu thức nhỏ như <code>@TT_LSP_KetQua_Final - @PR.BHXH - @PR.Thue</code>).
+        Khi render, engine <b>chạy công thức trên từng dòng lương độc lập</b> — mỗi dòng = 1 trang A4.
+        NV có N dòng → công thức được apply N lần, cho N kết quả.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">2. Cross-row BH/Thuế</h4>
+        <p>Các tham số cross-row (BHXH, thuế TNCN) đã được engine set7 gán vào dòng có <code>HT_HeSoBHXH</code> MAX,
+        các dòng khác = 0. Khi công thức gọi <code>@PR.BHXH</code>, engine trả về đúng giá trị per-row đó — không cần logic đặc biệt ở template.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">3. Modal picker 2 tab</h4>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li><b>Tab Millennium core</b>: luôn hiển thị. Chứa tham số HR (A.*, E.*) và PR (lương, phụ cấp, BH, thuế, Net) chuẩn Millennium.</li>
+          <li><b>Tab MPHG LSP</b>: chỉ enable khi template có <b>Nguồn DL = MPHG_LSP</b> (set ở set12). Bên trong có 3 sub-tab:
+            <ul>
+              <li><b>Cột grid Tính lương (set7)</b>: 26 cột C##.</li>
+              <li><b>HT_ (Số liệu hệ thống — set2)</b>: input engine.</li>
+              <li><b>TT_ (Tính toán — set3)</b>: output engine.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">4. Priority resolution</h4>
+        <p>Nếu 1 tham số tồn tại ở cả 2 nhóm (VD <code>@PR.BHXH</code> vs <code>@LSP.trichBH</code>) → engine ưu tiên
+        theo <b>nguồn DL của template</b>. Template Millennium chỉ resolve được các tham số Millennium; template MPHG_LSP resolve được cả 2.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">5. Lỗi resolve</h4>
+        <p>Nếu công thức tham chiếu tham số không tồn tại (VD template Millennium gọi <code>@C09_DonGia</code>) → engine log warning, trả về "N/A" ở phiếu.
+        Không throw exception để tránh vỡ phiếu.</p>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="closeQuyTacModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CURRENT_USER = 'FPT Admin';
+
+    function showAlert(msg, type) {
+      const b = document.getElementById('alertBox');
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display='none', 3500);
+    }
+
+    // ---------------- Mock: Templates (rút gọn từ set12) ----------------
+    const MOCK_TEMPLATES = [
+      { ma:'PL_01', tenVN:'Phiếu lương - MPHG chế biến',  nguonDL:'MPHG_LSP'   },
+      { ma:'PL_02', tenVN:'Phiếu lương - MPHG văn phòng', nguonDL:'MPHG_LSP'   },
+      { ma:'PL_03', tenVN:'Phiếu lương - KH A',            nguonDL:'MILLENNIUM' },
+      { ma:'PL_04', tenVN:'Phiếu lương - KH B',            nguonDL:'MILLENNIUM' },
+      { ma:'PL_05', tenVN:'Phiếu lương legacy'             /* nguonDL: undefined -> treat as MILLENNIUM */ }
+    ];
+
+    // ---------------- Mock: tiêu chí Millennium core ----------------
+    const MOCK_MILL = [
+      { ma:'A.SoQD',        vi:'Số Quyết định',        en:'Decision No.',       loai:'HR' },
+      { ma:'A.NgayQD',      vi:'Ngày Quyết định',      en:'Decision Date',      loai:'HR' },
+      { ma:'A.NgayHieuLuc', vi:'Ngày hiệu lực',        en:'Effective Date',     loai:'HR' },
+      { ma:'E.EmpCode',     vi:'Mã nhân viên',         en:'Employee Code',      loai:'HR' },
+      { ma:'E.EmpName',     vi:'Họ và tên',            en:'Full Name',          loai:'HR' },
+      { ma:'E.GenderStr',   vi:'Giới tính',            en:'Gender',             loai:'HR' },
+      { ma:'E.DOB',         vi:'Ngày sinh',            en:'Date of Birth',      loai:'HR' },
+      { ma:'E.NationalID',  vi:'Số CMND/CCCD',         en:'National ID',        loai:'HR' },
+      { ma:'E.JobTitleVN',  vi:'Chức danh (VN)',       en:'Job Title (VN)',     loai:'HR' },
+      { ma:'E.JobTitleEN',  vi:'Chức danh (EN)',       en:'Job Title (EN)',     loai:'HR' },
+      { ma:'E.Level1VN',    vi:'Đơn vị cấp 1',         en:'Dept Level 1',       loai:'HR' },
+      { ma:'E.Level2VN',    vi:'Đơn vị cấp 2',         en:'Dept Level 2',       loai:'HR' },
+      { ma:'E.Level3VN',    vi:'Đơn vị cấp 3',         en:'Dept Level 3',       loai:'HR' },
+      { ma:'E.HireDate',    vi:'Ngày vào làm',         en:'Hire Date',          loai:'HR' },
+      { ma:'E.BankAcc',     vi:'Số tài khoản NH',      en:'Bank Account',       loai:'HR' },
+      { ma:'E.BankName',    vi:'Tên ngân hàng',        en:'Bank Name',          loai:'HR' },
+      { ma:'E.TaxCode',     vi:'Mã số thuế',           en:'Tax Code',           loai:'HR' },
+      { ma:'E.InsuranceNo', vi:'Số sổ BHXH',           en:'Insurance No.',      loai:'HR' },
+      { ma:'PR.PRMonth',    vi:'Tháng lương',          en:'Payroll Month',      loai:'PR' },
+      { ma:'PR.LuongCoBan', vi:'Lương cơ bản',         en:'Basic Salary',       loai:'PR' },
+      { ma:'PR.LuongThoiGian', vi:'Lương thời gian',   en:'Time Salary',        loai:'PR' },
+      { ma:'PR.PhuCap',     vi:'Tổng phụ cấp',         en:'Total Allowance',    loai:'PR' },
+      { ma:'PR.Thuong',     vi:'Thưởng',               en:'Bonus',              loai:'PR' },
+      { ma:'PR.KhoanTru',   vi:'Tổng khoản trừ',       en:'Total Deduction',    loai:'PR' },
+      { ma:'PR.BHXH',       vi:'BHXH nhân viên',       en:'Insurance (Emp)',    loai:'PR' },
+      { ma:'PR.Thue',       vi:'Thuế TNCN',            en:'PIT',                loai:'PR' },
+      { ma:'PR.LuongNet',   vi:'Lương Net (thực nhận)',en:'Net Salary',         loai:'PR' },
+      { ma:'PR.CongThucTe', vi:'Công thực tế',         en:'Actual Days',        loai:'PR' },
+      { ma:'PR.CongChuan',  vi:'Công chuẩn tháng',     en:'Standard Days',      loai:'PR' }
+    ];
+
+    // ---------------- Mock: tiêu chí MPHG LSP ----------------
+    const MOCK_MPHG = {
+      SET7: [
+        { ma:'C01_MaNV',           vi:'Mã NV',                          en:'Emp Code',            loai:'set7' },
+        { ma:'C02_HoTen',          vi:'Họ và tên',                      en:'Full Name',           loai:'set7' },
+        { ma:'C03_NhomLuong',      vi:'Nhóm lương',                     en:'Payroll Group',       loai:'set7' },
+        { ma:'C04_NhomTL',         vi:'Nhóm tính lương',                en:'Calc Group',          loai:'set7' },
+        { ma:'C05_BPTL',           vi:'Bộ phận tính lương',             en:'Dept',                loai:'set7' },
+        { ma:'C06_CongThucTe',     vi:'Công thực tế (kỳ)',              en:'Actual Days',         loai:'set7' },
+        { ma:'C07_CongChuan',      vi:'Công chuẩn tháng',               en:'Standard Days',       loai:'set7' },
+        { ma:'C08_NangSuat',       vi:'Sản lượng NS_FINAL',             en:'Productivity',        loai:'set7' },
+        { ma:'C09_DonGia',         vi:'Đơn giá tiền lương',             en:'Unit Price',          loai:'set7' },
+        { ma:'C10_LuongGoc',       vi:'Lương gốc L0 (Base × Đơn giá)',  en:'Base L0',             loai:'set7' },
+        { ma:'C11_HeSo1',          vi:'Hệ số ĐC lần 1',                 en:'Adj coef 1',          loai:'set7' },
+        { ma:'C12_HeSo2',          vi:'Hệ số ĐC lần 2',                 en:'Adj coef 2',          loai:'set7' },
+        { ma:'C13_HeSo3',          vi:'Hệ số ĐC lần 3',                 en:'Adj coef 3',          loai:'set7' },
+        { ma:'C14_HeSo4',          vi:'Hệ số ĐC lần 4',                 en:'Adj coef 4',          loai:'set7' },
+        { ma:'C15_TienL1',         vi:'Tiền sau ĐC lần 1',              en:'After L1',            loai:'set7' },
+        { ma:'C16_TienL2',         vi:'Tiền sau ĐC lần 2',              en:'After L2',            loai:'set7' },
+        { ma:'C17_TienL3',         vi:'Tiền sau ĐC lần 3',              en:'After L3',            loai:'set7' },
+        { ma:'C18_HoTroChuyenBan', vi:'Hỗ trợ bàn giao',                en:'Handover support',    loai:'set7' },
+        { ma:'C19_LuongThoiGian',  vi:'Lương thời gian',                en:'Time salary',         loai:'set7' },
+        { ma:'C20_ThuongCaKip',    vi:'Thưởng ca kíp',                  en:'Shift bonus',         loai:'set7' },
+        { ma:'C21_PhuCapKy',       vi:'Phụ cấp theo kỳ',                en:'Period allowance',    loai:'set7' },
+        { ma:'C22_LuongDongBH',    vi:'Lương đóng BH',                  en:'Insurance base',      loai:'set7' },
+        { ma:'C23_KhoanTruThang',  vi:'Khoản trừ tháng',                en:'Monthly deduction',   loai:'set7' },
+        { ma:'C24_ThuNhapTinhThue',vi:'Thu nhập tính thuế',             en:'Taxable income',      loai:'set7' },
+        { ma:'C25_LuyKeLuong',     vi:'Lương lũy kế',                   en:'Cumulative',          loai:'set7' },
+        { ma:'C26_KetQuaFinal',    vi:'Tổng LSP cuối cùng (dòng)',      en:'Final result',        loai:'set7' }
+      ],
+      HT: [
+        { ma:'HT_TS_CongThucTe',        vi:'Công thực tế theo GĐ',            en:'',            loai:'HT_TS' },
+        { ma:'HT_TS_CongChuan',         vi:'Công chuẩn tháng',                en:'',            loai:'HT_TS' },
+        { ma:'HT_PR_NangSuatTinhLuong', vi:'Sản lượng NS_FINAL',              en:'',            loai:'HT_PR' },
+        { ma:'HT_PR_LSP_DonGia',        vi:'Đơn giá tiền lương',              en:'',            loai:'HT_PR' },
+        { ma:'HT_PR_LSP_HeSo1',         vi:'Hệ số ĐC lần 1',                  en:'',            loai:'HT_PR' },
+        { ma:'HT_PB_LuongCoBan_GD',     vi:'PB — Lương cơ bản theo GĐ',       en:'',            loai:'HT_PB' },
+        { ma:'HT_PB_LuongTong_GD',      vi:'PB — Tổng lương thô theo GĐ',     en:'',            loai:'HT_PB' },
+        { ma:'HT_PR_LSP_ThuongCaKip_MaxGD',vi:'Thưởng ca kíp (GĐ MAX)',       en:'',            loai:'HT_PR' },
+        { ma:'HT_PR_LSP_PhuCapKy',      vi:'Phụ cấp theo kỳ',                 en:'',            loai:'HT_PR' },
+        { ma:'HT_PR_LSP_TongLSP_Dept',  vi:'Tổng LSP theo Bộ phận',           en:'',            loai:'HT_PR' },
+        { ma:'HT_PR_LSP_BinhQuanLuongCa',vi:'Bình quân LSP theo Ca',          en:'',            loai:'HT_PR' },
+        { ma:'HT_PR_KhoanTruThang',     vi:'Khoản trừ tháng',                 en:'',            loai:'HT_PR' }
+      ],
+      TT: [
+        { ma:'TT_LSP_Base_L0',          vi:'Lương gốc L0',                    en:'Base L0',       loai:'TT_LSP' },
+        { ma:'TT_LSP_TienL1',           vi:'Tiền sau ĐC lần 1',               en:'After L1',      loai:'TT_LSP' },
+        { ma:'TT_LSP_TienL2',           vi:'Tiền sau ĐC lần 2',               en:'After L2',      loai:'TT_LSP' },
+        { ma:'TT_LSP_TienL3',           vi:'Tiền sau ĐC lần 3',               en:'After L3',      loai:'TT_LSP' },
+        { ma:'TT_LSP_HoTroChuyenBan',   vi:'Hỗ trợ bàn giao',                 en:'Handover',      loai:'TT_LSP' },
+        { ma:'TT_LSP_LuongThoiGian',    vi:'Lương thời gian',                 en:'Time salary',   loai:'TT_LSP' },
+        { ma:'TT_LSP_KhoanTruThang',    vi:'Khoản trừ tháng',                 en:'Monthly ded.',  loai:'TT_LSP' },
+        { ma:'TT_TNChiuThueTNCN',       vi:'Thu nhập chịu thuế TNCN',         en:'Taxable',       loai:'TT_LSP' },
+        { ma:'TT_LSP_KetQua_Final',     vi:'Tổng LSP cuối cùng',              en:'Final result',  loai:'TT_LSP' },
+        { ma:'LSP.trichBH',             vi:'Tổng BH trích',                   en:'Total Insur.',  loai:'LSP'    },
+        { ma:'LSP.thueTNCN',            vi:'Thuế TNCN kỳ',                    en:'PIT Total',     loai:'LSP'    }
+      ]
+    };
+
+    // ---------------- Mock: rows gán CT per template ----------------
+    const MOCK_ROWS = {
+      PL_01: [
+        { en:'EmpCode',   vi:'Mã nhân viên',        ct:'@E.EmpCode',       ghiChu:'' },
+        { en:'EmpName',   vi:'Họ và tên',           ct:'@E.EmpName',       ghiChu:'' },
+        { en:'JobTitle',  vi:'Chức danh',           ct:'@E.JobTitleVN',    ghiChu:'' },
+        { en:'Dept2',     vi:'Đơn vị',              ct:'@E.Level2VN',     ghiChu:'' },
+        { en:'Prod',      vi:'Sản lượng NS',        ct:'@C08_NangSuat',    ghiChu:'MPHG LSP set7' },
+        { en:'UnitPrice', vi:'Đơn giá',             ct:'@C09_DonGia',      ghiChu:'MPHG LSP set7' },
+        { en:'BaseL0',    vi:'Lương gốc L0',        ct:'@TT_LSP_Base_L0',  ghiChu:'MPHG TT set3' },
+        { en:'AfterL3',   vi:'Tiền sau ĐC L3',      ct:'@TT_LSP_TienL3',   ghiChu:'MPHG TT set3' },
+        { en:'BHXH',      vi:'BHXH NV',             ct:'@PR.BHXH',         ghiChu:'' },
+        { en:'PIT',       vi:'Thuế TNCN',           ct:'@PR.Thue',         ghiChu:'' },
+        { en:'NetPay',    vi:'Thực nhận',           ct:'@TT_LSP_KetQua_Final - @PR.BHXH - @PR.Thue', ghiChu:'Hybrid: MPHG + Millennium' }
+      ],
+      PL_03: [
+        { en:'EmpCode',   vi:'Mã NV',        ct:'@E.EmpCode',       ghiChu:'' },
+        { en:'EmpName',   vi:'Họ và tên',    ct:'@E.EmpName',       ghiChu:'' },
+        { en:'BaseSalary',vi:'Lương cơ bản', ct:'@PR.LuongCoBan',   ghiChu:'' },
+        { en:'Allowance', vi:'Phụ cấp',      ct:'@PR.PhuCap',       ghiChu:'' },
+        { en:'NetPay',    vi:'Lương Net',    ct:'@PR.LuongNet',     ghiChu:'' }
+      ]
+    };
+    // Auto-generate rows cho các template chưa mock
+    MOCK_TEMPLATES.forEach(t => { if (!MOCK_ROWS[t.ma]) MOCK_ROWS[t.ma] = []; });
+
+    // ---------------- UI helpers ----------------
+    function sourceBadge(source) {
+      const s = source || 'MILLENNIUM';
+      if (s === 'MPHG_LSP') return '<span class="badge-mphg">🆕 MPHG_LSP</span>';
+      return '<span class="badge-mill">Millennium (core)</span>';
+    }
+
+    function initCombo() {
+      const opts = MOCK_TEMPLATES.map(t =>
+        `<option value="${t.ma}">${t.ma} - ${t.tenVN}</option>`
+      ).join('');
+      document.getElementById('cboTemplate').innerHTML = opts;
+    }
+
+    function currentTemplate() {
+      const ma = document.getElementById('cboTemplate').value;
+      return MOCK_TEMPLATES.find(t => t.ma === ma);
+    }
+    function currentSource() {
+      const t = currentTemplate();
+      return (t && t.nguonDL) || 'MILLENNIUM'; // Backward compat
+    }
+
+    function onTemplateChange() {
+      const t = currentTemplate();
+      document.getElementById('tplSourceBadge').innerHTML = sourceBadge(t && t.nguonDL);
+      const banner = document.getElementById('mphgBanner');
+      if (currentSource() === 'MPHG_LSP') {
+        banner.className = 'mphg-banner on';
+        banner.innerHTML = '🆕 <b>Template MPHG_LSP</b> — modal chọn tiêu chí sẽ có <b>2 tab</b>: ' +
+          '<i>Millennium core</i> (tham số HR/PR chuẩn) + <i>MPHG LSP</i> (Cột grid set7 / HT_ / TT_).';
+      } else {
+        banner.className = 'mphg-banner off';
+        banner.innerHTML = 'Template <b>Millennium (core)</b> — modal chọn tiêu chí chỉ có 1 tab Millennium. ' +
+          'Muốn dùng tiêu chí MPHG LSP? Vào <a href="set12-dinhnghia-template-pl.html" target="_top">Định nghĩa template</a> đổi Nguồn DL.';
+      }
+      loadRows();
+    }
+
+    function loadRows() {
+      const ma = document.getElementById('cboTemplate').value;
+      const rows = MOCK_ROWS[ma] || [];
+      const html = rows.map((r, i) => `
+        <tr data-idx="${i}">
+          <td style="text-align:center;"><input type="checkbox" class="chk-row"></td>
+          <td style="text-align:center;">${i+1}</td>
+          <td class="col-en"><input class="cell-input" value="${r.en}" data-f="en"></td>
+          <td class="col-vn"><input class="cell-input" value="${r.vi}" data-f="vi"></td>
+          <td class="col-ct"><input class="cell-input" value="${r.ct}" data-f="ct" style="font-family:Consolas,monospace;"></td>
+          <td><input class="cell-input" value="${r.ghiChu||''}" data-f="ghiChu"></td>
+          <td class="col-picker"><button class="btn-picker" onclick="openPicker(${i})">[...]</button></td>
+        </tr>`).join('');
+      document.getElementById('gctBody').innerHTML = html ||
+        '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">Chưa có cột nào. Bấm <b>+ Thêm cột</b> để bắt đầu.</td></tr>';
+    }
+
+    function toggleAll(cb) {
+      document.querySelectorAll('.chk-row').forEach(c => c.checked = cb.checked);
+    }
+
+    function onAddRow() {
+      const ma = document.getElementById('cboTemplate').value;
+      MOCK_ROWS[ma].push({ en:'', vi:'', ct:'', ghiChu:'' });
+      loadRows();
+    }
+
+    function onDelete() {
+      const ma = document.getElementById('cboTemplate').value;
+      const cbs = document.querySelectorAll('.chk-row');
+      const keep = [];
+      cbs.forEach((cb, i) => { if (!cb.checked) keep.push(MOCK_ROWS[ma][i]); });
+      MOCK_ROWS[ma] = keep;
+      loadRows();
+      showAlert('Đã xóa dòng chọn.', 'success');
+    }
+
+    function onSaveAll() {
+      const ma = document.getElementById('cboTemplate').value;
+      const trs = document.querySelectorAll('#gctBody tr');
+      const arr = [];
+      trs.forEach(tr => {
+        const inputs = tr.querySelectorAll('input.cell-input');
+        if (inputs.length === 0) return;
+        const obj = {};
+        inputs.forEach(inp => obj[inp.dataset.f] = inp.value);
+        arr.push(obj);
+      });
+      MOCK_ROWS[ma] = arr;
+      showAlert(`Đã lưu ${arr.length} cột của template <b>${ma}</b>.`, 'success');
+    }
+
+    function onFilter() { showAlert('Mock: filter grid theo bộ lọc phía trên.', 'success'); }
+
+    // ---------------- Modal picker ----------------
+    let pickerRowIdx = null;
+    let pickerTab = 'MILL';   // MILL | MPHG
+    let pickerSub = 'SET7';   // SET7 | HT | TT
+
+    function openPicker(idx) {
+      pickerRowIdx = idx;
+      const ma = document.getElementById('cboTemplate').value;
+      const row = MOCK_ROWS[ma][idx];
+      document.getElementById('pickerColName').textContent = (row.en || '(chưa đặt tên)');
+
+      const src = currentSource();
+      const tabMPHG = document.getElementById('tabMPHG');
+      const tooltip = document.getElementById('tabMPHGTooltip');
+      const info = document.getElementById('pickerSourceInfo');
+
+      if (src === 'MPHG_LSP') {
+        tabMPHG.classList.remove('disabled');
+        tooltip.style.display = 'none';
+        info.innerHTML = 'Template hiện tại: <b>' + ma + '</b> — Nguồn: ' + sourceBadge('MPHG_LSP') +
+          '. Có thể chọn tiêu chí từ cả 2 tab (hybrid).';
+      } else {
+        tabMPHG.classList.add('disabled');
+        info.innerHTML = 'Template hiện tại: <b>' + ma + '</b> — Nguồn: ' + sourceBadge(src) +
+          '. Tab MPHG LSP <b>bị khóa</b> vì template dùng Millennium core.';
+        // Reset về Millennium
+        pickerTab = 'MILL';
+      }
+      switchTab(pickerTab);
+      document.getElementById('modal-picker').style.display = 'flex';
+    }
+
+    function closePicker() {
+      document.getElementById('modal-picker').style.display = 'none';
+      pickerRowIdx = null;
+    }
+
+    function switchTab(tab) {
+      // Guard: MPHG disabled?
+      if (tab === 'MPHG' && currentSource() !== 'MPHG_LSP') {
+        // Feedback visual — do nothing
+        return;
+      }
+      pickerTab = tab;
+      document.querySelectorAll('.picker-tab').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === tab);
+      });
+      document.getElementById('subtabsMPHG').style.display = (tab === 'MPHG') ? 'flex' : 'none';
+      document.getElementById('pickerSearch').value = '';
+      renderPickerList();
+    }
+
+    function switchSubtab(sub) {
+      pickerSub = sub;
+      document.querySelectorAll('.picker-subtab').forEach(el => {
+        el.classList.toggle('active', el.dataset.sub === sub);
+      });
+      document.getElementById('pickerSearch').value = '';
+      renderPickerList();
+    }
+
+    function renderPickerList() {
+      const q = document.getElementById('pickerSearch').value.trim().toLowerCase();
+      let list = [];
+      if (pickerTab === 'MILL') list = MOCK_MILL;
+      else                       list = MOCK_MPHG[pickerSub] || [];
+      if (q) list = list.filter(x =>
+        (x.ma||'').toLowerCase().includes(q) ||
+        (x.vi||'').toLowerCase().includes(q) ||
+        (x.en||'').toLowerCase().includes(q)
+      );
+      const html = list.map(x => `
+        <tr onclick="pickItem('${x.ma}','${x.vi.replace(/'/g,"\\'")}','${(x.en||'').replace(/'/g,"\\'")}')">
+          <td class="ma">${x.ma}</td>
+          <td>${x.vi}</td>
+          <td style="color:#666;">${x.en||''}</td>
+          <td style="text-align:center;font-family:Consolas,monospace;font-size:10px;">${x.loai||''}</td>
+        </tr>`).join('');
+      document.getElementById('pickerBody').innerHTML = html ||
+        '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Không có tiêu chí khớp.</td></tr>';
+    }
+
+    function pickItem(ma, vi, en) {
+      const idx = pickerRowIdx;
+      const tplMa = document.getElementById('cboTemplate').value;
+      const row = MOCK_ROWS[tplMa][idx];
+      row.ct = '@' + ma;
+      if (!row.en) row.en = en || ma;
+      if (!row.vi) row.vi = vi;
+      loadRows();
+      closePicker();
+      showAlert(`Đã gán <code>@${ma}</code> vào cột #${idx+1}.`, 'success');
+    }
+
+    function openQuyTacModal()  { document.getElementById('quyTacModal').style.display = 'flex'; }
+    function closeQuyTacModal() { document.getElementById('quyTacModal').style.display = 'none'; }
+
+    // init
+    initCombo();
+    onTemplateChange();
+  </script>
+</body>
+</html>

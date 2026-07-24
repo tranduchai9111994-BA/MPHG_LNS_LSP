@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Tạo báo cáo động</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* ===== SET8 layout ===== */
+    .set8-filter {
+      display: grid;
+      grid-template-columns: 160px 1fr 160px 1fr;
+      gap: 10px 20px;
+      align-items: center;
+      padding: 12px 14px;
+      background: #fafcff;
+      border: 1px solid #d8e1ee;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .set8-filter label { font-size: 12px; color: #333; text-align: right; }
+    .set8-filter label.req { color: #d32f2f; font-weight: bold; }
+    .set8-filter input[type="text"],
+    .set8-filter input[type="file"],
+    .set8-filter select,
+    .set8-filter textarea {
+      width: 100%; box-sizing: border-box;
+      border: 1px solid #ccc; padding: 4px 6px;
+      font-size: 12px; font-family: inherit;
+    }
+    .set8-filter input[type="text"], .set8-filter select { height: 26px; }
+    .set8-filter textarea { min-height: 48px; resize: vertical; }
+    .set8-filter .radio-inline { display: flex; gap: 18px; align-items: center; }
+    .set8-filter .radio-inline label { font-size: 12px; color: #333; text-align: left; }
+    .set8-filter .full-row { grid-column: 2 / -1; }
+    .set8-filter .full-4 { grid-column: 1 / -1; display: grid; grid-template-columns: 160px 1fr; gap: 10px 20px; align-items: start; }
+
+    /* Highlight option "Báo cáo tính lương theo thời gian" */
+    .set8-filter select option.opt-new { background: #fff9c4; font-weight: bold; color: #7a5c00; }
+    .set8-filter select optgroup[label*="MỚI"] { background: #fff9c4; color: #7a5c00; font-style: italic; }
+
+    /* Actions */
+    .set8-actions { display: flex; gap: 8px; justify-content: center; margin: 10px 0 14px; flex-wrap: wrap; }
+    .set8-actions button { padding: 6px 18px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: #fff; }
+    .set8-btn-save    { background: #5c9b00; }  .set8-btn-save:hover    { background: #4a8000; }
+    .set8-btn-refresh { background: #007bff; }  .set8-btn-refresh:hover { background: #0069d9; }
+    .set8-btn-export  { background: #fd7e14; }  .set8-btn-export:hover  { background: #e56b00; }
+
+    /* Grid list */
+    .set8-grid-wrap { border: 1px solid #ddd; max-height: 420px; overflow: auto; }
+    .set8-grid-wrap table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .set8-grid-wrap th {
+      background: #f4d03f; color: #333; padding: 6px 8px; border: 1px solid #ddd;
+      text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 2;
+    }
+    .set8-grid-wrap td { padding: 5px 8px; border: 1px solid #eee; vertical-align: middle; }
+    .set8-grid-wrap tbody tr:nth-child(even) { background: #fbfbfb; }
+    .set8-grid-wrap tbody tr:hover { background: #f1f8ff; }
+    .set8-grid-wrap tbody tr.row-editing { background: #fff3cd !important; }
+    .set8-grid-wrap .c-center { text-align: center; }
+    .set8-grid-wrap .c-mono { font-family: Consolas, monospace; color: #0056b3; font-weight: bold; }
+
+    /* Badge loại báo cáo */
+    .bc-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 11px; font-weight: bold; white-space: nowrap;
+    }
+    .bc-badge.ltg   { background: #fff9c4; color: #7a5c00; border: 1px solid #ffe082; }
+    .bc-badge.ktl   { background: #ffe0e0; color: #b71c1c; border: 1px solid #ef9a9a; }
+    .bc-badge.trk   { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+    .bc-badge.gl    { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+    .bc-badge.other { background: #eceff1; color: #37474f; border: 1px solid #b0bec5; }
+
+    /* Icon actions */
+    .icon-btn { cursor: pointer; font-size: 14px; border: none; background: transparent; padding: 2px 6px; }
+    .icon-edit { color: #e67e22; }
+    .icon-copy { color: #0056b3; }
+    .btn-gan {
+      background: #17a2b8; color: #fff; border: none; padding: 3px 9px; border-radius: 3px;
+      font-size: 11px; font-weight: bold; cursor: pointer;
+    }
+    .btn-gan:hover { background: #117a8b; }
+
+    .file-info { font-size: 11px; color: #0056b3; }
+    .file-info.none { color: #999; font-style: italic; }
+
+    /* Modal quy tắc body */
+    .rule-body { padding: 15px 20px; font-size: 12px; max-height: 70vh; overflow: auto; line-height: 1.55; }
+    .rule-body h4 { color: #0056b3; margin: 10px 0 6px; font-size: 13px; border-bottom: 1px dashed #cfd8dc; padding-bottom: 4px; }
+    .rule-body ul { margin: 4px 0 8px 18px; padding: 0; }
+    .rule-body li { margin: 3px 0; }
+    .rule-body code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; color: #b71c1c; font-size: 11px; }
+    .rule-body .box-tip { background: #fff9c4; border-left: 3px solid #f9a825; padding: 8px 10px; margin: 8px 0; }
+    .rule-body .box-warn { background: #ffebee; border-left: 3px solid #d32f2f; padding: 8px 10px; margin: 8px 0; color: #b71c1c; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+    <div class="breadcrumb">Lương › Báo cáo (Report) › Tạo báo cáo động</div>
+    <div class="page-title" style="position:relative;text-align:center;">
+      <span>TẠO BÁO CÁO ĐỘNG</span>
+      <button onclick="set8ShowRules()"
+              style="position:absolute;right:0;top:50%;transform:translateY(-50%);background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">
+        📋 Quy tắc
+      </button>
+    </div>
+
+    <div class="info-bar">
+      RÀNG BUỘC: <strong>Tên VN + Loại báo cáo</strong> bắt buộc. Loại "<b>Báo cáo tính lương theo thời gian</b>" (MỚI) phải upload template <code>.xlsx</code> trước khi mở màn Gán công thức.
+    </div>
+
+    <div id="set8-alert" class="alert-box"></div>
+
+    <!-- ===== FILTER PANEL ===== -->
+    <div class="set8-filter">
+      <label for="s8-tenEN">Tên xuất báo cáo EN</label>
+      <input type="text" id="s8-tenEN" placeholder="VD: Time-based Salary Report">
+
+      <label for="s8-tenVN" class="req">Tên xuất báo cáo VN</label>
+      <input type="text" id="s8-tenVN" placeholder="VD: Báo cáo tính lương theo thời gian - MPHG">
+
+      <label>Báo cáo</label>
+      <div class="radio-inline">
+        <label><input type="radio" name="s8-bc" value="chitiet" checked> Chi tiết</label>
+        <label><input type="radio" name="s8-bc" value="tonghop"> Tổng hợp</label>
+      </div>
+
+      <label for="s8-module">Module</label>
+      <select id="s8-module">
+        <option value="Lương" selected>Lương</option>
+        <option value="HR">HR</option>
+        <option value="Chấm công">Chấm công</option>
+        <option value="Thuế">Thuế</option>
+        <option value="BH">Bảo hiểm</option>
+      </select>
+
+      <label>Nhóm báo cáo</label>
+      <div class="radio-inline">
+        <label><input type="radio" name="s8-nhom" value="chitiet" checked> Báo cáo chi tiết</label>
+        <label><input type="radio" name="s8-nhom" value="quyetdinh"> Báo cáo quyết định</label>
+      </div>
+
+      <label for="s8-loai" class="req">Loại báo cáo</label>
+      <select id="s8-loai">
+        <option value="">-- Chọn loại --</option>
+        <optgroup label="Chuẩn hệ thống">
+          <option value="Báo cáo chi tiết bảng phí dịch vụ">Báo cáo chi tiết bảng phí dịch vụ</option>
+          <option value="Báo cáo chi tiết phân bổ chi phí">Báo cáo chi tiết phân bổ chi phí</option>
+          <option value="Báo cáo trình ký">Báo cáo trình ký</option>
+          <option value="Bảng kê thư xác nhận thu nhập">Bảng kê thư xác nhận thu nhập</option>
+          <option value="Giờ lương nhân viên từng phần">Giờ lương nhân viên từng phần</option>
+          <option value="Khấu trừ lương">Khấu trừ lương</option>
+        </optgroup>
+        <optgroup label="✨ MỚI BỔ SUNG">
+          <option value="Báo cáo tính lương theo thời gian" class="opt-new">✨ Báo cáo tính lương theo thời gian [MỚI]</option>
+        </optgroup>
+      </select>
+
+      <label for="s8-file">Đính kèm template</label>
+      <div>
+        <input type="file" id="s8-file" accept=".xlsx,.xls">
+        <div id="s8-file-name" style="font-size:11px;color:#0056b3;margin-top:3px;"></div>
+      </div>
+
+      <!-- Ghi chú span full row -->
+      <div class="full-4">
+        <label for="s8-ghichu">Ghi chú</label>
+        <textarea id="s8-ghichu" rows="2" placeholder="VD: Template khách hàng MPHG cấp 05/2026 — dùng cho tổ chế biến khối 1"></textarea>
+      </div>
+    </div>
+
+    <!-- ===== ACTIONS ===== -->
+    <div class="set8-actions">
+      <button class="set8-btn-save" onclick="set8Save()">💾 Lưu</button>
+      <button class="set8-btn-refresh" onclick="set8Reset()">🔄 Làm mới</button>
+      <button class="set8-btn-export" onclick="set8Export()">📤 Xuất dữ liệu</button>
+    </div>
+
+    <!-- ===== GRID LIST ===== -->
+    <div class="set8-grid-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px;"><input type="checkbox" id="s8-chk-all" onclick="set8ToggleAll(this)"></th>
+            <th style="width:44px;">STT</th>
+            <th style="width:40px;">Sửa</th>
+            <th style="width:40px;">Copy</th>
+            <th style="width:150px;">Mã BC</th>
+            <th style="width:22%;">Tên xuất báo cáo EN</th>
+            <th style="width:22%;">Tên xuất báo cáo VN</th>
+            <th style="width:200px;">Loại báo cáo</th>
+            <th style="width:180px;">Template Excel</th>
+            <th>Ghi chú</th>
+            <th style="width:130px;">Gán công thức</th>
+          </tr>
+        </thead>
+        <tbody id="s8-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ===== GHI CHÚ NGHIỆP VỤ ===== -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;box-sizing:border-box;border:1px dashed #ffd600;padding:8px;
+        font-size:12px;background:#fffef0;resize:vertical;font-family:inherit;"
+        placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;background:#5c9b00;color:#fff;border:none;border-radius:3px;font-weight:bold;cursor:pointer;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: QUY TẮC ===== -->
+  <div class="modal-overlay" id="s8-modal-rules" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:760px;max-width:92vw;">
+      <div class="modal-hdr">
+        📋 QUY TẮC — TẠO BÁO CÁO ĐỘNG
+        <button class="x" onclick="document.getElementById('s8-modal-rules').style.display='none'">✕</button>
+      </div>
+      <div class="rule-body">
+        <h4>1. Báo cáo động là gì?</h4>
+        <p>
+          Là báo cáo được cấu hình bởi BA/khách hàng — không phải báo cáo cứng do dev code sẵn. BA khai báo <b>tên</b>, <b>loại</b>, <b>module</b>,
+          rồi <b>upload template Excel</b> của khách. Hệ thống đọc header cột trong template → BA gán công thức mapping từng cột về tiêu chí có sẵn
+          (cột grid Tính lương, tiêu chí HT_, tiêu chí TT_) ở màn <b>Gán công thức dữ liệu</b>.
+        </p>
+
+        <h4>2. Loại báo cáo mới: <span style="color:#7a5c00;background:#fff9c4;padding:2px 6px;border-radius:3px;">✨ Báo cáo tính lương theo thời gian</span></h4>
+        <ul>
+          <li>Dùng khi khách muốn xuất bảng lương theo <b>khoảng thời gian tùy ý</b> (VD: 15/06 → 15/07) với cột mapping tự do.</li>
+          <li>Nguồn dữ liệu = kết quả màn <b>Tính lương tháng (set7)</b> + toàn bộ tiêu chí HT_/TT_ đã ráp ở set2/set3/set4.</li>
+          <li>Bắt buộc <b>upload template <code>.xlsx</code></b> trước → set9 mới có cột để BA gán công thức.</li>
+        </ul>
+
+        <h4>3. Quy trình chuẩn</h4>
+        <ol style="margin:4px 0 8px 20px;padding:0;">
+          <li>Ở màn này: nhập tên VN/EN → chọn loại "Báo cáo tính lương theo thời gian" → upload template Excel.</li>
+          <li>Bấm <b>💾 Lưu</b> → hệ thống thêm dòng vào grid list, hiện nút <b>🔗 Gán công thức</b>.</li>
+          <li>Click <b>🔗 Gán công thức</b> → chuyển sang màn <b>set9 - Gán công thức dữ liệu</b>.</li>
+          <li>Ở set9: chọn báo cáo → grid load cột từ template → gán công thức mỗi cột → Kiểm công thức → Lưu.</li>
+          <li>Xuất Excel: engine chạy công thức theo từng dòng NV, ghi vào cell template → tải file kết quả.</li>
+        </ol>
+
+        <h4>4. Rule template Excel</h4>
+        <div class="box-tip">
+          <b>Định dạng chuẩn:</b>
+          <ul>
+            <li>Header row rõ ràng ở dòng 1 (VD: A1="Mã NV", B1="Họ tên", C1="Lương theo bậc"...).</li>
+            <li>Chỉ dùng cột A-Z (26 cột tối đa), không merge header.</li>
+            <li>Không có công thức Excel sẵn — hệ thống sẽ chèn giá trị sau khi tính.</li>
+            <li>File <code>.xlsx</code> hoặc <code>.xls</code>, dung lượng ≤ 5MB.</li>
+          </ul>
+        </div>
+
+        <h4>5. Ràng buộc</h4>
+        <div class="box-warn">
+          <ul>
+            <li>Loại "Báo cáo tính lương theo thời gian" <b>bắt buộc</b> có template <code>.xlsx</code>. Không upload → không thể gán công thức.</li>
+            <li>Đổi template sau khi đã gán công thức: <b>reset</b> toàn bộ mapping đã gán (BA phải làm lại).</li>
+            <li>Xóa báo cáo có template = xóa cả file template lưu ở server (mockup: xóa key trong <code>localStorage</code>).</li>
+          </ul>
+        </div>
+
+        <h4>6. Nút "🔗 Gán công thức"</h4>
+        <p>Chỉ hiện với loại "Báo cáo tính lương theo thời gian" đã có template. Click sẽ mở màn <b>set9 - Gán công thức dữ liệu</b> với query <code>?maBC=xxx</code>.</p>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('s8-modal-rules').style.display='none'"
+                style="background:#6c757d;color:#fff;padding:6px 16px;font-weight:bold;border:none;border-radius:3px;cursor:pointer;">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ============================================================
+     SET8 — TẠO BÁO CÁO ĐỘNG
+     ============================================================ */
+  const S8_STORAGE_KEY = 'MPHG_LSP_BAO_CAO';
+  const LOAI_LTG = 'Báo cáo tính lương theo thời gian';
+
+  const MOCK_BAO_CAO_DEFAULT = [
+    { maBC:'BC_LTG_01', tenEN:'Time-based Salary Report',
+      tenVN:'Báo cáo tính lương theo thời gian - MPHG', module:'Lương',
+      loai:LOAI_LTG, template:'BC_LTG_01_template.xlsx',
+      ghiChu:'Template khách hàng MPHG cấp 05/2026 — dùng cho tổ chế biến khối 1',
+      bc:'chitiet', nhom:'chitiet' },
+    { maBC:'BC_LTG_02', tenEN:'Time-based Salary — VS',
+      tenVN:'Báo cáo tính lương theo thời gian - Nhóm vệ sinh', module:'Lương',
+      loai:LOAI_LTG, template:'BC_LTG_02_ve_sinh.xlsx',
+      ghiChu:'Áp dụng riêng nhóm vệ sinh — dùng BQ TLSP',
+      bc:'chitiet', nhom:'chitiet' },
+    { maBC:'BC_KTL_01', tenEN:'Salary Deduction',
+      tenVN:'Khấu trừ lương - MPHG', module:'Lương',
+      loai:'Khấu trừ lương', template:'', ghiChu:'',
+      bc:'chitiet', nhom:'chitiet' },
+    { maBC:'BC_TRK_01', tenEN:'Approval Sheet',
+      tenVN:'Báo cáo trình ký tháng', module:'Lương',
+      loai:'Báo cáo trình ký', template:'trinh_ky_v3.xlsx',
+      ghiChu:'BA MPHG duyệt 10/06/2026',
+      bc:'tonghop', nhom:'quyetdinh' },
+    { maBC:'BC_GL_01', tenEN:'Partial Hourly Salary',
+      tenVN:'Giờ lương nhân viên từng phần', module:'Lương',
+      loai:'Giờ lương nhân viên từng phần', template:'', ghiChu:'',
+      bc:'chitiet', nhom:'chitiet' },
+    { maBC:'BC_PDVU_01', tenEN:'Service Fee Detail',
+      tenVN:'Báo cáo chi tiết bảng phí dịch vụ Q2/2026', module:'Lương',
+      loai:'Báo cáo chi tiết bảng phí dịch vụ', template:'', ghiChu:'',
+      bc:'chitiet', nhom:'chitiet' },
+    { maBC:'BC_PBCP_01', tenEN:'Cost Allocation',
+      tenVN:'Báo cáo phân bổ chi phí — MPHG', module:'Lương',
+      loai:'Báo cáo chi tiết phân bổ chi phí', template:'phanbo_chi_phi_v2.xlsx',
+      ghiChu:'Phân bổ theo bộ phận cấp 3',
+      bc:'tonghop', nhom:'chitiet' }
+  ];
+
+  let S8_DATA = [];
+  let S8_EDITING = null;   // maBC đang edit
+  let S8_FILE_NAME = '';   // filename user vừa chọn cho form
+
+  /* ---------- Storage ---------- */
+  function s8Load() {
+    try {
+      const raw = localStorage.getItem(S8_STORAGE_KEY);
+      if (raw) { S8_DATA = JSON.parse(raw); return; }
+    } catch (e) { /* fall through */ }
+    S8_DATA = JSON.parse(JSON.stringify(MOCK_BAO_CAO_DEFAULT));
+    s8Persist();
+  }
+  function s8Persist() {
+    try { localStorage.setItem(S8_STORAGE_KEY, JSON.stringify(S8_DATA)); } catch(e) {}
+  }
+
+  /* ---------- Render grid ---------- */
+  function s8RenderGrid() {
+    const tb = document.getElementById('s8-tbody');
+    if (!S8_DATA.length) {
+      tb.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;color:#999;">Chưa có báo cáo nào.</td></tr>';
+      return;
+    }
+    tb.innerHTML = S8_DATA.map((r, i) => {
+      const badgeCls = s8BadgeClass(r.loai);
+      const tplHtml = r.template
+        ? `<span class="file-info">📎 ${escHtml(r.template)}</span>`
+        : `<span class="file-info none">Không có</span>`;
+      const isLTG = r.loai === LOAI_LTG;
+      const ganBtn = isLTG && r.template
+        ? `<button class="btn-gan" onclick="s8GanCongThuc('${r.maBC}')">🔗 Gán công thức</button>`
+        : (isLTG
+            ? `<span style="font-size:11px;color:#b71c1c;font-style:italic;">Cần upload template</span>`
+            : `<span style="font-size:11px;color:#999;">—</span>`);
+      const rowCls = S8_EDITING === r.maBC ? 'row-editing' : '';
+      return `<tr class="${rowCls}" data-mabc="${r.maBC}">
+        <td class="c-center"><input type="checkbox" class="chk-row"></td>
+        <td class="c-center">${i+1}</td>
+        <td class="c-center"><button class="icon-btn icon-edit" title="Sửa" onclick="s8Edit('${r.maBC}')">✎</button></td>
+        <td class="c-center"><button class="icon-btn icon-copy" title="Copy" onclick="s8Copy('${r.maBC}')">📋</button></td>
+        <td class="c-mono">${escHtml(r.maBC)}</td>
+        <td>${escHtml(r.tenEN || '')}</td>
+        <td>${escHtml(r.tenVN)}</td>
+        <td><span class="bc-badge ${badgeCls}">${escHtml(r.loai)}</span></td>
+        <td>${tplHtml}</td>
+        <td style="font-size:11px;color:#555;">${escHtml(r.ghiChu || '')}</td>
+        <td class="c-center">${ganBtn}</td>
+      </tr>`;
+    }).join('');
+  }
+  function s8BadgeClass(loai) {
+    if (loai === LOAI_LTG) return 'ltg';
+    if (loai === 'Khấu trừ lương') return 'ktl';
+    if (loai === 'Báo cáo trình ký') return 'trk';
+    if (loai === 'Giờ lương nhân viên từng phần') return 'gl';
+    return 'other';
+  }
+  function escHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, m => (
+      {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+    ));
+  }
+
+  /* ---------- Actions ---------- */
+  function s8ToggleAll(chk) {
+    document.querySelectorAll('#s8-tbody .chk-row').forEach(c => c.checked = chk.checked);
+  }
+
+  function s8Save() {
+    const tenVN = document.getElementById('s8-tenVN').value.trim();
+    const loai = document.getElementById('s8-loai').value;
+    if (!tenVN) { showAlert('Vui lòng nhập Tên xuất báo cáo VN', 'error'); return; }
+    if (!loai)  { showAlert('Vui lòng chọn Loại báo cáo', 'error'); return; }
+
+    const tenEN = document.getElementById('s8-tenEN').value.trim();
+    const module = document.getElementById('s8-module').value;
+    const bc = document.querySelector('input[name="s8-bc"]:checked').value;
+    const nhom = document.querySelector('input[name="s8-nhom"]:checked').value;
+    const ghiChu = document.getElementById('s8-ghichu').value.trim();
+    const template = S8_FILE_NAME || (S8_EDITING ? (S8_DATA.find(x => x.maBC === S8_EDITING)?.template || '') : '');
+
+    if (loai === LOAI_LTG && !template) {
+      showAlert('Loại "Báo cáo tính lương theo thời gian" bắt buộc phải đính kèm template Excel', 'error');
+      return;
+    }
+
+    if (S8_EDITING) {
+      const row = S8_DATA.find(x => x.maBC === S8_EDITING);
+      if (row) {
+        row.tenEN = tenEN; row.tenVN = tenVN; row.module = module;
+        row.bc = bc; row.nhom = nhom; row.loai = loai; row.ghiChu = ghiChu;
+        if (S8_FILE_NAME) row.template = S8_FILE_NAME;
+      }
+      showAlert(`Đã cập nhật báo cáo <b>${S8_EDITING}</b>`, 'success');
+      S8_EDITING = null;
+    } else {
+      const prefix = s8Prefix(loai);
+      const maBC = s8NextMa(prefix);
+      S8_DATA.push({ maBC, tenEN, tenVN, module, loai, template, ghiChu, bc, nhom });
+      showAlert(`Đã tạo báo cáo mới <b>${maBC}</b>`, 'success');
+    }
+    s8Persist();
+    s8RenderGrid();
+    s8Reset(true);
+  }
+
+  function s8Prefix(loai) {
+    if (loai === LOAI_LTG) return 'BC_LTG_';
+    if (loai === 'Khấu trừ lương') return 'BC_KTL_';
+    if (loai === 'Báo cáo trình ký') return 'BC_TRK_';
+    if (loai === 'Giờ lương nhân viên từng phần') return 'BC_GL_';
+    if (loai === 'Báo cáo chi tiết phân bổ chi phí') return 'BC_PBCP_';
+    if (loai === 'Báo cáo chi tiết bảng phí dịch vụ') return 'BC_PDVU_';
+    if (loai === 'Bảng kê thư xác nhận thu nhập') return 'BC_XNTN_';
+    return 'BC_GEN_';
+  }
+  function s8NextMa(prefix) {
+    let max = 0;
+    S8_DATA.forEach(r => {
+      if (r.maBC.startsWith(prefix)) {
+        const n = parseInt(r.maBC.slice(prefix.length), 10);
+        if (!isNaN(n) && n > max) max = n;
+      }
+    });
+    return prefix + String(max + 1).padStart(2, '0');
+  }
+
+  function s8Reset(keepAlert) {
+    document.getElementById('s8-tenEN').value = '';
+    document.getElementById('s8-tenVN').value = '';
+    document.getElementById('s8-module').value = 'Lương';
+    document.getElementById('s8-loai').value = '';
+    document.querySelector('input[name="s8-bc"][value="chitiet"]').checked = true;
+    document.querySelector('input[name="s8-nhom"][value="chitiet"]').checked = true;
+    document.getElementById('s8-file').value = '';
+    document.getElementById('s8-file-name').textContent = '';
+    document.getElementById('s8-ghichu').value = '';
+    S8_FILE_NAME = '';
+    S8_EDITING = null;
+    s8RenderGrid();
+    if (!keepAlert) hideAlert();
+  }
+
+  function s8Export() {
+    showAlert('📤 [Mockup] Đã xuất danh sách báo cáo động ra Excel (giả lập).', 'success');
+  }
+
+  function s8Edit(maBC) {
+    const r = S8_DATA.find(x => x.maBC === maBC);
+    if (!r) return;
+    document.getElementById('s8-tenEN').value = r.tenEN || '';
+    document.getElementById('s8-tenVN').value = r.tenVN || '';
+    document.getElementById('s8-module').value = r.module || 'Lương';
+    document.getElementById('s8-loai').value = r.loai || '';
+    const bcRadio = document.querySelector(`input[name="s8-bc"][value="${r.bc||'chitiet'}"]`); if (bcRadio) bcRadio.checked = true;
+    const nhomRadio = document.querySelector(`input[name="s8-nhom"][value="${r.nhom||'chitiet'}"]`); if (nhomRadio) nhomRadio.checked = true;
+    document.getElementById('s8-ghichu').value = r.ghiChu || '';
+    document.getElementById('s8-file-name').textContent = r.template ? `📎 Đã có: ${r.template} (chọn file mới để thay)` : '';
+    S8_FILE_NAME = '';
+    S8_EDITING = maBC;
+    s8RenderGrid();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showAlert(`Đang sửa báo cáo <b>${maBC}</b>. Nhấn 💾 Lưu để cập nhật.`, 'warning');
+  }
+
+  function s8Copy(maBC) {
+    const r = S8_DATA.find(x => x.maBC === maBC);
+    if (!r) return;
+    const prefix = s8Prefix(r.loai);
+    const newMa = s8NextMa(prefix);
+    S8_DATA.push({
+      ...r, maBC: newMa,
+      tenVN: r.tenVN + ' (Copy)',
+      tenEN: r.tenEN ? r.tenEN + ' (Copy)' : ''
+    });
+    s8Persist();
+    s8RenderGrid();
+    showAlert(`Đã copy báo cáo <b>${maBC}</b> → <b>${newMa}</b>`, 'success');
+  }
+
+  function s8GanCongThuc(maBC) {
+    console.log(`[SET8] Chuyển sang set9 với maBC=${maBC}`);
+    const r = S8_DATA.find(x => x.maBC === maBC);
+    const msg = `🔗 Chuyển sang màn "Gán công thức dữ liệu" cho báo cáo:\n\n  Mã: ${maBC}\n  Tên: ${r?.tenVN || ''}\n  Template: ${r?.template || '(chưa có)'}`;
+    if (confirm(msg + '\n\nNhấn OK để đi sang set9.')) {
+      window.location.href = `set9-gan-congthuc-baocao.html?maBC=${encodeURIComponent(maBC)}`;
+    }
+  }
+
+  /* ---------- Alert helper ---------- */
+  function showAlert(msg, type) {
+    const b = document.getElementById('set8-alert');
+    b.className = 'alert-box alert-' + (type || 'success');
+    b.innerHTML = msg;
+    b.style.display = 'block';
+    if (type !== 'error') setTimeout(() => { b.style.display = 'none'; }, 4000);
+  }
+  function hideAlert() {
+    const b = document.getElementById('set8-alert');
+    b.style.display = 'none';
+  }
+
+  function set8ShowRules() {
+    document.getElementById('s8-modal-rules').style.display = 'flex';
+  }
+
+  /* ---------- File input handler ---------- */
+  document.addEventListener('DOMContentLoaded', function() {
+    s8Load();
+    s8RenderGrid();
+
+    document.getElementById('s8-file').addEventListener('change', function(e) {
+      const f = e.target.files && e.target.files[0];
+      if (f) {
+        S8_FILE_NAME = f.name;
+        document.getElementById('s8-file-name').textContent = `📎 Đã chọn: ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+      } else {
+        S8_FILE_NAME = '';
+        document.getElementById('s8-file-name').textContent = '';
+      }
+    });
+  });
+  </script>
+</body>
+</html>

@@ -8,13 +8,31 @@
     <style>
       .btn-vd{background:#0056b3;color:#fff;border:none;padding:2px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-weight:bold;}
       .btn-vd:hover{background:#003d80;}
-      .vd-tbl{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0;}
-      .vd-tbl th{background:#e8eef5;padding:4px 6px;border:1px solid #ccc;text-align:left;font-weight:bold;}
-      .vd-tbl td{padding:4px 6px;border:1px solid #ddd;}
+      .vd-tbl{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0;white-space:normal;}
+      .vd-tbl th{background:#e8eef5;padding:4px 6px;border:1px solid #ccc;text-align:left;font-weight:bold;white-space:normal;}
+      .vd-tbl td{padding:4px 6px;border:1px solid #ddd;white-space:normal;word-break:break-word;}
       .vd-tbl .r{text-align:right;} .vd-tbl .hi{color:#0056b3;font-weight:bold;} .vd-tbl .dim{color:#999;}
       .vd-step{background:#f8f9fa;border-left:3px solid #0056b3;padding:8px 12px;margin:8px 0;font-size:11px;line-height:1.6;}
       .vd-step .op{color:#d63384;font-weight:bold;}
       .vd-info{background:#eaf7ea;border:1px solid #28a745;border-radius:4px;padding:6px 10px;font-size:11px;margin-top:8px;}
+      .help-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#6c757d;color:#fff;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;vertical-align:middle;user-select:none;}
+      .help-icon:hover{background:#0056b3;}
+      /* Combobox Căn cứ phân bổ */
+      .cbo-dropdown{position:absolute;top:100%;left:0;right:0;max-height:260px;overflow-y:auto;background:#fff;border:1px solid #b0b0b0;border-top:none;box-shadow:0 3px 8px rgba(0,0,0,.15);z-index:100;font-size:12px;}
+      .cbo-group{background:#e8eef5;color:#333;padding:4px 10px;font-weight:bold;font-size:11px;border-bottom:1px solid #d0d0d0;position:sticky;top:0;}
+      .cbo-item{padding:6px 10px;cursor:pointer;border-bottom:1px solid #f0f0f0;line-height:1.4;}
+      .cbo-item:hover,.cbo-item.hl{background:#e7f3ff;}
+      .cbo-item.selected{background:#d4edda;font-weight:bold;}
+      .cbo-item .code{color:#0056b3;font-family:Consolas,monospace;font-size:11px;}
+      .cbo-item .name{color:#333;}
+      .cbo-item .desc{color:#888;font-size:10px;margin-top:2px;}
+      .cbo-empty{padding:12px;color:#999;font-style:italic;text-align:center;}
+      /* Bảng Quy tắc trong modal */
+      .ref-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;table-layout:fixed;}
+      .ref-table th{background:#e8eef5;color:#333;padding:6px 8px;border:1px solid #ccc;text-align:left;font-weight:bold;white-space:normal;word-break:break-word;}
+      .ref-table td{padding:6px 8px;border:1px solid #ddd;background:#f9fbfd;vertical-align:top;text-align:left;white-space:normal;word-break:break-word;overflow-wrap:break-word;line-height:1.55;}
+      .ref-table td code{background:#f0f0f0;padding:1px 4px;border-radius:3px;font-family:Consolas,Monaco,monospace;font-size:11px;word-break:break-all;overflow-wrap:anywhere;white-space:normal;}
+      .ref-table tr:hover td{background:#eef4fb;}
     </style>
 </head>
 <body>
@@ -38,13 +56,27 @@
 
 <div>
   <div class="breadcrumb">Lương › Thiết lập (System) › Thiết lập công thức tính lương › Định nghĩa tiêu chí hệ thống tìm kiếm</div>
-  <div class="page-title">ĐỊNH NGHĨA TIÊU CHÍ HỆ THỐNG TÌM KIẾM</div>
-  <div class="info-bar" style="margin-bottom:10px;">
-    ĐẶC ĐIỂM: Tiêu chí tìm kiếm trả về kiểu <strong>NVARCHAR</strong> hoặc <strong>DATETIME</strong>.
-    Dùng cho 2 mục đích: <strong>(1)</strong> hiển thị cột trên báo cáo/lưới dữ liệu,
-    <strong>(2)</strong> làm điều kiện CASE WHEN trong tiêu chí hệ thống (HT_*) và tiêu chí tính toán (TT_*).
+  <div class="page-title" style="position:relative;text-align:center;">
+    <span>ĐỊNH NGHĨA TIÊU CHÍ HỆ THỐNG TÌM KIẾM</span>
+    <span style="position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:8px;">
+      <button onclick="showRules()" style="background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">&#128203; Quy tắc</button>
+    </span>
   </div>
   <div id="set1-alert" class="alert-box"></div>
+
+  <!-- MODAL: Quy tắc màn hình -->
+  <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:92vw;max-width:1100px;">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>&#128203; Quy tắc nghiệp vụ — Định nghĩa tiêu chí hệ thống tìm kiếm</span>
+        <button class="x" onclick="document.getElementById('modal-rules').style.display='none'">&#10005;</button>
+      </div>
+      <div class="modal-body" id="modal-rules-body" style="max-height:75vh;overflow-y:auto;padding:14px 18px;"></div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('modal-rules').style.display='none'">Đóng</button>
+      </div>
+    </div>
+  </div>
   <div class="form-panel">
     <div class="form-grid-2col">
       <label class="lbl-red">Mã tiêu chí</label>
@@ -53,37 +85,41 @@
       <div class="input-wrap"><input type="text" id="set1_tenVI" maxlength="255" placeholder="Tên tiếng Việt..."></div>
       <label>Tên tiếng Anh</label>
       <div class="input-wrap"><input type="text" id="set1_tenEN" maxlength="255" placeholder="Tên tiếng Anh..."></div>
-      <label>Thứ tự sắp xếp</label>
-      <div class="input-wrap"><input type="number" id="set1_thuTu" min="0" placeholder="0"></div>
+      <label class="lbl-red">Rank (Độ ưu tiên)</label>
+      <div class="input-wrap"><input type="number" id="set1_rank" min="1" value="1" style="width:80px;" title="Cùng Rank = xử lý đồng thời"><div class="input-note">Cùng Rank = chạy đồng thời</div></div>
       <label>Dùng fn table</label>
       <div class="input-wrap"><select id="set1_fnTable"><option value="">-- Chọn --</option><option value="HR_fnGetDonVi">HR_fnGetDonVi</option><option value="PR_LSP_fnGetNhomTinhLuong">PR_LSP_fnGetNhomTinhLuong</option></select></div>
       <label>Kiểu dữ liệu</label>
-      <div class="input-wrap"><select id="set1_kieu"><option value="nvarchar">nvarchar</option><option value="int">int</option><option value="float">float</option><option value="datetime">datetime</option></select></div>
-    </div>
-    <div style="margin-top:4px;">
-      <label class="lbl-red" style="display:block;margin-bottom:4px;">Công thức (SQL)</label>
-      <textarea id="set1_sql" maxlength="2000" style="width:100%;height:55px;" placeholder="VD: dbo.HR_fnGetDonVi(PR_LSP.EmpID, PR_LSP.ToDate, 3)"></textarea>
+      <div class="input-wrap"><select id="set1_kieu"><option value="nvarchar">nvarchar</option><option value="datetime">datetime</option></select></div>
     </div>
     <div class="form-grid-2col" style="margin-top:6px;">
-      <label>Ghi chú</label>
-      <div class="input-wrap"><textarea id="set1_note" maxlength="1000" style="height:55px;"></textarea></div>
-      <label></label>
-      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="set1_use" checked> Sử dụng</label>
-    </div>
-
-    <!-- Advanced Section -->
-    <div style="margin-top:12px;border:1px dashed #ccc;border-radius:4px;padding:0;">
-      <div onclick="toggleAdvanced()" style="cursor:pointer;padding:8px 12px;background:#f8f9fa;font-weight:bold;font-size:12px;color:#0056b3;user-select:none;">
-        🔧 Thuộc tính nâng cao (LSP) <span id="set1_advToggle" style="float:right;">▼</span>
+      <label class="lbl-red">Công thức (SQL)</label>
+      <div class="input-wrap" style="grid-column:2/5;"><textarea id="set1_sql" maxlength="2000" style="width:100%;height:55px;font-family:Consolas,monospace;font-size:11px;box-sizing:border-box;" placeholder="VD: dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 3) — chọn param từ Danh mục Param hệ thống (set0)"></textarea></div>
+      <label class="lbl-red">Phân bổ đầu ra<span class="help-icon" onclick="showHelp('phanBo')">?</span></label>
+      <div class="input-wrap" style="grid-column:2/5;">
+        <select id="set1_phanBo" onchange="onPhanBoChange()" style="min-width:320px;">
+          <option value="slice" title="Mỗi dòng GĐ giữ output của chính GĐ đó (N giá trị riêng). Phân bổ độc lập với việc BA truyền param nào vào function.">Theo giai đoạn — N giá trị (mỗi GĐ 1 giá trị riêng)</option>
+          <option value="last" title="Mọi dòng GĐ = output của GĐ cuối kỳ. Phân bổ độc lập với việc BA truyền param nào vào function.">Mới nhất — 1 giá trị (chốt cuối kỳ), replicate mọi dòng</option>
+          <option value="first" title="Mọi dòng GĐ = output của GĐ đầu kỳ. Phân bổ độc lập với việc BA truyền param nào vào function.">Cũ nhất — 1 giá trị (chốt đầu kỳ), replicate mọi dòng</option>
+          <option value="maxby" title="Engine chạy 2 pha: (1) chạy Căn cứ theo từng GĐ để chốt GĐ có căn cứ MAX, (2) lấy giá trị SQL tại GĐ đó → replicate mọi dòng. Yêu cầu chọn 'Căn cứ phân bổ' bên dưới.">Tiêu chí giá trị cao nhất — 1 giá trị (GĐ có căn cứ MAX), replicate mọi dòng</option>
+          <option value="minby" title="Engine chạy 2 pha: (1) chạy Căn cứ theo từng GĐ để chốt GĐ có căn cứ MIN, (2) lấy giá trị SQL tại GĐ đó → replicate mọi dòng. Yêu cầu chọn 'Căn cứ phân bổ' bên dưới.">Tiêu chí giá trị thấp nhất — 1 giá trị (GĐ có căn cứ MIN), replicate mọi dòng</option>
+        </select>
       </div>
-      <div id="set1_advPanel" style="padding:8px 12px;">
-        <div class="form-grid-2col">
-          <label>Áp dụng theo giai đoạn QTLV</label>
-          <div class="input-wrap"><select id="set1_applyStage" onchange="onApplyStageChange()"><option value="N">N</option><option value="Y">Y</option></select></div>
-          <label id="lbl_dateMode">Tham số ngày</label>
-          <div class="input-wrap"><select id="set1_dateMode" disabled><option value="ToDate">ToDate</option><option value="FromDate">FromDate</option><option value="FromDate&ToDate">FromDate&ToDate</option></select></div>
+      <label id="set1_basis_label" style="display:none;">Căn cứ phân bổ<span class="help-icon" onclick="showHelp('phanBoBasis')">?</span></label>
+      <div class="input-wrap" id="set1_basis_wrap" style="display:none;grid-column:2/5;">
+        <div class="cbo-basis" style="position:relative;width:100%;max-width:520px;">
+          <input type="text" id="set1_basis_input" autocomplete="off" placeholder="🔍 Chọn hoặc gõ để lọc (mã / tên / công thức)..." style="width:100%;box-sizing:border-box;padding:6px 28px 6px 8px;font-size:12px;" onfocus="openBasisCombo()" oninput="renderBasisCombo()" onkeydown="onBasisKeydown(event)" title="Click để mở danh sách. Gõ để lọc theo mã (VD: HT_PB), tên (VD: năng suất), hoặc mô tả công thức. Enter để chọn item đầu tiên. Bấm dấu ? bên trái để xem giải thích chi tiết.">
+          <span id="set1_basis_caret" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);color:#666;pointer-events:none;font-size:10px;">▾</span>
+          <input type="hidden" id="set1_phanBoBasis" value="">
+          <div id="set1_basis_dropdown" class="cbo-dropdown" style="display:none;"></div>
         </div>
       </div>
+      <label></label>
+      <div class="input-wrap" style="grid-column:2/5;">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;"><input type="checkbox" id="set1_use" checked> Sử dụng</label>
+      </div>
+      <label>Ghi chú</label>
+      <div class="input-wrap" style="grid-column:2/5;"><input type="text" id="set1_note" maxlength="1000" style="width:100%;box-sizing:border-box;" placeholder="Ghi chú ngắn về tiêu chí (tùy chọn)..."></div>
     </div>
   </div>
 
@@ -93,6 +129,20 @@
       <div class="modal-hdr" id="modal-vd-tk-title">📋 Ví dụ</div>
       <div class="modal-body" id="modal-vd-tk-body" style="max-height:75vh;overflow-y:auto;padding:12px 15px;font-size:12px;"></div>
       <div class="modal-ftr"><button class="btn btn-cancel" onclick="document.getElementById('modal-vd-tk').style.display='none'">Đóng</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Help icon (?) -->
+  <div class="modal-overlay" id="modal-help" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:92vw;max-width:820px;">
+      <div class="modal-hdr" style="background:#6c757d;">
+        <span id="modal-help-title">Giải thích</span>
+        <button class="x" onclick="document.getElementById('modal-help').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body" id="modal-help-body" style="max-height:65vh;overflow-y:auto;"></div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('modal-help').style.display='none'">Đóng</button>
+      </div>
     </div>
   </div>
 
@@ -111,14 +161,13 @@
       <th>Tên tiếng Anh</th>
       <th>Tên tiếng Việt</th>
       <th>Kiểu dữ liệu</th>
-      <th>Ghi chú</th>
-      <th>Thứ tự sắp xếp</th>
       <th>Công thức (SQL)</th>
       <th>Dùng fn table</th>
-      <th>Áp dụng QTLV</th>
-      <th>Tham số ngày</th>
+      <th>Rank</th>
+      <th>Phân bổ đầu ra</th>
       <th>Ví dụ</th>
       <th>Sử dụng</th>
+      <th>Ghi chú</th>
       <th>Người tạo</th>
       <th>Ngày tạo</th>
       <th>Người sửa</th>
@@ -128,13 +177,6 @@
   </table></div>
 </div>
 
-    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
-      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
-        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
-      </div>
-      <textarea rows="4" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;">RÀNG BUỘC: ApplyByStage=Y khiến engine gọi tiêu chí theo từng giai đoạn QTLV với cặp ngày theo Tham số ngày. Tiêu chí cũ (N) chạy như trước (1 lần/kỳ, ToDate cuối tháng) — đảm bảo backward-compatible.
-Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history lưu cả SQL hay chỉ metadata?</textarea>
-    </div>
   </div>
   <script src="../shared/mockdata.js"></script>
   <script src="../shared/utils.js"></script>
@@ -167,19 +209,313 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
     }
 
     const MOCK_TK = [
-      {ma:'TK_HR_DonViCap1', vi:'Đơn vị cấp 1', en:'Dept L1', sql:'dbo.HR_fnGetDonVi(PR_LSP.EmpID, PR_LSP.ToDate, 1)', fnTable:'', kieu:'nvarchar', thuTu:1, applyStage:'Y', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_DonViCap2', vi:'Đơn vị cấp 2', en:'Dept L2', sql:'dbo.HR_fnGetDonVi(PR_LSP.EmpID, PR_LSP.ToDate, 2)', fnTable:'', kieu:'nvarchar', thuTu:2, applyStage:'Y', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_DonViCap3', vi:'Đơn vị cấp 3', en:'Dept L3', sql:'dbo.HR_fnGetDonVi(PR_LSP.EmpID, PR_LSP.ToDate, 3)', fnTable:'', kieu:'nvarchar', thuTu:3, applyStage:'Y', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_DonViCap4', vi:'Đơn vị cấp 4 (Ca)', en:'Dept L4', sql:'dbo.HR_fnGetDonVi(PR_LSP.EmpID, PR_LSP.ToDate, 4)', fnTable:'', kieu:'nvarchar', thuTu:4, applyStage:'Y', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_DonViCap5', vi:'Đơn vị cấp 5 (Bàn)', en:'Dept L5', sql:'dbo.HR_fnGetDonVi(PR_LSP.EmpID, PR_LSP.ToDate, 5)', fnTable:'', kieu:'nvarchar', thuTu:5, applyStage:'Y', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_ChucVu', vi:'Chức vụ', en:'Job Title', sql:'dbo.HR_fnGetChucVu(PR_LSP.EmpID, PR_LSP.ToDate)', fnTable:'', kieu:'nvarchar', thuTu:6, applyStage:'N', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_ChucDanh', vi:'Chức danh', en:'Position', sql:'dbo.HR_fnGetChucDanh(PR_LSP.EmpID, PR_LSP.ToDate)', fnTable:'', kieu:'nvarchar', thuTu:7, applyStage:'N', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_NhomTinhLuong', vi:'Nhóm tính lương', en:'Salary Group', sql:'dbo.PR_LSP_fnGetNhomTinhLuong(PR_LSP.EmpID, PR_LSP.PRMonth)', fnTable:'', kieu:'nvarchar', thuTu:8, applyStage:'N', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_HR_DuCong', vi:'Cờ đủ công', en:'Full Attendance', sql:'dbo.PR_LSP_fnGetDuCong(PR_LSP.EmpID, PR_LSP.DeptID, PR_LSP.PRMonth)', fnTable:'', kieu:'int', thuTu:9, applyStage:'N', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
-      {ma:'TK_PR_LSP_LoaiDieuChinh', vi:'Loại điều chỉnh HS', en:'Adjust Type', sql:'dbo.PR_LSP_fnGetLoaiDieuChinh(PR_LSP.DeptID, PR_LSP.PRMonth)', fnTable:'', kieu:'nvarchar', thuTu:10, applyStage:'N', dateMode:'ToDate', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_DonViCap1', vi:'Đơn vị cấp 1', en:'Dept L1', sql:'dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 1)', fnTable:'', kieu:'nvarchar', thuTu:1, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'BA truyền @SliceToDate → engine gọi function N lần (1 lần/GĐ) → N giá trị', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_DonViCap2', vi:'Đơn vị cấp 2', en:'Dept L2', sql:'dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 2)', fnTable:'', kieu:'nvarchar', thuTu:2, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_DonViCap3', vi:'Đơn vị cấp 3', en:'Dept L3', sql:'dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 3)', fnTable:'', kieu:'nvarchar', thuTu:3, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_DonViCap4', vi:'Đơn vị cấp 4 (Ca)', en:'Dept L4', sql:'dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 4)', fnTable:'', kieu:'nvarchar', thuTu:4, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_DonViCap5', vi:'Đơn vị cấp 5 (Bàn)', en:'Dept L5', sql:'dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 5)', fnTable:'', kieu:'nvarchar', thuTu:5, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_NhomTinhLuong', vi:'Nhóm tính lương', en:'Salary Group', sql:'dbo.PR_LSP_fnGetNhomTinhLuong(@EmpID, @PRMonth)', fnTable:'', kieu:'nvarchar', thuTu:6, rank:1, params:['@EmpID','@PRMonth'], phanBo:'last', phanBoBasis:'', used:true, note:'Function không phụ thuộc GĐ (chỉ @PRMonth) → 1 giá trị replicate cho mọi dòng. Phân bổ đầu ra = Mới nhất = tag semantic', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_PR_LSP_LoaiDieuChinh', vi:'Loại điều chỉnh HS', en:'Adjust Type', sql:'dbo.PR_LSP_fnGetLoaiDieuChinh(@EmpID, @ToDate, @PRMonth)', fnTable:'', kieu:'nvarchar', thuTu:8, rank:1, params:['@EmpID','@ToDate','@PRMonth'], phanBo:'last', phanBoBasis:'', used:true, note:'BA truyền @ToDate để function trả loại điều chỉnh chốt tại cuối kỳ. Phân bổ đầu ra = Mới nhất → 1 giá trị replicate mọi dòng.', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_DonViCap3_MaxLuong', vi:'Đơn vị cấp 3 (GĐ lương cao nhất)', en:'Dept L3 (Max Salary Slice)', sql:'dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 3)', fnTable:'', kieu:'nvarchar', thuTu:9, rank:2, params:['@EmpID','@SliceToDate'], phanBo:'maxby', phanBoBasis:'TT_PB_LuongNet_GD', used:true, note:'Cùng SQL với TK_HR_DonViCap3 nhưng Phân bổ đầu ra = Cao nhất → engine 2 pha: (1) chạy TT_PB_LuongNet_GD từng GĐ để chốt GĐ MAX, (2) lấy giá trị của SQL này tại GĐ đó → replicate mọi dòng.', nguoiTao:CURRENT_USER, ngayTao:'01/01/2026 08:00', nguoiSua:'', ngaySua:''},
+      // ===== BỔ SUNG PHASE 2 — map Report5_Bangluong 82 cột =====
+      {ma:'TK_HR_MaNV', vi:'Mã nhân viên', en:'Employee ID', sql:'@EmpID', fnTable:'', kieu:'nvarchar(20)', thuTu:10, rank:1, params:['@EmpID'], phanBo:'last', phanBoBasis:'', used:true, note:'Map Report5 C00. Không cần function — engine inject @EmpID trực tiếp, replicate mọi dòng GĐ.', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_HoTen', vi:'Họ và tên', en:'Full name', sql:'dbo.HR_fnGetHoTen(@EmpID, @SliceToDate)', fnTable:'', kieu:'nvarchar(100)', thuTu:11, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'last', phanBoBasis:'', used:true, note:'Map Report5 C01+C02 (Họ+Tên). ⚠ Function `HR_fnGetHoTen` CHƯA có trong 27 function catalog — đề xuất bổ sung.', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_TenDonViCap5', vi:'Tên đơn vị cấp 5 (Bàn)', en:'Dept L5 Name', sql:'dbo.HR_fnGetTenDonVi(@EmpID, @SliceToDate, 5)', fnTable:'', kieu:'nvarchar(200)', thuTu:12, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Map Report5 C08 (VD: "Chế biến tải 01 ka 1"). Bổ sung để BA có thể lấy tên hiển thị mà không phải join.', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_NhomLuongCap1', vi:'Nhóm lương cấp 1', en:'Salary Group L1', sql:'dbo.HR_fnGetNhomLuong(@EmpID, @SliceToDate, 1)', fnTable:'', kieu:'nvarchar(50)', thuTu:13, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Map Report5 C75. VD "Lương CN".', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_NhomLuongCap2', vi:'Nhóm lương cấp 2', en:'Salary Group L2', sql:'dbo.HR_fnGetNhomLuong(@EmpID, @SliceToDate, 2)', fnTable:'', kieu:'nvarchar(50)', thuTu:14, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Map Report5 C76. VD "Năng suất".', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_NhomLuongCap3', vi:'Nhóm lương cấp 3', en:'Salary Group L3', sql:'dbo.HR_fnGetNhomLuong(@EmpID, @SliceToDate, 3)', fnTable:'', kieu:'nvarchar(50)', thuTu:15, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Map Report5 C77. VD "Năng suất".', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_BPTinhLuong', vi:'Bộ phận tính lương', en:'Payroll Dept', sql:'dbo.HR_fnGetBPTinhLuong(@EmpID, @SliceToDate)', fnTable:'', kieu:'nvarchar(50)', thuTu:16, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Map Report5 C78. Dùng làm filter Nhóm/Ca cho HT_PR_LSP_DonGia và HT_PR_NangSuatTinhLuong.', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_BPGom', vi:'Bộ phận gom', en:'Grouping Dept', sql:'dbo.HR_fnGetBPGom(@EmpID, @SliceToDate)', fnTable:'', kieu:'nvarchar(50)', thuTu:17, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Map Report5 C79. BP gom để aggregate cross-NV (dùng cho HT_PR_LSP_TongLSP_Dept).', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_HR_MaPBChiPhi', vi:'Mã phân bổ chi phí', en:'Cost Allocation Code', sql:'dbo.HR_fnGetMaPBChiPhi(@EmpID, @SliceToDate)', fnTable:'', kieu:'nvarchar(20)', thuTu:18, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Map Report5 C70. ⚠ Function `HR_fnGetMaPBChiPhi` CHƯA có trong 27 function catalog — đề xuất bổ sung.', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
+      {ma:'TK_TIME_CaLamViec', vi:'Ca làm việc chính', en:'Main Shift', sql:'dbo.PTS_fnGetCaChinh(@EmpID, @SliceToDate)', fnTable:'', kieu:'nvarchar(10)', thuTu:19, rank:1, params:['@EmpID','@SliceToDate'], phanBo:'slice', phanBoBasis:'', used:true, note:'Filter Ca đêm/ngày cho đơn giá TG khác nhau. ⚠ Function `PTS_fnGetCaChinh` CHƯA có trong 27 function catalog — đề xuất bổ sung.', nguoiTao:CURRENT_USER, ngayTao:'01/07/2026 08:00', nguoiSua:'', ngaySua:''},
     ];
 
+    // Danh sách tiêu chí PB (mock) — thực tế cross-ref sang set2 (HT_PB_*) và set3 (TT_PB_*) có flag choPhanBo=true
+    const PHAN_BO_BASIS_OPTIONS = [
+      {v:'HT_PB_LuongCoBan_GD',   name:'Lookup lương cơ bản',        group:'HT_PB_* — Lookup 1 cột (set2)', desc:"Trỏ trực tiếp cột 'Lương cơ bản' theo GĐ. Dùng khi phân bổ theo mức lương cứng."},
+      {v:'HT_PB_LuongTong_GD',    name:'Lookup tổng lương thô',      group:'HT_PB_* — Lookup 1 cột (set2)', desc:"Trỏ trực tiếp cột 'Tổng lương thô' theo GĐ."},
+      {v:'TT_PB_LuongNet_GD',     name:'Tính lương thực nhận',       group:'TT_PB_* — Tính toán (set3)',    desc:'Công thức: LuongTong − Thuế − BHXH − Khoản trừ khác. Dùng khi phân bổ theo lương thực nhận.'},
+      {v:'TT_PB_LuongCoNSDN_GD',  name:'Tính lương có năng suất',    group:'TT_PB_* — Tính toán (set3)',    desc:'Công thức: LuongCoBan + LuongLSP × HeSoNangSuat. Dùng khi phân bổ theo mức đóng góp năng suất.'},
+      {v:'TT_PB_TongThuNhap_GD',  name:'Tính tổng thu nhập',         group:'TT_PB_* — Tính toán (set3)',    desc:'Công thức: LuongTong + Thưởng + Phụ cấp. Dùng khi phân bổ theo tổng thu nhập.'}
+    ];
+    function phanBoBasisLabel(v){ const o=PHAN_BO_BASIS_OPTIONS.find(x=>x.v===v); return o?(o.v+' — '+o.name):v; }
+    function phanBoBasisSource(v){ const o=PHAN_BO_BASIS_OPTIONS.find(x=>x.v===v); return o?o.group:''; }
+
+    const PHAN_BO_OPTIONS = [
+      {v:'slice', t:'Theo giai đoạn',              short:'Giai đoạn', color:'#28a745', output:'N giá trị',                    needsBasis:false},
+      {v:'last',  t:'Mới nhất',                    short:'Mới nhất',  color:'#0056b3', output:'1 giá trị (cuối kỳ)',           needsBasis:false},
+      {v:'first', t:'Cũ nhất',                     short:'Cũ nhất',   color:'#6c757d', output:'1 giá trị (đầu kỳ)',             needsBasis:false},
+      {v:'maxby', t:'Tiêu chí giá trị cao nhất',   short:'MAX căn cứ',color:'#c9302c', output:'1 giá trị (GĐ có căn cứ MAX)',   needsBasis:true},
+      {v:'minby', t:'Tiêu chí giá trị thấp nhất',  short:'MIN căn cứ',color:'#f0ad4e', output:'1 giá trị (GĐ có căn cứ MIN)',   needsBasis:true}
+    ];
+
+    // ===== QUY TẮC NGHIỆP VỤ (popup) =====
+    // Mỗi loại 1 dòng — nội dung dùng bullet cho các quy tắc con.
+    const RULES_TK = [
+      {loai:'Kiến trúc',
+       text:'&#8226; <b>Tiêu chí tìm kiếm</b> output kiểu <b>NVARCHAR</b> hoặc <b>DATETIME</b>. Dùng cho 2 mục đích: (1) hiển thị cột trên báo cáo/lưới, (2) làm điều kiện <b>CASE WHEN</b> ở HT_* / TT_*.<br>'
+          + '&#8226; <b>Xử lý song song theo Rank</b>: cùng Rank = chạy đồng thời. Tiêu chí chỉ tham chiếu được các tiêu chí có Rank thấp hơn.<br>'
+          + '&#8226; <b>Function scalar do dev code theo yêu cầu BA</b> — BA xác định function cần gì (input params + logic), dev implement. Ngược lại BA vẫn phải <b>viết SQL gọi function + truyền param cụ thể</b>, chọn param từ <a href="set0-param-hethong.html" target="_blank" style="color:#0056b3;font-weight:bold;">Danh mục Param hệ thống (set0)</a>.<br>'
+          + '&#8226; Phần <u>ngắt dòng / slicing / loop qua GĐ QTLV</u> là việc engine — BA không cấu hình.',
+       vd:'BA yêu cầu dev code fnGetDonVi(nv, ngày, cấp) → BA viết: <code>dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 1)</code>'},
+
+      {loai:'Phân bổ đầu ra',
+       text:'<b>Phân bổ đầu ra = cách phân phối output của function vào N dòng GĐ QTLV trong grid</b>. Function tính ra output như thế nào là do BA/dev spec riêng ở SQL — Phân bổ chỉ nói "output đó gán vào dòng nào".<br><br>'
+          + 'Với NV có N giai đoạn QTLV, output grid có N dòng. 5 mode:<br>'
+          + '&#8226; <b style="color:#28a745;">Theo giai đoạn</b> → mỗi dòng GĐ giữ output của chính GĐ đó (N giá trị riêng).<br>'
+          + '&#8226; <b style="color:#0056b3;">Mới nhất</b> → mọi dòng GĐ = output của GĐ <u>cuối kỳ</u>.<br>'
+          + '&#8226; <b style="color:#6c757d;">Cũ nhất</b> → mọi dòng GĐ = output của GĐ <u>đầu kỳ</u>.<br>'
+          + '&#8226; <b style="color:#c9302c;">Tiêu chí giá trị cao nhất</b> / <b style="color:#f0ad4e;">thấp nhất</b> → mọi dòng GĐ = output của GĐ có <u>căn cứ MAX/MIN</u>. Cần chọn <b>Căn cứ phân bổ</b>.',
+       vd:'Xem help (?) cạnh combo Phân bổ đầu ra để thấy bảng số liệu 5 mode'},
+
+      {loai:'Căn cứ phân bổ',
+       text:'<b>Là trường thứ 2</b> (chỉ hiện khi <b>Phân bổ đầu ra</b> = Cao/Thấp nhất). Là tiêu chí RIÊNG do BA tạo sẵn (tránh chọn trực tiếp cột lương thô/nhầm giữa hàng chục cột).<br><br>'
+          + '<b>2 loại tiêu chí PB:</b><br>'
+          + '&#8226; <b>HT_PB_*</b> (set2) — lookup 1 cột số theo GĐ. VD: <code>HT_PB_LuongCoBan_GD</code>, <code>HT_PB_LuongTong_GD</code>.<br>'
+          + '&#8226; <b>TT_PB_*</b> (set3) — công thức tính toán +/- nhiều cột. VD: <code>TT_PB_LuongNet_GD</code> (=Tổng − Thuế − BHXH), <code>TT_PB_TongThuNhap_GD</code> (=Lương + Thưởng + PC).<br><br>'
+          + '<b>Điều kiện lên dropdown:</b> flag <code>choPhanBo = true</code> + Phân bổ đầu ra của tiêu chí đó = <b>Theo giai đoạn</b> + kiểu trả về là <b>số</b> (int/decimal/money).',
+       vd:''},
+
+      {loai:'Bắt buộc (Blocking)',
+       text:'&#8226; <b>Phân bổ đầu ra</b> = Cao/Thấp nhất mà chưa chọn <b>Căn cứ phân bổ</b> → chặn lưu.<br>'
+          + '&#8226; <b>Mã tiêu chí</b>, <b>Tên tiếng Việt</b>, <b>Công thức (SQL)</b> là trường bắt buộc.'},
+
+      {loai:'Ràng buộc SQL',
+       text:'&#8226; Công thức (SQL) phải là <b>function scalar</b> do dev cung cấp. Chỉ được dùng các param có trong <a href="set0-param-hethong.html" target="_blank" style="color:#0056b3;font-weight:bold;">Danh mục Param hệ thống (set0)</a>.<br>'
+          + '&#8226; Kiểu dữ liệu đầu ra: <b>NVARCHAR</b> (chuỗi so sánh) hoặc <b>DATETIME</b> (mốc thời gian). Không hỗ trợ số/boolean — dùng set2 (HT_*) cho các trường hợp đó.<br>'
+          + '&#8226; <b>Việc chọn param truyền vào function độc lập với Phân bổ đầu ra</b> — BA truyền param theo logic mà function cần tính, KHÔNG phải theo mode Phân bổ. VD function <code>fnGetDonVi(nv, ngày, cấp)</code> cần 1 tham số ngày → BA truyền ngày hợp lý (có thể là <code>@SliceToDate</code>, <code>@ToDate</code>, <code>@FromDate</code>...) tùy chỗ dùng. Sau đó Phân bổ mới quyết định output đó gán vào N dòng như nào.'},
+
+      {loai:'Định dạng',
+       text:'&#8226; <b>Mã tiêu chí:</b> chỉ chữ/số/gạch dưới, không dấu, không khoảng trắng, unique toàn hệ thống.<br>'
+          + '&#8226; <b>Naming convention:</b> tiêu chí PB đặt tên <code>HT_PB_*</code> (set2) hoặc <code>TT_PB_*</code> (set3) để dễ nhận biết & filter.'},
+
+      {loai:'Tự động (Engine)',
+       text:'&#8226; Ngắt dòng theo GĐ QTLV, số lần gọi function, thứ tự 2 pha (Cao/Thấp nhất) — <b>engine tự xử lý</b>. BA không cấu hình, không viết trong SQL.<br>'
+          + '&#8226; Với Cao/Thấp nhất: engine luôn chạy <b>pha 1 (căn cứ PB) trước pha 2 (tiêu chí hiện tại)</b> bất kể Rank cấu hình. Khuyến nghị đặt Rank tiêu chí MAX/MIN &gt; Rank căn cứ PB để dễ audit.'},
+
+      {loai:'Còn cân nhắc',
+       text:'&#8226; Có nên thêm mode <b>"Giữa kỳ"</b> / <b>"GĐ dài ngày nhất"</b> / <b>"Trung bình cộng"</b>? — chưa có yêu cầu nghiệp vụ cụ thể.<br>'
+          + '&#8226; set2/set3 cần bổ sung: checkbox <code>choPhanBo</code> + validate naming convention <code>HT_PB_*</code> / <code>TT_PB_*</code> — <u>chưa triển khai</u>.'}
+    ];
+    function showRules(){
+      var html = '<table class="ref-table" style="table-layout:fixed;width:100%;"><thead><tr><th style="width:16%;">Loại</th><th style="width:54%;">Quy tắc</th><th style="width:30%;">Tham khảo ví dụ</th></tr></thead><tbody>';
+      RULES_TK.forEach(function(r){
+        var color = r.loai.indexOf('Blocking')>=0 ? '#dc3545'
+                  : r.loai==='Tự động (Engine)'    ? '#0056b3'
+                  : r.loai==='Phân bổ đầu ra'       ? '#28a745'
+                  : r.loai==='Căn cứ phân bổ'       ? '#c9302c'
+                  : r.loai==='Còn cân nhắc'         ? '#f0ad4e'
+                  : '#6c757d';
+        html += '<tr><td style="vertical-align:top;word-break:break-word;"><b style="color:'+color+'">'+r.loai+'</b></td>'
+          + '<td style="vertical-align:top;line-height:1.6;word-break:break-word;">'+r.text+'</td>'
+          + '<td style="vertical-align:top;color:#6f42c1;line-height:1.6;word-break:break-word;">'+(r.vd||'—')+'</td></tr>';
+      });
+      html += '</tbody></table>';
+      document.getElementById('modal-rules-body').innerHTML = html;
+      document.getElementById('modal-rules').style.display = 'flex';
+    }
+    function phanBoLabel(v){ const o=PHAN_BO_OPTIONS.find(x=>x.v===v); return o?o.t:v; }
+    function phanBoTooltip(v){
+      const o = PHAN_BO_OPTIONS.find(x=>x.v===v);
+      if (!o) return '';
+      const tips = {
+        slice: 'Theo giai đoạn — mỗi dòng GĐ giữ output của chính GĐ đó (N giá trị riêng).',
+        last:  'Mới nhất — mọi dòng GĐ = output của GĐ cuối kỳ.',
+        first: 'Cũ nhất — mọi dòng GĐ = output của GĐ đầu kỳ.',
+        maxby: 'Tiêu chí giá trị cao nhất — mọi dòng GĐ = output của GĐ có căn cứ MAX. Engine 2 pha: (1) chạy căn cứ từng GĐ, (2) lấy output tại GĐ MAX.',
+        minby: 'Tiêu chí giá trị thấp nhất — mọi dòng GĐ = output của GĐ có căn cứ MIN. Engine 2 pha tương tự.'
+      };
+      return tips[v] || o.t;
+    }
+    function phanBoTag(v){
+      const o=PHAN_BO_OPTIONS.find(x=>x.v===v)||PHAN_BO_OPTIONS[1];
+      const tip = phanBoTooltip(v).replace(/"/g,'&quot;');
+      return '<span title="'+tip+'" style="display:inline-block;background:'+o.color+';color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:bold;cursor:help;">'+o.short+'</span>';
+    }
+    function phanBoNeedsBasis(v){ const o=PHAN_BO_OPTIONS.find(x=>x.v===v); return !!(o && o.needsBasis); }
+
     let set1EditingMa = null;
+
+    // ===== Helpers cho Phân bổ =====
+    function getFormPhanBo() {
+      const el = document.getElementById('set1_phanBo');
+      return el ? el.value : 'slice';
+    }
+    function setFormPhanBo(v) {
+      const el = document.getElementById('set1_phanBo');
+      if (el) el.value = v || 'slice';
+      onPhanBoChange();
+    }
+    function getFormPhanBoBasis() {
+      const el = document.getElementById('set1_phanBoBasis');
+      return el ? el.value : '';
+    }
+    function setFormPhanBoBasis(v) {
+      const hid = document.getElementById('set1_phanBoBasis');
+      const inp = document.getElementById('set1_basis_input');
+      if (hid) hid.value = v || '';
+      if (inp) inp.value = v ? phanBoBasisLabel(v) : '';
+      closeBasisCombo();
+    }
+    function onPhanBoChange() {
+      const pb = getFormPhanBo();
+      const needsBasis = phanBoNeedsBasis(pb);
+      const lbl = document.getElementById('set1_basis_label');
+      const wrap = document.getElementById('set1_basis_wrap');
+      if (lbl) lbl.style.display = needsBasis ? '' : 'none';
+      if (wrap) wrap.style.display = needsBasis ? '' : 'none';
+      if (!needsBasis) setFormPhanBoBasis('');
+    }
+    // ===== Custom combobox cho Căn cứ phân bổ =====
+    let __basisHl = -1; // index của item đang highlight (keyboard)
+    function openBasisCombo(){
+      const dd = document.getElementById('set1_basis_dropdown');
+      if (!dd) return;
+      renderBasisCombo();
+      dd.style.display = 'block';
+    }
+    function closeBasisCombo(){
+      const dd = document.getElementById('set1_basis_dropdown');
+      if (dd) dd.style.display = 'none';
+      __basisHl = -1;
+    }
+    function renderBasisCombo(){
+      const inp = document.getElementById('set1_basis_input');
+      const dd = document.getElementById('set1_basis_dropdown');
+      const cur = (document.getElementById('set1_phanBoBasis')||{}).value || '';
+      if (!inp || !dd) return;
+      const q = (inp.value||'').toLowerCase().trim();
+      // Chỉ filter khi user gõ khác với label của item đang chọn
+      const isFullLabel = cur && q === phanBoBasisLabel(cur).toLowerCase();
+      const items = PHAN_BO_BASIS_OPTIONS.filter(o => {
+        if (!q || isFullLabel) return true;
+        const hay = (o.v + ' ' + o.name + ' ' + (o.desc||'') + ' ' + (o.group||'')).toLowerCase();
+        return hay.indexOf(q) >= 0;
+      });
+      if (!items.length) {
+        dd.innerHTML = '<div class="cbo-empty">Không tìm thấy tiêu chí phù hợp</div>';
+        __basisHl = -1;
+        return;
+      }
+      let html = '', lastGroup = '';
+      items.forEach((o, i) => {
+        if (o.group !== lastGroup) {
+          html += '<div class="cbo-group">' + o.group + '</div>';
+          lastGroup = o.group;
+        }
+        const sel = (o.v === cur) ? ' selected' : '';
+        const hl  = (i === __basisHl) ? ' hl' : '';
+        html += '<div class="cbo-item'+sel+hl+'" data-idx="'+i+'" data-value="'+o.v+'" title="'+(o.desc||'').replace(/"/g,'&quot;')+'" onmousedown="pickBasisCombo(\''+o.v+'\')">'
+              + '<span class="code">'+o.v+'</span> <span style="color:#999;">—</span> <span class="name">'+o.name+'</span>'
+              + (o.desc?'<div class="desc">'+o.desc+'</div>':'')
+              + '</div>';
+      });
+      dd.innerHTML = html;
+    }
+    function pickBasisCombo(v){
+      setFormPhanBoBasis(v);
+    }
+    function onBasisKeydown(e){
+      const dd = document.getElementById('set1_basis_dropdown');
+      if (!dd) return;
+      const items = dd.querySelectorAll('.cbo-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (dd.style.display === 'none') openBasisCombo();
+        __basisHl = Math.min((__basisHl<0?-1:__basisHl) + 1, items.length - 1);
+        highlightBasisItem();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        __basisHl = Math.max(__basisHl - 1, 0);
+        highlightBasisItem();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const target = items[__basisHl>=0 ? __basisHl : 0];
+        if (target) pickBasisCombo(target.getAttribute('data-value'));
+      } else if (e.key === 'Escape') {
+        closeBasisCombo();
+      }
+    }
+    function highlightBasisItem(){
+      const dd = document.getElementById('set1_basis_dropdown');
+      if (!dd) return;
+      dd.querySelectorAll('.cbo-item').forEach((el, i) => el.classList.toggle('hl', i === __basisHl));
+      const hl = dd.querySelector('.cbo-item.hl');
+      if (hl) hl.scrollIntoView({block:'nearest'});
+    }
+    // Đóng combobox khi click ngoài
+    document.addEventListener('mousedown', function(e){
+      const wrap = document.querySelector('.cbo-basis');
+      if (wrap && !wrap.contains(e.target)) closeBasisCombo();
+    });
+
+    // ===== Help icon (?) =====
+    const HELP_TK = {
+      phanBo: {
+        title: 'Phân bổ đầu ra — cách phân phối output vào N dòng GĐ',
+        body: '<b>Phân bổ đầu ra trả lời: output của function được gán vào N dòng GĐ QTLV như thế nào?</b> Nó KHÔNG liên quan tới việc BA truyền param nào vào function — đó là chuyện riêng ở SQL.<br><br>'
+          + '<table class="vd-tbl" style="table-layout:fixed;margin-bottom:10px;"><thead><tr>'
+          + '<th style="width:24%;">Phân bổ đầu ra</th><th style="width:32%;">Cách gán vào N dòng GĐ</th><th style="width:44%;">Ý nghĩa</th>'
+          + '</tr></thead><tbody>'
+          + '<tr><td><b style="color:#28a745;">Theo giai đoạn</b></td><td>Mỗi dòng GĐ giữ output của <b>chính GĐ đó</b> (N giá trị riêng)</td><td>Dùng khi giá trị thay đổi theo QTLV, cần thấy rõ từng GĐ</td></tr>'
+          + '<tr><td><b style="color:#0056b3;">Mới nhất</b></td><td>Mọi dòng GĐ = output của <b>GĐ cuối kỳ</b> (replicate)</td><td>Chốt trạng thái cuối kỳ, mọi dòng cùng NV thấy giống nhau</td></tr>'
+          + '<tr><td><b style="color:#6c757d;">Cũ nhất</b></td><td>Mọi dòng GĐ = output của <b>GĐ đầu kỳ</b> (replicate)</td><td>Chốt trạng thái đầu kỳ</td></tr>'
+          + '<tr><td><b style="color:#c9302c;">Tiêu chí giá trị cao nhất</b></td><td>Mọi dòng GĐ = output của <b>GĐ có căn cứ MAX</b> (replicate)</td><td>Cần chọn <b>Căn cứ phân bổ</b>. Engine 2 pha.</td></tr>'
+          + '<tr><td><b style="color:#f0ad4e;">Tiêu chí giá trị thấp nhất</b></td><td>Mọi dòng GĐ = output của <b>GĐ có căn cứ MIN</b> (replicate)</td><td>Tương tự Cao nhất</td></tr>'
+          + '</tbody></table>'
+          + '<div style="background:#e7f3ff;border-left:3px solid #0056b3;padding:8px 12px;margin-bottom:10px;font-size:11px;">'
+          + '<b>Tách biệt 2 concept:</b> (1) Việc <b>truyền param vào function</b> = BA quyết định function tính cái gì (spec logic). (2) <b>Phân bổ đầu ra</b> = quyết định output đó đi vào những dòng nào. Hai việc này không phụ thuộc nhau: cùng 1 function có thể dùng với các Phân bổ khác nhau.'
+          + '</div>'
+          + '<b>Ví dụ số liệu:</b> NV Nguyễn Thị Loan, kỳ 05/2026, 2 GĐ QTLV. Đơn vị cấp 3: GĐ1 = "PX Chế biến 1" (01–15/05), GĐ2 = "PX Chế biến 2" (16–31/05). Lương net GĐ1 = 4.1M, GĐ2 = 6.15M. Giả sử function output "đơn vị cấp 3" đã có đủ giá trị theo từng GĐ:<br>'
+          + '<table class="vd-tbl" style="table-layout:fixed;"><thead><tr>'
+          + '<th style="width:24%;">Phân bổ đầu ra</th><th style="width:38%;">Cách gán</th><th style="width:19%;">Dòng GĐ1</th><th style="width:19%;">Dòng GĐ2</th>'
+          + '</tr></thead><tbody>'
+          + '<tr><td><b style="color:#28a745;">Theo giai đoạn</b></td><td>Mỗi dòng lấy output riêng</td><td class="hi">"PX Chế biến 1"</td><td class="hi">"PX Chế biến 2"</td></tr>'
+          + '<tr><td><b style="color:#0056b3;">Mới nhất</b></td><td>Cả 2 dòng = output GĐ2 (cuối kỳ)</td><td class="hi">"PX Chế biến 2"</td><td class="hi">"PX Chế biến 2"</td></tr>'
+          + '<tr><td><b style="color:#6c757d;">Cũ nhất</b></td><td>Cả 2 dòng = output GĐ1 (đầu kỳ)</td><td class="hi">"PX Chế biến 1"</td><td class="hi">"PX Chế biến 1"</td></tr>'
+          + '<tr><td><b style="color:#c9302c;">Cao nhất</b><br><span style="font-size:9px;">(căn cứ: LuongNet)</span></td><td>Căn cứ MAX = GĐ2 → cả 2 dòng = output GĐ2</td><td class="hi">"PX Chế biến 2"</td><td class="hi">"PX Chế biến 2"</td></tr>'
+          + '<tr><td><b style="color:#f0ad4e;">Thấp nhất</b><br><span style="font-size:9px;">(căn cứ: LuongNet)</span></td><td>Căn cứ MIN = GĐ1 → cả 2 dòng = output GĐ1</td><td class="hi">"PX Chế biến 1"</td><td class="hi">"PX Chế biến 1"</td></tr>'
+          + '</tbody></table>'
+          + '<div class="vd-info">&#128161; <b>Nếu function trả 1 giá trị duy nhất</b> (không có "output theo GĐ") — mọi mode Phân bổ đều ra cùng kết quả replicate. Phân bổ khi đó chỉ là tag semantic mô tả ý nghĩa.</div>'
+      },
+      phanBoBasis: {
+        title: 'Căn cứ phân bổ — tiêu chí PB riêng cho Cao/Thấp nhất',
+        body: '<div style="background:#e7f3ff;border:1px solid #0056b3;border-radius:4px;padding:10px 12px;margin-bottom:12px;font-size:11px;">'
+          + '<b style="color:#0056b3;">&#127919; Vấn đề thực tế:</b> Trong hệ thống lương có <b>hàng chục cột</b> (thô, ròng, phụ cấp, khoản trừ, thưởng, thuế, BHXH...) trải trên nhiều màn hình. '
+          + 'Nếu cho user chọn trực tiếp bất kỳ cột nào làm căn cứ phân bổ → dễ chọn sai, mỗi người chọn 1 kiểu, không nhất quán, khó audit.<br><br>'
+          + '<b style="color:#0056b3;">&#9989; Giải pháp:</b> BA tạo <b>1 tiêu chí PB riêng</b> (dedicated allocation basis criteria) — dropdown chỉ hiển thị nhóm PB này, ngữ nghĩa đã được BA chốt sẵn.'
+          + '</div>'
+          + '<b>2 loại tiêu chí PB:</b>'
+          + '<table class="vd-tbl" style="table-layout:fixed;margin-bottom:10px;"><thead><tr>'
+          + '<th style="width:22%;">Loại</th><th style="width:24%;">Nơi tạo</th><th style="width:54%;">Ví dụ</th>'
+          + '</tr></thead><tbody>'
+          + '<tr><td><b>HT_PB_*</b><br><span style="color:#999;">Lookup 1 cột</span></td>'
+          + '<td>set2 — Định nghĩa tiêu chí hệ thống</td>'
+          + '<td><code>HT_PB_LuongCoBan_GD</code> = trỏ trực tiếp cột "Lương cơ bản" theo GĐ<br><code>HT_PB_LuongTong_GD</code> = trỏ cột "Tổng lương thô"</td></tr>'
+          + '<tr><td><b>TT_PB_*</b><br><span style="color:#999;">Công thức tính toán</span></td>'
+          + '<td>set3 — Định nghĩa tiêu chí tính toán</td>'
+          + '<td><code>TT_PB_LuongNet_GD</code> = <code>LuongTong − Thuế − BHXH − KhoanTru</code><br><code>TT_PB_TongThuNhap_GD</code> = <code>LuongTong + Thuong + PhuCap</code></td></tr>'
+          + '</tbody></table>'
+          + '<b>Ràng buộc tiêu chí PB (để lên được dropdown này):</b><br>'
+          + '&#8226; Flag <code>choPhanBo = true</code> (checkbox riêng trong set2/set3)<br>'
+          + '&#8226; Phân bổ đầu ra = <b>Theo giai đoạn</b> (trả ra N giá trị/NV, 1 giá trị mỗi GĐ)<br>'
+          + '&#8226; Kiểu trả về = <b>số</b> (int / decimal / money)<br><br>'
+          + '<b>Cách engine chạy 2 pha:</b>'
+          + '<table class="vd-tbl" style="table-layout:fixed;margin-top:6px;"><thead><tr><th style="width:8%;">Pha</th><th style="width:32%;">Việc engine làm</th><th style="width:60%;">Ví dụ: NV Loan, căn cứ = TT_PB_LuongNet_GD</th></tr></thead><tbody>'
+          + '<tr><td><b>1</b></td><td>Chạy tiêu chí căn cứ (TT_PB) theo từng GĐ QTLV, lấy toàn bộ giá trị số</td><td>GĐ1: LuongNet = 4.100.000 (=5.2M − Thuế − BHXH)<br>GĐ2: LuongNet = <b class="hi">6.150.000</b> (=7.8M − Thuế − BHXH)</td></tr>'
+          + '<tr><td><b>2</b></td><td>Chọn GĐ có MAX/MIN &rarr; lấy giá trị SQL của tiêu chí hiện tại tại GĐ đó (engine chạy SQL với context của GĐ đó) &rarr; replicate mọi dòng</td><td>MAX = GĐ2 &rarr; lấy giá trị của <code>dbo.HR_fnGetDonVi(1022907668, @SliceToDate, 3)</code> tại GĐ2 &rarr; "PX Chế biến 2"</td></tr>'
+          + '</tbody></table>'
+          + '<div class="vd-info">&#128161; <b>Thứ tự chạy (dependency ngầm):</b> Engine luôn chạy <u>pha 1 (căn cứ PB) trước pha 2 (tiêu chí hiện tại)</u> — không phụ thuộc Rank cấu hình. Để dễ audit + song song đúng, nên đặt <b>Rank tiêu chí hiện tại &gt; Rank của căn cứ PB</b>.</div>'
+          + '<div class="vd-info" style="background:#fff3cd;border-color:#ffc107;">&#9888; <b>Ràng buộc validation:</b> chọn <b>Phân bổ đầu ra</b> = Cao/Thấp nhất mà chưa chọn <b>Căn cứ phân bổ</b> → chặn lưu. Danh sách chỉ hiển thị tiêu chí có flag <code>choPhanBo=true</code>. Nếu chưa có tiêu chí PB phù hợp, BA cần tạo trước ở set2/set3.</div>'
+      }
+    };
+    function showHelp(key) {
+      const h = HELP_TK[key];
+      if (!h) return;
+      document.getElementById('modal-help-title').textContent = h.title;
+      document.getElementById('modal-help-body').innerHTML = h.body;
+      document.getElementById('modal-help').style.display = 'flex';
+    }
 
     function renderGrid(data) {
       const tbody = document.getElementById('set1-tbody');
@@ -189,7 +525,6 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
         const usedHtml = r.used
           ? '<span style="color:green;font-weight:bold">✔</span>'
           : '<span style="color:#ccc;font-weight:bold">✘</span>';
-        const applyHtml = r.applyStage === 'Y' ? '<b>X</b>' : '';
         html += '<tr data-ma="'+r.ma+'">'
           + '<td><input type="checkbox" class="set1-chk"></td>'
           + '<td>'+(i+1)+'</td>'
@@ -198,14 +533,15 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
           + '<td>'+r.en+'</td>'
           + '<td>'+r.vi+'</td>'
           + '<td style="text-align:center;">'+r.kieu+'</td>'
-          + '<td>'+r.note+'</td>'
-          + '<td style="text-align:center;">'+r.thuTu+'</td>'
           + '<td style="font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+r.sql+'">'+r.sql+'</td>'
           + '<td>'+r.fnTable+'</td>'
-          + '<td style="text-align:center;">'+applyHtml+'</td>'
-          + '<td style="text-align:center;">'+(r.applyStage==='Y'?r.dateMode:'')+'</td>'
+          + '<td style="text-align:center;">'+r.rank+'</td>'
+          + '<td style="text-align:center;">'+phanBoTag(r.phanBo)
+             +(r.phanBoBasis?'<br><span style="font-size:9px;color:#666;">Căn cứ: <code>'+r.phanBoBasis+'</code></span>':'')
+             +'</td>'
           + '<td style="text-align:center;"><button class="btn-vd" onclick="showVD_TK(\''+r.ma+'\')">Xem VD</button></td>'
           + '<td style="text-align:center;">'+usedHtml+'</td>'
+          + '<td style="font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+r.note+'">'+r.note+'</td>'
           + '<td>'+r.nguoiTao+'</td>'
           + '<td style="text-align:center;">'+r.ngayTao+'</td>'
           + '<td>'+r.nguoiSua+'</td>'
@@ -220,30 +556,32 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
       const vi = document.getElementById('set1_tenVI').value.trim();
       const en = document.getElementById('set1_tenEN').value.trim();
       const sql = document.getElementById('set1_sql').value.trim();
-      const thuTu = parseInt(document.getElementById('set1_thuTu').value) || 0;
       const fnTable = document.getElementById('set1_fnTable').value;
       const kieu = document.getElementById('set1_kieu').value;
       const note = document.getElementById('set1_note').value.trim();
       const used = document.getElementById('set1_use').checked;
-      const applyStage = document.getElementById('set1_applyStage').value;
-      const dateMode = document.getElementById('set1_dateMode').value;
+      const rank = parseInt(document.getElementById('set1_rank').value) || 1;
+      const phanBo = getFormPhanBo();
+      const phanBoBasis = getFormPhanBoBasis();
       const isEdit = document.getElementById('set1_ma').readOnly;
 
       if (!ma || !vi || !sql) return showAlert2('set1-alert','Vui lòng nhập đầy đủ các trường bắt buộc (màu đỏ): Mã tiêu chí, Tên tiếng Việt, Công thức (SQL).','error');
       if (!/^[a-zA-Z0-9_]+$/.test(ma)) return showAlert2('set1-alert','Mã tiêu chí không hợp lệ. Phải viết liền không dấu, không khoảng trắng.','error');
+      if (phanBoNeedsBasis(phanBo) && !phanBoBasis) return showAlert2('set1-alert','<b>Lỗi (Blocking):</b> Phân bổ đầu ra ['+phanBoLabel(phanBo)+'] yêu cầu chọn <b>Căn cứ phân bổ</b> (1 tiêu chí hệ thống trả về số theo GĐ).','error');
 
-      if (applyStage === 'Y' && !dateMode) {
-        return showAlert2('set1-alert','Vui lòng chọn Tham số ngày khi áp dụng theo giai đoạn','error');
-      }
+      // Auto-detect params từ SQL để phục vụ ví dụ
+      const detectedParams = [];
+      ['@EmpID','@DeptID','@PRMonth','@PRYear','@ToDate','@FromDate','@SliceFromDate','@SliceToDate','@BPTL','@NTL','@CongDoanMa','@KaID','@BanID','@CompanyID']
+        .forEach(p => { if (sql.indexOf(p) >= 0) detectedParams.push(p); });
 
       if (!isEdit) {
         const exists = MOCK_TK.find(r => r.ma.toUpperCase() === ma.toUpperCase());
         if (exists) return showAlert2('set1-alert','<b>Lỗi (Blocking):</b> Mã tiêu chí ['+ma+'] đã tồn tại.','error');
-        MOCK_TK.push({ma, vi, en, sql, fnTable, kieu, thuTu, applyStage, dateMode, used, note, nguoiTao:CURRENT_USER, ngayTao:nowStr(), nguoiSua:'', ngaySua:''});
+        MOCK_TK.push({ma, vi, en, sql, fnTable, kieu, rank, phanBo, phanBoBasis, params:detectedParams, used, note, nguoiTao:CURRENT_USER, ngayTao:nowStr(), nguoiSua:'', ngaySua:''});
       } else {
         const idx = MOCK_TK.findIndex(r => r.ma === ma);
         if (idx >= 0) {
-          MOCK_TK[idx] = {...MOCK_TK[idx], vi, en, sql, fnTable, kieu, thuTu, applyStage, dateMode, used, note, nguoiSua:CURRENT_USER, ngaySua:nowStr()};
+          MOCK_TK[idx] = {...MOCK_TK[idx], vi, en, sql, fnTable, kieu, rank, phanBo, phanBoBasis, params:detectedParams, used, note, nguoiSua:CURRENT_USER, ngaySua:nowStr()};
         }
       }
       renderGrid();
@@ -262,14 +600,13 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
       document.getElementById('set1_tenVI').value = item.vi;
       document.getElementById('set1_tenEN').value = item.en;
       document.getElementById('set1_sql').value = item.sql;
-      document.getElementById('set1_thuTu').value = item.thuTu;
       document.getElementById('set1_fnTable').value = item.fnTable;
       document.getElementById('set1_kieu').value = item.kieu;
       document.getElementById('set1_note').value = item.note;
       document.getElementById('set1_use').checked = item.used;
-      document.getElementById('set1_applyStage').value = item.applyStage;
-      onApplyStageChange();
-      document.getElementById('set1_dateMode').value = item.dateMode;
+      document.getElementById('set1_rank').value = item.rank;
+      setFormPhanBo(item.phanBo || 'slice');
+      setFormPhanBoBasis(item.phanBoBasis || '');
       set1EditingMa = ma;
       window.scrollTo(0,0);
     }
@@ -296,13 +633,13 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
       document.getElementById('set1_tenVI').value = '';
       document.getElementById('set1_tenEN').value = '';
       document.getElementById('set1_sql').value = '';
-      document.getElementById('set1_thuTu').value = '';
       document.getElementById('set1_fnTable').value = '';
       document.getElementById('set1_kieu').value = 'nvarchar';
       document.getElementById('set1_note').value = '';
       document.getElementById('set1_use').checked = true;
-      document.getElementById('set1_applyStage').value = 'N';
-      onApplyStageChange();
+      document.getElementById('set1_rank').value = 1;
+      setFormPhanBo('slice');
+      setFormPhanBoBasis('');
       document.getElementById('set1-alert').style.display = 'none';
       set1EditingMa = null;
     }
@@ -322,9 +659,9 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
     }
 
     function set1Export() {
-      let csv = 'Mã tiêu chí,Tên tiếng Việt,Tên tiếng Anh,Kiểu dữ liệu,Thứ tự,Công thức (SQL),Dùng fn table,Áp dụng QTLV,Tham số ngày,Sử dụng,Ghi chú\n';
+      let csv = 'Mã tiêu chí,Tên tiếng Việt,Tên tiếng Anh,Kiểu dữ liệu,Công thức (SQL),Dùng fn table,Rank,Phân bổ đầu ra,Căn cứ phân bổ,Sử dụng,Ghi chú\n';
       MOCK_TK.forEach(r => {
-        csv += '"'+r.ma+'","'+r.vi+'","'+r.en+'","'+r.kieu+'",'+r.thuTu+',"'+r.sql+'","'+r.fnTable+'","'+r.applyStage+'","'+r.dateMode+'",'+(r.used?'Y':'N')+',"'+r.note+'"\n';
+        csv += '"'+r.ma+'","'+r.vi+'","'+r.en+'","'+r.kieu+'","'+r.sql+'","'+r.fnTable+'",'+r.rank+',"'+phanBoLabel(r.phanBo)+'","'+(r.phanBoBasis||'')+'",'+(r.used?'Y':'N')+',"'+r.note+'"\n';
       });
       const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
       const link = document.createElement('a');
@@ -335,153 +672,147 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
       showAlert2('set1-alert','Xuất dữ liệu CSV thành công!','success');
     }
 
-    function toggleAdvanced() {
-      const panel = document.getElementById('set1_advPanel');
-      const toggle = document.getElementById('set1_advToggle');
-      if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        toggle.textContent = '▼';
-      } else {
-        panel.style.display = 'none';
-        toggle.textContent = '►';
-      }
-    }
-
-    function onApplyStageChange() {
-      const val = document.getElementById('set1_applyStage').value;
-      const dateMode = document.getElementById('set1_dateMode');
-      const lbl = document.getElementById('lbl_dateMode');
-      if (val === 'Y') {
-        dateMode.disabled = false;
-        lbl.className = 'lbl-red';
-      } else {
-        dateMode.disabled = true;
-        lbl.className = '';
-      }
-    }
-
-    // ===== VÍ DỤ TIÊU CHÍ TÌM KIẾM — context-aware theo row =====
+    // ===== VÍ DỤ TIÊU CHÍ TÌM KIẾM — context-aware theo phân bổ =====
     function showVD_TK(ma){
       var r = MOCK_TK.find(function(x){ return x.ma===ma; });
       if(!r) return;
-      var isY = r.applyStage==='Y';
-      var dm = r.dateMode||'ToDate';
+      var phanBo = r.phanBo || 'slice';
+      var pbOpt = PHAN_BO_OPTIONS.find(function(x){return x.v===phanBo;}) || PHAN_BO_OPTIONS[0];
+      var isMaxMin = phanBo==='maxby' || phanBo==='minby';
       var kieu = r.kieu;
+      var params = r.params || [];
+      // Xác định function có phụ thuộc GĐ QTLV hay không (dựa vào param date-varying nào có trong SQL)
+      var hasSliceParam = params.indexOf('@SliceToDate') >= 0 || params.indexOf('@SliceFromDate') >= 0;
+      var hasPeriodDate = params.indexOf('@ToDate') >= 0 || params.indexOf('@FromDate') >= 0;
+      var isTimeDependent = hasSliceParam || hasPeriodDate;
 
       var emp='<div style="background:#eef2f7;padding:8px 12px;border-radius:4px;margin-bottom:10px;font-size:11px;">'
         +'<b>NV mẫu:</b> Nguyễn Thị Loan (1022907668) &mdash; Kỳ 05/2026 &mdash; <b>2 giai đoạn QTLV</b><br>'
-        +'GĐ1: CB101 (01/05–15/05) &nbsp;|&nbsp; GĐ2: CB102 (16/05–31/05)</div>';
+        +'GĐ1: CB101 (01/05–15/05) &nbsp;|&nbsp; GĐ2: CB102 (16/05–31/05)'
+        +(isMaxMin ? '<br><b>Căn cứ phân bổ:</b> <code>'+r.phanBoBasis+'</code> &rarr; GĐ1 = 4.100.000, GĐ2 = 6.150.000 (LuongNet giả lập)' : '')
+        +'</div>';
 
-      // Setup badge
       var badge='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">'
         +'<span style="background:#0056b3;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Kiểu: '+kieu.toUpperCase()+'</span>'
-        +'<span style="background:'+(isY?'#28a745':'#6c757d')+';color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">ApplyByStage = '+r.applyStage+'</span>'
-        +(isY?'<span style="background:#e67e22;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">DateMode = '+dm+'</span>':'')
+        +'<span style="background:#17a2b8;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Rank: '+r.rank+'</span>'
+        +'<span style="background:'+pbOpt.color+';color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Phân bổ đầu ra: '+pbOpt.t+' &rarr; '+pbOpt.output+'</span>'
+        +(isMaxMin ? '<span style="background:#6f42c1;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Execution: 2 pha</span>' : '')
         +'</div>';
 
       var title = '&#128270; Ví dụ: '+r.ma+' ('+r.vi+')';
       var body = emp + badge;
 
-      // --- PHẦN 1: Engine gọi SQL như thế nào ---
-      body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:8px 0 4px;">1. Engine gọi SQL như thế nào?</div>';
-
-      if(!isY){
-        // ApplyByStage = N
-        body += '<div class="vd-step">'
-          +'<b>ApplyByStage = N</b> → Engine gọi SQL <span class="op">1 lần duy nhất</span> cho cả NV, không tách theo giai đoạn.<br><br>'
-          +'<b>SQL:</b> <code>'+r.sql+'</code><br><br>'
-          +'<b>Tham số ngày:</b> Không áp dụng — engine truyền <b>ToDate = ngày cuối kỳ</b> (31/05/2026) mặc định.<br><br>'
-          +'<b>Kết quả:</b> 1 giá trị duy nhất → <b>copy giống nhau</b> cho tất cả dòng (giai đoạn) của NV.'
-          +'</div>';
-        body += '<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Ngày truyền vào</th><th>Kết quả '+r.ma+'</th><th>Ghi chú</th></tr></thead>'
-          +'<tbody>';
-        if(kieu==='nvarchar'){
-          body += '<tr><td>1</td><td>CB101</td><td>31/05/2026</td><td class="hi">"Nhóm A"</td><td>copy từ kết quả duy nhất</td></tr>'
-            +'<tr><td>2</td><td>CB102</td><td>31/05/2026</td><td class="hi">"Nhóm A"</td><td>copy từ kết quả duy nhất</td></tr>';
-        } else if(kieu==='datetime'){
-          body += '<tr><td>1</td><td>CB101</td><td>31/05/2026</td><td class="hi">2020-03-15</td><td>copy từ kết quả duy nhất</td></tr>'
-            +'<tr><td>2</td><td>CB102</td><td>31/05/2026</td><td class="hi">2020-03-15</td><td>copy từ kết quả duy nhất</td></tr>';
-        } else {
-          body += '<tr><td>1</td><td>CB101</td><td>31/05/2026</td><td class="hi">1</td><td>copy từ kết quả duy nhất</td></tr>'
-            +'<tr><td>2</td><td>CB102</td><td>31/05/2026</td><td class="hi">1</td><td>copy từ kết quả duy nhất</td></tr>';
-        }
-        body += '</tbody></table>';
-      } else {
-        // ApplyByStage = Y — tách theo DateMode
-        body += '<div class="vd-step">'
-          +'<b>ApplyByStage = Y</b> → Engine gọi SQL <span class="op">N lần</span> (1 lần / giai đoạn QTLV). Mỗi lần truyền tham số ngày khác nhau.<br><br>'
-          +'<b>SQL:</b> <code>'+r.sql+'</code><br><br>'
-          +'<b>DateMode = '+dm+'</b> → ';
-        if(dm==='ToDate'){
-          body += 'Engine truyền <b>ngày cuối</b> của mỗi giai đoạn:<br>'
-            +'&nbsp;&nbsp;GĐ1: ToDate = <span class="op">15/05/2026</span><br>'
-            +'&nbsp;&nbsp;GĐ2: ToDate = <span class="op">31/05/2026</span>';
-        } else if(dm==='FromDate'){
-          body += 'Engine truyền <b>ngày đầu</b> của mỗi giai đoạn:<br>'
-            +'&nbsp;&nbsp;GĐ1: FromDate = <span class="op">01/05/2026</span><br>'
-            +'&nbsp;&nbsp;GĐ2: FromDate = <span class="op">16/05/2026</span>';
-        } else {
-          body += 'Engine truyền <b>cả 2 ngày</b> (đầu + cuối) của mỗi giai đoạn:<br>'
-            +'&nbsp;&nbsp;GĐ1: FromDate = <span class="op">01/05/2026</span>, ToDate = <span class="op">15/05/2026</span><br>'
-            +'&nbsp;&nbsp;GĐ2: FromDate = <span class="op">16/05/2026</span>, ToDate = <span class="op">31/05/2026</span>';
-        }
-        body += '</div>';
-
-        // Bảng kết quả theo DateMode
-        var dateCol = dm==='FromDate&ToDate' ? '<th>FromDate</th><th>ToDate</th>' : '<th>'+dm+' truyền vào</th>';
-        body += '<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th>'+dateCol+'<th>Kết quả '+r.ma+'</th></tr></thead><tbody>';
-        if(kieu==='nvarchar'){
-          if(dm==='FromDate&ToDate'){
-            body += '<tr><td>1</td><td>CB101</td><td>01/05</td><td>15/05</td><td class="hi">"PX Chế biến 1"</td></tr>'
-              +'<tr><td>2</td><td>CB102</td><td>16/05</td><td>31/05</td><td class="hi">"PX Chế biến 2"</td></tr>';
-          } else {
-            var d1=dm==='ToDate'?'15/05/2026':'01/05/2026', d2=dm==='ToDate'?'31/05/2026':'16/05/2026';
-            body += '<tr><td>1</td><td>CB101</td><td>'+d1+'</td><td class="hi">"PX Chế biến 1"</td></tr>'
-              +'<tr><td>2</td><td>CB102</td><td>'+d2+'</td><td class="hi">"PX Chế biến 2"</td></tr>';
-          }
-        } else if(kieu==='datetime'){
-          if(dm==='FromDate&ToDate'){
-            body += '<tr><td>1</td><td>CB101</td><td>01/05</td><td>15/05</td><td class="hi">2020-03-15</td></tr>'
-              +'<tr><td>2</td><td>CB102</td><td>16/05</td><td>31/05</td><td class="hi">2024-08-01</td></tr>';
-          } else {
-            var d1=dm==='ToDate'?'15/05/2026':'01/05/2026', d2=dm==='ToDate'?'31/05/2026':'16/05/2026';
-            body += '<tr><td>1</td><td>CB101</td><td>'+d1+'</td><td class="hi">2020-03-15</td></tr>'
-              +'<tr><td>2</td><td>CB102</td><td>'+d2+'</td><td class="hi">2024-08-01</td></tr>';
-          }
-        } else {
-          if(dm==='FromDate&ToDate'){
-            body += '<tr><td>1</td><td>CB101</td><td>01/05</td><td>15/05</td><td class="hi">1</td></tr>'
-              +'<tr><td>2</td><td>CB102</td><td>16/05</td><td>31/05</td><td class="hi">0</td></tr>';
-          } else {
-            var d1=dm==='ToDate'?'15/05/2026':'01/05/2026', d2=dm==='ToDate'?'31/05/2026':'16/05/2026';
-            body += '<tr><td>1</td><td>CB101</td><td>'+d1+'</td><td class="hi">1</td></tr>'
-              +'<tr><td>2</td><td>CB102</td><td>'+d2+'</td><td class="hi">0</td></tr>';
-          }
-        }
-        body += '</tbody></table>';
+      // Helper: resolve giá trị param
+      function paramVal(p, slice){
+        if(p==='@EmpID') return '1022907668';
+        if(p==='@DeptID') return slice===1?'CB101':'CB102';
+        if(p==='@PRMonth') return '5';
+        if(p==='@PRYear') return '2026';
+        if(p==='@ToDate') return '31/05/2026';
+        if(p==='@FromDate') return '01/05/2026';
+        if(p==='@SliceFromDate') return slice===1?'01/05/2026':'16/05/2026';
+        if(p==='@SliceToDate') return slice===1?'15/05/2026':'31/05/2026';
+        if(p==='@BPTL') return 'BPTL_001';
+        if(p==='@NTL') return 'NTL_A';
+        if(p==='@CongDoanMa') return 'CD01';
+        return '(giá trị tương ứng)';
       }
 
-      // --- PHẦN 2: So sánh Y vs N ---
-      body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:14px 0 4px;">2. So sánh: nếu đổi ApplyByStage thì sao?</div>';
-      if(!isY){
+      // --- PHẦN 1: Engine gọi function ---
+      body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:8px 0 4px;">1. Output shape &amp; giá trị</div>';
+
+      var soDong, moTa;
+      if(phanBo==='slice'){
+        soDong = 'N giá trị — mỗi dòng GĐ QTLV giữ output riêng của GĐ đó (2 dòng cho NV mẫu)';
+        moTa = 'Phân bổ đầu ra = <b style="color:#28a745;">Theo giai đoạn</b> → mỗi dòng GĐ giữ output của chính GĐ đó.';
+      } else if(phanBo==='last'){
+        soDong = '1 giá trị (output tại GĐ cuối kỳ), replicate mọi dòng GĐ';
+        moTa = 'Phân bổ đầu ra = <b style="color:#0056b3;">Mới nhất</b> → mọi dòng GĐ = output của GĐ cuối kỳ.';
+      } else if(phanBo==='first'){
+        soDong = '1 giá trị (output tại GĐ đầu kỳ), replicate mọi dòng GĐ';
+        moTa = 'Phân bổ đầu ra = <b style="color:#6c757d;">Cũ nhất</b> → mọi dòng GĐ = output của GĐ đầu kỳ.';
+      } else if(isMaxMin){
+        soDong = '1 giá trị (output tại GĐ có căn cứ '+(phanBo==='maxby'?'MAX':'MIN')+'), replicate mọi dòng GĐ';
+        moTa = 'Phân bổ đầu ra = <b style="color:'+pbOpt.color+';">'+pbOpt.t+'</b> → Engine chạy <b>2 pha</b>: (1) chạy Căn cứ phân bổ <code>'+(r.phanBoBasis||'?')+'</code> theo từng GĐ, (2) chốt GĐ có '+(phanBo==='maxby'?'MAX':'MIN')+' → lấy output của tiêu chí này tại GĐ đó → replicate mọi dòng.';
+      }
+
+      body += '<div class="vd-step">'
+        +moTa+'<br><br>'
+        +'<b>SQL BA viết:</b> <code>'+r.sql+'</code><br><br>'
+        +'<b>Output shape:</b> <span class="op">'+soDong+'</span>';
+
+      if(phanBo==='slice'){
+        body += '<br><br><b>Giá trị param theo từng giai đoạn:</b><br><u>GĐ1:</u><br>';
+        params.forEach(function(p){ body += '&nbsp;&nbsp;'+p+' = <span class="op">'+paramVal(p,1)+'</span><br>'; });
+        body += '<u>GĐ2:</u><br>';
+        params.forEach(function(p){ body += '&nbsp;&nbsp;'+p+' = <span class="op">'+paramVal(p,2)+'</span><br>'; });
+      } else if(!isMaxMin){
+        body += '<br><br><b>Giá trị param truyền vào (gọi 1 lần):</b><br>';
+        params.forEach(function(p){ body += '&nbsp;&nbsp;'+p+' = <span class="op">'+paramVal(p,phanBo==='first'?1:2)+'</span><br>'; });
+      } else {
+        body += '<br><br><span style="color:#666;font-style:italic;">Xem 2 pha bên dưới.</span>';
+      }
+      body += '</div>';
+
+      // Bảng pha 1 cho max/min
+      if(isMaxMin){
+        var chosenSlice = phanBo==='maxby'?2:1;
+        var chosenVal = phanBo==='maxby'?'6.150.000':'4.100.000';
+        var chosenLabel = phanBo==='maxby'?'MAX':'MIN';
+        body += '<div style="font-weight:bold;color:#6f42c1;font-size:11px;margin:8px 0 4px;">&#9881; Pha 1 — Chạy căn cứ <code>'+(r.phanBoBasis||'?')+'</code> theo từng GĐ:</div>';
+        body += '<table class="vd-tbl"><thead><tr><th style="width:10%;">GĐ</th><th style="width:14%;">Bàn</th><th style="width:26%;">Khoảng GĐ</th><th style="width:24%;">Kết quả căn cứ</th><th>Chốt</th></tr></thead><tbody>'
+          +'<tr><td>1</td><td>CB101</td><td>01/05–15/05/2026</td><td>4.100.000</td><td>'+(chosenSlice===1?'<b class="hi">&larr; '+chosenLabel+'</b>':'')+'</td></tr>'
+          +'<tr><td>2</td><td>CB102</td><td>16/05–31/05/2026</td><td>6.150.000</td><td>'+(chosenSlice===2?'<b class="hi">&larr; '+chosenLabel+'</b>':'')+'</td></tr>'
+          +'</tbody></table>'
+          +'<div style="font-size:10px;color:#6f42c1;margin:4px 0 8px;">&rarr; Engine chốt <b>GĐ'+chosenSlice+'</b> ('+chosenLabel+' = '+chosenVal+') để lấy giá trị SQL tại GĐ đó.</div>';
+        body += '<div style="font-weight:bold;color:#6f42c1;font-size:11px;margin:8px 0 4px;">&#9881; Pha 2 — Lấy giá trị SQL tại GĐ đã chốt &amp; replicate:</div>';
+      }
+
+      // Kết quả bảng
+      body += '<table class="vd-tbl"><thead><tr><th style="width:8%;">GĐ</th><th style="width:12%;">Bàn</th><th style="width:32%;">Context truyền vào function</th><th>Kết quả '+r.ma+'</th></tr></thead><tbody>';
+      function sampleValFor(slice){
+        if(kieu==='nvarchar'){
+          if(phanBo==='slice') return slice===1?'"PX Chế biến 1"':'"PX Chế biến 2"';
+          if(phanBo==='last'||phanBo==='maxby') return '"PX Chế biến 2"';
+          if(phanBo==='first'||phanBo==='minby') return '"PX Chế biến 1"';
+        }
+        if(kieu==='datetime') return '2024-08-01';
+        return phanBo==='slice' ? (slice===1?'1':'0') : '1';
+      }
+      var ctxG1, ctxG2;
+      if(phanBo==='slice'){
+        ctxG1 = hasSliceParam ? '@SliceToDate = 15/05/2026' : (hasPeriodDate ? '(cố định trong kỳ)' : '(không phụ thuộc ngày)');
+        ctxG2 = hasSliceParam ? '@SliceToDate = 31/05/2026' : (hasPeriodDate ? '(cố định trong kỳ)' : '(không phụ thuộc ngày)');
+      } else if(phanBo==='last'){
+        ctxG1 = ctxG2 = hasPeriodDate ? '@ToDate = 31/05/2026' : '(gọi 1 lần, replicate)';
+      } else if(phanBo==='first'){
+        ctxG1 = ctxG2 = hasPeriodDate ? '@FromDate = 01/05/2026' : '(gọi 1 lần, replicate)';
+      } else {
+        ctxG1 = ctxG2 = phanBo==='maxby' ? 'GĐ có MAX căn cứ → GĐ2' : 'GĐ có MIN căn cứ → GĐ1';
+      }
+      body += '<tr><td>1</td><td>CB101</td><td>'+ctxG1+'</td><td class="hi">'+sampleValFor(1)+'</td></tr>'
+           +'<tr><td>2</td><td>CB102</td><td>'+ctxG2+'</td><td class="hi">'+sampleValFor(phanBo==='slice'?2:1)+'</td></tr>';
+      body += '</tbody></table>';
+
+      // --- PHẦN 2: Cách Engine xử lý (đảm bảo khả thi triển khai) ---
+      body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:14px 0 4px;">2. Cách Engine xử lý — đảm bảo khả thi triển khai</div>';
+      if(phanBo==='slice'){
         body += '<div class="vd-step">'
-          +'<b>Hiện tại (N):</b> 1 lần gọi → 2 dòng nhận <b>cùng</b> giá trị.<br>'
-          +'<b>Nếu đổi sang Y + ToDate:</b> 2 lần gọi → mỗi dòng có thể nhận giá trị <b>khác nhau</b> (vì ToDate khác).<br><br>'
-          +'<span class="warn">&#9888; Khi nào cần Y?</span> Khi thông tin thay đổi giữa các giai đoạn (VD: NV chuyển bàn → đơn vị cấp 3 khác nhau).<br>'
-          +'<span style="color:#28a745;font-weight:bold;">&#9989; Khi nào giữ N?</span> Khi thông tin không đổi theo giai đoạn (VD: ngày vào làm, cờ đủ công cả tháng).'
+          +'Engine <b>lặp qua từng giai đoạn QTLV</b> của NV trong kỳ (2 GĐ = 2 lần gọi function). Với mỗi GĐ, engine execute SQL với các param date-slice tương ứng.<br><br>'
+          +'<span style="color:#28a745;font-weight:bold;">&#9989; Triển khai:</span> for-each qua bảng QTLV, không thuật toán phức tạp.'
+          +'</div>';
+      } else if(isMaxMin){
+        body += '<div class="vd-step">'
+          +'Engine chạy <b>2 pha</b>:<br>'
+          +'&nbsp;&nbsp;<b>Pha 1</b>: chạy tiêu chí căn cứ <code>'+(r.phanBoBasis||'?')+'</code> (Phân bổ đầu ra = Theo giai đoạn) để có N giá trị số theo GĐ. Đây là dependency ngầm — engine tự đảm bảo pha 1 chạy trước pha 2 bất kể Rank cấu hình.<br>'
+          +'&nbsp;&nbsp;<b>Pha 2</b>: chọn GĐ có '+(phanBo==='maxby'?'MAX':'MIN')+', lấy giá trị SQL tại GĐ đó (engine chạy SQL với context của GĐ đó). Kết quả replicate cho mọi dòng GĐ của NV.<br><br>'
+          +'<span style="color:#28a745;font-weight:bold;">&#9989; Triển khai:</span> tương đương SQL <code>ORDER BY [căn cứ] '+(phanBo==='maxby'?'DESC':'ASC')+' LIMIT 1</code> trên bảng slice, sau đó lấy value của SQL tiêu chí tại slice đó.'
           +'</div>';
       } else {
         body += '<div class="vd-step">'
-          +'<b>Hiện tại (Y + '+dm+'):</b> N lần gọi → mỗi dòng có thể nhận giá trị <b>khác nhau</b>.<br>'
-          +'<b>Nếu đổi sang N:</b> 1 lần gọi → 2 dòng nhận <b>cùng</b> giá trị (lấy ToDate cuối kỳ mặc định).<br><br>';
-        if(dm==='ToDate'){
-          body += '<b>Tại sao chọn ToDate?</b> Lấy trạng thái <b>tại thời điểm kết thúc</b> giai đoạn. VD: NV thuộc bàn nào vào ngày cuối giai đoạn đó.';
-        } else if(dm==='FromDate'){
-          body += '<b>Tại sao chọn FromDate?</b> Lấy trạng thái <b>tại thời điểm bắt đầu</b> giai đoạn. VD: hệ số lương áp dụng từ ngày đầu giai đoạn.';
-        } else {
-          body += '<b>Tại sao chọn FromDate&ToDate?</b> Cần <b>cả khoảng thời gian</b> để tính. VD: đếm ngày công từ FromDate đến ToDate.';
-        }
-        body += '</div>';
+          +'Engine gọi function <b>1 lần duy nhất</b> với param cố định trong kỳ ('+(phanBo==='last'?'ngày cuối kỳ':'ngày đầu kỳ')+'). Kết quả replicate xuống mọi dòng GĐ.<br><br>'
+          +'<span style="color:#28a745;font-weight:bold;">&#9989; Triển khai:</span> 1 lời gọi + nhân bản giá trị — không cần for-each.'
+          +'</div>';
       }
 
       // --- PHẦN 3: Dùng trong CASE WHEN ---
@@ -505,10 +836,11 @@ Need Confirm: có cần mode GiữaKỳ cho Tham số ngày? Field-level history
 
       // --- PHẦN 4: Hiển thị trên báo cáo ---
       body += '<div style="font-weight:bold;color:#0056b3;font-size:12px;margin:14px 0 4px;">4. Hiển thị trên báo cáo</div>';
-      body += '<div class="vd-info">Cột <b>'+r.ma+'</b> ('+r.vi+') sẽ hiển thị trên lưới kết quả / báo cáo. '
-        +(isY ? 'Do ApplyByStage=Y, mỗi dòng (giai đoạn) có thể có giá trị <b>khác nhau</b> → báo cáo phản ánh đúng trạng thái từng giai đoạn.'
-              : 'Do ApplyByStage=N, tất cả dòng cùng NV hiển thị <b>cùng giá trị</b>.')
-        +'</div>';
+      var reportMsg;
+      if(phanBo==='slice') reportMsg = 'Do phân bổ <b>Theo giai đoạn</b>, mỗi dòng GĐ có thể có giá trị <b>khác nhau</b> → báo cáo phản ánh đúng trạng thái từng giai đoạn.';
+      else if(isMaxMin) reportMsg = 'Do phân bổ <b>'+pbOpt.t+'</b> (chốt tại GĐ có '+(phanBo==='maxby'?'MAX':'MIN')+' căn cứ), tất cả dòng cùng NV hiển thị <b>cùng giá trị</b>. Cột này thường đi kèm cột căn cứ trên báo cáo để user thấy rõ vì sao chốt GĐ đó.';
+      else reportMsg = 'Do phân bổ <b>'+pbOpt.t+'</b> (1 giá trị/NV), tất cả dòng cùng NV hiển thị <b>cùng giá trị</b>.';
+      body += '<div class="vd-info">Cột <b>'+r.ma+'</b> ('+r.vi+') sẽ hiển thị trên lưới kết quả / báo cáo. '+reportMsg+'</div>';
 
       document.getElementById('modal-vd-tk-title').innerHTML=title;
       document.getElementById('modal-vd-tk-body').innerHTML=body;

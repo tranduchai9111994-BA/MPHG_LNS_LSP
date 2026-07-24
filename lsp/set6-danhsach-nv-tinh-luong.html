@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Cập nhật DS nhân viên tính lương</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* ====== SET6 layout ====== */
+    .set6-period-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff8e1; border: 1px solid #ffd54f; border-radius: 4px;
+      padding: 8px 12px; margin-bottom: 10px;
+    }
+    .set6-period-bar label { font-weight: bold; color: #d32f2f; font-size: 13px; }
+    .set6-period-bar select { min-width: 320px; height: 28px; font-size: 12px; padding: 2px 6px; border: 1px solid #ccc; }
+    .set6-period-info { margin-left: auto; font-size: 11px; color: #555; }
+    .set6-period-info b { color: #0056b3; }
+
+    .set6-filter { display: grid;
+      grid-template-columns: 110px 1fr 110px 1fr 110px 1fr 110px 1fr;
+      gap: 8px 12px; align-items: center;
+    }
+    .set6-filter label { font-size: 12px; color: #333; text-align: right; }
+    .set6-filter input[type="text"], .set6-filter input[type="date"], .set6-filter select {
+      width: 100%; height: 26px; padding: 3px 6px; border: 1px solid #ccc; font-size: 12px;
+    }
+    .set6-filter .radio-group { display: flex; gap: 8px; font-size: 11px; align-items: center; }
+    .set6-filter .radio-group label { color: #333; font-weight: normal; text-align: left; }
+    .set6-filter .radio-group input[type="radio"] { margin-right: 3px; }
+    .set6-filter .col-span-2 { grid-column: span 2; }
+
+    /* Toolbar buttons */
+    .set6-toolbar { display: flex; gap: 8px; justify-content: center; margin: 10px 0; flex-wrap: wrap; }
+    .set6-toolbar button { padding: 6px 16px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: #fff; }
+    .set6-btn-load { background: #28a745; }
+    .set6-btn-load:hover { background: #218838; }
+    .set6-btn-refresh { background: #007bff; }
+    .set6-btn-export { background: #fd7e14; }
+    .set6-btn-import { background: #17a2b8; }
+
+    /* Dual list */
+    .set6-dual { display: grid; grid-template-columns: 1fr 70px 1fr; gap: 8px; margin-top: 12px; }
+    .set6-list { border: 1px solid #ccc; background: #fff; display: flex; flex-direction: column; min-height: 460px; }
+    .set6-list-header {
+      background: #eef2f7; padding: 6px 10px; border-bottom: 1px solid #ccc;
+      display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 12px;
+    }
+    .set6-list-header .side-left { color: #6c757d; }
+    .set6-list-header .side-right { color: #155724; }
+    .set6-list-header .counter { background: #0056b3; color: #fff; border-radius: 10px; padding: 2px 10px; font-size: 11px; }
+    .set6-list-search { padding: 5px 8px; border-bottom: 1px solid #eee; background: #fafbfc; }
+    .set6-list-search input { width: 100%; height: 24px; padding: 2px 6px; border: 1px solid #ccc; font-size: 11px; }
+    .set6-list-body { flex: 1; max-height: 400px; overflow: auto; }
+    .set6-list-body table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
+    .set6-list-body th {
+      background: #f4d03f; color: #333; padding: 5px 6px; border: 1px solid #ddd;
+      text-align: center; font-weight: bold; font-size: 11px; position: sticky; top: 0; z-index: 3;
+    }
+    .set6-list-body td { padding: 4px 6px; border: 1px solid #eee; text-align: center; word-break: break-word; }
+    .set6-list-body td.tl { text-align: left; }
+    .set6-list-body td.c-ma { font-family: Consolas, monospace; color: #0056b3; font-weight: bold; }
+    .set6-list-body tbody tr:nth-child(even) { background: #fbfbfb; }
+    .set6-list-body tbody tr:hover { background: #f1f8ff; cursor: pointer; }
+    .set6-list-body tr.row-nghi { background: #fff3cd !important; }
+    .set6-list-body tr.row-nghi td { color: #856404; }
+    .set6-list-body tr.row-locked { background: #d1d1d1 !important; color: #777; }
+    .set6-empty { padding: 40px 20px; text-align: center; color: #999; font-size: 12px; }
+
+    /* Column widths */
+    .set6-list-body col.c-chk { width: 32px; }
+    .set6-list-body col.c-stt { width: 40px; }
+    .set6-list-body col.c-manv { width: 90px; }
+    .set6-list-body col.c-tennv { width: 22%; }
+    .set6-list-body col.c-donvi { width: 22%; }
+    .set6-list-body col.c-bptl { width: 15%; }
+    .set6-list-body col.c-cv { width: 14%; }
+    .set6-list-body col.c-ngayvao { width: 80px; }
+
+    /* Transfer buttons */
+    .set6-transfer {
+      display: flex; flex-direction: column; align-items: stretch; justify-content: center; gap: 8px;
+      padding: 0 4px;
+    }
+    .set6-transfer button {
+      padding: 8px 4px; border: 1px solid #b0bec5; background: #fff; cursor: pointer;
+      font-size: 14px; font-weight: bold; color: #0056b3; border-radius: 3px;
+    }
+    .set6-transfer button:hover { background: #e8eef5; }
+    .set6-transfer button:disabled { color: #ccc; cursor: not-allowed; background: #f8f9fa; }
+    .set6-transfer .lbl { font-size: 9px; color: #666; text-align: center; margin-top: -6px; }
+
+    /* Bulk actions */
+    .set6-bulk { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+    .set6-bulk button { padding: 8px 18px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: #fff; }
+    .set6-btn-save { background: #5c9b00; }
+    .set6-btn-save:hover { background: #4a8000; }
+    .set6-btn-clear-all { background: #dc3545; }
+    .set6-btn-clear-all:hover { background: #b02a37; }
+
+    /* Modal Quy tắc */
+    .rules-section { margin-bottom: 14px; padding: 8px 12px; background: #f8f9fa; border-left: 3px solid #6f42c1; border-radius: 3px; }
+    .rules-section h4 { margin: 0 0 6px 0; color: #6f42c1; font-size: 13px; }
+    .rules-section p, .rules-section li { font-size: 12px; line-height: 1.6; color: #333; margin: 3px 0; }
+    .rules-section ol, .rules-section ul { margin: 4px 0 4px 20px; padding: 0; }
+    .rules-flow {
+      display: flex; gap: 8px; align-items: center; padding: 10px; background: #eef2f7;
+      border-radius: 4px; font-size: 12px; font-weight: bold; color: #0056b3; overflow-x: auto;
+    }
+    .rules-flow .step { padding: 6px 12px; background: #fff; border: 1px solid #b0bec5; border-radius: 20px; white-space: nowrap; }
+    .rules-flow .arr { color: #6c757d; font-size: 16px; }
+
+    /* Modal import */
+    .set6-import-body { padding: 10px 4px; font-size: 12px; }
+    .set6-import-body .drop {
+      border: 2px dashed #17a2b8; border-radius: 6px; padding: 30px; text-align: center;
+      color: #17a2b8; font-weight: bold; margin: 10px 0; cursor: pointer;
+    }
+    .set6-import-body .drop:hover { background: #e8f6f9; }
+    .set6-import-body .hint { color: #666; font-size: 11px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <script src="../shared/xlsx-export.js"></script>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+    <div class="breadcrumb">Lương &#8250; Chức năng &#8250; Cập nhật danh sách nhân viên được tính lương</div>
+    <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>CẬP NHẬT DANH SÁCH NHÂN VIÊN ĐƯỢC TÍNH LƯƠNG</span>
+      <button onclick="showRules()" style="background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">&#128220; Quy tắc</button>
+    </div>
+    <div class="info-bar" style="margin-bottom:10px;">
+      ĐẶC ĐIỂM: Màn hình sử dụng <strong>sau khi tạo kỳ lương</strong> (set5). BA lọc nhân viên từ HR, chọn (chuyển phải) những NV cần tính lương cho kỳ hiện tại, và <strong>Lưu danh sách</strong> để engine tính lương chạy chỉ trên tập này.
+    </div>
+    <div id="set6-alert" class="alert-box"></div>
+
+    <!-- MODAL: Quy tắc nghiệp vụ -->
+    <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
+      <div class="modal-box wide" style="width:92vw;max-width:900px;">
+        <div class="modal-hdr" style="background:#6f42c1;">
+          <span>&#128220; Quy tắc nghiệp vụ — Cập nhật DS nhân viên tính lương</span>
+          <button class="x" onclick="hideModal('modal-rules')">&#10005;</button>
+        </div>
+        <div class="modal-body" style="max-height:75vh;overflow-y:auto;padding:14px 18px;">
+          <div class="rules-section">
+            <h4>1. Khi nào dùng màn này?</h4>
+            <p>Sau khi tạo <b>kỳ lương</b> ở MH <i>Tạo kỳ lương</i> (set5). Kỳ mới sinh ra sẽ tự nạp danh sách NV theo <b>BPTL + Nhóm tính lương</b> khai báo ở kỳ. BA có thể điều chỉnh bằng cách <b>thêm/bớt</b> NV trước khi chạy tính lương ở MH <i>Tính LSP</i> (pg2).</p>
+          </div>
+          <div class="rules-section">
+            <h4>2. Ý nghĩa 2 danh sách</h4>
+            <ul>
+              <li><b>Cột trái — "Chưa được tính lương"</b>: NV thuộc HR phù hợp filter nhưng <b>KHÔNG</b> nằm trong danh sách tính lương của kỳ này.</li>
+              <li><b>Cột phải — "Đã được tính lương"</b>: NV sẽ được engine tính lương chạy khi bấm "Tính LSP" ở kỳ này.</li>
+              <li>Một NV chỉ nằm ở <b>một bên</b> tại một thời điểm.</li>
+            </ul>
+          </div>
+          <div class="rules-section">
+            <h4>3. Quy trình 4 bước</h4>
+            <div class="rules-flow">
+              <span class="step">1. Chọn kỳ lương</span>
+              <span class="arr">&#10142;</span>
+              <span class="step">2. Nhập filter (BPTL, ĐV, ...)</span>
+              <span class="arr">&#10142;</span>
+              <span class="step">3. Tải nhân sự</span>
+              <span class="arr">&#10142;</span>
+              <span class="step">4. Chuyển sang phải &amp; Lưu</span>
+            </div>
+            <p style="margin-top:8px;color:#666;">Chú ý: nút <b>Tải nhân sự</b> query lại HR theo filter — <b>không xoá</b> danh sách bên phải, chỉ refill bên trái các NV còn lại chưa được chọn.</p>
+          </div>
+          <div class="rules-section">
+            <h4>4. Rule Import Excel</h4>
+            <ul>
+              <li>File Excel cần tối thiểu cột <b>Mã NV</b> (header dòng 1). Các cột phụ (Tên NV, ĐV, BPTL) chỉ để tham chiếu.</li>
+              <li>Engine sẽ add mã NV vào <b>cột trái</b> nếu chưa có ở kỳ, bỏ qua mã trùng.</li>
+              <li>Mã NV không tồn tại trong HR → cảnh báo, không thêm.</li>
+            </ul>
+          </div>
+          <div class="rules-section">
+            <h4>5. Validation khi Lưu</h4>
+            <ol>
+              <li>Phải chọn <b>kỳ lương</b> (dropdown ≠ empty).</li>
+              <li>Cột phải phải có <b>≥ 1 NV</b>.</li>
+              <li>Cảnh báo (không block) khi có NV <i>Thôi việc</i> mà chưa có <b>Ngày làm việc cuối cùng</b> — BA cần confirm để tránh trả lương cho NV đã nghỉ.</li>
+            </ol>
+          </div>
+          <div class="rules-section">
+            <h4>6. Red flags (mockup)</h4>
+            <ul>
+              <li>Prototype dùng single-select cho các bộ lọc DV/BPTL/... — <b>bản production</b> nên dùng multi-select với chip.</li>
+              <li>Xuất/Nhập DL chỉ là alert mockup, chưa gắn parser Excel thật.</li>
+              <li>Chưa có phân trang cho dual-list — khi HR &gt; 500 NV cần server-side paging + virtual scroll.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-ftr">
+          <button class="btn-cancel" onclick="hideModal('modal-rules')">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Import Excel (mockup) -->
+    <div class="modal-overlay" id="modal-import" style="display:none;justify-content:center;align-items:center;">
+      <div class="modal-box" style="width:520px;">
+        <div class="modal-hdr" style="background:#17a2b8;">
+          <span>&#128228; Nhập DL nhân viên từ Excel</span>
+          <button class="x" onclick="hideModal('modal-import')">&#10005;</button>
+        </div>
+        <div class="modal-body set6-import-body">
+          <div>Tải file Excel chứa danh sách <b>Mã NV</b> để thêm vào cột <i>Chưa được tính lương</i>.</div>
+          <div class="drop" onclick="mockupImport()">
+            &#128194;<br>Kéo thả file .xlsx vào đây<br>hoặc click để chọn
+          </div>
+          <div class="hint">
+            • File cần cột <b>Mã NV</b> (header dòng 1).<br>
+            • Mã trùng trong kỳ hiện tại sẽ được bỏ qua.<br>
+            • Mã không tồn tại trong HR sẽ bị reject và log ra danh sách lỗi.
+          </div>
+        </div>
+        <div class="modal-ftr">
+          <button class="btn-cancel" onclick="hideModal('modal-import')">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TOP PERIOD SELECTOR ============ -->
+    <div class="set6-period-bar">
+      <label>Kỳ lương</label>
+      <select id="set6-ky" onchange="onChangeKy()">
+        <option value="">-- Chọn kỳ --</option>
+      </select>
+      <div class="set6-period-info" id="set6-ky-info">Chưa chọn kỳ</div>
+    </div>
+
+    <!-- ============ FILTER PANEL ============ -->
+    <div class="form-panel">
+      <div class="set6-filter">
+        <label>Mã NV</label>
+        <input type="text" id="f-manv" placeholder="Chứa...">
+        <label>Tên NV</label>
+        <input type="text" id="f-ten" placeholder="Chứa...">
+        <label>Đơn vị cấp 1</label>
+        <select id="f-dv1"><option value="">Tất cả</option></select>
+        <label>Đơn vị cấp 2</label>
+        <select id="f-dv2"><option value="">Tất cả</option></select>
+
+        <label>Đơn vị cấp 3</label>
+        <select id="f-dv3"><option value="">Tất cả</option></select>
+        <label>Đơn vị cấp 4</label>
+        <select id="f-dv4"><option value="">Tất cả</option></select>
+        <label>Đơn vị cấp 5</label>
+        <select id="f-dv5"><option value="">Tất cả</option></select>
+        <label>BPTL</label>
+        <select id="f-bptl"><option value="">Tất cả</option></select>
+
+        <label>Chức vụ</label>
+        <select id="f-cv"><option value="">Tất cả</option></select>
+        <label>Nhóm tính lương</label>
+        <select id="f-ntl"><option value="">Tất cả</option></select>
+        <label>Nghỉ việc từ ngày</label>
+        <input type="date" id="f-nghi">
+        <label>NLV cuối từ ngày</label>
+        <input type="date" id="f-nlvc">
+
+        <label>Tháng năm</label>
+        <input type="text" id="f-thangnam" readonly placeholder="Auto-fill từ kỳ">
+        <label>Khóa lương</label>
+        <div class="radio-group">
+          <label><input type="radio" name="f-khoa" value="all" checked>Tất cả</label>
+          <label><input type="radio" name="f-khoa" value="locked">Đã khóa</label>
+          <label><input type="radio" name="f-khoa" value="unlocked">Chưa khóa</label>
+        </div>
+        <label>Tình trạng</label>
+        <div class="radio-group col-span-2">
+          <label><input type="radio" name="f-tt" value="all" checked>Tất cả</label>
+          <label><input type="radio" name="f-tt" value="working">Đang làm việc</label>
+          <label><input type="radio" name="f-tt" value="quit">Thôi việc</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TOOLBAR ============ -->
+    <div class="set6-toolbar">
+      <button class="set6-btn-load" onclick="loadNhanSu()">&#128260; Tải nhân sự</button>
+      <button class="set6-btn-refresh" onclick="resetFilter()">Làm mới</button>
+      <button class="set6-btn-export" onclick="exportData()" title="Xuất 1 file .xlsx chứa 2 sheet (Chưa tính + Đã tính)">&#128229; Xuất Excel (cả 2 lưới)</button>
+      <button class="set6-btn-import" onclick="openImport()">&#128228; Nhập DL</button>
+    </div>
+
+    <!-- ============ DUAL LIST ============ -->
+    <div class="set6-dual">
+      <!-- LEFT: Chưa được tính -->
+      <div class="set6-list">
+        <div class="set6-list-header">
+          <span class="side-left">&#9673; Nhân viên CHƯA được tính lương</span>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <button type="button" onclick="exportSide('left')" title="Xuất Excel riêng lưới này"
+              style="background:#fd7e14;color:#fff;border:none;border-radius:3px;padding:2px 8px;font-size:11px;font-weight:bold;cursor:pointer;">
+              &#128229; Xuất
+            </button>
+            <span class="counter" id="cnt-left">0</span>
+          </span>
+        </div>
+        <div class="set6-list-search">
+          <input type="text" id="search-left" placeholder="&#128269; Lọc trong danh sách (Mã / Tên / ĐV)..." oninput="renderLeft()">
+        </div>
+        <div class="set6-list-body">
+          <table>
+            <colgroup>
+              <col class="c-chk"><col class="c-stt"><col class="c-manv">
+              <col class="c-tennv"><col class="c-donvi"><col class="c-bptl">
+              <col class="c-cv"><col class="c-ngayvao">
+            </colgroup>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="chk-all-left" onchange="toggleAllLeft(this)"></th>
+                <th>STT</th><th>Mã NV</th><th>Tên NV</th>
+                <th>Đơn vị</th><th>BPTL</th><th>Chức vụ</th><th>Ngày vào</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-left"></tbody>
+          </table>
+          <div class="set6-empty" id="empty-left" style="display:none;">Chưa có dữ liệu — bấm <b>Tải nhân sự</b> để bắt đầu.</div>
+        </div>
+      </div>
+
+      <!-- Transfer buttons -->
+      <div class="set6-transfer">
+        <button title="Chuyển các NV đã tick sang phải" onclick="transferRight(false)">&#10142;</button>
+        <div class="lbl">Chuyển tick</div>
+        <button title="Chuyển toàn bộ cột trái (theo filter hiển thị) sang phải" onclick="transferRight(true)">&#10142;&#10142;</button>
+        <div class="lbl">Chuyển tất</div>
+        <button title="Bỏ các NV đã tick về trái" onclick="transferLeft(false)">&#10094;</button>
+        <div class="lbl">Bỏ tick</div>
+        <button title="Bỏ toàn bộ cột phải về trái" onclick="transferLeft(true)">&#10094;&#10094;</button>
+        <div class="lbl">Bỏ tất</div>
+      </div>
+
+      <!-- RIGHT: Đã được tính -->
+      <div class="set6-list">
+        <div class="set6-list-header">
+          <span class="side-right">&#9673; Nhân viên ĐÃ được tính lương</span>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <button type="button" onclick="exportSide('right')" title="Xuất Excel riêng lưới này"
+              style="background:#fd7e14;color:#fff;border:none;border-radius:3px;padding:2px 8px;font-size:11px;font-weight:bold;cursor:pointer;">
+              &#128229; Xuất
+            </button>
+            <span class="counter" id="cnt-right">0</span>
+          </span>
+        </div>
+        <div class="set6-list-search">
+          <input type="text" id="search-right" placeholder="&#128269; Lọc trong danh sách (Mã / Tên / ĐV)..." oninput="renderRight()">
+        </div>
+        <div class="set6-list-body">
+          <table>
+            <colgroup>
+              <col class="c-chk"><col class="c-stt"><col class="c-manv">
+              <col class="c-tennv"><col class="c-donvi"><col class="c-bptl">
+              <col class="c-cv"><col class="c-ngayvao">
+            </colgroup>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="chk-all-right" onchange="toggleAllRight(this)"></th>
+                <th>STT</th><th>Mã NV</th><th>Tên NV</th>
+                <th>Đơn vị</th><th>BPTL</th><th>Chức vụ</th><th>Ngày vào</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-right"></tbody>
+          </table>
+          <div class="set6-empty" id="empty-right" style="display:none;">Chưa có NV nào được chọn tính lương cho kỳ này.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ BULK ACTIONS ============ -->
+    <div class="set6-bulk">
+      <button class="set6-btn-save" onclick="saveDanhSach()">&#128190; Lưu danh sách tính lương</button>
+      <button class="set6-btn-clear-all" onclick="clearAll()">&#128465; Xóa toàn bộ (chuyển hết về trái)</button>
+    </div>
+
+    <!-- ============ GHI CHÚ NGHIỆP VỤ ============ -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        &#128220; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">&#128190; Lưu ghi chú</button>
+      </div>
+      <div style="margin-top:10px;padding:8px 12px;background:#e7f5ff;border-left:3px solid #0d6efd;border-radius:3px;font-size:11.5px;color:#1c3a5b;">
+        &#128241;&#128188; <b>Follow-up giai đoạn 2 (ESS + Mobile):</b> DS NV chốt ở màn này quyết định phạm vi engine tính lương (set7).
+        Sau khi kỳ được tính + khóa, dữ liệu lương của từng NV sẽ được publish sang Web Dịch vụ cá nhân và Mobile app MPHG.
+        Chi tiết xem tại <a href="set7-tinhluong-thang.html#ghichu-ess-mobile" style="color:#0d6efd;font-weight:bold;">set7 &#8250; Follow-up ESS/Mobile</a>.
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ================================================================
+ *  MOCK DATA — set6
+ *  MOCK_KY_LUONG:  danh sách kỳ (tương thích với set5 nếu tồn tại).
+ *  MOCK_NV_HR:     danh sách NV từ HR (đầy đủ, ~40 NV).
+ *  MOCK_KY_LUONG_NV: map maKy -> array các maNV đã "chốt" tính lương.
+ * ================================================================ */
+
+const MOCK_KY_LUONG = [
+  { ma:'KY_202605_LSP', ten:'Kỳ 05/2026 - LSP MPHG', thang:5, nam:2026,
+    tuNgay:'2026-05-01', denNgay:'2026-05-31',
+    bptl:['BPTL_001','BPTL_002','BPTL_003'], nhomTL:['NTL_A','NTL_B'], daKhoa:false },
+  { ma:'KY_202604_LSP', ten:'Kỳ 04/2026 - LSP MPHG', thang:4, nam:2026,
+    tuNgay:'2026-04-01', denNgay:'2026-04-30',
+    bptl:['BPTL_001','BPTL_002'], nhomTL:['NTL_A'], daKhoa:true },
+  { ma:'KY_202603_LSP', ten:'Kỳ 03/2026 - LSP MPHG (Chế biến)', thang:3, nam:2026,
+    tuNgay:'2026-03-01', denNgay:'2026-03-31',
+    bptl:['BPTL_002','BPTL_003'], nhomTL:['NTL_B'], daKhoa:true },
+  { ma:'KY_202605_VS', ten:'Kỳ 05/2026 - LSP Vệ sinh', thang:5, nam:2026,
+    tuNgay:'2026-05-01', denNgay:'2026-05-31',
+    bptl:['BPTL_004'], nhomTL:['NTL_VS'], daKhoa:false }
+];
+
+// Master lookups
+const DV_CAP1 = ['MPHG'];
+const DV_CAP2 = ['NM Cà Mau','NM Hậu Giang','NM Kiên Giang'];
+const DV_CAP3 = ['PX Chế biến 1','PX Chế biến 2','PX Đóng gói','PX Vệ sinh','PX Phụ trợ'];
+const DV_CAP4 = ['Ca sáng','Ca chiều','Ca đêm','Hành chính'];
+const DV_CAP5 = ['CB101','CB102','CB201','CB202','DG101','VS101','PT101'];
+const BPTL_LIST = [
+  {ma:'BPTL_001', ten:'Bộ phận chế biến 1'},
+  {ma:'BPTL_002', ten:'Bộ phận chế biến 2'},
+  {ma:'BPTL_003', ten:'Bộ phận đóng gói'},
+  {ma:'BPTL_004', ten:'Bộ phận vệ sinh'},
+  {ma:'BPTL_005', ten:'Bộ phận phụ trợ'}
+];
+const CV_LIST = ['Công nhân','Tổ trưởng','Ca trưởng','Kỹ thuật','Vệ sinh viên','Phụ việc'];
+const NTL_LIST = [
+  {ma:'NTL_A', ten:'Nhóm A - Sơ chế'},
+  {ma:'NTL_B', ten:'Nhóm B - Tinh chế'},
+  {ma:'NTL_VS', ten:'Nhóm VS - Vệ sinh'},
+  {ma:'NTL_PT', ten:'Nhóm PT - Phụ trợ'}
+];
+
+// Sinh MOCK_NV_HR (~40 NV) với dữ liệu phân bố hợp lý
+const HO_LIST = ['Nguyễn','Trần','Lê','Phạm','Hoàng','Huỳnh','Võ','Đặng','Bùi','Đỗ','Ngô','Dương','Lý','Trương','Phan'];
+const TEN_NU = ['Loan','Hoa','Lan','Mai','Trang','Linh','Nhung','Vy','Yến','Hằng','Thắm','Ngọc','Thu','Diễm','Xuân'];
+const TEN_NAM = ['Hùng','Dũng','Minh','Tuấn','Nam','Thanh','Sơn','Bình','Cường','Long','Phong','Kiên','Trung','Đức','Bảo'];
+const TEN_DEM_NU = ['Thị','Thị Kim','Thị Bích','Thị Ngọc','Thị Hồng'];
+const TEN_DEM_NAM = ['Văn','Hữu','Đình','Ngọc','Xuân'];
+
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function pad(n){ return String(n).padStart(2,'0'); }
+
+const MOCK_NV_HR = (function genNV(){
+  // Seeded pseudo-random để mỗi lần reload đều ra cùng data
+  let seed = 42;
+  const srand = ()=>{ seed = (seed*9301 + 49297) % 233280; return seed/233280; };
+  const pick = a => a[Math.floor(srand()*a.length)];
+
+  const list = [];
+  for (let i = 0; i < 45; i++){
+    const isNu = srand() < 0.72; // 72% nữ (chế biến thủy sản)
+    const ho = pick(HO_LIST);
+    const tenDem = isNu ? pick(TEN_DEM_NU) : pick(TEN_DEM_NAM);
+    const tenChinh = isNu ? pick(TEN_NU) : pick(TEN_NAM);
+    const maNV = '10229' + String(76668 + i);
+    const year = 2015 + Math.floor(srand()*10);
+    const month = 1 + Math.floor(srand()*12);
+    const day = 1 + Math.floor(srand()*28);
+    const bptl = pick(BPTL_LIST).ma;
+    const ntl = pick(NTL_LIST).ma;
+    const trangThai = srand() < 0.85 ? 'Đang làm việc' : 'Thôi việc';
+    const khoaLuong = srand() < 0.15;
+    let nghiTuNgay = null, ngayLamCuoi = null;
+    if (trangThai === 'Thôi việc') {
+      nghiTuNgay = `2026-0${3 + Math.floor(srand()*3)}-${pad(1 + Math.floor(srand()*28))}`;
+      if (srand() < 0.7) ngayLamCuoi = nghiTuNgay; // 30% chưa cập nhật NLV cuối → warning khi save
+    }
+
+    list.push({
+      maNV,
+      ten: `${ho} ${tenDem} ${tenChinh}`,
+      gioiTinh: isNu ? 'Nữ' : 'Nam',
+      ngayVao: `${year}-${pad(month)}-${pad(day)}`,
+      dvCap1: 'MPHG',
+      dvCap2: pick(DV_CAP2),
+      dvCap3: pick(DV_CAP3),
+      dvCap4: pick(DV_CAP4),
+      dvCap5: pick(DV_CAP5),
+      bptl,
+      chucVu: pick(CV_LIST),
+      nhomTL: ntl,
+      trangThai,
+      khoaLuong,
+      nghiTuNgay,
+      ngayLamCuoi
+    });
+  }
+  return list;
+})();
+
+// Persisted: kỳ -> list mã NV đã lưu (mock ban đầu)
+const MOCK_KY_LUONG_NV = {
+  'KY_202605_LSP': MOCK_NV_HR.filter((_,i)=> i%2===0).slice(0,12).map(nv=>nv.maNV), // 12 NV đầu chẵn
+  'KY_202604_LSP': MOCK_NV_HR.filter((_,i)=> i%3===0).slice(0,10).map(nv=>nv.maNV),
+  'KY_202603_LSP': MOCK_NV_HR.slice(15,25).map(nv=>nv.maNV),
+  'KY_202605_VS':  [] // kỳ vệ sinh chưa chọn NV nào
+};
+
+/* ================================================================
+ *  STATE
+ * ================================================================ */
+const state = {
+  kyLuong: null,         // object kỳ đang chọn
+  hrPool: [],            // các NV thoả filter sau khi bấm "Tải nhân sự"
+  leftList: [],          // các maNV bên trái
+  rightList: [],         // các maNV bên phải
+  leftChecked: new Set(),
+  rightChecked: new Set()
+};
+
+const CURRENT_USER = 'FPT Admin';
+function nowStr(){
+  const d = new Date();
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/* ================================================================
+ *  INIT
+ * ================================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  populateKyLuong();
+  populateFilterDropdowns();
+  // Auto-select first period for demo
+  const sel = document.getElementById('set6-ky');
+  if (MOCK_KY_LUONG.length > 0) {
+    sel.value = MOCK_KY_LUONG[0].ma;
+    onChangeKy();
+  }
+});
+
+function populateKyLuong(){
+  const sel = document.getElementById('set6-ky');
+  MOCK_KY_LUONG.forEach(ky => {
+    const opt = document.createElement('option');
+    opt.value = ky.ma;
+    opt.textContent = `${ky.ma} - ${ky.ten}${ky.daKhoa ? ' [ĐÃ KHÓA]' : ''}`;
+    sel.appendChild(opt);
+  });
+}
+
+function fillSelect(id, options, mapper){
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  // Keep first option "Tất cả"
+  while (sel.options.length > 1) sel.remove(1);
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    if (mapper){
+      opt.value = mapper(o).value;
+      opt.textContent = mapper(o).label;
+    } else {
+      opt.value = o;
+      opt.textContent = o;
+    }
+    sel.appendChild(opt);
+  });
+}
+
+function populateFilterDropdowns(){
+  fillSelect('f-dv1', DV_CAP1);
+  fillSelect('f-dv2', DV_CAP2);
+  fillSelect('f-dv3', DV_CAP3);
+  fillSelect('f-dv4', DV_CAP4);
+  fillSelect('f-dv5', DV_CAP5);
+  fillSelect('f-cv',  CV_LIST);
+  fillSelect('f-bptl', BPTL_LIST, b => ({value: b.ma, label: `${b.ma} - ${b.ten}`}));
+  fillSelect('f-ntl',  NTL_LIST,  n => ({value: n.ma, label: `${n.ma} - ${n.ten}`}));
+}
+
+/* ================================================================
+ *  CHANGE KY
+ * ================================================================ */
+function onChangeKy(){
+  const maKy = document.getElementById('set6-ky').value;
+  const ky = MOCK_KY_LUONG.find(k => k.ma === maKy);
+  state.kyLuong = ky || null;
+
+  const info = document.getElementById('set6-ky-info');
+  const thangnam = document.getElementById('f-thangnam');
+  if (!ky){
+    info.innerHTML = 'Chưa chọn kỳ';
+    thangnam.value = '';
+    resetAllLists();
+    return;
+  }
+
+  info.innerHTML = `Tháng: <b>${pad(ky.thang)}/${ky.nam}</b> | Từ: <b>${formatDate(ky.tuNgay)}</b> đến <b>${formatDate(ky.denNgay)}</b> | BPTL: <b>${ky.bptl.join(', ')}</b>`
+    + (ky.daKhoa ? ' <span style="color:#dc3545;font-weight:bold;">[KỲ ĐÃ KHÓA]</span>' : '');
+  thangnam.value = `${pad(ky.thang)}/${ky.nam}`;
+
+  // Load rightList từ MOCK_KY_LUONG_NV, leftList = rỗng đến khi bấm "Tải nhân sự"
+  state.rightList = (MOCK_KY_LUONG_NV[maKy] || []).slice();
+  state.leftList = [];
+  state.hrPool = [];
+  state.leftChecked.clear();
+  state.rightChecked.clear();
+  renderAll();
+}
+
+function resetAllLists(){
+  state.rightList = [];
+  state.leftList = [];
+  state.hrPool = [];
+  state.leftChecked.clear();
+  state.rightChecked.clear();
+  renderAll();
+}
+
+/* ================================================================
+ *  LOAD NHÂN SỰ (apply filter)
+ * ================================================================ */
+function readFilter(){
+  const val = id => (document.getElementById(id).value || '').trim();
+  const radioVal = name => (document.querySelector(`input[name="${name}"]:checked`)?.value) || 'all';
+  return {
+    manv: val('f-manv').toLowerCase(),
+    ten: val('f-ten').toLowerCase(),
+    dv1: val('f-dv1'),
+    dv2: val('f-dv2'),
+    dv3: val('f-dv3'),
+    dv4: val('f-dv4'),
+    dv5: val('f-dv5'),
+    bptl: val('f-bptl'),
+    cv: val('f-cv'),
+    ntl: val('f-ntl'),
+    nghi: val('f-nghi'),   // date string yyyy-mm-dd
+    nlvc: val('f-nlvc'),
+    khoa: radioVal('f-khoa'),
+    tt:   radioVal('f-tt')
+  };
+}
+
+function matchFilter(nv, f){
+  if (f.manv && !nv.maNV.toLowerCase().includes(f.manv)) return false;
+  if (f.ten && !nv.ten.toLowerCase().includes(f.ten)) return false;
+  if (f.dv1 && nv.dvCap1 !== f.dv1) return false;
+  if (f.dv2 && nv.dvCap2 !== f.dv2) return false;
+  if (f.dv3 && nv.dvCap3 !== f.dv3) return false;
+  if (f.dv4 && nv.dvCap4 !== f.dv4) return false;
+  if (f.dv5 && nv.dvCap5 !== f.dv5) return false;
+  if (f.bptl && nv.bptl !== f.bptl) return false;
+  if (f.cv && nv.chucVu !== f.cv) return false;
+  if (f.ntl && nv.nhomTL !== f.ntl) return false;
+  if (f.nghi && (!nv.nghiTuNgay || nv.nghiTuNgay < f.nghi)) return false;
+  if (f.nlvc && (!nv.ngayLamCuoi || nv.ngayLamCuoi < f.nlvc)) return false;
+  if (f.khoa === 'locked' && !nv.khoaLuong) return false;
+  if (f.khoa === 'unlocked' && nv.khoaLuong) return false;
+  if (f.tt === 'working' && nv.trangThai !== 'Đang làm việc') return false;
+  if (f.tt === 'quit' && nv.trangThai !== 'Thôi việc') return false;
+  return true;
+}
+
+function loadNhanSu(){
+  if (!state.kyLuong){
+    showAlert('Vui lòng chọn kỳ lương trước.', 'error');
+    return;
+  }
+  const f = readFilter();
+  const matched = MOCK_NV_HR.filter(nv => matchFilter(nv, f));
+
+  state.hrPool = matched.map(nv => nv.maNV);
+  // rightList giữ nguyên. leftList = hrPool - rightList
+  const rightSet = new Set(state.rightList);
+  state.leftList = state.hrPool.filter(id => !rightSet.has(id));
+  state.leftChecked.clear();
+  renderAll();
+
+  showAlert(`Đã tải <b>${matched.length}</b> NV từ HR (${state.leftList.length} chưa chọn / ${state.rightList.length} đã chọn).`, 'success');
+}
+
+function resetFilter(){
+  ['f-manv','f-ten','f-nghi','f-nlvc'].forEach(id => document.getElementById(id).value = '');
+  ['f-dv1','f-dv2','f-dv3','f-dv4','f-dv5','f-bptl','f-cv','f-ntl'].forEach(id => document.getElementById(id).value = '');
+  document.querySelector('input[name="f-khoa"][value="all"]').checked = true;
+  document.querySelector('input[name="f-tt"][value="all"]').checked = true;
+  showAlert('Đã làm mới bộ lọc.', 'success');
+}
+
+/* ================================================================
+ *  RENDER LIST
+ * ================================================================ */
+function nvById(id){ return MOCK_NV_HR.find(nv => nv.maNV === id); }
+
+function renderRow(nv, side, stt, checked){
+  const cls = [];
+  if (nv.trangThai === 'Thôi việc') cls.push('row-nghi');
+  if (nv.khoaLuong) cls.push('row-locked');
+  return `<tr class="${cls.join(' ')}" data-manv="${nv.maNV}" onclick="onRowClick(event,'${side}','${nv.maNV}')">
+    <td><input type="checkbox" data-manv="${nv.maNV}" ${checked?'checked':''} onclick="event.stopPropagation();onCheckRow('${side}','${nv.maNV}',this.checked)"></td>
+    <td>${stt}</td>
+    <td class="c-ma">${nv.maNV}</td>
+    <td class="tl">${nv.ten}</td>
+    <td class="tl">${nv.dvCap3} / ${nv.dvCap5}</td>
+    <td class="tl">${nv.bptl}</td>
+    <td class="tl">${nv.chucVu}</td>
+    <td>${formatDate(nv.ngayVao)}</td>
+  </tr>`;
+}
+
+function filterBySearch(list, q){
+  if (!q) return list;
+  const s = q.toLowerCase();
+  return list.filter(id => {
+    const nv = nvById(id); if (!nv) return false;
+    return nv.maNV.toLowerCase().includes(s)
+      || nv.ten.toLowerCase().includes(s)
+      || (nv.dvCap3||'').toLowerCase().includes(s)
+      || (nv.dvCap5||'').toLowerCase().includes(s)
+      || (nv.bptl||'').toLowerCase().includes(s);
+  });
+}
+
+function renderLeft(){
+  const q = document.getElementById('search-left').value;
+  const filtered = filterBySearch(state.leftList, q);
+  const tbody = document.getElementById('tbody-left');
+  const empty = document.getElementById('empty-left');
+  if (state.leftList.length === 0){
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map((id, i) => {
+      const nv = nvById(id); if (!nv) return '';
+      return renderRow(nv, 'left', i+1, state.leftChecked.has(id));
+    }).join('');
+  }
+  document.getElementById('cnt-left').textContent = `Tổng: ${state.leftList.length}${q ? ' (hiển thị '+filtered.length+')' : ''}`;
+  syncCheckAll('left');
+}
+
+function renderRight(){
+  const q = document.getElementById('search-right').value;
+  const filtered = filterBySearch(state.rightList, q);
+  const tbody = document.getElementById('tbody-right');
+  const empty = document.getElementById('empty-right');
+  if (state.rightList.length === 0){
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map((id, i) => {
+      const nv = nvById(id); if (!nv) return '';
+      return renderRow(nv, 'right', i+1, state.rightChecked.has(id));
+    }).join('');
+  }
+  document.getElementById('cnt-right').textContent = `Tổng: ${state.rightList.length}${q ? ' (hiển thị '+filtered.length+')' : ''}`;
+  syncCheckAll('right');
+}
+
+function renderAll(){ renderLeft(); renderRight(); }
+
+/* ================================================================
+ *  CHECKBOX HANDLERS
+ * ================================================================ */
+function onCheckRow(side, maNV, checked){
+  const set = side === 'left' ? state.leftChecked : state.rightChecked;
+  if (checked) set.add(maNV); else set.delete(maNV);
+  syncCheckAll(side);
+}
+
+function toggleAllLeft(cb){
+  const q = document.getElementById('search-left').value;
+  const visible = filterBySearch(state.leftList, q);
+  if (cb.checked) visible.forEach(id => state.leftChecked.add(id));
+  else visible.forEach(id => state.leftChecked.delete(id));
+  renderLeft();
+}
+
+function toggleAllRight(cb){
+  const q = document.getElementById('search-right').value;
+  const visible = filterBySearch(state.rightList, q);
+  if (cb.checked) visible.forEach(id => state.rightChecked.add(id));
+  else visible.forEach(id => state.rightChecked.delete(id));
+  renderRight();
+}
+
+function syncCheckAll(side){
+  const q = document.getElementById('search-'+side).value;
+  const list = side==='left'?state.leftList:state.rightList;
+  const set = side==='left'?state.leftChecked:state.rightChecked;
+  const visible = filterBySearch(list, q);
+  const cb = document.getElementById('chk-all-'+side);
+  if (!cb) return;
+  if (visible.length === 0){ cb.checked = false; cb.indeterminate = false; return; }
+  const tickedInVisible = visible.filter(id => set.has(id)).length;
+  cb.checked = tickedInVisible === visible.length;
+  cb.indeterminate = tickedInVisible > 0 && tickedInVisible < visible.length;
+}
+
+// Click row (không phải checkbox) → toggle tick row đó
+function onRowClick(ev, side, maNV){
+  const set = side==='left'?state.leftChecked:state.rightChecked;
+  if (set.has(maNV)) set.delete(maNV); else set.add(maNV);
+  if (side==='left') renderLeft(); else renderRight();
+}
+
+/* ================================================================
+ *  TRANSFER LOGIC
+ * ================================================================ */
+function transferRight(all){
+  if (state.leftList.length === 0){
+    showAlert('Cột trái đang trống. Bấm <b>Tải nhân sự</b> trước.', 'warning');
+    return;
+  }
+  let moving;
+  if (all){
+    // Chuyển toàn bộ HIỂN THỊ (theo search-left)
+    const q = document.getElementById('search-left').value;
+    moving = filterBySearch(state.leftList, q);
+    if (moving.length === 0){ showAlert('Không có NV nào phù hợp bộ lọc trong danh sách để chuyển.', 'warning'); return; }
+  } else {
+    moving = state.leftList.filter(id => state.leftChecked.has(id));
+    if (moving.length === 0){ showAlert('Chưa tick NV nào ở cột trái.', 'warning'); return; }
+  }
+  const movingSet = new Set(moving);
+  state.leftList = state.leftList.filter(id => !movingSet.has(id));
+  state.rightList = [...state.rightList, ...moving];
+  state.leftChecked.clear();
+  renderAll();
+  showAlert(`Đã chuyển <b>${moving.length}</b> NV sang cột "Đã được tính lương".`, 'success');
+}
+
+function transferLeft(all){
+  if (state.rightList.length === 0){
+    showAlert('Cột phải đang trống.', 'warning');
+    return;
+  }
+  let moving;
+  if (all){
+    const q = document.getElementById('search-right').value;
+    moving = filterBySearch(state.rightList, q);
+    if (moving.length === 0){ showAlert('Không có NV nào phù hợp bộ lọc trong danh sách để bỏ.', 'warning'); return; }
+  } else {
+    moving = state.rightList.filter(id => state.rightChecked.has(id));
+    if (moving.length === 0){ showAlert('Chưa tick NV nào ở cột phải.', 'warning'); return; }
+  }
+  const movingSet = new Set(moving);
+  state.rightList = state.rightList.filter(id => !movingSet.has(id));
+  // NV bỏ ra chỉ trả về cột trái NẾU đang nằm trong hrPool (tức là đã "Tải nhân sự" và match filter).
+  // Nếu không, đưa vào cột trái luôn cũng OK để user thấy — vì user có thể muốn move ngược sau này.
+  const poolSet = new Set(state.hrPool);
+  const toLeft = moving.filter(id => poolSet.size === 0 || poolSet.has(id));
+  const dropped = moving.length - toLeft.length;
+  state.leftList = [...state.leftList, ...toLeft];
+  state.rightChecked.clear();
+  renderAll();
+  let msg = `Đã bỏ <b>${moving.length}</b> NV về cột "Chưa được tính lương".`;
+  if (dropped > 0) msg += ` (Trong đó <b>${dropped}</b> NV không match filter hiện tại — vẫn giữ trong tập nếu bấm Tải nhân sự lại)`;
+  showAlert(msg, 'success');
+}
+
+function clearAll(){
+  if (state.rightList.length === 0){ showAlert('Cột phải đã trống rồi.', 'warning'); return; }
+  if (!confirm(`Chuyển toàn bộ ${state.rightList.length} NV về cột trái?`)) return;
+  const poolSet = new Set(state.hrPool);
+  const toLeft = state.rightList.filter(id => poolSet.size === 0 || poolSet.has(id));
+  state.leftList = [...state.leftList, ...toLeft];
+  state.rightList = [];
+  state.rightChecked.clear();
+  renderAll();
+  showAlert('Đã chuyển toàn bộ NV về cột "Chưa được tính lương".', 'success');
+}
+
+/* ================================================================
+ *  SAVE
+ * ================================================================ */
+function saveDanhSach(){
+  if (!state.kyLuong){ showAlert('Vui lòng chọn kỳ lương.', 'error'); return; }
+  if (state.rightList.length === 0){
+    showAlert('Cột "Đã được tính lương" đang rỗng — không thể lưu.', 'error');
+    return;
+  }
+  if (state.kyLuong.daKhoa){
+    if (!confirm('Kỳ này đã KHÓA. Bạn cần Mở khóa ở MH pg3 trước. Vẫn tiếp tục?')) return;
+  }
+  // Warning: NV Thôi việc không có NLV cuối
+  const missing = state.rightList
+    .map(id => nvById(id))
+    .filter(nv => nv && nv.trangThai === 'Thôi việc' && !nv.ngayLamCuoi);
+  if (missing.length > 0){
+    const list = missing.slice(0,5).map(nv => nv.maNV+' - '+nv.ten).join('\n');
+    const extra = missing.length > 5 ? `\n... và ${missing.length - 5} NV khác` : '';
+    if (!confirm(`Cảnh báo: có ${missing.length} NV "Thôi việc" chưa có Ngày làm việc cuối cùng:\n\n${list}${extra}\n\nEngine sẽ không biết cắt lương tới ngày nào. Vẫn tiếp tục lưu?`)){
+      return;
+    }
+  }
+  MOCK_KY_LUONG_NV[state.kyLuong.ma] = state.rightList.slice();
+  showAlert(`Đã lưu <b>${state.rightList.length}</b> NV vào kỳ <b>${state.kyLuong.ma}</b> lúc ${nowStr()} bởi ${CURRENT_USER}.`, 'success');
+}
+
+/* ================================================================
+ *  EXPORT / IMPORT (mockup)
+ * ================================================================ */
+// Cột dùng chung cho cả 2 sheet + 2 nút export riêng
+const SET6_EXPORT_COLUMNS = [
+  { key: 'stt',      header: 'STT',      width: 6  },
+  { key: 'maNV',     header: 'Mã NV',    width: 14 },
+  { key: 'ten',      header: 'Tên NV',   width: 28 },
+  { key: 'donVi',    header: 'Đơn vị',   width: 34 },
+  { key: 'bptl',     header: 'BPTL',     width: 12 },
+  { key: 'chucVu',   header: 'Chức vụ',  width: 16 },
+  { key: 'nhomTL',   header: 'Nhóm TL',  width: 12 },
+  { key: 'ngayVao',  header: 'Ngày vào', width: 12 },
+  { key: 'trangThai',header: 'Trạng thái', width: 14 }
+];
+
+function _buildExportRows(maNVList){
+  return maNVList.map(function(id, i){
+    var nv = nvById(id) || {};
+    return {
+      stt: i + 1,
+      maNV: nv.maNV || id,
+      ten:  nv.ten  || '',
+      donVi: [nv.dvCap2, nv.dvCap3, nv.dvCap5].filter(Boolean).join(' / '),
+      bptl:  nv.bptl || '',
+      chucVu: nv.chucVu || '',
+      nhomTL: nv.nhomTL || '',
+      ngayVao: formatDate(nv.ngayVao),
+      trangThai: nv.trangThai || ''
+    };
+  });
+}
+
+function _kyLabel(){
+  return state.kyLuong ? state.kyLuong.ma : 'CHUA_CHON_KY';
+}
+
+function exportData(){
+  if (!state.kyLuong){ showAlert('Vui lòng chọn kỳ lương trước khi xuất.', 'error'); return; }
+  if (typeof XLSXExport === 'undefined'){
+    showAlert('Helper XLSXExport chưa load. Vui lòng reload trang.', 'error'); return;
+  }
+  var fname = 'DS_NV_TinhLuong_' + _kyLabel() + '_' + new Date().toISOString().slice(0,10);
+  XLSXExport.exportMulti({
+    filename: fname,
+    sheets: [
+      { name: 'NV chưa tính', columns: SET6_EXPORT_COLUMNS, data: _buildExportRows(state.leftList) },
+      { name: 'NV đã tính',   columns: SET6_EXPORT_COLUMNS, data: _buildExportRows(state.rightList) }
+    ]
+  });
+  showAlert('Đang xuất file <b>' + fname + '.xlsx</b> (2 sheet: '
+    + state.leftList.length + ' chưa tính / ' + state.rightList.length + ' đã tính).', 'success');
+}
+
+// Xuất riêng 1 lưới (side = 'left' | 'right')
+function exportSide(side){
+  if (!state.kyLuong){ showAlert('Vui lòng chọn kỳ lương trước khi xuất.', 'error'); return; }
+  if (typeof XLSXExport === 'undefined'){
+    showAlert('Helper XLSXExport chưa load. Vui lòng reload trang.', 'error'); return;
+  }
+  var list = side === 'left' ? state.leftList : state.rightList;
+  if (list.length === 0){
+    showAlert('Lưới <b>' + (side==='left'?'Chưa tính':'Đã tính') + '</b> đang trống — không có gì để xuất.', 'warning');
+    return;
+  }
+  var suffix = side === 'left' ? 'ChuaTinh' : 'DaTinh';
+  var sheetName = side === 'left' ? 'NV chưa tính' : 'NV đã tính';
+  var fname = 'DS_NV_' + suffix + '_' + _kyLabel() + '_' + new Date().toISOString().slice(0,10);
+  XLSXExport.export({
+    filename: fname,
+    sheetName: sheetName,
+    columns: SET6_EXPORT_COLUMNS,
+    data: _buildExportRows(list)
+  });
+  showAlert('Đang xuất <b>' + list.length + '</b> NV (lưới ' + suffix + ') ra <b>' + fname + '.xlsx</b>.', 'success');
+}
+
+function openImport(){
+  if (!state.kyLuong){ showAlert('Vui lòng chọn kỳ lương trước khi import.', 'error'); return; }
+  document.getElementById('modal-import').style.display = 'flex';
+}
+
+function mockupImport(){
+  hideModal('modal-import');
+  alert(`[MOCKUP] Đọc file Excel → thêm các Mã NV chưa có vào cột "Chưa được tính lương".
+
+- Bỏ qua mã đã có trong kỳ.
+- Reject mã không tồn tại trong HR.
+- Sau import, có thể bấm ">" để chuyển sang cột "Đã được tính".
+
+(Demo — chưa có parser Excel thật.)`);
+}
+
+/* ================================================================
+ *  HELPERS
+ * ================================================================ */
+function formatDate(iso){
+  if (!iso) return '';
+  const p = iso.split('-');
+  if (p.length !== 3) return iso;
+  return `${p[2]}/${p[1]}/${p[0]}`;
+}
+
+function showAlert(msg, type){
+  const b = document.getElementById('set6-alert');
+  b.className = 'alert-box alert-' + type;
+  b.innerHTML = msg;
+  b.style.display = 'block';
+  if (type !== 'error') setTimeout(() => b.style.display = 'none', 4500);
+}
+
+function showRules(){ document.getElementById('modal-rules').style.display = 'flex'; }
+function hideModal(id){ document.getElementById(id).style.display = 'none'; }
+</script>
+</body>
+</html>

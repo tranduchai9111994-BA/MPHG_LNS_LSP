@@ -14,6 +14,59 @@
       .btn-vd:hover{background:#003d80;}
       .btn-chitiet{background:#17a2b8;color:#fff;border:none;padding:3px 12px;border-radius:3px;cursor:pointer;font-size:11px;font-weight:bold;}
       .btn-chitiet:hover{background:#117a8b;}
+      .vd-tbl { width:100%; border-collapse:collapse; font-size:11px; margin:8px 0; white-space:normal; }
+      .vd-tbl th { background:#e8eef5; padding:5px 8px; border:1px solid #ccc; font-weight:bold; color:#333; text-align:center; white-space:normal; }
+      .vd-tbl td { padding:4px 8px; border:1px solid #ddd; text-align:center; white-space:normal; word-break:break-word; }
+      .vd-tbl td.r { text-align:right; font-family:Consolas,monospace; }
+      .vd-tbl tr.sum td { font-weight:bold; background:#eef2f7; border-top:2px solid #999; }
+      .vd-tbl td.hi { background:#d4edda; font-weight:bold; color:#155724; }
+      .vd-tbl td.hi2 { background:#fff3cd; font-weight:bold; color:#856404; }
+      .vd-tbl td.dim { color:#bbb; }
+      .vd-step { background:#f8f9fa; border:1px solid #dee2e6; border-radius:4px; padding:8px 12px; margin:8px 0; font-size:11px; line-height:1.8; }
+      .vd-step b { color:#0056b3; }
+      .vd-step .op { color:#28a745; font-weight:bold; }
+      .vd-step .warn { color:#e67e22; }
+      .vd-info { background:#e8f4f8; border-left:3px solid #0056b3; padding:6px 10px; font-size:11px; margin-top:8px; color:#004085; }
+      .help-icon { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#6c757d; color:#fff; font-size:11px; font-weight:bold; cursor:pointer; margin-left:5px; vertical-align:middle; user-select:none; }
+      .help-icon:hover { background:#0056b3; }
+      /* ===== Detail popup: toolbar + row states ===== */
+      .set4-detail-toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px; padding:8px 10px; background:#f8f9fa; border:1px solid #dee2e6; border-radius:4px; font-size:12px; }
+      .set4-detail-toolbar input[type=text] { height:26px; padding:2px 8px; border:1px solid #ccc; border-radius:3px; font-size:12px; min-width:220px; }
+      .set4-detail-toolbar label { font-weight:normal; display:flex; align-items:center; gap:5px; cursor:pointer; }
+      .set4-detail-toolbar .toolbar-counter { margin-left:auto; padding:2px 10px; background:#0056b3; color:#fff; border-radius:3px; font-weight:bold; font-size:11px; }
+      .set4-detail-toolbar .btn-bulk { background:#f0ad4e; color:#fff; border:none; border-radius:3px; padding:4px 12px; font-size:11px; font-weight:bold; cursor:pointer; }
+      .set4-detail-toolbar .btn-bulk:hover { background:#ec971f; }
+      .set4-detail-toolbar .btn-bulk:disabled { background:#ccc; cursor:not-allowed; }
+      /* Row disabled state (order>=999) */
+      tr.set4-row-off > td { background:#fafafa; color:#adb5bd; }
+      tr.set4-row-off > td b { color:#adb5bd; }
+      tr.set4-row-off input[type=text], tr.set4-row-off select, tr.set4-row-off input[type=number] { background:#f5f5f5; color:#999; border-color:#e0e0e0; }
+      .badge-off { display:inline-block; background:#e9ecef; color:#6c757d; border:1px solid #ced4da; border-radius:3px; padding:1px 6px; font-size:9px; font-weight:bold; margin-left:6px; vertical-align:middle; }
+      /* Sticky column: Mã tiêu chí (col 3 of tbody + thead) — dùng !important để thắng inline z-index */
+      #set4-detail table thead th:nth-child(3),
+      #set4-detail table tbody td:nth-child(3) { position:sticky !important; left:70px !important; background:#fff; box-shadow:1px 0 0 #dee2e6; }
+      #set4-detail table tbody td:nth-child(3) { z-index:2 !important; }
+      #set4-detail table thead th:nth-child(3) { z-index:6 !important; background:#f0f0f0; }
+      tr.set4-row-off > td:nth-child(3) { background:#fafafa !important; }
+
+      /* ===== Modal "Quy tắc nghiệp vụ" — scoped rules table + notes block ===== */
+      #modal-rules .ref-table { font-size:13px; table-layout:fixed; width:100%; border-collapse:collapse; }
+      #modal-rules .ref-table th { background:#e8eef5; color:#333; padding:10px 12px; border:1px solid #ccc; text-align:left; font-weight:bold; font-size:13px; }
+      #modal-rules .ref-table td { padding:10px 12px; border:1px solid #ddd; background:#fff; vertical-align:top; word-wrap:break-word; overflow-wrap:break-word; line-height:1.6; font-size:13px; }
+      #modal-rules .ref-table tr:nth-child(even) td { background:#fafcff; }
+      #modal-rules .ref-table code { background:#f5f5f5; color:#c7254e; padding:2px 5px; border-radius:3px; font-family:Consolas,Monaco,monospace; font-size:12px; word-break:break-word; }
+      #modal-rules .ref-table td .vd-example { margin-top:4px; padding:8px 10px; background:#fff9e6; border-left:3px solid #ffc107; border-radius:3px; }
+      #modal-rules .ref-table td .vd-example .vd-title { font-weight:bold; color:#856404; margin-bottom:4px; font-size:12px; }
+      #modal-rules .ref-table td .vd-example .vd-line { margin:3px 0; color:#333; line-height:1.55; }
+      #modal-rules .ref-table td .vd-example .vd-num { font-family:Consolas,Monaco,monospace; color:#0056b3; font-weight:bold; }
+      #modal-rules .notes-block { margin-top:18px; padding:14px 18px; background:#fff8e1; border:1px solid #ffc107; border-left:4px solid #f0ad4e; border-radius:4px; font-size:13px; line-height:1.7; }
+      #modal-rules .notes-block h3 { margin:0 0 10px 0; color:#856404; font-size:14px; font-weight:bold; }
+      #modal-rules .notes-block ol { margin:0; padding-left:22px; }
+      #modal-rules .notes-block ol > li { margin-bottom:10px; color:#333; }
+      #modal-rules .notes-block ol > li b { color:#0056b3; }
+      #modal-rules .notes-block code { background:#fff; border:1px solid #e0dcc4; color:#c7254e; padding:1px 5px; border-radius:3px; font-family:Consolas,Monaco,monospace; font-size:12px; }
+      #modal-rules .notes-block .warn-tag { display:inline-block; background:#dc3545; color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:3px; margin-right:4px; }
+      #modal-rules .notes-block .ok-tag { display:inline-block; background:#28a745; color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:3px; margin-right:4px; }
     </style>
 </head>
 <body>
@@ -37,24 +90,21 @@
 
 <div>
   <div class="breadcrumb">Lương › Thiết lập (System) › Thiết lập công thức tính lương › Tạo công thức lương</div>
-  <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;">
+  <div class="page-title" style="position:relative;text-align:center;">
     <span>TẠO CÔNG THỨC LƯƠNG</span>
-    <button onclick="showRules()" style="background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">📋 Quy tắc</button>
-  </div>
-  <div class="info-bar" style="margin-bottom:10px;">
-    Màn hình này lưu <strong>thông tin master</strong> của bộ công thức (Tên, Customer, Ghi chú). Việc ráp/xem các dòng tiêu chí (+−×÷) thực hiện trong popup <strong>[Chi tiết]</strong> của từng công thức bên dưới.
+    <button onclick="showRules()" style="position:absolute;right:0;top:50%;transform:translateY(-50%);background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">📋 Quy tắc</button>
   </div>
   <div id="set4-alert" class="alert-box"></div>
 
   <!-- MODAL: Quy tắc màn hình -->
   <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
-    <div class="modal-box wide" style="max-width:720px;">
-      <div class="modal-hdr" style="background:#6f42c1;">
+    <div class="modal-box wide" style="max-width:min(1200px,92vw);width:min(1200px,92vw);max-height:90vh;display:flex;flex-direction:column;">
+      <div class="modal-hdr" style="background:#6f42c1;flex-shrink:0;">
         <span>📋 Quy tắc nghiệp vụ — Tạo công thức lương</span>
         <button class="x" onclick="document.getElementById('modal-rules').style.display='none'">✕</button>
       </div>
-      <div class="modal-body" id="modal-rules-body" style="max-height:75vh;overflow-y:auto;"></div>
-      <div class="modal-ftr">
+      <div class="modal-body" id="modal-rules-body" style="flex:1;overflow-y:auto;padding:14px 18px;"></div>
+      <div class="modal-ftr" style="flex-shrink:0;">
         <button class="btn-cancel" onclick="document.getElementById('modal-rules').style.display='none'">Đóng</button>
       </div>
     </div>
@@ -81,7 +131,8 @@
     <button class="btn-save2" onclick="set4SaveMaster()">Lưu</button>
     <button class="btn-refresh" onclick="set4CancelMaster()">Làm mới</button>
     <button class="btn-import" style="background:#6f42c1;" onclick="copyFormula()">Sao chép</button>
-    <button class="btn-export" onclick="exportMasterData()">Xuất dữ liệu</button>
+    <button class="btn-export" onclick="exportMasterData()" title="Xuất danh sách bộ công thức (Mã, Tên, Customer, Số dòng, Ghi chú) của các dòng đã tick — không tick thì xuất toàn bộ.">Xuất master</button>
+    <button class="btn-export" style="background:#17a2b8;" onclick="exportAllDetails()" title="Xuất TOÀN BỘ dòng tiêu chí của các bộ công thức đã tick (kèm mã bộ công thức) — không tick thì xuất tất cả bộ.">Xuất details</button>
   </div>
 
   <!-- Master List Grid -->
@@ -93,7 +144,7 @@
       <th>Mã</th>
       <th>Tên Công thức</th>
       <th>Customer</th>
-      <th>Số dòng tiêu chí</th>
+      <th title="Số dòng đang dùng (Số thứ tự < 999) trên Tổng dòng tiêu chí TT_">Đang dùng / Tổng</th>
       <th>Ghi chú</th>
       <th>Chi tiết</th>
     </tr></thead>
@@ -108,63 +159,69 @@
       <span id="set4-detail-title">🔧 CHI TIẾT CÔNG THỨC</span>
       <button class="x" onclick="hideModal('set4-detail')">✕</button>
     </div>
-    <div class="modal-body" style="flex:1;overflow-y:auto;">
-      <div id="set4-detail-info" style="margin-bottom:10px;font-size:12px;color:#555;"></div>
-      <div class="actions-bar" style="padding:0;background:transparent;border:none;margin-bottom:10px;">
-        <button class="btn-export" onclick="exportDetailData()">Xuất dữ liệu dòng</button>
-        <button class="btn-import" onclick="openPreview()">Xem trước nhiều dòng</button>
+    <div class="modal-body" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+      <div id="set4-detail-info" style="margin-bottom:10px;font-size:12px;color:#555;flex-shrink:0;"></div>
+      <div class="set4-detail-toolbar" style="flex-shrink:0;">
+        <input type="text" id="set4-detail-search" placeholder="🔍 Tìm theo Mã / Tên tiêu chí..." oninput="onDetailSearch()">
+        <label title="Chỉ hiển thị dòng có Số thứ tự < 999 (dòng đang được dùng trong công thức)"><input type="checkbox" id="set4-detail-onlyused" checked onchange="renderDetailGrid()"> Chỉ hiện đang dùng</label>
+        <button class="btn-bulk" onclick="bulkSetOrderOff()">↓ Set 999 cho dòng đã tick</button>
+        <button class="btn-bulk" style="background:#28a745" onclick="bulkClearOff()">↑ Bật lại dòng đã tick</button>
+        <span class="toolbar-counter" id="set4-detail-counter">Đang dùng: 0/0</span>
       </div>
-      <div class="grid-wrap"><table>
+      <div class="grid-wrap" style="flex:1;overflow:auto;max-height:none;min-height:0;">
+        <table style="border-collapse:collapse;width:100%;">
         <thead><tr>
-          <th><input type="checkbox" id="set4_chkAll" onchange="toggleAllSet4Detail(this)"></th>
-          <th>STT</th>
-          <th>Mã tiêu chí</th>
-          <th>Tên tiêu chí</th>
-          <th>STT thứ tự</th>
-          <th style="min-width:280px">Công thức</th>
-          <th>Ghi chú</th>
+          <th style="position:sticky;top:0;z-index:2;"><input type="checkbox" id="set4_chkAll" onchange="toggleAllSet4Detail(this)"></th>
+          <th style="position:sticky;top:0;z-index:2;">STT</th>
+          <th style="position:sticky;top:0;z-index:2;">Mã tiêu chí</th>
+          <th style="position:sticky;top:0;z-index:2;">Tên tiêu chí</th>
+          <th style="position:sticky;top:0;z-index:2;" title="Số thứ tự dòng trong bộ CT (nhỏ = hiển thị trên; 999 = không dùng). KHÁC với Rank engine ở set3.">Số thứ tự</th>
+          <th style="position:sticky;top:0;z-index:2;min-width:240px">Công thức<span class="help-icon" onclick="showHelp('congthuc')">?</span></th>
+          <th style="position:sticky;top:0;z-index:2;min-width:140px">Toán tử gộp N→1<span class="help-icon" onclick="showHelp('reduce')">?</span></th>
+          <th style="position:sticky;top:0;z-index:2;min-width:200px">Phân bổ đầu ra<span class="help-icon" onclick="showHelp('phanbo')">?</span></th>
+          <th style="position:sticky;top:0;z-index:2;min-width:180px">Căn cứ phân bổ</th>
+          <th style="position:sticky;top:0;z-index:2;">Ví dụ</th>
+          <th style="position:sticky;top:0;z-index:2;min-width:200px">Ghi chú</th>
         </tr></thead>
         <tbody id="set4-tbody"></tbody>
-      </table></div>
+      </table>
+      </div>
     </div>
-    <div class="modal-ftr">
+    <div class="modal-ftr" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn-save2" onclick="saveDetailGrid()">Lưu</button>
       <button class="btn-cancel" onclick="hideModal('set4-detail')">Đóng</button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Xem trước nhiều dòng -->
-<div class="modal-overlay" id="set4-preview">
-  <div class="modal-box" style="width:95vw;max-width:1500px;height:92vh;display:flex;flex-direction:column;">
-    <div class="modal-hdr" style="background:#0056b3;">
-      <span>🔍 XEM TRƯỚC KẾT QUẢ NHIỀU DÒNG</span>
-      <button class="x" onclick="hideModal('set4-preview')">✕</button>
+<!-- Modal: Help icon (?) -->
+<div class="modal-overlay" id="modal-help" style="display:none;justify-content:center;align-items:center;">
+  <div class="modal-box wide" style="width:92vw;max-width:820px;">
+    <div class="modal-hdr" style="background:#6c757d;">
+      <span id="modal-help-title">Giải thích</span>
+      <button class="x" onclick="document.getElementById('modal-help').style.display='none'">✕</button>
     </div>
-    <div class="modal-body" style="flex:1;overflow-y:auto;">
-      <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;">
-        <label style="margin:0;font-weight:bold;">Nhân viên:</label>
-        <select id="set4_previewEmp" onchange="selectEmployee()" style="padding:4px 6px;border:1px solid #ccc;height:26px;min-width:260px;">
-          <option value="1022907668">1022907668 - Nguyễn Thị Loan</option>
-        </select>
-      </div>
-      <div id="set4-preview-content"></div>
-    </div>
+    <div class="modal-body" id="modal-help-body" style="max-height:65vh;overflow-y:auto;"></div>
     <div class="modal-ftr">
-      <button class="btn-cancel" onclick="hideModal('set4-preview')">Đóng</button>
+      <button class="btn-cancel" onclick="document.getElementById('modal-help').style.display='none'">Đóng</button>
     </div>
   </div>
 </div>
 
-    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
-      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
-        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
-      </div>
-      <textarea rows="6" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;font-family:Arial;background:#fffef0;resize:vertical;">Màn hình tách 2 lớp: (1) Master ngoài trang — chỉ lưu Tên/Customer/Ghi chú + danh sách công thức đã tạo; (2) popup [Chi tiết] — nơi ráp các dòng tiêu chí tính toán (TT_) thành 1 bộ công thức, mỗi dòng vẫn nhập công thức dạng text (VD: TT_A × HT_B) như bản trước, chưa có form-builder kéo-thả toán tử.
-Không định nghĩa lại RowClass/Allocation/SumPrev ở đây — đã chốt tại MH "Định nghĩa tiêu chí tính toán" (xem nút Quy tắc ở MH đó).
-[Sao chép]: nhân bản 1 dòng master đã tick (kèm toàn bộ dòng tiêu chí bên trong) thành bộ mới, tự thêm hậu tố "(Copy)".
-[Xuất dữ liệu] ở ngoài: xuất danh sách master đã tick (hoặc toàn bộ nếu không tick). [Xuất dữ liệu dòng] trong popup Chi tiết: xuất các dòng tiêu chí đã tick của riêng công thức đang mở.
-Need Confirm (confirm #7): NV làm nhiều BP trong tháng — sau khi tính từng dòng có gộp tổng theo BP (M25=SUM) không? Bộ công thức có cần versioning?</textarea>
+<!-- Modal: Ví dụ chi tiết Phân bổ đầu ra (per dòng công thức) -->
+<div class="modal-overlay" id="modal-vd" style="display:none;justify-content:center;align-items:center;">
+  <div class="modal-box wide" style="width:95vw;max-width:1300px;height:92vh;display:flex;flex-direction:column;">
+    <div class="modal-hdr" style="background:#0056b3;">
+      <span id="modal-vd-title">Ví dụ chi tiết</span>
+      <button class="x" onclick="document.getElementById('modal-vd').style.display='none'">✕</button>
     </div>
+    <div class="modal-body" id="modal-vd-body" style="flex:1;overflow-y:auto;"></div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="document.getElementById('modal-vd').style.display='none'">Đóng</button>
+    </div>
+  </div>
+</div>
+
   </div>
   <script src="../shared/mockdata.js"></script>
   <script src="../shared/utils.js"></script>
@@ -182,9 +239,13 @@ Need Confirm (confirm #7): NV làm nhiều BP trong tháng — sau khi tính t�
     }
 
     // ==================== Mock Data ====================
-    // Mỗi bộ công thức = master (code/name/customer/note) + danh sách dòng tham chiếu
-    // tiêu chí tính toán (TT_). RowClass/Allocation/SumPrev của từng TT_ đã chốt ở
-    // MH Tiêu chí tính toán, không lặp lại/hiển thị toán tử ở đây.
+    // Mỗi bộ công thức = master (code/name/customer/note) + danh sách dòng tiêu chí tính toán (TT_).
+    // Pipeline mỗi dòng: [ct raw] → [reduce N→1 optional] → [phanBo distribute lên N GĐ] → output cuối
+    //   - ct: biểu thức (+−×÷, số, mã HT_/TT_/TK_, CASE WHEN) — KHÔNG viết SUM/MAX/AVG inline
+    //   - reduce: NONE (giữ raw) | SUM | AVG | MAX | MIN — áp lên output raw của DÒNG NÀY (không phải per-ref)
+    //   - phanBo: slice/last/first/maxby/minby/prorata (đồng bộ set2)
+    //   - phanBoBasis: căn cứ cho maxby/minby/prorata
+    // Downstream criteria chỉ tham chiếu mã — engine tự broadcast/match theo shape output đã có.
     const MOCK_FORMULAS = [
       {
         code: 'LSP_01',
@@ -192,46 +253,301 @@ Need Confirm (confirm #7): NV làm nhiều BP trong tháng — sau khi tính t�
         customer: 'MPHG',
         note: '',
         lines: [
-          { stt:1, ma:'TT_LSP_Base_L0', ten:'Lương gốc L0', order:1, ct:'Σ(HT_PR_NangSuatTinhLuong × HT_PR_LSP_DonGia)' },
-          { stt:2, ma:'TT_LSP_TienL1', ten:'Tiền sau ĐC lần 1', order:2, ct:'TT_LSP_Base_L0 × HT_PR_LSP_HeSo1' },
-          { stt:3, ma:'TT_LSP_HoTroChuyenBan', ten:'Hỗ trợ bàn giao (giai đoạn cũ)', order:3, ct:'500,000 (cố định khi có ≥2 giai đoạn, Allocation=OldStage)' },
-          { stt:4, ma:'TT_LSP_LuongThoiGian', ten:'Lương thời gian', order:4, ct:'HT_TS_CongThucTe × ĐơnGiáNgày' },
-          { stt:5, ma:'TT_LSP_LuongDongBH', ten:'Lương đóng BH', order:5, ct:'MAX(TT_LSP_KetQua_Final theo dòng)' },
-          { stt:6, ma:'TT_LSP_LuyKeLuong', ten:'Lương lũy kế xuyên giai đoạn', order:6, ct:'REF(TT_LSP_Base_L0) cộng dồn' },
-          { stt:7, ma:'TT_LSP_ThuNhapTinhThue', ten:'Thu nhập tính thuế', order:7, ct:'Σ TT_LSP_KetQua_Final' },
-          { stt:8, ma:'TT_LSP_KetQua_Final', ten:'Tổng LSP cuối', order:8, ct:'TT_LSP_TienL3 + HoTro...' },
+          { stt:1, ma:'TT_LSP_Base_L0', ten:'Lương gốc L0', order:1, ct:'HT_PR_NangSuatTinhLuong × HT_PR_LSP_DonGia', reduce:'NONE', phanBo:'slice', phanBoBasis:'', note:'Cả 2 tiêu chí đầu vào đều theo GĐ → raw đã là N giá trị. Không reduce, phân bổ theo GĐ.' },
+          { stt:2, ma:'TT_LSP_TienL1', ten:'Tiền sau ĐC lần 1', order:2, ct:'TT_LSP_Base_L0 × HT_PR_LSP_HeSo1', reduce:'NONE', phanBo:'slice', phanBoBasis:'', note:'HeSo1 là "Mới nhất" (1 giá trị) — engine tự broadcast lên N GĐ khi nhân với TT_LSP_Base_L0.' },
+          { stt:3, ma:'TT_LSP_HoTroChuyenBan', ten:'Hỗ trợ bàn giao (GĐ cũ nhất)', order:3, ct:'500000', reduce:'NONE', phanBo:'first', phanBoBasis:'', note:'Cố định 500k, dồn 100% vào GĐ đầu tiên. Chỉ phát sinh khi NV có ≥2 GĐ.' },
+          { stt:4, ma:'TT_LSP_LuongThoiGian', ten:'Lương thời gian', order:4, ct:'HT_TS_CongChuan × ĐonGiaNgay', reduce:'NONE', phanBo:'prorata', phanBoBasis:'HT_TS_CongThucTe', note:'1 tổng cho cả NV → engine chia tỷ lệ theo Công thực tế mỗi GĐ.' },
+          { stt:5, ma:'TT_TNChiuThueTNCN', ten:'Thu nhập chịu thuế TNCN', order:5, ct:'TT_LSP_KetQua_Final', reduce:'SUM', phanBo:'last', phanBoBasis:'', note:'SUM cả kỳ (75 = 50+25) → dồn vào GĐ cuối kỳ tính thuế 1 lần.' },
+          { stt:6, ma:'TT_LSP_KetQua_Final', ten:'Tổng LSP cuối', order:6, ct:'TT_LSP_TienL1 + TT_LSP_HoTroChuyenBan + TT_LSP_LuongThoiGian', reduce:'NONE', phanBo:'slice', phanBoBasis:'', note:'Cộng theo GĐ — engine tự khớp GĐ giữa các thành phần.' }
         ]
       }
     ];
     let editingMasterCode = '';   // mã công thức đang sửa ở form master (rỗng = đang tạo mới)
     let detailFormulaCode = '';   // mã công thức đang mở trong popup Chi tiết
     let currentFormulaLines = []; // dòng tiêu chí của công thức đang mở trong popup Chi tiết
+    const DEFAULT_ORDER_OFF = 999; // Số thứ tự cho dòng tiêu chí "không dùng" — pattern hệ thống cũ, không để trống
 
-    const MOCK_PREVIEW = {
-      emp: { id:'1022907668', name:'Nguyễn Thị Loan' },
-      slices: [
-        { stage:1, ban:'CB101', from:'01/05/2026', to:'15/05/2026', cong:12, L0:5000000, final:6200000 },
-        { stage:2, ban:'CB102', from:'16/05/2026', to:'31/05/2026', cong:13, L0:5800000, final:7100000 },
-      ]
-    };
+    // Toàn bộ tiêu chí TT_ có sẵn (mirror set3 MOCK_TT). Khi mở popup Chi tiết công thức,
+    // engine load ALL tiêu chí này vào grid — dòng chưa có công thức thì để order=999 (không dùng).
+    // Trong production: list này lấy từ set3 MOCK_TT (hoặc DB tblTieuChiTinhToan).
+    const ALL_TT_CRITERIA = [
+      {ma:'TT_LSP_Base_L0',           ten:'Lương gốc L0',                     rank:10},
+      {ma:'TT_LSP_TienL1',            ten:'Tiền sau ĐC lần 1',                rank:20},
+      {ma:'TT_LSP_TienL2',            ten:'Tiền sau ĐC lần 2',                rank:30},
+      {ma:'TT_LSP_TienL3',            ten:'Tiền sau ĐC lần 3',                rank:40},
+      {ma:'TT_LSP_HoTroChuyenBan',    ten:'Hỗ trợ bàn giao (giai đoạn cũ)',   rank:45},
+      {ma:'TT_LSP_LuongThoiGian',     ten:'Lương thời gian (ngày công)',      rank:50},
+      {ma:'TT_LSP_KhoanTruThang',     ten:'Khoản trừ tháng (tạm ứng, kỷ luật...)', rank:62},
+      {ma:'TT_TNChiuThueTNCN',        ten:'Thu nhập chịu thuế TNCN',          rank:70},
+      {ma:'TT_LSP_KetQua_Final',      ten:'Tổng LSP cuối cùng',               rank:99}
+    ];
+
+    // Trạng thái filter cho popup Chi tiết
+    let detailSearchText = '';
+
+    // ==================== PHÂN BỔ ĐẦU RA (đồng bộ set2) ====================
+    var PHAN_BO_OPTIONS = [
+      {v:'slice',   t:'Theo giai đoạn',              hint:'Mỗi GĐ giữ giá trị riêng (N giá trị theo N GĐ QTLV).', color:'#28a745'},
+      {v:'last',    t:'Mới nhất',                    hint:'Dồn 100% vào GĐ cuối kỳ (ToDate lớn nhất). Các GĐ khác = 0.', color:'#17a2b8'},
+      {v:'first',   t:'Cũ nhất',                     hint:'Dồn 100% vào GĐ đầu kỳ (FromDate nhỏ nhất). Các GĐ khác = 0.', color:'#6c757d'},
+      {v:'maxby',   t:'Tiêu chí giá trị cao nhất',   hint:'Dồn 100% vào GĐ có căn cứ phân bổ MAX. Dùng cho tiền trừ/BH (dồn vào GĐ tiền nhiều).', color:'#dc3545'},
+      {v:'minby',   t:'Tiêu chí giá trị thấp nhất',  hint:'Dồn 100% vào GĐ có căn cứ phân bổ MIN.', color:'#e67e22'},
+      {v:'prorata', t:'Prorata (chia tỷ lệ)',        hint:'Chia 1 tổng thành N phần theo tỷ lệ căn cứ phân bổ mỗi GĐ. Tổng không đổi.', color:'#6f42c1'}
+    ];
+    function phanBoLabel(v){ var o = PHAN_BO_OPTIONS.find(x=>x.v===v); return o?o.t:'—'; }
+    function phanBoNeedsBasis(v){ return v==='maxby'||v==='minby'||v==='prorata'; }
+    function phanBoColor(v){ var o = PHAN_BO_OPTIONS.find(x=>x.v===v); return o?o.color:'#6c757d'; }
+    function phanBoTag(v){
+      var o = PHAN_BO_OPTIONS.find(x=>x.v===v);
+      if(!o) return '';
+      return '<span style="background:'+o.color+';color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;" title="'+o.hint+'">'+o.t+'</span>';
+    }
+
+    // Danh sách căn cứ phân bổ ứng viên (các tiêu chí HT_/TT_ số, theo GĐ) — mock cho set4
+    var PHAN_BO_BASIS_OPTIONS = [
+      {ma:'HT_TS_CongThucTe',           ten:'Công thực tế mỗi GĐ',        loai:'HT_TS'},
+      {ma:'HT_TS_CongChuan',            ten:'Công chuẩn tháng',           loai:'HT_TS'},
+      {ma:'HT_PR_NangSuatTinhLuong',    ten:'Sản lượng NS_FINAL',         loai:'HT_PR'},
+      {ma:'HT_PR_LSP_DonGia',           ten:'Đơn giá tiền lương',         loai:'HT_PR'},
+      {ma:'TT_LSP_Base_L0',             ten:'Lương gốc L0 (tính trước)',  loai:'TT_'},
+      {ma:'TT_LSP_TienL1',              ten:'Tiền sau ĐC lần 1',          loai:'TT_'},
+      {ma:'TT_LSP_KetQua_Final',        ten:'Tổng LSP cuối',              loai:'TT_'}
+    ];
+    function findBasisMeta(ma){ return PHAN_BO_BASIS_OPTIONS.find(x=>x.ma===ma); }
+
+    // ==================== TOÁN TỬ RÚT GỌN OUTPUT (áp lên output raw của DÒNG NÀY) ====================
+    // Pipeline: [ct raw output] → [reduce N→1 nếu ≠ NONE] → [phanBo distribute lên N GĐ] → output cuối
+    // Đây là thuộc tính CỦA DÒNG (không phải per-ref) — downstream criteria chỉ cần tham chiếu mã,
+    // engine tự broadcast/match theo shape output cuối đã có.
+    var REDUCE_OPS = [
+      {v:'NONE', t:'— (Giữ nguyên)',       hint:'Không rút gọn. Nếu ct raw ra N giá trị → giữ N. Nếu ra 1 giá trị → giữ 1. Mặc định.'},
+      {v:'SUM',  t:'SUM (∑ N GĐ)',         hint:'Cộng dồn N giá trị raw thành 1 số trước khi phân bổ. VD: raw [50, 25] → SUM = 75.'},
+      {v:'AVG',  t:'AVG (trung bình)',     hint:'Trung bình cộng N giá trị raw. VD: [50, 25] → 37.5.'},
+      {v:'MAX',  t:'MAX (lớn nhất)',       hint:'Lấy giá trị lớn nhất. VD: [50, 25] → 50.'},
+      {v:'MIN',  t:'MIN (nhỏ nhất)',       hint:'Lấy giá trị nhỏ nhất. VD: [50, 25] → 25.'}
+    ];
+    function reduceLabel(op){ var o = REDUCE_OPS.find(x=>x.v===op); return o?o.t:op; }
+    function reduceIsActive(op){ return op && op !== 'NONE'; }
+    function reduceColor(op){
+      return op==='SUM'?'#0056b3': op==='AVG'?'#6f42c1': op==='MAX'?'#dc3545': op==='MIN'?'#e67e22':'#6c757d';
+    }
+    function reduceTag(op){
+      if (!reduceIsActive(op)) return '<span style="color:#6c757d;font-size:10px;font-style:italic;">Giữ nguyên</span>';
+      var color = reduceColor(op);
+      return '<span style="background:'+color+';color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;" title="Gộp N→1: áp toán tử lên N giá trị raw trước khi phân bổ">' + reduceLabel(op) + '</span>';
+    }
 
     // ==================== QUY TẮC NGHIỆP VỤ (popup) ====================
+    // Ví dụ minh họa dùng NV 1022907668, kỳ 05/2026, chuyển bàn 15/05
     var RULES_FRM = [
-      {loai:'Bắt buộc', text:'Tên Công thức và Customer là trường bắt buộc khi Lưu master.', vd:'Xem dòng LSP_01 trong danh sách master bên dưới.'},
-      {loai:'Bắt buộc', text:'Chỉ được [Sao chép] khi đã chọn (tick) đúng 1 dòng master có sẵn.', vd:'Tick dòng LSP_01 rồi bấm Sao chép — kết quả tự thêm hậu tố "(Copy)".'},
-      {loai:'Kiến trúc', text:'RowClass/Allocation/SumPrev của từng tiêu chí KHÔNG cấu hình lại ở đây — chỉ tham chiếu Mã tiêu chí (TT_) đã tạo sẵn.', vd:'Bấm [Chi tiết] dòng LSP_01 → cột "Mã tiêu chí" chỉ hiển thị tham chiếu, không có cột toán tử.'},
-      {loai:'Kiến trúc', text:'Chiều sinh dòng (theo Quá trình làm việc) đã xác định tại tiêu chí HT_/TT_, không khai báo lại ở màn hình này.'},
-      {loai:'Xuất dữ liệu', text:'Nút Xuất dữ liệu ngoài trang xuất DANH SÁCH MASTER (đã tick hoặc toàn bộ); nút Xuất dữ liệu dòng trong popup Chi tiết chỉ xuất các DÒNG TIÊU CHÍ của công thức đang mở.'}
+      {loai:'Bắt buộc (Blocking)',
+       text:'&#8226; <b>Tên Công thức</b> và <b>Customer</b> là bắt buộc khi Lưu master.<br>'
+          + '&#8226; Chỉ được <b>[Sao chép]</b> khi đã tick đúng 1 dòng master có sẵn.<br>'
+          + '&#8226; Dòng ĐANG DÙNG (STT&lt;999) có Phân bổ đầu ra = <b>Prorata / Tiêu chí giá trị cao nhất / Tiêu chí giá trị thấp nhất</b> phải chọn <b>Căn cứ phân bổ</b> — chưa chọn thì chặn Lưu.<br>'
+          + '&#8226; <b>Tham chiếu TK_</b> phải nằm trong <code>CASE WHEN</code>; không được dùng làm giá trị số ngoài CASE (vì TK_ trả nvarchar/datetime).',
+       vd:'<div class="vd-example"><div class="vd-title">Ví dụ số (NV 1022907668 · kỳ 05/2026)</div>'
+          + '<div class="vd-line">&#8226; Tên CT: <code>CT_LTG_MPHG_CB01_2026</code></div>'
+          + '<div class="vd-line">&#8226; Customer: <code>MPHG</code> (master 999)</div>'
+          + '<div class="vd-line">&#8226; Prorata: T5/2026 có 31 ngày, NV làm 15 ngày → hệ số <span class="vd-num">15/31 &asymp; 0.4839</span></div>'
+          + '<div class="vd-line">&#8226; Dòng <code>TT_LSP_LuongThoiGian</code> (Prorata) → phải chọn Căn cứ = <code>HT_TS_CongThucTe</code></div></div>'},
+
+      {loai:'Số thứ tự = 999 (Không dùng)',
+       text:'&#8226; <b>Popup Chi tiết luôn load TẤT CẢ tiêu chí TT_</b> đã khai báo ở set3, kể cả tiêu chí không dùng trong bộ này — <u>đồng bộ hệ thống cũ</u>: không cho phép để trống dòng.<br>'
+          + '&#8226; Tiêu chí không dùng: Số thứ tự = <b>999</b> (dòng mờ đi, có badge "Không dùng"). Bỏ trống Công thức cũng được — engine hiểu <b>= 0</b> khi tính.<br>'
+          + '&#8226; Muốn <b>bật dòng</b>: tick + bấm <b>[↑ Bật lại]</b> (auto-gán STT kế tiếp), hoặc gõ số &lt;999 vào ô Số thứ tự.<br>'
+          + '&#8226; Muốn <b>tắt dòng</b>: tick + bấm <b>[↓ Set 999]</b>, hoặc gõ 999 vào ô Số thứ tự.<br>'
+          + '&#8226; <b>Số thứ tự trùng nhau</b>: OK — engine coi là chạy đồng thời, thứ tự thực thi lấy theo <b>Rank</b> (thuộc tính engine ở set3).',
+       vd:'<div class="vd-example"><div class="vd-title">Ví dụ số — Bộ LSP_01</div>'
+          + '<div class="vd-line">&#8226; Set3 khai báo <span class="vd-num">11 tiêu chí TT_</span>, bộ này dùng <span class="vd-num">7</span> dòng (STT 1-7)</div>'
+          + '<div class="vd-line">&#8226; 4 dòng còn lại giữ <code>STT=999</code> → engine skip → Lưu master hiển thị <span class="vd-num">"7/11"</span></div>'
+          + '<div class="vd-line">&#8226; Case KH có 3 nhóm BPTL: <code>TT_LSP_LuongTong_Dept_A</code>, <code>_B</code>, <code>_C</code> → mỗi bộ CT set 999 cho 2 tiêu chí không thuộc nhóm</div></div>'},
+
+      {loai:'Ràng buộc công thức',
+       text:'&#8226; Cột <b>Công thức</b> chỉ dùng: <code>+ − × ÷</code>, số cố định, mã tiêu chí (HT_/TT_ có Rank thấp hơn), và <code>CASE WHEN &lt;điều kiện TK_&gt; THEN &lt;giá trị&gt; ELSE ... END</code>.<br>'
+          + '&#8226; <b>TK_</b> (nvarchar/datetime) — <u>chỉ đặt trong điều kiện CASE WHEN</u>. VD: <code>CASE WHEN TK_HR_NhomTL=\'A\' THEN HT_PR_LSP_DonGia*1.1 ELSE HT_PR_LSP_DonGia END</code>.<br>'
+          + '&#8226; <b>HT_</b> (float), <b>TT_</b> (float, Rank thấp hơn) — dùng làm giá trị số / operand trong phép tính.<br>'
+          + '&#8226; <b>KHÔNG viết SUM/AVG/MAX/MIN inline</b> trong công thức. Cần rút gọn N giá trị raw → 1 số? Cấu hình ở cột <b>Toán tử gộp N→1</b> (áp lên chính output của dòng hiện tại).',
+       vd:'<div class="vd-example"><div class="vd-title">Ví dụ đúng vs sai</div>'
+          + '<div class="vd-line">&#9989; <b>ĐÚNG (TK_ trong CASE)</b>: <code>CASE WHEN TK_HR_BPGom=\'CB\' THEN 1 ELSE 0 END</code></div>'
+          + '<div class="vd-line">&#9989; <b>ĐÚNG (HT_ × HT_)</b>: <code>HT_PR_NangSuatTinhLuong &times; HT_PR_LSP_DonGia</code></div>'
+          + '<div class="vd-line">&#10060; <b>SAI</b>: <code>TK_ThangLuong + 1000</code> — string + number → engine error</div>'
+          + '<div class="vd-line">&#10060; <b>SAI</b>: <code>SUM(TT_LSP_TienL1)</code> inline → phải để cột <b>Toán tử gộp = SUM</b></div></div>'},
+
+      {loai:'Toán tử gộp N→1',
+       text:'&#8226; Là <u>1 bước xử lý của bản thân dòng</u> (không phải per-tham-chiếu). Pipeline: <b>[ct raw]</b> → <b>[Rút gọn N→1 nếu ≠ NONE]</b> → <b>[Phân bổ vào N GĐ]</b>.<br>'
+          + '&#8226; <b>NONE (mặc định)</b>: giữ nguyên shape raw. Nếu raw ra N giá trị → giữ N; nếu ra 1 giá trị → giữ 1.<br>'
+          + '&#8226; <b>SUM</b>: cộng dồn N GĐ raw thành 1 số. Dùng cho thu nhập tính thuế cả kỳ, BH...<br>'
+          + '&#8226; <b>AVG / MAX / MIN</b>: trung bình / lớn nhất / nhỏ nhất của N giá trị raw. Dùng cho lương bình quân, đỉnh, sàn.<br>'
+          + '&#8226; <b>Không cần per-ref config</b>: downstream criteria chỉ cần tham chiếu mã (VD <code>TT_LSP_KetQua_Final + 100000</code>) — engine tự broadcast/khớp GĐ theo shape output cuối của tiêu chí đích.',
+       vd:'<div class="vd-example"><div class="vd-title">Ví dụ số — NV có 5 dòng lương trong kỳ 05/2026</div>'
+          + '<div class="vd-line">&#8226; <b>SUM</b>: <span class="vd-num">5,000,000 + 3,200,000 + 1,800,000 + 900,000 + 400,000 = 11,300,000</span></div>'
+          + '<div class="vd-line">&#8226; <b>MAX</b> (<code>HT_AGG_MaxLuongGopKy</code>): <span class="vd-num">5,000,000</span></div>'
+          + '<div class="vd-line">&#8226; <b>AVG</b> (bình quân 3 kỳ gần nhất): <span class="vd-num">(5.2tr + 5.5tr + 5.8tr) / 3 = 5,500,000</span></div>'
+          + '<div class="vd-line">&#8226; <b>PROD</b> (hệ số nối): <span class="vd-num">1.2 &times; 0.9 &times; 1.1 = 1.188</span></div></div>'},
+
+      {loai:'Phân bổ đầu ra',
+       text:'&#8226; <b>Theo giai đoạn (slice)</b> — mỗi GĐ giữ giá trị riêng (N GĐ → N giá trị). Mặc định khi công thức đã tính per-GĐ.<br>'
+          + '&#8226; <b>Mới nhất (last)</b> — dồn 100% vào GĐ ToDate lớn nhất. Dùng cho thuế TN, quyết toán cuối kỳ.<br>'
+          + '&#8226; <b>Cũ nhất (first)</b> — dồn 100% vào GĐ FromDate nhỏ nhất. Dùng cho hỗ trợ chuyển bàn giao GĐ đầu.<br>'
+          + '&#8226; <b>Tiêu chí giá trị cao nhất (maxby)</b> — dồn 100% vào GĐ có Căn cứ phân bổ MAX. Dùng cho tiền trừ, BH — dồn vào GĐ tiền nhiều.<br>'
+          + '&#8226; <b>Tiêu chí giá trị thấp nhất (minby)</b> — đối xứng, dồn vào GĐ MIN.<br>'
+          + '&#8226; <b>Prorata (chia tỷ lệ)</b> — chia 1 tổng thành N phần theo tỷ lệ Căn cứ phân bổ mỗi GĐ. Tổng không đổi.',
+       vd:'<div class="vd-example"><div class="vd-title">Ví dụ số — NV chuyển bàn 15/05/2026 (2 GĐ)</div>'
+          + '<div class="vd-line">&#8226; <b>Mới nhất</b>: GĐ2 từ 15/05 → <code>TT_LSP_LuongCoBan_MoiNhat</code> = <span class="vd-num">5,500,000</span></div>'
+          + '<div class="vd-line">&#8226; <b>Cũ nhất</b>: GĐ1 từ 01/05 → <code>TT_LSP_LuongCoBan_CuNhat</code> = <span class="vd-num">5,000,000</span></div>'
+          + '<div class="vd-line">&#8226; <b>MAX (maxby)</b>: <code>TT_LSP_LuongCoBan_MaxGD</code> = <span class="vd-num">5,500,000</span> (GĐ2)</div>'
+          + '<div class="vd-line">&#8226; <b>Prorata</b>: GĐ1 = 5tr &times; (14/31) + GĐ2 = 5.5tr &times; (17/31) = <span class="vd-num">2,258,065 + 3,016,129 = 5,274,194</span></div></div>'},
+
+      {loai:'Căn cứ phân bổ',
+       text:'&#8226; Bắt buộc khi Phân bổ đầu ra = <b>Cao nhất / Thấp nhất / Prorata</b>.<br>'
+          + '&#8226; Là 1 tiêu chí HT_/TT_ số (float) trả theo GĐ. Engine chạy 2 pha: pha 1 tính căn cứ trước, pha 2 phân bổ theo căn cứ.<br>'
+          + '&#8226; Đặt Rank tiêu chí đích &lt; Rank tiêu chí hiện tại (để căn cứ tính xong trước).',
+       vd:'<div class="vd-example"><div class="vd-title">Ví dụ căn cứ phân bổ</div>'
+          + '<div class="vd-line">&#8226; <b>HT_ (float)</b>: <code>HT_TS_CongThucTe = 22.5 giờ</code> → chỉ số Prorata theo giờ công</div>'
+          + '<div class="vd-line">&#8226; <b>HT_ (int)</b>: <code>HT_HR_SoNguoiPhuThuoc = 2</code> → dùng cho miễn trừ thuế</div>'
+          + '<div class="vd-line">&#8226; <b>Formula string (CASE)</b>: <code>CASE WHEN HT_HR_LevelChinh &gt; 3 THEN \'A\' ELSE \'B\' END</code> → phân nhóm level</div>'
+          + '<div class="vd-line">&#8226; <b>maxby</b>: <code>TT_LSP_KetQua_Final</code> → dồn khoản trừ vào GĐ có Final MAX</div></div>'},
+
+      {loai:'Tự động (Engine)',
+       text:'&#8226; <b>Sinh dòng theo Quá trình làm việc</b> đã xác định tại tiêu chí HT_/TT_, KHÔNG cấu hình lại ở màn hình này.<br>'
+          + '&#8226; <b>Toán tử gộp N→1</b> áp trước Phân bổ đầu ra: raw (N giá trị) → SUM/AVG/MAX/MIN → 1 số → Phân bổ.<br>'
+          + '&#8226; <b>rowClass (Detail/Summary)</b> đã bỏ — engine mặc định tính per-dòng, sau đó Phân bổ đầu ra quyết định "N giá trị" hay "1 giá trị dồn/chia".<br>'
+          + '&#8226; <b>Mode "Lũy kế (Accumulate)"</b> đã bỏ — muốn lũy kế, BA có thể cộng các tiêu chí Rank thấp hơn trong Công thức (VD: <code>TT_A + TT_B + TT_C</code>).',
+       vd:'<div class="vd-example"><div class="vd-title">Ví dụ auto engine</div>'
+          + '<div class="vd-line">&#8226; CT có <code>TT_LSP_LuongTong</code> dùng SUM → engine tự thêm dòng phụ <code>TT_LSP_LuongTong_SumAgg</code> làm cache cross-row cho các tiêu chí downstream</div>'
+          + '<div class="vd-line">&#8226; <b>Rank auto</b>: nếu <code>TT_A</code> tham chiếu <code>TT_B</code> → engine gán <code>Rank(A) &gt; Rank(B)</code> để tính B trước</div>'
+          + '<div class="vd-line">&#8226; Kỳ 05/2026 NV 1022907668 có 2 GĐ (01-14/05 + 15-31/05) — auto sinh 2 dòng cho mọi tiêu chí per-GĐ</div></div>'},
+
+      {loai:'Xuất dữ liệu',
+       text:'&#8226; <b>[Xuất master]</b> (ngoài trang) — xuất danh sách bộ công thức đã tick (Mã, Tên, Customer, Số dòng, Ghi chú).<br>'
+          + '&#8226; <b>[Xuất details]</b> (ngoài trang) — xuất toàn bộ dòng tiêu chí của các bộ công thức đã tick, có cột "Bộ CT (Mã)" để phân biệt.<br>'
+          + '&#8226; Nếu không tick → xuất toàn bộ. Có thể phối hợp với <b>[Sao chép]</b> để clone bộ công thức.'},
+
+      {loai:'Best practice — Tách tiêu chí đệm',
+       text:'&#8226; Khi một dòng công thức phức tạp (nhiều CASE lồng, nhiều toán tử, nhiều tham chiếu HT_/TT_/TK_) → thay vì viết cả cục trong 1 dòng, hãy <b>tách thành nhiều tiêu chí trung gian</b> ở set2/set3 rồi ráp lại ở đây.<br>'
+          + '&#8226; <b>Naming convention</b>: <code>&lt;Prefix&gt;_&lt;Nghiệp vụ&gt;_Base</code> (khối gốc) → <code>_Adj</code> (khối điều chỉnh) → <code>_Final</code> (kết quả cuối). Rank tăng dần: Base &lt; Adj &lt; Final.<br>'
+          + '&#8226; <b>Lợi ích</b>: (1) BA/QA đọc công thức dễ hơn — mỗi dòng làm 1 việc; (2) tiêu chí đệm reuse được cho nhiều bộ công thức khác nhau; (3) đổi 1 phần chỉ cần sửa tiêu chí đệm, các dòng dùng nó tự động cập nhật; (4) audit trail rõ ràng — mỗi bước tính có row riêng, dễ export cho khách kiểm.<br>'
+          + '&#8226; <b>Trade-off</b>: tổng số tiêu chí tăng → phải kỷ luật Rank + naming. Nếu quá nhỏ (mỗi tiêu chí 1 phép cộng đơn giản) thì overhead quản lý &gt; lợi ích.',
+       vd:'Bộ công thức LSP hiện có: <code>TT_LSP_Base_L0</code> → <code>TT_LSP_TienL1</code> → <code>TT_LSP_TienL2</code> → ... → <code>TT_LSP_KetQua_Final</code>. Nếu 1 dòng đơn của khách yêu cầu 10 phép tính lồng, gợi ý BA tách 3-4 tiêu chí đệm.'},
+
+      {loai:'Còn cân nhắc',
+       text:'&#8226; NV làm nhiều BP trong kỳ — sau khi tính từng dòng có gộp tổng theo BP (M25=SUM) không? Cần xác nhận.<br>'
+          + '&#8226; Bộ công thức có cần versioning (theo customer, theo kỳ hiệu lực)?'}
     ];
     function showRules() {
-      var html = '<table class="ref-table"><thead><tr><th style="width:130px;">Loại</th><th>Quy tắc</th><th style="width:220px;">Tham khảo ví dụ</th></tr></thead><tbody>';
+      var html = '<table class="ref-table"><thead><tr>'
+               + '<th style="width:12%;">Loại</th>'
+               + '<th style="width:48%;">Quy tắc</th>'
+               + '<th style="width:40%;">Tham khảo &amp; ví dụ</th>'
+               + '</tr></thead><tbody>';
       RULES_FRM.forEach(function(r){
-        var color = r.loai.indexOf('Bắt buộc')>=0 ? '#dc3545' : (r.loai.indexOf('Kiến trúc')>=0 ? '#0056b3' : '#6c757d');
-        html += '<tr><td><b style="color:'+color+'">'+r.loai+'</b></td><td>'+r.text+'</td><td style="color:#6f42c1;">'+(r.vd||'—')+'</td></tr>';
+        var color = r.loai.indexOf('Blocking')>=0 ? '#dc3545'
+                  : r.loai.indexOf('Ràng buộc')>=0 ? '#dc3545'
+                  : r.loai==='Tự động (Engine)'   ? '#0056b3'
+                  : r.loai==='Phân bổ đầu ra'     ? '#28a745'
+                  : r.loai==='Toán tử gộp N→1'     ? '#6f42c1'
+                  : r.loai==='Căn cứ phân bổ'     ? '#c9302c'
+                  : r.loai==='Còn cân nhắc'       ? '#f0ad4e'
+                  : '#6c757d';
+        html += '<tr>'
+             + '<td><b style="color:'+color+'">'+r.loai+'</b></td>'
+             + '<td>'+r.text+'</td>'
+             + '<td>'+(r.vd||'<span style="color:#999;">—</span>')+'</td>'
+             + '</tr>';
       });
       html += '</tbody></table>';
+
+      // ===== Section "⚠️ Lưu ý & Best practices" =====
+      html += '<div class="notes-block">'
+           +   '<h3>&#9888; Lưu ý &amp; Best practices</h3>'
+           +   '<ol>'
+           +     '<li><b>Tách công thức phức tạp</b>: nếu 1 dòng (Dline) &gt; 20 tham chiếu / CASE lồng nhau → tách thành N tiêu chí trung gian, dễ debug &amp; audit.<br>'
+           +       'Ví dụ: <code>CT_A_Full</code> (30 dòng) → tách <code>CT_A_Luong (12)</code> + <code>CT_A_PhuCap (10)</code> + <code>CT_A_TruBH (8)</code>.</li>'
+
+           +     '<li><b>Thứ tự Rank quan trọng</b>: engine chạy theo <b>Rank ASC</b>. <code>TT_TruThueTNCN</code> phải có Rank &gt; tất cả <code>TT_TN*</code> (thu nhập chịu thuế) — nếu không sẽ bị <code>@Prev_&lt;Mã&gt;</code> null → engine trả 0 sai kết quả.</li>'
+
+           +     '<li><b>Cross-row toán tử</b>: SUM/MAX/AVG áp trên tất cả dòng lương của NV trong kỳ — dùng cẩn thận.<br>'
+           +       '<span class="ok-tag">ĐÚNG</span> <code>HT_AGG_MaxLuongGopKy = MAX(TotalIncome per row)</code> → dùng cho trần BH.<br>'
+           +       '<span class="warn-tag">SAI</span> Đặt SUM cross-row cho <code>HT_TG_TrongGio</code> — tiêu chí này đã là per-row, sẽ bị cộng dồn nhân đôi.</li>'
+
+           +     '<li><b>Prorata cross-month</b>: nếu kỳ 05/2026 chứa 15 ngày cuối T4/2026 → prorata phải dùng <code>MAX(kỳ.tuNgay, sliceFromDate)</code> và <code>MIN(kỳ.denNgay, sliceToDate)</code> để không tính trùng ngày ngoài kỳ.</li>'
+
+           +     '<li><b>Test với NV nhiều dòng</b>: trước khi Publish, TEST với 1 NV có 2+ dòng lương (VD <code>1022906002</code>) — verify BH trích <b>ĐÚNG 1 lần</b> (không 2×), thuế TNCN cộng dồn đúng bậc lũy tiến.</li>'
+
+           +     '<li><b>Backup công thức trước khi sửa</b>: engine <u>cache config</u>. Edit công thức sau khi <b>khóa kỳ</b> → <span class="warn-tag">KHÔNG</span> có effect trên kỳ đã khóa. Muốn áp dụng: mở khóa kỳ, tính lại, hoặc chờ kỳ sau.</li>'
+
+           +     '<li><b>Toán tử NONE</b> ở dòng Dline: chỉ giữ per-row output cuối, KHÔNG aggregate. Dùng khi output đã là kết quả cuối muốn giữ nguyên shape.<br>'
+           +       'Ví dụ: <code>TT_TLTGTrongGio = HT_TG &times; TT_DonGia</code> — mỗi dòng chấm công đã ra 1 giá trị đúng, không cần gộp.</li>'
+           +   '</ol>'
+           + '</div>';
+
       document.getElementById('modal-rules-body').innerHTML = html;
       document.getElementById('modal-rules').style.display = 'flex';
+    }
+
+    // ==================== HELP ICON (?) ====================
+    var HELP_FRM = {
+      congthuc: {
+        title: 'Công thức — toán tử nào được dùng?',
+        body: 'Cột <b>Công thức</b> là biểu thức tính toán, chỉ dùng: <code>+ − × ÷</code>, số cố định, mã tiêu chí (HT_/TT_/TK_), và <code>CASE WHEN ... THEN ... END</code>.<br><br>'
+          + '<div class="vd-info">&#9888; <b>KHÔNG viết SUM/AVG/MAX/MIN inline</b> trong công thức. Việc rút gọn N→1 output của dòng hiện tại được cấu hình ở cột <b>Toán tử gộp N→1</b> (bấm ? cột đó). Việc gán kết quả vào N dòng GĐ (dồn/chia) ở cột <b>Phân bổ đầu ra</b>. Pipeline 3 bước rõ ràng: raw → rút gọn → phân bổ.</div>'
+          + '<table class="vd-tbl" style="table-layout:fixed;"><thead><tr><th style="width:16%;">Thành phần</th><th style="width:34%;">Cách dùng</th><th style="width:50%;">Ví dụ</th></tr></thead><tbody>'
+          + '<tr><td>+ − × ÷</td><td>Cộng/trừ/nhân/chia giữa số &amp; tiêu chí số</td><td><code>HT_PR_NangSuatTinhLuong × HT_PR_LSP_DonGia</code></td></tr>'
+          + '<tr><td>Mã <b>HT_</b>, <b>TT_</b></td><td>Tham chiếu <u>giá trị số</u> của tiêu chí Rank thấp hơn (float)</td><td><code>TT_LSP_Base_L0 × HT_PR_LSP_HeSo1</code></td></tr>'
+          + '<tr><td>Mã <b>TK_</b></td><td><u>Chỉ đặt trong CASE WHEN</u> — vì TK_ trả nvarchar/datetime, không phải số</td><td><code>CASE WHEN TK_HR_NhomTL=\'A\' THEN HT_PR_LSP_DonGia*1.1 ELSE HT_PR_LSP_DonGia END</code></td></tr>'
+          + '<tr><td>Số cố định</td><td>Giá trị hằng</td><td><code>500000</code></td></tr>'
+          + '<tr><td>CASE WHEN</td><td>Phân nhánh giá trị theo điều kiện TK_ / HT_</td><td><code>CASE WHEN HT_TS_CongThucTe &lt; 15 THEN 0 ELSE HT_PR_LSP_DonGia*HT_PR_NangSuatTinhLuong END</code></td></tr>'
+          + '</tbody></table>'
+          + '<table class="vd-tbl" style="table-layout:fixed;margin-top:10px;"><thead><tr><th style="width:33%;">&#10060; Sai</th><th style="width:33%;">&#9989; Đúng</th><th style="width:34%;">Vì sao</th></tr></thead><tbody>'
+          + '<tr><td><code>SUM(TT_LSP_TienL1)</code> inline</td><td>Viết <code>TT_LSP_TienL1</code> + cột Toán tử gộp = SUM</td><td>SUM/AVG/MAX/MIN thuộc lớp gộp N→1, không phải phép tính inline.</td></tr>'
+          + '<tr><td><code>MAX(...) trong công thức</code></td><td>Phân bổ đầu ra = maxby + Căn cứ = tiêu chí đích</td><td>MAX-chọn-dòng là hành vi phân bổ, engine post-process.</td></tr>'
+          + '<tr><td><code>TK_HR_NhomTL × 1.1</code></td><td><code>CASE WHEN TK_HR_NhomTL=\'A\' THEN 1.1 ELSE 1.0 END × ...</code></td><td>TK_ trả nvarchar → không nhân được số. Chỉ dùng làm điều kiện.</td></tr>'
+          + '</tbody></table>'
+      },
+
+      reduce: {
+        title: 'Toán tử gộp N→1 — SUM/AVG/MAX/MIN áp lên output raw của dòng này',
+        body: '<div class="vd-info">&#128736; <b>Pipeline 3 bước mỗi dòng:</b><br>'
+          + '&nbsp;&nbsp;<b>1.</b> Tính công thức (ct) → <b>raw output</b> có thể là 1 hoặc N giá trị theo GĐ.<br>'
+          + '&nbsp;&nbsp;<b>2.</b> <b>Toán tử gộp N→1</b> (cột này): nếu ≠ NONE thì áp SUM/AVG/MAX/MIN lên N giá trị raw để lấy 1 số.<br>'
+          + '&nbsp;&nbsp;<b>3.</b> <b>Phân bổ đầu ra</b>: engine gán giá trị (1 hoặc N) vào N dòng GĐ theo rule đã chọn.</div>'
+          + '<table class="vd-tbl" style="table-layout:fixed;margin-top:10px;"><thead><tr><th style="width:14%;">Toán tử</th><th style="width:36%;">Ý nghĩa</th><th style="width:50%;">Khi dùng</th></tr></thead><tbody>'
+          + '<tr><td><b>— (NONE)</b></td><td>Mặc định. Giữ nguyên shape raw.</td><td>Raw đã đúng shape mong muốn: N giá trị cho slice, 1 giá trị cho last/first/prorata...</td></tr>'
+          + '<tr><td><b>SUM</b></td><td>Cộng dồn N GĐ raw → 1 số.</td><td>Thu nhập tính thuế, BH — cần tổng cả kỳ trước khi dồn 1 dòng.</td></tr>'
+          + '<tr><td><b>AVG</b></td><td>Trung bình cộng.</td><td>Lương bình quân, hệ số trung bình các GĐ.</td></tr>'
+          + '<tr><td><b>MAX</b></td><td>Giá trị lớn nhất.</td><td>Lấy đỉnh của kỳ (VD lương cao nhất để làm mức đóng BH tối đa).</td></tr>'
+          + '<tr><td><b>MIN</b></td><td>Giá trị nhỏ nhất.</td><td>Lấy sàn / mức tối thiểu.</td></tr>'
+          + '</tbody></table>'
+          + '<div class="vd-info" style="background:#e8f4f8;border-color:#0056b3;margin-top:10px;">&#128161; <b>Vì sao thuộc DÒNG mà không thuộc từng tham chiếu?</b><br>'
+          + '&nbsp;&nbsp;&#8226; Công thức có thể chứa nhiều tiêu chí (VD <code>TT_A + TT_B + TT_C - TT_D</code>) — cấu hình per-ref sẽ cực rối.<br>'
+          + '&nbsp;&nbsp;&#8226; Model mới: <b>mỗi tiêu chí tự quyết định output cuối của mình</b>. Downstream chỉ cần tham chiếu mã, engine tự broadcast/khớp GĐ theo shape output đã có.<br>'
+          + '&nbsp;&nbsp;&#8226; Cần rút gọn khác nhau cho cùng 1 nguồn? → Tạo tiêu chí trung gian riêng cho từng shape (VD <code>TT_A_Sum</code> vs <code>TT_A_Avg</code>).</div>'
+          + '<div class="vd-info" style="background:#fff3cd;border-color:#ffc107;margin-top:8px;">&#9888; <b>Khác gì Phân bổ đầu ra?</b><br>'
+          + '&nbsp;&nbsp;&#8226; <b>Toán tử gộp N→1</b> = <u>bước 2</u> — thay đổi shape từ N→1 (hoặc giữ nguyên).<br>'
+          + '&nbsp;&nbsp;&#8226; <b>Phân bổ đầu ra</b> = <u>bước 3</u> — engine gán giá trị vào N dòng GĐ như thế nào (dồn/chia/giữ).<br>'
+          + '&nbsp;&nbsp;&#8226; VD: reduce=SUM + phanBo=last → 75 dồn cuối kỳ; reduce=SUM + phanBo=prorata → 75 chia tỷ lệ.</div>'
+      },
+
+      phanbo: {
+        title: 'Phân bổ đầu ra — engine gán kết quả vào các dòng GĐ như thế nào?',
+        body: 'Sau khi Công thức được tính, engine cần biết <b>kết quả gán vào bao nhiêu dòng GĐ và như thế nào</b>. Đây là hậu xử lý (post-process) — không phải phép tính.<br><br>'
+          + '<table class="vd-tbl" style="table-layout:fixed;"><thead><tr><th style="width:22%;">Mode</th><th style="width:38%;">Hành vi</th><th style="width:40%;">Nghiệp vụ điển hình</th></tr></thead><tbody>'
+          + '<tr><td><b style="color:#28a745">Theo giai đoạn</b></td><td>Giữ nguyên N giá trị (mỗi GĐ 1 giá trị)</td><td>Lương gốc L0 — tính riêng mỗi GĐ theo NS/ĐơnGiá GĐ đó.</td></tr>'
+          + '<tr><td><b style="color:#17a2b8">Mới nhất</b></td><td>Dồn 100% vào GĐ ToDate lớn nhất, các GĐ khác = 0</td><td>Thuế TN, quyết toán cuối kỳ.</td></tr>'
+          + '<tr><td><b style="color:#6c757d">Cũ nhất</b></td><td>Dồn 100% vào GĐ FromDate nhỏ nhất</td><td>Hỗ trợ chuyển bàn giao GĐ đầu.</td></tr>'
+          + '<tr><td><b style="color:#dc3545">Tiêu chí giá trị cao nhất</b></td><td>Dồn 100% vào GĐ có Căn cứ phân bổ MAX (bắt chọn căn cứ)</td><td>Tiền trừ, BH — dồn vào GĐ tiền nhiều để tránh trừ âm.</td></tr>'
+          + '<tr><td><b style="color:#e67e22">Tiêu chí giá trị thấp nhất</b></td><td>Dồn 100% vào GĐ có Căn cứ MIN (bắt chọn căn cứ)</td><td>Khấu trừ theo mức tối thiểu.</td></tr>'
+          + '<tr><td><b style="color:#6f42c1">Prorata (chia tỷ lệ)</b></td><td>Chia 1 tổng thành N phần theo tỷ lệ Căn cứ (bắt chọn căn cứ). Tổng không đổi.</td><td>Lương thời gian chia theo Công thực tế / phụ cấp chia theo Sản lượng.</td></tr>'
+          + '</tbody></table>'
+          + '<div class="vd-info" style="margin-top:10px;">&#128161; <b>Engine 2 pha (cho maxby/minby/prorata):</b> Pha 1 tính Căn cứ phân bổ tại từng GĐ. Pha 2 dùng căn cứ để phân bổ tiêu chí hiện tại. → Đặt Rank tiêu chí đích căn cứ nhỏ hơn Rank tiêu chí hiện tại.</div>'
+      }
+    };
+    function showHelp(key) {
+      var h = HELP_FRM[key];
+      if (!h) return;
+      document.getElementById('modal-help-title').textContent = h.title;
+      document.getElementById('modal-help-body').innerHTML = h.body;
+      document.getElementById('modal-help').style.display = 'flex';
     }
 
     // ==================== Render Master List ====================
@@ -250,7 +566,8 @@ Need Confirm (confirm #7): NV làm nhiều BP trong tháng — sau khi tính t�
         html += '<td><b>' + f.code + '</b></td>';
         html += '<td style="text-align:left;">' + f.name + '</td>';
         html += '<td>' + f.customer + '</td>';
-        html += '<td>' + f.lines.length + '</td>';
+        var activeLines = (f.lines || []).filter(function(l){ return (l.order || DEFAULT_ORDER_OFF) < DEFAULT_ORDER_OFF; }).length;
+        html += '<td title="' + activeLines + ' dòng đang dùng / ' + f.lines.length + ' tổng">' + activeLines + '/' + f.lines.length + '</td>';
         html += '<td style="text-align:left;">' + (f.note || '') + '</td>';
         html += '<td><button class="btn-chitiet" onclick="openDetail(\'' + f.code + '\')">Chi tiết</button></td>';
         html += '</tr>';
@@ -337,10 +654,11 @@ Need Confirm (confirm #7): NV làm nhiều BP trong tháng — sau khi tính t�
         ? checked.map(c => MOCK_FORMULAS.find(f => f.code === c.closest('tr').getAttribute('data-code')))
         : MOCK_FORMULAS;
 
-      const header = ['Mã', 'Tên Công thức', 'Customer', 'Số dòng tiêu chí', 'Ghi chú'];
+      const header = ['Mã', 'Tên Công thức', 'Customer', 'Số dòng đang dùng', 'Tổng dòng tiêu chí', 'Ghi chú'];
       const csvLines = [header.join(',')];
       list.forEach(f => {
-        csvLines.push([f.code, '"' + f.name.replace(/"/g,'""') + '"', f.customer, f.lines.length, '"' + (f.note||'').replace(/"/g,'""') + '"'].join(','));
+        var activeCnt = (f.lines || []).filter(function(l){ return (l.order || DEFAULT_ORDER_OFF) < DEFAULT_ORDER_OFF; }).length;
+        csvLines.push([f.code, '"' + f.name.replace(/"/g,'""') + '"', f.customer, activeCnt, f.lines.length, '"' + (f.note||'').replace(/"/g,'""') + '"'].join(','));
       });
       downloadCsv(csvLines, 'danh_sach_cong_thuc.csv');
       showAlert2('set4-alert', 'Đã xuất ' + list.length + '/' + MOCK_FORMULAS.length + ' công thức ' + (checked.length ? '(đã chọn)' : '(toàn bộ)') + '.', 'success');
@@ -360,192 +678,527 @@ Need Confirm (confirm #7): NV làm nhiều BP trong tháng — sau khi tính t�
     }
 
     // ==================== Popup Chi tiết (dòng tiêu chí) ====================
+    // Build "full lines" từ ALL_TT_CRITERIA — tiêu chí đã có công thức thì giữ nguyên,
+    // chưa có thì tạo dòng mặc định với order=999 (Pattern hệ thống cũ: không để trống).
+    function buildFullLines(f) {
+      const existingByMa = {};
+      (f.lines || []).forEach(l => { existingByMa[l.ma] = l; });
+      return ALL_TT_CRITERIA.map(function(tt) {
+        const existing = existingByMa[tt.ma];
+        if (existing) {
+          // Đảm bảo có đủ field mặc định (backward-compat cho data cũ)
+          return Object.assign({
+            ma: tt.ma, ten: tt.ten, order: DEFAULT_ORDER_OFF,
+            ct: '', reduce: 'NONE', phanBo: 'slice', phanBoBasis: '', note: ''
+          }, existing, {ten: tt.ten});
+        }
+        return {
+          ma: tt.ma, ten: tt.ten,
+          order: DEFAULT_ORDER_OFF, ct: '', reduce: 'NONE',
+          phanBo: 'slice', phanBoBasis: '', note: ''
+        };
+      });
+    }
+
     function openDetail(code) {
       const f = MOCK_FORMULAS.find(x => x.code === code);
       if (!f) return;
       detailFormulaCode = code;
+      currentFormulaLines = buildFullLines(f);
       document.getElementById('set4-detail-title').textContent = '🔧 CHI TIẾT CÔNG THỨC — ' + f.name;
       document.getElementById('set4-detail-info').innerHTML =
         '<b>Mã:</b> ' + f.code + ' &nbsp;|&nbsp; <b>Customer:</b> ' + f.customer +
         (f.note ? ' &nbsp;|&nbsp; <b>Ghi chú:</b> ' + f.note : '');
-      renderDetailGrid(f.lines);
+      // Reset filter state cho lần mở mới
+      detailSearchText = '';
+      var srch = document.getElementById('set4-detail-search'); if (srch) srch.value = '';
+      var onlyUsed = document.getElementById('set4-detail-onlyused'); if (onlyUsed) onlyUsed.checked = true;
+      renderDetailGrid();
       showModal('set4-detail');
     }
 
-    function renderDetailGrid(lines) {
+    function onDetailSearch() {
+      var el = document.getElementById('set4-detail-search');
+      detailSearchText = (el ? el.value : '').trim().toLowerCase();
+      renderDetailGrid();
+    }
+
+    // Trước khi re-render, sync data từ inputs hiện tại vào currentFormulaLines
+    // để tránh mất giá trị BA đang gõ dở khi bấm toggle/search.
+    function syncInputsToLines() {
+      document.querySelectorAll('#set4-tbody tr[data-idx]').forEach(function(tr){
+        const idx = parseInt(tr.getAttribute('data-idx'), 10);
+        const l = currentFormulaLines[idx];
+        if (!l) return;
+        var orderEl = tr.querySelector('.dline-order');
+        if (orderEl) {
+          var v = parseInt(orderEl.value, 10);
+          l.order = isNaN(v) ? DEFAULT_ORDER_OFF : v;
+        }
+        var ctEl = tr.querySelector('.dline-ct'); if (ctEl) l.ct = ctEl.value;
+        var rdEl = tr.querySelector('.dline-reduce'); if (rdEl) l.reduce = rdEl.value;
+        var pbEl = tr.querySelector('.dline-phanbo'); if (pbEl) l.phanBo = pbEl.value;
+        var bsEl = tr.querySelector('.dline-basis'); if (bsEl) l.phanBoBasis = bsEl.value;
+        var ntEl = tr.querySelector('.dline-note'); if (ntEl) l.note = ntEl.value;
+      });
+    }
+
+    function isRowOff(l) { return (l.order || DEFAULT_ORDER_OFF) >= DEFAULT_ORDER_OFF; }
+
+    function updateDetailCounter() {
+      const total = currentFormulaLines.length;
+      const active = currentFormulaLines.filter(function(l){ return !isRowOff(l); }).length;
+      var el = document.getElementById('set4-detail-counter');
+      if (el) el.textContent = 'Đang dùng: ' + active + '/' + total;
+    }
+
+    function renderDetailGrid() {
       const tbody = document.getElementById('set4-tbody');
-      currentFormulaLines = lines || [];
-      if (!lines || lines.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="color:#999;font-style:italic;padding:15px;">Chưa có dòng tiêu chí nào trong công thức này.</td></tr>';
+      if (!currentFormulaLines || currentFormulaLines.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="color:#999;font-style:italic;padding:15px;">Chưa có tiêu chí TT_ nào — vui lòng khai báo ở màn Định nghĩa tiêu chí tính toán trước.</td></tr>';
+        updateDetailCounter();
         return;
       }
+      // Sort by order ASC (đang dùng lên đầu, order=999 gạt xuống cuối)
+      currentFormulaLines.sort(function(a, b){ return (a.order||DEFAULT_ORDER_OFF) - (b.order||DEFAULT_ORDER_OFF); });
+      currentFormulaLines.forEach(function(l, i){ l.stt = i + 1; });
+
+      const onlyUsedEl = document.getElementById('set4-detail-onlyused');
+      const onlyUsed = onlyUsedEl ? onlyUsedEl.checked : true;
+
       let html = '';
-      lines.forEach((l, i) => {
-        html += '<tr data-idx="' + i + '">';
+      let visibleCount = 0;
+      currentFormulaLines.forEach(function(l, i) {
+        // Filter theo toggle "Chỉ dùng"
+        if (onlyUsed && isRowOff(l)) return;
+        // Filter theo search
+        if (detailSearchText) {
+          const hay = (l.ma + ' ' + l.ten).toLowerCase();
+          if (hay.indexOf(detailSearchText) < 0) return;
+        }
+        visibleCount++;
+        const reduce = l.reduce || 'NONE';
+        const phanBo = l.phanBo || 'slice';
+        const needsBasis = phanBoNeedsBasis(phanBo);
+        const basisDisabled = needsBasis ? '' : 'disabled';
+        const rowOff = isRowOff(l);
+        const trClass = rowOff ? ' class="set4-row-off"' : '';
+        const offBadge = rowOff ? '<span class="badge-off" title="Số thứ tự = ' + DEFAULT_ORDER_OFF + ' — dòng chưa dùng trong công thức này">Không dùng</span>' : '';
+        html += '<tr' + trClass + ' data-idx="' + i + '">';
         html += '<td><input type="checkbox" class="set4-chk"></td>';
         html += '<td>' + l.stt + '</td>';
-        html += '<td style="text-align:left;"><b>' + l.ma + '</b></td>';
+        html += '<td style="text-align:left;"><b>' + l.ma + '</b>' + offBadge + '</td>';
         html += '<td style="text-align:left;">' + l.ten + '</td>';
-        html += '<td>' + l.order + '</td>';
-        html += '<td style="text-align:left;font-family:Consolas,monospace;font-size:11px;white-space:normal;">' + l.ct + '</td>';
-        html += '<td></td>';
+        html += '<td><input type="number" class="dline-order" data-idx="' + i + '" min="1" value="' + (l.order||DEFAULT_ORDER_OFF) + '" onblur="onDlineOrderBlur(this)" style="width:60px;text-align:center;padding:3px;border:1px solid #ccc;border-radius:3px;" title="Nhập số nhỏ hơn ' + DEFAULT_ORDER_OFF + ' để bật dòng. Để ' + DEFAULT_ORDER_OFF + ' = không dùng."></td>';
+        html += '<td style="text-align:left;"><input type="text" class="dline-ct" data-idx="' + i + '" value="' + (l.ct||'').replace(/"/g, '&quot;') + '" placeholder="(trống = 0 khi tính)" style="width:100%;font-family:Consolas,monospace;font-size:11px;padding:4px 6px;border:1px solid #ccc;border-radius:3px;box-sizing:border-box;"></td>';
+        var reduceBg = reduceIsActive(reduce) ? (reduceColor(reduce) + '20') : '#f8f9fa';
+        var reduceTextStyle = reduceIsActive(reduce) ? '' : 'color:#6c757d;font-style:italic;';
+        html += '<td><select class="dline-reduce" data-idx="' + i + '" onchange="onDlineReduceChange(this)" style="padding:3px;border:1px solid #ccc;border-radius:3px;width:100%;background:' + reduceBg + ';' + reduceTextStyle + '">'
+          + REDUCE_OPS.map(function(o){ return '<option value="'+o.v+'"'+(reduce===o.v?' selected':'')+' title="'+o.hint+'" style="background:#fff;color:#333;font-style:normal;">'+o.t+'</option>'; }).join('')
+          + '</select></td>';
+        html += '<td><select class="dline-phanbo" data-idx="' + i + '" onchange="onDlinePhanBoChange(' + i + ')" style="padding:3px;border:1px solid #ccc;border-radius:3px;width:100%;">'
+          + PHAN_BO_OPTIONS.map(function(o){ return '<option value="'+o.v+'"'+(phanBo===o.v?' selected':'')+' title="'+o.hint+'">'+o.t+'</option>'; }).join('')
+          + '</select></td>';
+        html += '<td><select class="dline-basis" data-idx="' + i + '" ' + basisDisabled + ' style="padding:3px;border:1px solid #ccc;border-radius:3px;width:100%;">'
+          + '<option value="">' + (needsBasis ? '-- Chọn căn cứ --' : '(N/A cho mode này)') + '</option>'
+          + PHAN_BO_BASIS_OPTIONS.map(function(o){ return '<option value="'+o.ma+'"'+((l.phanBoBasis||'')===o.ma?' selected':'')+'>'+o.ma+' — '+o.ten+'</option>'; }).join('')
+          + '</select></td>';
+        html += '<td style="text-align:center;"><button class="btn-vd" onclick="showVD(' + i + ')">Xem VD</button></td>';
+        html += '<td style="text-align:left;"><input type="text" class="dline-note" data-idx="' + i + '" value="' + (l.note||'').replace(/"/g, '&quot;') + '" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #ccc;border-radius:3px;box-sizing:border-box;"></td>';
         html += '</tr>';
       });
+
+      if (visibleCount === 0) {
+        const activeCount = currentFormulaLines.filter(function(l){ return !isRowOff(l); }).length;
+        let msg = 'Không có dòng nào khớp filter.';
+        if (activeCount === 0 && onlyUsed) {
+          msg = 'Bộ công thức này chưa dùng dòng tiêu chí nào (tất cả đang ở Số thứ tự ' + DEFAULT_ORDER_OFF + '). Bỏ tick <b>"Chỉ hiện đang dùng"</b> ở trên để thấy toàn bộ ' + currentFormulaLines.length + ' tiêu chí TT_ và bắt đầu khai báo.';
+        } else if (detailSearchText) {
+          msg = 'Không có tiêu chí nào khớp từ khóa "<b>' + detailSearchText + '</b>". Xóa ô tìm kiếm để xem lại.';
+        } else {
+          msg = 'Không có dòng nào khớp filter — thử tắt toggle "Chỉ hiện đang dùng" hoặc xóa search.';
+        }
+        html = '<tr><td colspan="11" style="color:#666;font-style:italic;padding:20px;text-align:center;line-height:1.6;">' + msg + '</td></tr>';
+      }
       tbody.innerHTML = html;
+      updateDetailCounter();
     }
 
-    function toggleAllSet4Detail(master) {
-      document.querySelectorAll('.set4-chk').forEach(c => c.checked = master.checked);
-    }
-
-    function exportDetailData() {
-      if (!currentFormulaLines.length) {
-        return showAlert2('set4-alert', 'Chưa có dòng công thức để xuất.', 'error');
+    // Blur handler: nếu order trống hoặc = 0 → tự động set về 999 (default không dùng)
+    function onDlineOrderBlur(input) {
+      var v = parseInt(input.value, 10);
+      if (isNaN(v) || v <= 0) {
+        input.value = DEFAULT_ORDER_OFF;
       }
-      const checked = Array.from(document.querySelectorAll('.set4-chk:checked'));
-      const idxToExport = checked.length
-        ? checked.map(c => parseInt(c.closest('tr').getAttribute('data-idx'), 10))
-        : currentFormulaLines.map((_, i) => i);
+      // Sync ngay vào model + refresh visual (chuyển row on/off)
+      var tr = input.closest('tr');
+      if (!tr) return;
+      var idx = parseInt(tr.getAttribute('data-idx'), 10);
+      if (currentFormulaLines[idx]) {
+        currentFormulaLines[idx].order = parseInt(input.value, 10);
+        syncInputsToLines();
+        renderDetailGrid();
+      }
+    }
 
-      const rows = idxToExport.map(i => currentFormulaLines[i]).filter(Boolean);
-      const header = ['STT', 'Mã tiêu chí', 'Tên tiêu chí', 'STT thứ tự', 'Công thức'];
+    // Bulk: set order=999 cho các dòng đã tick (soft-disable)
+    function bulkSetOrderOff() {
+      syncInputsToLines();
+      var checked = document.querySelectorAll('#set4-tbody .set4-chk:checked');
+      if (!checked.length) {
+        return showAlert2('set4-alert', 'Tick ít nhất 1 dòng để áp bulk action.', 'error');
+      }
+      var count = 0;
+      checked.forEach(function(chk){
+        var tr = chk.closest('tr[data-idx]');
+        if (!tr) return;
+        var idx = parseInt(tr.getAttribute('data-idx'), 10);
+        if (currentFormulaLines[idx]) {
+          currentFormulaLines[idx].order = DEFAULT_ORDER_OFF;
+          count++;
+        }
+      });
+      renderDetailGrid();
+      showAlert2('set4-alert', 'Đã set ' + count + ' dòng về Số thứ tự ' + DEFAULT_ORDER_OFF + ' (không dùng).', 'success');
+    }
+
+    // Bulk: bật lại các dòng tick — auto-gán order = (max order<999) + 10
+    function bulkClearOff() {
+      syncInputsToLines();
+      var checked = document.querySelectorAll('#set4-tbody .set4-chk:checked');
+      if (!checked.length) {
+        return showAlert2('set4-alert', 'Tick ít nhất 1 dòng để áp bulk action.', 'error');
+      }
+      var maxActive = 0;
+      currentFormulaLines.forEach(function(l){
+        if (!isRowOff(l) && (l.order||0) > maxActive) maxActive = l.order;
+      });
+      var nextOrder = maxActive + 10;
+      var count = 0;
+      checked.forEach(function(chk){
+        var tr = chk.closest('tr[data-idx]');
+        if (!tr) return;
+        var idx = parseInt(tr.getAttribute('data-idx'), 10);
+        if (currentFormulaLines[idx] && isRowOff(currentFormulaLines[idx])) {
+          currentFormulaLines[idx].order = nextOrder;
+          nextOrder += 10;
+          count++;
+        }
+      });
+      renderDetailGrid();
+      showAlert2('set4-alert', 'Đã bật ' + count + ' dòng (auto-gán Số thứ tự từ ' + (maxActive + 10) + ').', 'success');
+    }
+
+    function toggleAllSet4Detail(masterChk) {
+      document.querySelectorAll('#set4-tbody .set4-chk').forEach(function(c){ c.checked = masterChk.checked; });
+    }
+
+    function onDlineReduceChange(sel) {
+      var active = reduceIsActive(sel.value);
+      sel.style.background = active ? (reduceColor(sel.value) + '20') : '#f8f9fa';
+      sel.style.color = active ? '' : '#6c757d';
+      sel.style.fontStyle = active ? 'normal' : 'italic';
+    }
+
+    function onDlinePhanBoChange(idx) {
+      const phanBoEl = document.querySelector('.dline-phanbo[data-idx="' + idx + '"]');
+      const basisEl = document.querySelector('.dline-basis[data-idx="' + idx + '"]');
+      if (!phanBoEl || !basisEl) return;
+      const needsBasis = phanBoNeedsBasis(phanBoEl.value);
+      basisEl.disabled = !needsBasis;
+      if (!needsBasis) basisEl.value = '';
+      var firstOpt = basisEl.querySelector('option[value=""]');
+      if (firstOpt) firstOpt.textContent = needsBasis ? '-- Chọn căn cứ --' : '(N/A cho mode này)';
+    }
+
+    function saveDetailGrid() {
+      if (!detailFormulaCode) return;
+      const f = MOCK_FORMULAS.find(x => x.code === detailFormulaCode);
+      if (!f) return;
+
+      // Sync inputs → model (chỉ cho các dòng đang hiển thị/visible)
+      syncInputsToLines();
+
+      // Normalize order: nếu ai để trống/NaN → set 999
+      currentFormulaLines.forEach(function(l){
+        var v = parseInt(l.order, 10);
+        l.order = isNaN(v) || v <= 0 ? DEFAULT_ORDER_OFF : v;
+        // ct trống là hợp lệ — engine hiểu = 0 khi tính
+        if (l.ct == null) l.ct = '';
+      });
+
+      // Validate CHỈ áp dụng cho dòng ĐANG DÙNG (order<999):
+      //  - Phân bổ maxby/minby/prorata phải có Căn cứ phân bổ
+      //  - TK_ chỉ dùng trong CASE WHEN
+      // (Duplicate order và ct trống KHÔNG chặn — theo confirm của BA:
+      //  trùng = xử lý đồng thời theo Rank; ct trống = 0 khi tính.)
+      for (const l of currentFormulaLines) {
+        if (isRowOff(l)) continue;
+        if (phanBoNeedsBasis(l.phanBo) && !l.phanBoBasis) {
+          return showAlert2('set4-alert', '<b>Lỗi (Blocking):</b> Dòng [' + l.ma + '] Phân bổ đầu ra = <b>' + phanBoLabel(l.phanBo) + '</b> phải chọn <b>Căn cứ phân bổ</b>.', 'error');
+        }
+        const tkRefs = (l.ct || '').match(/\bTK_[A-Za-z0-9_]+/g);
+        if (tkRefs && !/CASE\s+WHEN/i.test(l.ct)) {
+          return showAlert2('set4-alert', '<b>Lỗi (Blocking):</b> Dòng [' + l.ma + '] có tham chiếu TK_ (' + tkRefs.join(', ') + ') ngoài CASE WHEN. TK_ chỉ dùng làm điều kiện (vì trả nvarchar/datetime).', 'error');
+        }
+      }
+
+      // Sort ASC theo order; STT gán lại theo thứ tự
+      currentFormulaLines.sort(function(a, b){ return (a.order||DEFAULT_ORDER_OFF) - (b.order||DEFAULT_ORDER_OFF); });
+      currentFormulaLines.forEach(function(l, i){ l.stt = i + 1; });
+      // Lưu TẤT CẢ dòng (bao gồm order=999) vào formula.lines — pattern hệ thống cũ
+      f.lines = currentFormulaLines.slice();
+
+      renderDetailGrid();
+      renderMasterGrid();
+      var activeCount = f.lines.filter(function(l){ return !isRowOff(l); }).length;
+      showAlert2('set4-alert', 'Đã lưu công thức [' + f.name + '] — <b>' + activeCount + '/' + f.lines.length + '</b> dòng đang dùng, các dòng còn lại giữ Số thứ tự ' + DEFAULT_ORDER_OFF + '.', 'success');
+    }
+
+    // ==================== Export ALL details của master(s) đã tick ====================
+    // Nút [Xuất details] ở khu master — xuất toàn bộ dòng tiêu chí của các bộ công thức đã tick.
+    // Nếu không tick → xuất tất cả bộ. Cột "Bộ công thức (mã)" giúp phân biệt.
+    function exportAllDetails() {
+      if (!MOCK_FORMULAS.length) return showAlert2('set4-alert', 'Chưa có bộ công thức nào.', 'error');
+      const checked = Array.from(document.querySelectorAll('.set4m-chk:checked'));
+      const codes = checked.length
+        ? checked.map(c => c.closest('tr').getAttribute('data-code'))
+        : MOCK_FORMULAS.map(f => f.code);
+
+      const rows = [];
+      codes.forEach(code => {
+        const f = MOCK_FORMULAS.find(x => x.code === code);
+        if (!f) return;
+        (f.lines || []).forEach(l => rows.push({ formulaCode: code, formulaName: f.name, line: l }));
+      });
+      if (!rows.length) return showAlert2('set4-alert', 'Các bộ công thức đã chọn không có dòng tiêu chí nào.', 'error');
+
+      const header = ['Bộ CT (Mã)', 'Bộ CT (Tên)', 'STT', 'Mã tiêu chí', 'Tên tiêu chí', 'Số thứ tự', 'Trạng thái', 'Công thức', 'Toán tử gộp N→1', 'Phân bổ đầu ra', 'Căn cứ phân bổ', 'Ghi chú'];
       const csvLines = [header.join(',')];
-      rows.forEach(l => {
-        csvLines.push([l.stt, l.ma, '"' + l.ten.replace(/"/g, '""') + '"', l.order, '"' + l.ct.replace(/"/g, '""') + '"'].join(','));
+      rows.forEach(r => {
+        const l = r.line;
+        var isOff = (l.order || DEFAULT_ORDER_OFF) >= DEFAULT_ORDER_OFF;
+        csvLines.push([
+          r.formulaCode,
+          '"' + r.formulaName.replace(/"/g, '""') + '"',
+          l.stt,
+          l.ma,
+          '"' + l.ten.replace(/"/g, '""') + '"',
+          l.order,
+          isOff ? 'Không dùng' : 'Đang dùng',
+          '"' + (l.ct || '').replace(/"/g, '""') + '"',
+          l.reduce || 'NONE',
+          phanBoLabel(l.phanBo || 'slice'),
+          l.phanBoBasis || '',
+          '"' + (l.note || '').replace(/"/g, '""') + '"'
+        ].join(','));
       });
-      downloadCsv(csvLines, (detailFormulaCode || 'cong_thuc_luong') + '.csv');
-      showAlert2('set4-alert', 'Đã xuất ' + rows.length + '/' + currentFormulaLines.length + ' dòng ' + (checked.length ? '(đã chọn)' : '(toàn bộ)') + '.', 'success');
+      downloadCsv(csvLines, 'details_' + (checked.length ? codes.join('_') : 'all') + '.csv');
+      showAlert2('set4-alert', 'Đã xuất ' + rows.length + ' dòng tiêu chí từ ' + codes.length + ' bộ công thức ' + (checked.length ? '(đã tick)' : '(toàn bộ)') + '.', 'success');
     }
 
-    // ==================== Preview Engine ====================
-    function formatNum(n) {
-      if (n === 0) return '0';
-      return n.toLocaleString('vi-VN');
+    // ==================== VÍ DỤ CHI TIẾT ALLOCATION (theo dòng công thức) ====================
+    var VD_EMP = {name:'Nguyễn Thị Loan', id:'1022907668', ky:'05/2026'};
+    var VD_SLICES = [
+      {gd:1, ban:'CB101', from:'01/05/2026', to:'15/05/2026', cong:12, ns:800, dg:6200},
+      {gd:2, ban:'CB102', from:'16/05/2026', to:'31/05/2026', cong:13, ns:900, dg:6400}
+    ];
+    function fmtN(n){ return Math.round(n).toLocaleString('vi-VN'); }
+
+    function vdHeader(){
+      return '<div style="background:#eef2f7;padding:8px 12px;border-radius:4px;margin-bottom:10px;font-size:11px;">'
+        +'<b>NV mẫu:</b> '+VD_EMP.name+' ('+VD_EMP.id+') &mdash; Kỳ '+VD_EMP.ky+' &mdash; <b>2 giai đoạn QTLV</b>'
+        +'</div>'
+        +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Từ ngày</th><th>Đến ngày</th><th>Công</th><th>Năng suất</th><th>Đơn giá</th></tr></thead>'
+        +'<tbody>'
+        +'<tr><td>1</td><td>CB101</td><td>01/05</td><td>15/05</td><td><b>12</b></td><td class="r">800</td><td class="r">6,200</td></tr>'
+        +'<tr><td>2</td><td>CB102</td><td>16/05</td><td>31/05</td><td><b>13</b></td><td class="r">900</td><td class="r">6,400</td></tr>'
+        +'<tr class="sum"><td colspan="4" style="text-align:right;">Tổng</td><td><b>25</b></td><td></td><td></td></tr>'
+        +'</tbody></table>';
     }
 
-    function runPreviewEngine(data) {
-      const slices = data.slices;
-      const totalCong = slices.reduce((s, r) => s + r.cong, 0);
-
-      const luongThoiGianTotal = 4000000;
-
-      let luyKeRunning = 0;
-      const results = slices.map((sl, i) => {
-        const row = { ...sl };
-        row.luongThoiGian = Math.round(luongThoiGianTotal * sl.cong / totalCong);
-        row.luongDongBH = 0;
-        row.thuNhapTinhThue = 0;
-        row.hoTroChuyenBan = (i === 0 && slices.length > 1) ? 500000 : 0; // OldStage: dồn vào giai đoạn ĐẦU tiên
-        luyKeRunning += sl.L0;
-        row.luyKeLuong = luyKeRunning;
-        return row;
-      });
-
-      let maxFinalIdx = 0;
-      let maxFinalVal = 0;
-      results.forEach((r, i) => {
-        if (r.final > maxFinalVal) { maxFinalVal = r.final; maxFinalIdx = i; }
-      });
-      const totalFinal = results.reduce((s, r) => s + r.final, 0);
-      results[maxFinalIdx].luongDongBH = totalFinal;
-      results[results.length - 1].thuNhapTinhThue = totalFinal;
-
-      return results;
+    // Render section "Pipeline xử lý" cho showVD: ct raw → reduce → phân bổ
+    function vdPipelineSection(row){
+      var reduce = row.reduce || 'NONE';
+      var isRed = reduceIsActive(reduce);
+      var phanBo = row.phanBo || 'slice';
+      var basis = row.phanBoBasis || '';
+      return '<div class="vd-step" style="background:#eef4fb;border-color:#0056b3;">'
+        +'<b>&#128736; Pipeline 3 bước cho dòng ['+row.ma+']:</b><br>'
+        +'&nbsp;&nbsp;<b>1. Tính raw:</b> <code>'+row.ct+'</code> → có thể ra 1 hoặc N giá trị theo GĐ.<br>'
+        +'&nbsp;&nbsp;<b>2. Toán tử gộp N→1:</b> '+reduceTag(reduce)
+          +(isRed ? ' <i style="color:#666;font-size:10px;">— áp '+reduceLabel(reduce)+' lên N giá trị raw để lấy 1 số.</i>'
+                  : ' <i style="color:#666;font-size:10px;">— giữ nguyên shape raw.</i>')+'<br>'
+        +'&nbsp;&nbsp;<b>3. Phân bổ đầu ra:</b> '+phanBoTag(phanBo)
+          +(phanBoNeedsBasis(phanBo) ? ' &nbsp;| căn cứ: <b>'+(basis||'<span style="color:#dc3545;">CHƯA CHỌN</span>')+'</b>' : '')
+          +' <i style="color:#666;font-size:10px;">— engine gán giá trị vào N dòng GĐ.</i>'
+        +'</div>';
     }
 
-    function renderPreviewTable(results) {
-      const container = document.getElementById('set4-preview-content');
-      const totalCong = results.reduce((s, r) => s + r.cong, 0);
+    function showVD(idx){
+      var row = currentFormulaLines[idx];
+      if(!row) return;
+      var phanBo = row.phanBo || 'slice';
+      var reduce = row.reduce || 'NONE';
+      var basis = row.phanBoBasis || '';
 
-      let html = '<div style="margin-bottom:8px;font-size:11px;color:#555;">';
-      html += '<b>Sinh dòng theo Quá trình làm việc:</b> Mỗi dòng = 1 giai đoạn QTLV (đã xác định tại tiêu chí, không cấu hình lại ở đây). ';
-      html += 'Tổng công: <b>' + totalCong + '</b> ngày.</div>';
+      // Badge setup
+      var badgeHtml = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">'
+        +'<span style="background:#0056b3;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">'+row.ma+'</span>'
+        +'<span style="background:#6c757d;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;" title="Gộp N→1: áp toán tử lên N giá trị raw trước khi phân bổ">Gộp: '+reduceLabel(reduce)+'</span>'
+        +phanBoTag(phanBo)
+        +(phanBoNeedsBasis(phanBo) ? '<span style="background:'+(basis?'#6f42c1':'#dc3545')+';color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Căn cứ PB: '+(basis||'CHƯA CHỌN')+'</span>' : '')
+        +'<span style="background:#17a2b8;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:bold;">Rank: '+row.order+'</span>'
+        +'</div>'
+        +'<div style="font-size:10px;color:#666;margin-bottom:8px;font-style:italic;">&#9881; Pipeline 3 bước: (1) Tính raw từ công thức → (2) Gộp N→1 (nếu chọn SUM/AVG/MAX/MIN) → (3) Phân bổ vào N dòng GĐ.</div>';
 
-      html += '<div style="overflow-x:auto;"><table style="font-size:11px;width:100%;">';
-      html += '<thead><tr>';
-      html += '<th>Giai đoạn</th><th>Bàn</th><th>Từ ngày</th><th>Đến ngày</th><th>Công</th>';
-      html += '<th>Lương gốc L0</th><th>LSP Final</th>';
-      html += '<th style="background:#d4edda;">Lương thời gian<br><span style="font-size:9px;font-weight:normal;">(Prorata)</span></th>';
-      html += '<th style="background:#e8f4f8;">Lương đóng BH<br><span style="font-size:9px;font-weight:normal;">(MaxSalaryRow)</span></th>';
-      html += '<th style="background:#fff3cd;">Thu nhập tính thuế<br><span style="font-size:9px;font-weight:normal;">(LastStageRow)</span></th>';
-      html += '<th style="background:#e2d9f3;">Hỗ trợ bàn giao<br><span style="font-size:9px;font-weight:normal;">(OldStage)</span></th>';
-      html += '<th style="background:#d6eaf8;">Lũy kế lương<br><span style="font-size:9px;font-weight:normal;">(Accumulate)</span></th>';
-      html += '</tr></thead><tbody>';
+      var title = '', body = vdHeader() + badgeHtml + vdPipelineSection(row);
+      var L0_1=800*6200, L0_2=900*6400;
 
-      let sumL0 = 0, sumFinal = 0, sumLTG = 0, sumLDBH = 0, sumTNTT = 0, sumCong = 0, sumHTCB = 0;
-
-      results.forEach(r => {
-        sumCong += r.cong;
-        sumL0 += r.L0;
-        sumFinal += r.final;
-        sumLTG += r.luongThoiGian;
-        sumLDBH += r.luongDongBH;
-        sumTNTT += r.thuNhapTinhThue;
-        sumHTCB += r.hoTroChuyenBan;
-
-        const highlightBH = r.luongDongBH > 0 ? 'background:#e8f4f8;font-weight:bold;color:#0056b3;' : 'color:#ccc;';
-        const highlightTT = r.thuNhapTinhThue > 0 ? 'background:#fff3cd;font-weight:bold;color:#856404;' : 'color:#ccc;';
-        const highlightHTCB = r.hoTroChuyenBan > 0 ? 'background:#e2d9f3;font-weight:bold;color:#6f42c1;' : 'color:#ccc;';
-
-        html += '<tr>';
-        html += '<td>' + r.stage + '</td>';
-        html += '<td>' + r.ban + '</td>';
-        html += '<td>' + r.from + '</td>';
-        html += '<td>' + r.to + '</td>';
-        html += '<td><b>' + r.cong + '</b></td>';
-        html += '<td style="text-align:right;">' + formatNum(r.L0) + '</td>';
-        html += '<td style="text-align:right;font-weight:bold;">' + formatNum(r.final) + '</td>';
-        html += '<td style="text-align:right;background:#f1fdf4;">' + formatNum(r.luongThoiGian) + '</td>';
-        html += '<td style="text-align:right;' + highlightBH + '">' + formatNum(r.luongDongBH) + '</td>';
-        html += '<td style="text-align:right;' + highlightTT + '">' + formatNum(r.thuNhapTinhThue) + '</td>';
-        html += '<td style="text-align:right;' + highlightHTCB + '">' + formatNum(r.hoTroChuyenBan) + '</td>';
-        html += '<td style="text-align:right;background:#d6eaf8;">' + formatNum(r.luyKeLuong) + '</td>';
-        html += '</tr>';
-      });
-
-      html += '<tr style="background:#f8f9fa;font-weight:bold;border-top:2px solid #333;">';
-      html += '<td colspan="4" style="text-align:right;">TỔNG CỘNG</td>';
-      html += '<td>' + sumCong + '</td>';
-      html += '<td style="text-align:right;">' + formatNum(sumL0) + '</td>';
-      html += '<td style="text-align:right;color:#0056b3;">' + formatNum(sumFinal) + '</td>';
-      html += '<td style="text-align:right;background:#d4edda;">' + formatNum(sumLTG) + '</td>';
-      html += '<td style="text-align:right;background:#e8f4f8;">' + formatNum(sumLDBH) + '</td>';
-      html += '<td style="text-align:right;background:#fff3cd;">' + formatNum(sumTNTT) + '</td>';
-      html += '<td style="text-align:right;background:#e2d9f3;">' + formatNum(sumHTCB) + '</td>';
-      html += '<td style="text-align:right;background:#d6eaf8;">' + formatNum(results[results.length-1].luyKeLuong) + '</td>';
-      html += '</tr>';
-
-      html += '</tbody></table></div>';
-
-      html += '<div style="margin-top:12px;padding:10px;background:#fffef0;border:1px dashed #ffd600;font-size:11px;">';
-      html += '<b>Giải thích phân bổ:</b><br>';
-      html += '• <b>Lương thời gian (Prorata):</b> Chia theo tỷ lệ công. ';
-      results.forEach(r => {
-        html += 'GĐ' + r.stage + ': ' + formatNum(r.luongThoiGian) + ' (' + r.cong + '/' + sumCong + '). ';
-      });
-      html += '<br>';
-      html += '• <b>Lương đóng BH (MaxSalaryRow):</b> 100% tập trung vào giai đoạn có LSP Final cao nhất (GĐ' + (results.findIndex(r => r.luongDongBH > 0) + 1) + ').<br>';
-      html += '• <b>Thu nhập tính thuế (LastStageRow):</b> 100% tập trung vào giai đoạn cuối cùng (GĐ' + results.length + ').<br>';
-      html += '• <b>Hỗ trợ bàn giao (OldStage):</b> chỉ phát sinh khi NV có ≥2 giai đoạn, dồn 100% vào giai đoạn ĐẦU tiên (GĐ1) — ngược hướng với LastStageRow.<br>';
-      html += '• <b>Lũy kế lương (Accumulate):</b> cộng dồn Lương gốc L0 từ giai đoạn đầu → giai đoạn cuối = ' + formatNum(results[results.length-1].luyKeLuong) + '.';
-      html += '</div>';
-
-      container.innerHTML = html;
-    }
-
-    function openPreview() {
-      if (!currentFormulaLines.length) {
-        showAlert2('set4-alert', 'Công thức này chưa có dòng tiêu chí để xem trước.', 'error');
-        return;
+      if(phanBo==='slice'){
+        title = '&#128196; Ví dụ: Phân bổ đầu ra = Theo giai đoạn';
+        body += '<div class="vd-step">'
+          +'<b>Tiêu chí:</b> '+row.ma+' — Phân bổ đầu ra=<b>Theo giai đoạn</b><br>'
+          +'<b>Công thức:</b> '+row.ct+' (tính riêng mỗi GĐ)<br><br>'
+          +'<b>Bước 1:</b> Engine tính per-GĐ theo Rank ASC:<br>'
+          +'&nbsp;&nbsp;GĐ1: <span class="op">800 × 6,200 = '+fmtN(L0_1)+'</span><br>'
+          +'&nbsp;&nbsp;GĐ2: <span class="op">900 × 6,400 = '+fmtN(L0_2)+'</span><br><br>'
+          +'<b>Bước 2:</b> Theo giai đoạn → <b>giữ nguyên N giá trị</b>, không phân bổ lại.'
+          +'</div>'
+          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>Công</th><th>NS</th><th>Đơn giá</th><th>Kết quả</th></tr></thead>'
+          +'<tbody>'
+          +'<tr><td>1</td><td>CB101</td><td>12</td><td class="r">800</td><td class="r">6,200</td><td class="r"><b>'+fmtN(L0_1)+'</b></td></tr>'
+          +'<tr><td>2</td><td>CB102</td><td>13</td><td class="r">900</td><td class="r">6,400</td><td class="r"><b>'+fmtN(L0_2)+'</b></td></tr>'
+          +'<tr class="sum"><td colspan="5" style="text-align:right;">Tổng</td><td class="r">'+fmtN(L0_1+L0_2)+'</td></tr>'
+          +'</tbody></table>'
+          +'<div class="vd-info">&#9989; Mỗi GĐ có NS/ĐơnGiá riêng → kết quả khác nhau. Phù hợp khi dữ liệu đầu vào đã tách sẵn theo GĐ.</div>';
       }
-      const results = runPreviewEngine(MOCK_PREVIEW);
-      renderPreviewTable(results);
-      showModal('set4-preview');
-    }
 
-    function selectEmployee() {
-      const results = runPreviewEngine(MOCK_PREVIEW);
-      renderPreviewTable(results);
+      if(phanBo==='prorata'){
+        title = '&#128200; Ví dụ: Phân bổ đầu ra = Prorata (chia tỷ lệ)';
+        var total = 4000000;
+
+        if(!basis){
+          body += '<div style="background:#f8d7da;border:1px solid #dc3545;border-radius:4px;padding:10px 12px;font-size:11px;">'
+            +'&#10060; <b>Thiếu cấu hình:</b> Phân bổ đầu ra=Prorata nhưng <b>chưa chọn Căn cứ phân bổ</b>.<br><br>'
+            +'Engine không thể tự suy luận nên chia theo Công chuẩn, Công thực tế hay Sản lượng — phải khai báo rõ tiêu chí nào cấp trọng số cho từng GĐ. Vui lòng chọn 1 giá trị ở <b>"Căn cứ phân bổ"</b> trước khi Lưu.'
+            +'</div>';
+        } else {
+          var basisMeta = {
+            'HT_TS_CongThucTe': {label:'Công thực tế', unit:'công', field:'cong'},
+            'HT_TS_CongChuan':  {label:'Công chuẩn tháng', unit:'công', field:'congchuan'},
+            'HT_PR_NangSuatTinhLuong': {label:'Sản lượng NS_FINAL', unit:'kg/sp', field:'ns'}
+          };
+          var bm = basisMeta[basis] || basisMeta['HT_TS_CongThucTe'];
+          var v1, v2;
+          if(bm.field === 'cong'){ v1 = VD_SLICES[0].cong; v2 = VD_SLICES[1].cong; }
+          else if(bm.field === 'ns'){ v1 = VD_SLICES[0].ns; v2 = VD_SLICES[1].ns; }
+          else { v1 = 26; v2 = 26; }
+          var sumV = v1 + v2;
+          var pct1 = v1/sumV, pct2 = v2/sumV;
+          var r1 = Math.round(total * pct1), r2 = total - r1;
+
+          body += '<div class="vd-step">'
+            +'<b>Tiêu chí:</b> '+row.ma+' — Phân bổ đầu ra=<b>Prorata</b>, <span class="op">Căn cứ = '+basis+'</span><br>'
+            +'<b>Công thức:</b> '+row.ct+' = 1 tổng cho cả NV<br><br>'
+            +'<b>Bước 1:</b> Tính tổng (1 giá trị / NV):<br>'
+            +'&nbsp;&nbsp;Tổng = <span class="op">'+fmtN(total)+'</span><br><br>'
+            +'<b>Bước 2:</b> Prorata → lấy giá trị theo GĐ của tiêu chí <b>'+basis+' ('+bm.label+')</b> làm trọng số:<br>'
+            +'&nbsp;&nbsp;GĐ1: '+bm.label+' = '+v1+' '+bm.unit+' &nbsp;|&nbsp; GĐ2: '+bm.label+' = '+v2+' '+bm.unit+' &nbsp;|&nbsp; Mẫu số = '+sumV+'<br><br>'
+            +'<b>Bước 3:</b> Chia tỷ lệ:<br>'
+            +'&nbsp;&nbsp;GĐ1: '+fmtN(total)+' × <span class="op">('+v1+' / '+sumV+') = '+(pct1*100).toFixed(1)+'%</span> → <b>'+fmtN(r1)+'</b><br>'
+            +'&nbsp;&nbsp;GĐ2: '+fmtN(total)+' × <span class="op">('+v2+' / '+sumV+') = '+(pct2*100).toFixed(1)+'%</span> → <b>'+fmtN(r2)+'</b><br><br>'
+            +'<b>Kiểm tra:</b> '+fmtN(r1)+' + '+fmtN(r2)+' = '+fmtN(r1+r2)+' &#9989; khớp tổng ban đầu.'
+            +'</div>'
+            +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>'+bm.label+'</th><th>Tỷ lệ</th><th>Trước</th><th>Sau Prorata</th></tr></thead>'
+            +'<tbody>'
+            +'<tr><td>1</td><td>CB101</td><td><b>'+v1+'</b></td><td>'+v1+'/'+sumV+' = '+(pct1*100).toFixed(1)+'%</td><td class="r dim">'+fmtN(total)+'</td><td class="r hi">'+fmtN(r1)+'</td></tr>'
+            +'<tr><td>2</td><td>CB102</td><td><b>'+v2+'</b></td><td>'+v2+'/'+sumV+' = '+(pct2*100).toFixed(1)+'%</td><td class="r dim">'+fmtN(total)+'</td><td class="r hi">'+fmtN(r2)+'</td></tr>'
+            +'<tr class="sum"><td colspan="4" style="text-align:right;">Tổng</td><td class="r">'+fmtN(total)+'</td><td class="r">'+fmtN(r1+r2)+'</td></tr>'
+            +'</tbody></table>'
+            +'<div class="vd-info">&#128161; <b>Khi nào dùng:</b> Có 1 giá trị tổng (lương thời gian, phụ cấp cố định...) cần chia theo trọng số theo GĐ. Đảm bảo tổng không đổi.</div>';
+        }
+      }
+
+      if(phanBo==='maxby'){
+        title = '&#128737; Ví dụ: Phân bổ đầu ra = Tiêu chí giá trị cao nhất';
+        var L1_1=L0_1*1.05, L1_2=L0_2*1.05;
+        var final1 = L1_1 + 1920000, final2 = L1_2 + 2080000;
+        var totalBH = final1 + final2;
+        body += '<div class="vd-step">'
+          +'<b>Tiêu chí:</b> '+row.ma+' — Phân bổ đầu ra=<b>Tiêu chí giá trị cao nhất</b>, Căn cứ = <span class="op">'+basis+'</span><br>'
+          +'<b>Công thức:</b> '+row.ct+'<br><br>'
+          +'<b>Bước 1 (Pha 1):</b> Engine tính giá trị căn cứ <b>'+basis+'</b> tại từng GĐ:<br>'
+          +'&nbsp;&nbsp;GĐ1: '+basis+' = <span class="op">'+fmtN(final1)+'</span><br>'
+          +'&nbsp;&nbsp;GĐ2: '+basis+' = <span class="op">'+fmtN(final2)+'</span><br><br>'
+          +'<b>Bước 2:</b> Tính tổng công thức: <b>'+fmtN(totalBH)+'</b><br><br>'
+          +'<b>Bước 3 (Pha 2):</b> So sánh căn cứ → GĐ có giá trị MAX = <b>GĐ'+(final2>final1?2:1)+'</b> → dồn 100% vào đó.'
+          +'</div>'
+          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>'+basis+'</th><th>So sánh</th><th>Kết quả</th></tr></thead>'
+          +'<tbody>'
+          +'<tr><td>1</td><td>CB101</td><td class="r">'+fmtN(final1)+'</td><td>'+(final1<final2?'nhỏ hơn':'&#9733; LỚN NHẤT')+'</td><td class="r '+(final1<final2?'dim':'hi')+'">'+(final1<final2?'0':fmtN(totalBH))+'</td></tr>'
+          +'<tr><td>2</td><td>CB102</td><td class="r"><b>'+fmtN(final2)+'</b></td><td style="color:#28a745;font-weight:bold;">'+(final2>final1?'&#9733; LỚN NHẤT':'nhỏ hơn')+'</td><td class="r '+(final2>final1?'hi':'dim')+'">'+(final2>final1?fmtN(totalBH):'0')+'</td></tr>'
+          +'<tr class="sum"><td colspan="4" style="text-align:right;">Tổng</td><td class="r">'+fmtN(totalBH)+'</td></tr>'
+          +'</tbody></table>'
+          +'<div class="vd-info">&#128737; <b>Nghiệp vụ điển hình:</b> Tiền trừ, BH — dồn vào GĐ có tiền lương nhiều để tránh trừ âm vào GĐ ít tiền. Không cần MAX() trong công thức.<br>'
+          +'<b>Tie-break:</b> Nếu 2 GĐ căn cứ bằng nhau → chọn GĐ có ToDate lớn hơn.</div>';
+      }
+
+      if(phanBo==='minby'){
+        title = '&#128737; Ví dụ: Phân bổ đầu ra = Tiêu chí giá trị thấp nhất';
+        var L1_1=L0_1*1.05, L1_2=L0_2*1.05;
+        var final1 = L1_1 + 1920000, final2 = L1_2 + 2080000;
+        var totalX = final1 + final2;
+        body += '<div class="vd-step">'
+          +'<b>Tiêu chí:</b> '+row.ma+' — Phân bổ đầu ra=<b>Tiêu chí giá trị thấp nhất</b>, Căn cứ = <span class="op">'+basis+'</span><br>'
+          +'<b>Công thức:</b> '+row.ct+'<br><br>'
+          +'<b>Bước 1 (Pha 1):</b> Engine tính căn cứ tại từng GĐ:<br>'
+          +'&nbsp;&nbsp;GĐ1: '+basis+' = <span class="op">'+fmtN(final1)+'</span><br>'
+          +'&nbsp;&nbsp;GĐ2: '+basis+' = <span class="op">'+fmtN(final2)+'</span><br><br>'
+          +'<b>Bước 2 (Pha 2):</b> So sánh → GĐ có giá trị MIN = <b>GĐ'+(final1<final2?1:2)+'</b> → dồn 100%.'
+          +'</div>'
+          +'<div class="vd-info">&#128737; Đối xứng với "Tiêu chí giá trị cao nhất" — dùng khi nghiệp vụ cần dồn vào GĐ ít tiền (VD: khấu trừ theo mức tối thiểu).</div>';
+      }
+
+      if(phanBo==='last'){
+        title = '&#128176; Ví dụ: Phân bổ đầu ra = Mới nhất';
+        var L1_1=L0_1*1.05, L1_2=L0_2*1.05;
+        var total = L1_1 + L1_2;
+        body += '<div class="vd-step">'
+          +'<b>Tiêu chí:</b> '+row.ma+' — Phân bổ đầu ra=<b>Mới nhất</b><br>'
+          +'<b>Công thức:</b> '+row.ct+'<br><br>'
+          +'<b>Bước 1:</b> Tính công thức (1 số hoặc N số rồi rút gọn):<br>'
+          +'&nbsp;&nbsp;Tổng = <span class="op">'+fmtN(total)+'</span><br><br>'
+          +'<b>Bước 2:</b> Mới nhất → tìm GĐ có <b>ToDate lớn nhất</b> = <b>GĐ2 (31/05)</b> → dồn 100%.'
+          +'</div>'
+          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>ToDate</th><th>Kết quả</th></tr></thead>'
+          +'<tbody>'
+          +'<tr><td>1</td><td>CB101</td><td>15/05</td><td class="r dim">0</td></tr>'
+          +'<tr><td>2</td><td>CB102</td><td><b>31/05</b></td><td class="r hi2">'+fmtN(total)+'</td></tr>'
+          +'<tr class="sum"><td colspan="3" style="text-align:right;">Tổng</td><td class="r">'+fmtN(total)+'</td></tr>'
+          +'</tbody></table>'
+          +'<div class="vd-info">&#128176; <b>Nghiệp vụ:</b> Dồn 1 lần/tháng vào cuối kỳ (thuế TN, phí quyết toán...).</div>';
+      }
+
+      if(phanBo==='first'){
+        title = '&#128260; Ví dụ: Phân bổ đầu ra = Cũ nhất';
+        body += '<div class="vd-step">'
+          +'<b>Tiêu chí:</b> '+row.ma+' — Phân bổ đầu ra=<b>Cũ nhất</b><br>'
+          +'<b>Công thức:</b> '+row.ct+'<br><br>'
+          +'<b>Cũ nhất:</b> Dồn 100% vào GĐ đầu tiên (FromDate nhỏ nhất). Các GĐ sau = 0.'
+          +'</div>'
+          +'<table class="vd-tbl"><thead><tr><th>GĐ</th><th>Bàn</th><th>FromDate</th><th>Loại</th><th>Kết quả</th></tr></thead>'
+          +'<tbody>'
+          +'<tr><td>1</td><td>CB101</td><td><b>01/05</b></td><td style="color:#e67e22;font-weight:bold;">GĐ CŨ (đầu)</td><td class="r hi2">500,000</td></tr>'
+          +'<tr><td>2</td><td>CB102</td><td>16/05</td><td>GĐ sau</td><td class="r dim">0</td></tr>'
+          +'</tbody></table>'
+          +'<div class="vd-info">&#128260; <b>Nghiệp vụ:</b> Khoản gắn với GĐ đầu (VD: hỗ trợ chuyển bàn giao). Chỉ phát sinh khi NV có &ge;2 GĐ.<br>'
+          +'<b>Muốn dồn vào GĐ CUỐI thay vì đầu?</b> Dùng <b>Mới nhất</b>.</div>';
+      }
+
+      document.getElementById('modal-vd-title').innerHTML = title;
+      document.getElementById('modal-vd-body').innerHTML = body;
+      document.getElementById('modal-vd').style.display = 'flex';
     }
 
     // ==================== Init ====================

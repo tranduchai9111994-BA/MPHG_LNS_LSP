@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Danh mục Function scalar</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .fc-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;padding:10px 12px;margin-bottom:10px;}
+    .fc-toolbar .grp{display:flex;align-items:center;gap:4px;}
+    .fc-toolbar label{font-size:11px;font-weight:bold;color:#495057;margin-right:2px;}
+    .fc-toolbar input[type=text],.fc-toolbar select{font-size:11px;padding:4px 6px;border:1px solid #ced4da;border-radius:3px;}
+    .fc-toolbar input[type=text]{width:220px;}
+    .fc-btn{border:none;border-radius:3px;padding:5px 12px;font-size:11px;font-weight:bold;cursor:pointer;color:#fff;}
+    .fc-btn.search{background:#0056b3;} .fc-btn.search:hover{background:#003d80;}
+    .fc-btn.reset{background:#6c757d;} .fc-btn.reset:hover{background:#545b62;}
+    .fc-btn.add{background:#28a745;} .fc-btn.add:hover{background:#1e7e34;}
+    .fc-btn.exp{background:#17a2b8;} .fc-btn.exp:hover{background:#117a8b;}
+    .fc-count{margin-left:auto;font-size:11px;color:#495057;background:#e9ecef;padding:4px 10px;border-radius:3px;}
+
+    .fc-grid-wrap{overflow:auto;max-height:calc(100vh - 320px);border:1px solid #dee2e6;border-radius:4px;}
+    .fc-table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;}
+    .fc-table thead th{position:sticky;top:0;background:#fff8dc;color:#212529;padding:6px 8px;border:1px solid #d0c67e;text-align:left;font-weight:bold;font-size:11px;white-space:nowrap;z-index:2;}
+    .fc-table tbody td{padding:5px 8px;border:1px solid #e5e7eb;vertical-align:top;word-break:break-word;}
+    .fc-table tbody tr:hover td{background:#f5faff;}
+    .fc-mono{font-family:Consolas,Monaco,monospace;font-size:11px;}
+    .fc-name{font-weight:bold;color:#0056b3;}
+    .fc-code-cell{white-space:pre-wrap;word-break:break-all;background:#fafafa;color:#333;}
+    .fc-code-cell code{font-family:Consolas,monospace;font-size:10.5px;}
+
+    .badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:bold;line-height:1.3;white-space:nowrap;}
+    .st-de-xuat       {background:#e9ecef;color:#495057;}
+    .st-dang-phat     {background:#fff3cd;color:#664d03;}
+    .st-da-co         {background:#d1e7dd;color:#0f5132;}
+    .st-dang-dung     {background:#cfe2ff;color:#052c65;font-weight:bold;}
+    .st-chua-can      {background:#f1f3f5;color:#adb5bd;font-style:italic;}
+
+    .nb-hr-core       {background:#e3f2fd;color:#0d47a1;}
+    .nb-cham-cong     {background:#fff3e0;color:#7c4a03;}
+    .nb-san-luong     {background:#e8f5e9;color:#1b5e20;}
+    .nb-dinh-muc      {background:#f3e5f5;color:#4a148c;}
+    .nb-khoan-tru     {background:#ffebee;color:#8b1f1f;}
+    .nb-phu-cap       {background:#e0f7fa;color:#006064;}
+
+    .action-btns{display:flex;gap:4px;justify-content:center;}
+    .action-btns button{border:none;background:transparent;cursor:pointer;font-size:13px;padding:1px 4px;border-radius:3px;}
+    .action-btns button:hover{background:#e9ecef;}
+
+    /* Modal form */
+    .fc-modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:999;justify-content:center;align-items:center;}
+    .fc-modal{background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;flex-direction:column;max-height:92vh;}
+    .fc-modal-hdr{background:#0056b3;color:#fff;padding:10px 14px;border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center;font-weight:bold;font-size:13px;}
+    .fc-modal-hdr .x{background:transparent;border:none;color:#fff;font-size:16px;cursor:pointer;}
+    .fc-modal-body{padding:14px 18px;overflow-y:auto;font-size:12px;}
+    .fc-modal-ftr{padding:10px 14px;border-top:1px solid #dee2e6;display:flex;gap:8px;justify-content:flex-end;background:#f8f9fa;border-radius:0 0 6px 6px;}
+    .fc-modal-ftr .btn-save{background:#28a745;color:#fff;border:none;padding:6px 16px;border-radius:3px;font-size:12px;font-weight:bold;cursor:pointer;}
+    .fc-modal-ftr .btn-cancel{background:#6c757d;color:#fff;border:none;padding:6px 16px;border-radius:3px;font-size:12px;cursor:pointer;}
+
+    .fc-form{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;align-items:start;}
+    .fc-form label{font-size:11px;font-weight:bold;color:#495057;padding-top:5px;}
+    .fc-form label.req::after{content:' *';color:#dc3545;}
+    .fc-form input,.fc-form select,.fc-form textarea{width:100%;font-size:11px;padding:5px 7px;border:1px solid #ced4da;border-radius:3px;box-sizing:border-box;font-family:inherit;}
+    .fc-form textarea{font-family:Consolas,monospace;resize:vertical;}
+
+    .fc-rule-modal .fc-modal-hdr{background:#6f42c1;}
+    .rule-list{counter-reset:rule;list-style:none;padding:0;margin:0;}
+    .rule-list li{position:relative;padding:10px 12px 10px 44px;margin-bottom:8px;background:#faf5ff;border-left:3px solid #6f42c1;border-radius:4px;font-size:12px;line-height:1.55;}
+    .rule-list li::before{counter-increment:rule;content:counter(rule);position:absolute;left:10px;top:8px;width:24px;height:24px;border-radius:50%;background:#6f42c1;color:#fff;font-weight:bold;font-size:11px;display:flex;align-items:center;justify-content:center;}
+    .rule-list li code{background:#eee;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:11px;color:#0d47a1;}
+
+    .fc-note{background:#fffbea;border:1px dashed #ffc107;border-radius:4px;padding:8px 12px;margin-top:10px;font-size:11px;color:#664d03;line-height:1.6;}
+
+    .fc-alert{display:none;padding:8px 12px;border-radius:4px;font-size:11px;margin-bottom:8px;}
+    .fc-alert.error{background:#f8d7da;color:#842029;border:1px solid #f5c2c7;}
+    .fc-alert.success{background:#d1e7dd;color:#0f5132;border:1px solid #badbcc;}
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Thiết lập › Danh mục Function scalar</div>
+    <div class="page-title" style="position:relative;text-align:center;">
+      <span>DANH MỤC FUNCTION SCALAR</span>
+      <span style="position:absolute;right:0;top:50%;transform:translateY(-50%);">
+        <button onclick="showRules()" style="background:#6f42c1;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;">&#128203; Quy tắc</button>
+      </span>
+    </div>
+
+    <div id="fc-alert" class="fc-alert"></div>
+
+    <!-- Toolbar filter -->
+    <div class="fc-toolbar">
+      <div class="grp">
+        <label>Tìm:</label>
+        <input type="text" id="f-search" placeholder="Tên function / mô tả..." oninput="applyFilter()">
+      </div>
+      <div class="grp">
+        <label>Nhóm:</label>
+        <select id="f-nhom" onchange="applyFilter()">
+          <option value="">-- Tất cả --</option>
+          <option>HR core</option>
+          <option>Chấm công</option>
+          <option>Sản lượng</option>
+          <option>Định mức</option>
+          <option>Khoản trừ/Thuế</option>
+          <option>Phụ cấp</option>
+        </select>
+      </div>
+      <div class="grp">
+        <label>Module:</label>
+        <select id="f-module" onchange="applyFilter()">
+          <option value="">-- Tất cả --</option>
+          <option value="set1">set1</option>
+          <option value="set2">set2</option>
+          <option value="both">Cả 2</option>
+        </select>
+      </div>
+      <div class="grp">
+        <label>Trạng thái:</label>
+        <select id="f-trangthai" onchange="applyFilter()">
+          <option value="">-- Tất cả --</option>
+          <option>Đề xuất</option>
+          <option>Đang phát triển</option>
+          <option>Đã có</option>
+          <option>Đang dùng</option>
+          <option>Chưa cần</option>
+        </select>
+      </div>
+      <div class="grp">
+        <label>Loại:</label>
+        <select id="f-loai" onchange="applyFilter()">
+          <option value="">-- Tất cả --</option>
+          <option>Scalar</option>
+          <option>iTVF</option>
+          <option>mTVF</option>
+        </select>
+      </div>
+      <button class="fc-btn search" onclick="applyFilter()">&#128269; Tìm</button>
+      <button class="fc-btn reset" onclick="resetFilter()">&#128260; Làm mới</button>
+      <button class="fc-btn add" onclick="openAddModal()">&#10133; Thêm</button>
+      <button class="fc-btn exp" onclick="alert('[Mockup] Xuất Excel — sẽ xuất danh sách theo bộ lọc hiện tại.')">&#128228; Xuất Excel</button>
+      <div class="fc-count" id="fc-count">0 / 0</div>
+    </div>
+
+    <!-- Grid -->
+    <div class="fc-grid-wrap">
+      <table class="fc-table">
+        <thead>
+          <tr>
+            <th style="width:36px;">STT</th>
+            <th style="min-width:220px;">Tên function</th>
+            <th style="width:110px;">Nhóm</th>
+            <th style="width:90px;">Module</th>
+            <th style="min-width:180px;">Mục đích</th>
+            <th style="min-width:200px;">Params</th>
+            <th style="width:110px;">Return</th>
+            <th style="min-width:260px;">Ví dụ SQL</th>
+            <th style="width:130px;">Ví dụ KQ</th>
+            <th style="width:70px;">Loại</th>
+            <th style="width:110px;">Trạng thái</th>
+            <th style="width:78px;text-align:center;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="fc-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Ghi chú nghiệp vụ -->
+    <div class="fc-note">
+      <b>&#128221; Ghi chú nghiệp vụ:</b><br>
+      &bull; Danh mục này là <b>hợp đồng giữa BA ↔ Dev</b>: BA đề xuất function cần có, dev implement và update trạng thái.<br>
+      &bull; Cột <code>cot</code> tham chiếu bảng Excel cấu trúc lương (VD C05 = hệ số BHXH, C13 = năng suất → đơn giá).<br>
+      &bull; Function <b>Scalar</b> return 1 giá trị đơn — nếu cần trả nhiều cột/dòng, chuyển sang <b>iTVF/mTVF</b> (Table-Valued Function).<br>
+      &bull; Đồng bộ tên params với <a href="set0-param-hethong.html" target="_blank" style="color:#0056b3;font-weight:bold;">Danh mục Param hệ thống (set0)</a> để tránh 2 nguồn sự thật.
+    </div>
+  </div>
+
+  <!-- MODAL: Thêm/Sửa function -->
+  <div class="fc-modal-overlay" id="modal-edit">
+    <div class="fc-modal" style="width:600px;max-width:92vw;">
+      <div class="fc-modal-hdr">
+        <span id="modal-edit-title">&#10133; Thêm function scalar</span>
+        <button class="x" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="fc-modal-body">
+        <div class="fc-form">
+          <label class="req">Tên function</label>
+          <input type="text" id="fe-ten" placeholder="VD: dbo.HR_fnGetVungMien">
+
+          <label class="req">Nhóm</label>
+          <select id="fe-nhom">
+            <option>HR core</option>
+            <option>Chấm công</option>
+            <option>Sản lượng</option>
+            <option>Định mức</option>
+            <option>Khoản trừ/Thuế</option>
+            <option>Phụ cấp</option>
+          </select>
+
+          <label>Module dùng</label>
+          <select id="fe-module">
+            <option value="set1">set1</option>
+            <option value="set2" selected>set2</option>
+            <option value="set1,set2">Cả 2 (set1,set2)</option>
+          </select>
+
+          <label class="req">Mục đích</label>
+          <textarea id="fe-mucdich" rows="2" placeholder="Mô tả ngắn function làm gì..." style="font-family:inherit;"></textarea>
+
+          <label>Params</label>
+          <textarea id="fe-params" rows="2" placeholder="@EmpID varchar(20), @Date date, ..."></textarea>
+
+          <label>Return</label>
+          <input type="text" id="fe-return" placeholder="VD: decimal(18,2)">
+
+          <label>Ví dụ SQL</label>
+          <textarea id="fe-visql" rows="2" placeholder="dbo.HR_fnGetVungMien('1022906420','2026-07-31')"></textarea>
+
+          <label>Ví dụ KQ</label>
+          <input type="text" id="fe-vikq" placeholder="VD: 2">
+
+          <label>Cột liên quan</label>
+          <input type="text" id="fe-cot" placeholder="VD: C20 hoặc (input)">
+
+          <label>Loại</label>
+          <select id="fe-loai">
+            <option>Scalar</option>
+            <option>iTVF</option>
+            <option>mTVF</option>
+          </select>
+
+          <label>Trạng thái</label>
+          <select id="fe-trangthai">
+            <option>Đề xuất</option>
+            <option>Đang phát triển</option>
+            <option>Đã có</option>
+            <option>Đang dùng</option>
+            <option>Chưa cần</option>
+          </select>
+        </div>
+      </div>
+      <div class="fc-modal-ftr">
+        <button class="btn-cancel" onclick="closeEditModal()">Hủy</button>
+        <button class="btn-save" onclick="saveFunction()">&#128190; Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Quy tắc -->
+  <div class="fc-modal-overlay fc-rule-modal" id="modal-rules">
+    <div class="fc-modal" style="width:720px;max-width:94vw;">
+      <div class="fc-modal-hdr">
+        <span>&#128203; Quy tắc — Danh mục Function scalar</span>
+        <button class="x" onclick="document.getElementById('modal-rules').style.display='none'">&times;</button>
+      </div>
+      <div class="fc-modal-body">
+        <ol class="rule-list">
+          <li><b>Prefix chuẩn theo domain:</b> <code>HR_fn*</code> (nhân sự), <code>PTS_fn*</code> (chấm công), <code>PR_LSP_fn*</code> (lương sản phẩm), <code>PR_fn*</code> (lương chung), <code>PIT_fn*</code> (thuế TNCN).</li>
+          <li><b>Function Scalar KHÔNG return bảng.</b> Cần trả nhiều cột/dòng thì convert sang <b>iTVF</b> (inline) hoặc <b>mTVF</b> (multi-statement). iTVF ưu tiên vì optimizer inline được.</li>
+          <li><b>Tên params phải đồng bộ Danh mục Param hệ thống (set0):</b> <code>@EmpID</code>, <code>@FromDate</code>/<code>@ToDate</code>, <code>@PRMonth</code>, <code>@PRYear</code>, <code>@BPTL</code>... — không tự đặt tên khác.</li>
+          <li><b>Function đọc kỳ trước</b> (retro / kỳ trước liền kề) → param dạng <code>@Prev_&lt;Mã&gt;</code> (template chuẩn). Engine set2 auto-parse để build dependency.</li>
+          <li><b>Trạng thái mặc định = "Đề xuất"</b> khi BA tạo mới. Dev chuyển sang <b>"Đang phát triển"</b> khi bắt tay code, <b>"Đã có"</b> khi review + deploy. <b>"Chưa cần"</b> giữ lại cho tương lai.</li>
+          <li><b>SQL Server &lt; 2019:</b> scalar UDF không inline → performance kém khi gọi trong SELECT hàng loạt. Cân nhắc <b>iTVF trả 1 cột</b> + <code>CROSS APPLY</code> để tăng tốc, hoặc bật <code>INLINE = ON</code> nếu SQL 2019+.</li>
+        </ol>
+      </div>
+      <div class="fc-modal-ftr">
+        <button class="btn-cancel" onclick="document.getElementById('modal-rules').style.display='none'">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MOCK_FUNCTIONS = [
+      { stt:1, ten:'dbo.HR_fnGetDonVi', nhom:'HR core', module:'set1,set2', mucDich:'Lấy mã đơn vị cấp N của NV tại thời điểm', params:'@EmpID varchar(20), @Date date, @Level tinyint', ret:'varchar(20)', viDuSQL:"dbo.HR_fnGetDonVi('1022906420','2026-07-31',5)", viDuKQ:"'CB101'", cot:'C70', loai:'Scalar', trangThai:'Đã có' },
+      { stt:2, ten:'dbo.HR_fnGetTenDonVi', nhom:'HR core', module:'set1,set2', mucDich:'Lấy tên đơn vị cấp N', params:'@EmpID, @Date, @Level tinyint', ret:'nvarchar(200)', viDuSQL:"dbo.HR_fnGetTenDonVi('1022906420','2026-07-31',5)", viDuKQ:"'Chế biến tải 01 ka 1'", cot:'C71', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:3, ten:'dbo.HR_fnGetNhomLuong', nhom:'HR core', module:'set1,set2', mucDich:'Lấy nhóm lương cấp N', params:'@EmpID, @PRMonth int, @Cap tinyint', ret:'varchar(20)', viDuSQL:"dbo.HR_fnGetNhomLuong('1022906420',7,1)", viDuKQ:"'Lương CN'", cot:'C72-C74', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:4, ten:'dbo.HR_fnGetBPTinhLuong', nhom:'HR core', module:'set1,set2', mucDich:'Lấy bộ phận tính lương', params:'@EmpID, @PRMonth, @PRYear', ret:'varchar(20)', viDuSQL:"dbo.HR_fnGetBPTinhLuong('1022906420',7,2026)", viDuKQ:"'CB'", cot:'C75', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:5, ten:'dbo.HR_fnGetBPGom', nhom:'HR core', module:'set1,set2', mucDich:'BP gom (bảng kê)', params:'@EmpID, @PRMonth, @PRYear', ret:'varchar(20)', viDuSQL:"dbo.HR_fnGetBPGom('1022906420',7,2026)", viDuKQ:"'Chế Biến'", cot:'C76', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:6, ten:'dbo.HR_fnGetHeSoBHXH', nhom:'HR core', module:'set2', mucDich:'Hệ số BHXH', params:'@EmpID, @Date', ret:'decimal(6,3)', viDuSQL:"dbo.HR_fnGetHeSoBHXH('1022906420','2026-07-31')", viDuKQ:"1.103", cot:'C05', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:7, ten:'dbo.HR_fnGetLuongCoBan', nhom:'HR core', module:'set2', mucDich:'Lương cơ bản NV', params:'@EmpID, @Date', ret:'decimal(18,2)', viDuSQL:"dbo.HR_fnGetLuongCoBan('1022906420','2026-07-31')", viDuKQ:"4650000", cot:'(input)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:8, ten:'dbo.PTS_fnGetCongChiTietNgay', nhom:'Chấm công', module:'set2', mucDich:'Số công thực tế', params:'@EmpID, @FromDate, @ToDate', ret:'decimal(6,2)', viDuSQL:"dbo.PTS_fnGetCongChiTietNgay('1022906420','2026-07-01','2026-07-31')", viDuKQ:"20.4", cot:'C06', loai:'Scalar', trangThai:'Đã có' },
+      { stt:9, ten:'dbo.PTS_fnGetGioLV', nhom:'Chấm công', module:'set2', mucDich:'Giờ LV theo loại', params:'@EmpID, @FromDate, @ToDate, @Loai varchar(20)', ret:'decimal(9,2)', viDuSQL:"dbo.PTS_fnGetGioLV('1022906420','2026-07-01','2026-07-31','TRONG_GIO')", viDuKQ:"162.56", cot:'C22-C27', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:10, ten:'dbo.PTS_fnGetGioNgungViec', nhom:'Chấm công', module:'set2', mucDich:'Giờ ngừng việc', params:'@EmpID, @FromDate, @ToDate, @Loai', ret:'decimal(9,2)', viDuSQL:"dbo.PTS_fnGetGioNgungViec('1022906420','2026-07-01','2026-07-31','GIUA_CA')", viDuKQ:"5.0", cot:'C29-C30', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:11, ten:'dbo.PTS_fnGetSoPhanAn', nhom:'Chấm công', module:'set2', mucDich:'Số phần ăn cơm', params:'@EmpID, @FromDate, @ToDate', ret:'int', viDuSQL:"dbo.PTS_fnGetSoPhanAn('1022906420','2026-07-01','2026-07-31')", viDuKQ:"25", cot:'C07', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:12, ten:'dbo.PTS_fnGetPhepNam', nhom:'Chấm công', module:'set2', mucDich:'Phép năm theo loại', params:'@EmpID, @PRYear int, @Loai varchar(10)', ret:'decimal(5,2)', viDuSQL:"dbo.PTS_fnGetPhepNam('1022906420',2026,'CHE_DO')", viDuKQ:"14.0", cot:'C68-C69', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:13, ten:'dbo.PTS_fnGetCongNghiLe', nhom:'Chấm công', module:'set2', mucDich:'Công nghỉ Lễ', params:'@EmpID, @PRMonth, @PRYear, @LoaiLe tinyint', ret:'decimal(5,2)', viDuSQL:"dbo.PTS_fnGetCongNghiLe('1022906420',7,2026,1)", viDuKQ:"0", cot:'C78-C79', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:14, ten:'dbo.PR_LSP_fnGetNS', nhom:'Sản lượng', module:'set2', mucDich:'Năng suất cá nhân', params:'@EmpID, @BPTL, @CongDoanMa, @FromDate, @ToDate', ret:'decimal(18,4)', viDuSQL:"dbo.PR_LSP_fnGetNS('1022906420','CB','CD01','2026-07-01','2026-07-31')", viDuKQ:"12450.5000", cot:'(input C13)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:15, ten:'dbo.PR_LSP_fnGetTongLSP_Dept', nhom:'Sản lượng', module:'set2', mucDich:'Tổng LSP đơn vị', params:'@DeptID, @BPTL, @PRMonth', ret:'decimal(18,2)', viDuSQL:"dbo.PR_LSP_fnGetTongLSP_Dept('CB101','CB',7)", viDuKQ:"856000000", cot:'(aggr)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:16, ten:'dbo.PR_LSP_fnGetTongCong_Dept', nhom:'Sản lượng', module:'set2', mucDich:'Tổng công đơn vị', params:'@DeptID, @BPTL, @PRMonth', ret:'decimal(9,2)', viDuSQL:"dbo.PR_LSP_fnGetTongCong_Dept('CB101','CB',7)", viDuKQ:"540.5", cot:'(aggr)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:17, ten:'dbo.PR_LSP_fnGetBinhQuan_Ka', nhom:'Sản lượng', module:'set2', mucDich:'Bình quân theo ca', params:'@KaID, @BPTL, @PRMonth', ret:'decimal(18,2)', viDuSQL:"dbo.PR_LSP_fnGetBinhQuan_Ka('KA_SANG','CB',7)", viDuKQ:"6250000", cot:'(aggr)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:18, ten:'dbo.PR_LSP_fnGetDonGia', nhom:'Định mức', module:'set2', mucDich:'Đơn giá công đoạn', params:'@EmpID, @BPTL, @CongDoanMa, @FromDate, @ToDate', ret:'decimal(18,4)', viDuSQL:"dbo.PR_LSP_fnGetDonGia('1022906420','CB','CD01','2026-07-01','2026-07-31')", viDuKQ:"385.0000", cot:'(input C13)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:19, ten:'dbo.PR_LSP_fnGetHeSo', nhom:'Định mức', module:'set2', mucDich:'Hệ số điều chỉnh', params:'@Prev_HT_TS_CongThucTe, @EmpID, @PRMonth, @Lan tinyint', ret:'decimal(6,3)', viDuSQL:"dbo.PR_LSP_fnGetHeSo(22.5,'1022906420',7,1)", viDuKQ:"1.085", cot:'(hệ số ĐC)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:20, ten:'dbo.PR_LSP_fnGetCongChuan', nhom:'Định mức', module:'set2', mucDich:'Công chuẩn tháng', params:'@PRMonth, @PRYear', ret:'decimal(5,2)', viDuSQL:"dbo.PR_LSP_fnGetCongChuan(7,2026)", viDuKQ:"26.0", cot:'(input)', loai:'Scalar', trangThai:'Đã có' },
+      { stt:21, ten:'dbo.PR_fnGetLuongToiThieuVung', nhom:'Định mức', module:'set2', mucDich:'Lương tối thiểu vùng', params:'@Vung tinyint, @Date', ret:'decimal(18,2)', viDuSQL:"dbo.PR_fnGetLuongToiThieuVung(2,'2026-07-31')", viDuKQ:"4160000", cot:'C20', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:22, ten:'dbo.PR_LSP_fnGetHoTro_QCSX', nhom:'Định mức', module:'set2', mucDich:'Hỗ trợ QCSX', params:'@BPTL, @NhomLuong, @PRMonth', ret:'decimal(6,3)', viDuSQL:"dbo.PR_LSP_fnGetHoTro_QCSX('CB','LCN',7)", viDuKQ:"0.05", cot:'C15', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:23, ten:'dbo.PR_fnGetKhoanTruThang', nhom:'Khoản trừ/Thuế', module:'set2', mucDich:'Tổng khoản trừ tháng', params:'@EmpID, @PRMonth, @PRYear', ret:'decimal(18,2)', viDuSQL:"dbo.PR_fnGetKhoanTruThang('1022906420',7,2026)", viDuKQ:"479474", cot:'C56', loai:'Scalar', trangThai:'Đã có' },
+      { stt:24, ten:'dbo.PIT_fnGetGiamTru', nhom:'Khoản trừ/Thuế', module:'set2', mucDich:'Giảm trừ thuế', params:'@EmpID, @TaxYear', ret:'decimal(18,2)', viDuSQL:"dbo.PIT_fnGetGiamTru('1022906420',2026)", viDuKQ:"15400000", cot:'(input thuế)', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:25, ten:'dbo.PR_fnGetQuyTinhThuong', nhom:'Khoản trừ/Thuế', module:'set2', mucDich:'Quỹ tình thương', params:'@EmpID, @PRMonth, @PRYear', ret:'decimal(18,2)', viDuSQL:"dbo.PR_fnGetQuyTinhThuong('1022906420',7,2026)", viDuKQ:"10000", cot:'C58', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:26, ten:'dbo.PR_LSP_fnGetPhuCapKy', nhom:'Phụ cấp', module:'set2', mucDich:'Phụ cấp theo loại', params:'@EmpID, @PRMonth, @LoaiPC varchar(20)', ret:'decimal(18,2)', viDuSQL:"dbo.PR_LSP_fnGetPhuCapKy('1022906420',7,'PHA_XANG')", viDuKQ:"84000", cot:'C43', loai:'Scalar', trangThai:'Đã có' },
+      { stt:27, ten:'dbo.PR_LSP_fnGetHoTro_CNMoi', nhom:'Phụ cấp', module:'set2', mucDich:'Hỗ trợ CN mới', params:'@EmpID, @PRMonth, @PRYear', ret:'decimal(18,2)', viDuSQL:"dbo.PR_LSP_fnGetHoTro_CNMoi('1022906420',7,2026)", viDuKQ:"0", cot:'C14, C50', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:28, ten:'dbo.HR_fnGetHoTen', nhom:'HR core', module:'set1', mucDich:'Lấy họ tên NV tại thời điểm', params:'@EmpID varchar(20), @Date date', ret:'nvarchar(100)', viDuSQL:"dbo.HR_fnGetHoTen('1022906420','2026-07-31')", viDuKQ:"'Huỳnh Thị Nuôl'", cot:'C01+C02', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:29, ten:'dbo.HR_fnGetMaPBChiPhi', nhom:'HR core', module:'set1', mucDich:'Mã phân bổ chi phí NV', params:'@EmpID, @Date date', ret:'varchar(20)', viDuSQL:"dbo.HR_fnGetMaPBChiPhi('1022906420','2026-07-31')", viDuKQ:"'CB-CB101'", cot:'C70', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:30, ten:'dbo.HR_fnGetSoNguoiPhuThuoc', nhom:'HR core', module:'set2', mucDich:'Số người phụ thuộc thuế TNCN', params:'@EmpID, @TaxYear int', ret:'int', viDuSQL:"dbo.HR_fnGetSoNguoiPhuThuoc('1022906420',2026)", viDuKQ:"2", cot:'(giảm trừ thuế)', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:31, ten:'dbo.PTS_fnGetCaChinh', nhom:'Chấm công', module:'set1', mucDich:'Ca làm việc chính', params:'@EmpID, @Date', ret:'varchar(10)', viDuSQL:"dbo.PTS_fnGetCaChinh('1022906420','2026-07-31')", viDuKQ:"'KA1'", cot:'(filter)', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:32, ten:'dbo.PTS_fnGetChoTienAn', nhom:'Chấm công', module:'set2', mucDich:'Cờ cho tiền ăn (1/0)', params:'@EmpID, @PRMonth int', ret:'int', viDuSQL:"dbo.PTS_fnGetChoTienAn('1022906420',7)", viDuKQ:"1", cot:'C04', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:33, ten:'dbo.PIT_fnCalcThue', nhom:'Khoản trừ/Thuế', module:'set2', mucDich:'Tính thuế TNCN progressive 7 bậc', params:'@TNChiuThue decimal(18,2), @TaxYear int, @GiamTru decimal(18,2)', ret:'decimal(18,2)', viDuSQL:"dbo.PIT_fnCalcThue(25000000, 2026, 24200000)", viDuKQ:"40000", cot:'C59', loai:'Scalar', trangThai:'Đề xuất' },
+      { stt:34, ten:'dbo.PR_LSP_fnGetMaxLuongGopKy', nhom:'Sản lượng', module:'set2', mucDich:'CROSS-ROW: MAX lương gộp của NV trong kỳ (dùng cho trích BH 1 lần)', params:'@EmpID, @PRMonth int, @PRYear int', ret:'decimal(18,2)', viDuSQL:"dbo.PR_LSP_fnGetMaxLuongGopKy('1022906002',5,2026)", viDuKQ:"6200000", cot:'(cross-row)', loai:'Scalar', trangThai:'Đang dùng' },
+      { stt:35, ten:'dbo.PR_LSP_fnGetSumTNChiuThueKy', nhom:'Sản lượng', module:'set2', mucDich:'CROSS-ROW: SUM TN chịu thuế toàn kỳ của NV (dùng cho thuế TNCN)', params:'@EmpID, @PRMonth, @PRYear', ret:'decimal(18,2)', viDuSQL:"dbo.PR_LSP_fnGetSumTNChiuThueKy('1022906002',5,2026)", viDuKQ:"10700000", cot:'(cross-row)', loai:'Scalar', trangThai:'Đang dùng' },
+      { stt:36, ten:'dbo.PR_fnGetTrichBH_RowV2', nhom:'Khoản trừ/Thuế', module:'set2', mucDich:'Trích BH per-row với isMax flag (chỉ dòng MAX mới trích) — gọi PR_fnGetTranBHVung để cap base. V1 legacy (@EmpID,@PRMonth,@PRYear,@RowIndex) giữ nguyên cho LSP/LNS backward-compat; V2 dùng cho LTG engine.', params:'@EmpID varchar(20), @KyID varchar(30), @LuotDong int', ret:'decimal(18,2)', viDuSQL:"dbo.PR_fnGetTrichBH_RowV2('1022906002','KY_202605_LTG',1)", viDuKQ:"430000", cot:'C56 per-row', loai:'Scalar', trangThai:'Đang dùng' },
+      { stt:37, ten:'dbo.PR_fnGetTranBHVung', nhom:'Khoản trừ/Thuế', module:'set2', mucDich:'Trần lương đóng BH theo vùng của NV tại @Date (NV → Đơn vị → Vùng I/II/III/IV → LTT vùng × 20). Configurable qua HR data / Salary Config, engine không hardcode. Return decimal(18,2) để tránh round-off khi so sánh trần BH biên (VD 72,800,000.00001 vs 72,800,000).', params:'@EmpID varchar(20), @Date datetime', ret:'decimal(18,2)', viDuSQL:"dbo.PR_fnGetTranBHVung(@EmpID, @ToDate)", viDuKQ:"72800000", cot:'(cap BH, dùng trong PR_fnGetTrichBH_RowV2)', loai:'Scalar', trangThai:'Đang dùng' }
+    ];
+
+    let editingIdx = -1;
+
+    const NHOM_CLASS = {
+      'HR core':'nb-hr-core',
+      'Chấm công':'nb-cham-cong',
+      'Sản lượng':'nb-san-luong',
+      'Định mức':'nb-dinh-muc',
+      'Khoản trừ/Thuế':'nb-khoan-tru',
+      'Phụ cấp':'nb-phu-cap'
+    };
+    const ST_CLASS = {
+      'Đề xuất':'st-de-xuat',
+      'Đang phát triển':'st-dang-phat',
+      'Đã có':'st-da-co',
+      'Đang dùng':'st-dang-dung',
+      'Chưa cần':'st-chua-can'
+    };
+
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    function showAlert(msg, type){
+      const el = document.getElementById('fc-alert');
+      el.className = 'fc-alert ' + type;
+      el.innerHTML = msg;
+      el.style.display = 'block';
+      if (type === 'success') setTimeout(()=>{ el.style.display='none'; }, 2500);
+    }
+
+    function applyFilter(){
+      const q = document.getElementById('f-search').value.trim().toLowerCase();
+      const nhom = document.getElementById('f-nhom').value;
+      const modF = document.getElementById('f-module').value;
+      const st = document.getElementById('f-trangthai').value;
+      const loai = document.getElementById('f-loai').value;
+
+      const filtered = MOCK_FUNCTIONS.filter(r=>{
+        if (q && !((r.ten||'').toLowerCase().includes(q) || (r.mucDich||'').toLowerCase().includes(q))) return false;
+        if (nhom && r.nhom !== nhom) return false;
+        if (modF){
+          if (modF === 'both'){ if (r.module !== 'set1,set2') return false; }
+          else { if (!(r.module||'').split(',').map(x=>x.trim()).includes(modF)) return false; }
+        }
+        if (st && r.trangThai !== st) return false;
+        if (loai && r.loai !== loai) return false;
+        return true;
+      });
+      renderGrid(filtered);
+    }
+
+    function resetFilter(){
+      document.getElementById('f-search').value = '';
+      document.getElementById('f-nhom').value = '';
+      document.getElementById('f-module').value = '';
+      document.getElementById('f-trangthai').value = '';
+      document.getElementById('f-loai').value = '';
+      renderGrid(MOCK_FUNCTIONS);
+    }
+
+    function renderGrid(data){
+      if (!data) data = MOCK_FUNCTIONS;
+      const tbody = document.getElementById('fc-tbody');
+      let html = '';
+      data.forEach((r, i)=>{
+        const nbCls = NHOM_CLASS[r.nhom] || '';
+        const stCls = ST_CLASS[r.trangThai] || 'st-de-xuat';
+        const realIdx = MOCK_FUNCTIONS.indexOf(r);
+        html += '<tr>'
+          + '<td style="text-align:center;">'+(i+1)+'</td>'
+          + '<td class="fc-mono fc-name">'+esc(r.ten)+'<div style="font-size:9.5px;color:#888;font-weight:normal;">cột: '+esc(r.cot)+'</div></td>'
+          + '<td><span class="badge '+nbCls+'">'+esc(r.nhom)+'</span></td>'
+          + '<td class="fc-mono" style="font-size:10.5px;">'+esc(r.module)+'</td>'
+          + '<td>'+esc(r.mucDich)+'</td>'
+          + '<td class="fc-mono" style="font-size:10.5px;white-space:pre-wrap;">'+esc(r.params)+'</td>'
+          + '<td class="fc-mono" style="font-size:10.5px;">'+esc(r.ret)+'</td>'
+          + '<td class="fc-code-cell"><code>'+esc(r.viDuSQL)+'</code></td>'
+          + '<td class="fc-mono" style="font-size:10.5px;">'+esc(r.viDuKQ)+'</td>'
+          + '<td>'+esc(r.loai)+'</td>'
+          + '<td><span class="badge '+stCls+'">'+esc(r.trangThai)+'</span></td>'
+          + '<td><div class="action-btns">'
+            + '<button title="Sửa" onclick="openEditModal('+realIdx+')">&#9998;</button>'
+            + '<button title="Copy tên" onclick="copyName('+realIdx+')">&#128203;</button>'
+            + '<button title="Xóa" onclick="delFunction('+realIdx+')">&#128465;</button>'
+          + '</div></td>'
+          + '</tr>';
+      });
+      tbody.innerHTML = html || '<tr><td colspan="12" style="text-align:center;padding:20px;color:#999;font-style:italic;">Không có function phù hợp bộ lọc.</td></tr>';
+      document.getElementById('fc-count').textContent = data.length + ' / ' + MOCK_FUNCTIONS.length;
+    }
+
+    function openAddModal(){
+      editingIdx = -1;
+      document.getElementById('modal-edit-title').innerHTML = '&#10133; Thêm function scalar';
+      document.getElementById('fe-ten').value = '';
+      document.getElementById('fe-nhom').value = 'HR core';
+      document.getElementById('fe-module').value = 'set2';
+      document.getElementById('fe-mucdich').value = '';
+      document.getElementById('fe-params').value = '';
+      document.getElementById('fe-return').value = '';
+      document.getElementById('fe-visql').value = '';
+      document.getElementById('fe-vikq').value = '';
+      document.getElementById('fe-cot').value = '';
+      document.getElementById('fe-loai').value = 'Scalar';
+      document.getElementById('fe-trangthai').value = 'Đề xuất';
+      document.getElementById('modal-edit').style.display = 'flex';
+    }
+
+    function openEditModal(idx){
+      const r = MOCK_FUNCTIONS[idx];
+      if (!r) return;
+      editingIdx = idx;
+      document.getElementById('modal-edit-title').innerHTML = '&#9998; Sửa function scalar';
+      document.getElementById('fe-ten').value = r.ten || '';
+      document.getElementById('fe-nhom').value = r.nhom || 'HR core';
+      document.getElementById('fe-module').value = r.module || 'set2';
+      document.getElementById('fe-mucdich').value = r.mucDich || '';
+      document.getElementById('fe-params').value = r.params || '';
+      document.getElementById('fe-return').value = r.ret || '';
+      document.getElementById('fe-visql').value = r.viDuSQL || '';
+      document.getElementById('fe-vikq').value = r.viDuKQ || '';
+      document.getElementById('fe-cot').value = r.cot || '';
+      document.getElementById('fe-loai').value = r.loai || 'Scalar';
+      document.getElementById('fe-trangthai').value = r.trangThai || 'Đề xuất';
+      document.getElementById('modal-edit').style.display = 'flex';
+    }
+
+    function closeEditModal(){ document.getElementById('modal-edit').style.display = 'none'; }
+
+    function saveFunction(){
+      const ten = document.getElementById('fe-ten').value.trim();
+      const mucDich = document.getElementById('fe-mucdich').value.trim();
+      if (!ten || !mucDich){
+        alert('Vui lòng nhập Tên function và Mục đích.');
+        return;
+      }
+      const obj = {
+        stt: 0,
+        ten: ten,
+        nhom: document.getElementById('fe-nhom').value,
+        module: document.getElementById('fe-module').value,
+        mucDich: mucDich,
+        params: document.getElementById('fe-params').value.trim(),
+        ret: document.getElementById('fe-return').value.trim(),
+        viDuSQL: document.getElementById('fe-visql').value.trim(),
+        viDuKQ: document.getElementById('fe-vikq').value.trim(),
+        cot: document.getElementById('fe-cot').value.trim(),
+        loai: document.getElementById('fe-loai').value,
+        trangThai: document.getElementById('fe-trangthai').value
+      };
+      if (editingIdx >= 0){
+        obj.stt = MOCK_FUNCTIONS[editingIdx].stt;
+        MOCK_FUNCTIONS[editingIdx] = obj;
+        showAlert('Đã cập nhật function <b>'+esc(ten)+'</b>.', 'success');
+      } else {
+        obj.stt = MOCK_FUNCTIONS.length + 1;
+        MOCK_FUNCTIONS.push(obj);
+        showAlert('Đã thêm function <b>'+esc(ten)+'</b>.', 'success');
+      }
+      closeEditModal();
+      applyFilter();
+    }
+
+    function delFunction(idx){
+      const r = MOCK_FUNCTIONS[idx];
+      if (!r) return;
+      if (!confirm('Xóa function ['+r.ten+']?')) return;
+      MOCK_FUNCTIONS.splice(idx, 1);
+      applyFilter();
+      showAlert('Đã xóa function.', 'success');
+    }
+
+    function copyName(idx){
+      const r = MOCK_FUNCTIONS[idx];
+      if (!r) return;
+      if (navigator.clipboard){
+        navigator.clipboard.writeText(r.ten).then(()=>{
+          showAlert('Đã copy: <code>'+esc(r.ten)+'</code>', 'success');
+        }).catch(()=>{ prompt('Copy thủ công:', r.ten); });
+      } else {
+        prompt('Copy thủ công:', r.ten);
+      }
+    }
+
+    function showRules(){ document.getElementById('modal-rules').style.display = 'flex'; }
+
+    renderGrid(MOCK_FUNCTIONS);
+  </script>
+</body>
+</html>

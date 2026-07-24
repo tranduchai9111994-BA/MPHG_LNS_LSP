@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH PHU – Lương Sản Phẩm</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <style>
+      .param-grid { min-width:1050px; }
+      .param-grid th, .param-grid td { font-size:11px; vertical-align:top; }
+      .param-grid td.col-ma { font-family:Consolas,monospace; font-weight:bold; color:#0056b3; white-space:nowrap; text-align:left; }
+      .param-grid td.col-kieu { font-family:Consolas,monospace; font-size:10px; text-align:center; }
+      .param-grid td.col-mucdich { text-align:left; word-wrap:break-word; white-space:normal; }
+      .param-grid td.col-khadung { text-align:center; }
+      .param-grid td.col-vidu { word-wrap:break-word; white-space:normal; font-family:Consolas,monospace; font-size:10px; color:#555; text-align:left; line-height:1.5; }
+      .param-grid td.col-vidu-num { word-wrap:break-word; white-space:normal; font-family:Consolas,monospace; font-size:10px; color:#0056b3; text-align:left; line-height:1.5; }
+      .param-grid td.col-status { text-align:center; white-space:nowrap; }
+      .param-grid td.col-ghichu { text-align:left; word-wrap:break-word; white-space:normal; line-height:1.5; }
+      .filter-row { display:flex; gap:15px; align-items:center; flex-wrap:wrap; }
+      .filter-row label { font-size:12px; color:#333; font-weight:bold; }
+      .filter-row input, .filter-row select { height:26px; font-size:12px; border:1px solid #ccc; padding:2px 6px; }
+      .filter-row input[type="text"] { width:200px; }
+      .filter-row select { min-width:160px; }
+      /* Status badges */
+      .status-badge { display:inline-block; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:bold; white-space:nowrap; }
+      .status-active   { background:#d4edda; color:#155724; border:1px solid #28a745; }
+      .status-reserved { background:#fff3cd; color:#856404; border:1px solid #ffc107; }
+      .status-internal { background:#e2e3e5; color:#495057; border:1px solid #6c757d; }
+      /* Status legend in info-bar */
+      .status-legend { display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-top:6px; padding-top:6px; border-top:1px dashed #ffd600; font-size:11px; color:#555; }
+      .status-legend .status-badge { margin-right:4px; }
+    </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+    <div class="breadcrumb">Lương › Thiết lập (System) › Thiết lập công thức tính lương › Danh mục Param hệ thống</div>
+    <div class="page-title">DANH MỤC PARAM HỆ THỐNG</div>
+
+    <div class="info-bar" style="margin-bottom:10px;">
+      ĐẶC ĐIỂM: Danh sách tham số hệ thống do Dev cung cấp sẵn trong engine.
+      Khi tạo tiêu chí, user chọn param cần truyền vào function scalar —
+      <strong>param quyết định hành vi thực tế của function</strong> (không phải CalcLevel label).
+      <div class="status-legend">
+        <span><span class="status-badge status-active">Đang dùng</span> Có function scalar thực tế đang gọi (set1/set2).</span>
+        <span><span class="status-badge status-reserved">Dự phòng</span> Khai báo cho tương lai — chưa có function nào dùng, cần confirm nghiệp vụ trước khi phát triển.</span>
+        <span><span class="status-badge status-internal">Engine internal</span> Engine tự inject/tính — khuyến nghị dùng Phân bổ đầu ra (set2/set4) thay vì tham chiếu thủ công.</span>
+      </div>
+    </div>
+
+    <div id="alertBox" class="alert-box"></div>
+
+    <div class="form-panel" style="padding:10px 15px;">
+      <div class="filter-row">
+        <label>Tên Param</label>
+        <input type="text" id="fltParam" placeholder="VD: @EmpID, @PRMonth...">
+        <label>Khả dụng khi</label>
+        <select id="fltKhaDung">
+          <option value="">Tất cả</option>
+          <option value="Luôn có">Luôn có</option>
+          <option value="Khi NV có quá trình">Khi NV có quá trình</option>
+        </select>
+        <label>Trạng thái</label>
+        <select id="fltTrangThai">
+          <option value="">Tất cả</option>
+          <option value="Đang dùng">Đang dùng</option>
+          <option value="Dự phòng">Dự phòng</option>
+          <option value="Engine internal">Engine internal</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions-bar">
+      <button class="btn-search" onclick="doSearch()">Tìm Kiếm</button>
+      <button class="btn-refresh" onclick="doRefresh()">Làm mới</button>
+      <button class="btn" style="background:#fd7e14;color:#fff;" onclick="alert('Chức năng xuất dữ liệu (demo)')">Xuất dữ liệu</button>
+    </div>
+
+    <div class="grid-container" style="max-height:65vh;">
+      <table class="param-grid" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="width:40px;">STT</th>
+            <th style="width:115px;">Tên Param</th>
+            <th style="width:85px;">Kiểu dữ liệu</th>
+            <th style="width:160px;">Mục đích</th>
+            <th style="width:95px;">Khả dụng khi</th>
+            <th style="width:230px;">Ví dụ sử dụng</th>
+            <th style="width:150px;">Ví dụ số liệu</th>
+            <th style="width:90px;">Trạng thái</th>
+            <th style="width:175px;">Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody id="gridBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Ghi chú nghiệp vụ -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="BA nhập ghi chú, open points, điểm cần xác nhận với khách hàng..."></textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+
+  </div><!-- /.container -->
+
+  <script src="../shared/mockdata.js"></script>
+  <script src="../shared/utils.js"></script>
+  <script>
+// trangThai:
+//   'Đang dùng'       — có function scalar thực tế đang gọi param này (set1/set2)
+//   'Dự phòng'        — khai báo cho tương lai / module chưa triển khai, chưa có function nào dùng
+//   'Engine internal' — engine tự inject/tính; khuyến nghị dùng Phân bổ đầu ra (set2/set4) thay vì tham chiếu thủ công
+// Bộ giá trị mẫu (kỳ 05/2026, NV Nguyễn Thị Loan – 2 GĐ QTLV) — consistent với set1/set2.
+const MOCK_PARAMS = [
+  {ma:'@EmpID', kieu:'varchar(20)', mucDich:'Mã nhân viên đang xử lý', khaDung:'Luôn có', viDu:'dbo.HR_fnGetDonVi(@EmpID, @ToDate, 3) → truyền mã NV để lấy đơn vị cấp 3 tại thời điểm ToDate', viDuSoLieu:"'1022907668'  → Nguyễn Thị Loan", trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@DeptID', kieu:'varchar(20)', mucDich:'Mã bộ phận hiện tại của NV', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetHoTroBP(@DeptID, @PRMonth) → lấy % hỗ trợ BP theo tháng', viDuSoLieu:"'CB101' (GĐ1) hoặc 'CB102' (GĐ2)", trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@PRMonth', kieu:'int', mucDich:'Tháng kỳ lương (1-12)', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetCongChuan(@PRMonth, @PRYear) → lấy công chuẩn tháng', viDuSoLieu:'5', trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@PRYear', kieu:'int', mucDich:'Năm kỳ lương', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetCongChuan(@PRMonth, @PRYear)', viDuSoLieu:'2026', trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@KyID', kieu:'varchar(30)', mucDich:'Mã kỳ lương duy nhất (định danh nghiệp vụ của kỳ)', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetTongLuongKy(@EmpID, @KyID) → tổng lương của NV trong 1 kỳ cụ thể (aggregate cross-row cùng kỳ)\ndbo.PR_LSP_fnGetLuongKyTruoc(@EmpID, @KyID) → truy vấn kỳ liền trước dựa trên @KyID', viDuSoLieu:"'KY_202605_LSP'", trangThai:'Đang dùng', ghiChu:'Derive trực tiếp từ set5 (Tạo kỳ) — không phụ thuộc NV. Dùng cho function aggregate cross-row trong cùng kỳ, audit trail, và truy vấn liên kỳ chính xác hơn @PRMonth/@PRYear (khi 1 tháng có nhiều kỳ: LSP + LNS + Kỳ 13).'},
+  {ma:'@ToDate', kieu:'date', mucDich:'Ngày cuối kỳ lương', khaDung:'Luôn có', viDu:'dbo.HR_fnGetDonVi(@EmpID, @ToDate, 3) → lấy đơn vị tại ngày cuối kỳ (dùng cho Phân bổ = Mới nhất)', viDuSoLieu:"'31/05/2026'", trangThai:'Đang dùng', ghiChu:'BA truyền @ToDate khi muốn tiêu chí trả giá trị chốt tại cuối kỳ (Phân bổ = Mới nhất). Nếu bảng có quá trình, lấy bản ghi hiệu lực tại @ToDate.'},
+  {ma:'@FromDate', kieu:'date', mucDich:'Ngày đầu kỳ lương', khaDung:'Luôn có', viDu:'dbo.HR_fnGetDonVi(@EmpID, @FromDate, 3) → lấy đơn vị tại ngày đầu kỳ (dùng cho Phân bổ = Cũ nhất)', viDuSoLieu:"'01/05/2026'", trangThai:'Đang dùng', ghiChu:'BA truyền @FromDate khi muốn tiêu chí trả giá trị chốt tại đầu kỳ (Phân bổ = Cũ nhất)'},
+  {ma:'@SliceFromDate', kieu:'date', mucDich:'Ngày đầu giai đoạn QTLV', khaDung:'Khi NV có quá trình công tác trong kỳ', viDu:'dbo.PTS_fnGetCongSlice(@EmpID, @SliceFromDate, @SliceToDate) → công thực tế trong giai đoạn', viDuSoLieu:"GĐ1: '01/05/2026'\nGĐ2: '16/05/2026'", trangThai:'Đang dùng', ghiChu:'Chỉ có giá trị khi NV có >=2 giai đoạn QTLV; nếu NV chỉ có 1 GĐ thì = @FromDate'},
+  {ma:'@SliceToDate', kieu:'date', mucDich:'Ngày cuối giai đoạn QTLV', khaDung:'Khi NV có quá trình công tác trong kỳ', viDu:'dbo.HR_fnGetDonVi(@EmpID, @SliceToDate, 3) → lấy đơn vị tại ngày cuối GĐ (dùng cho Phân bổ = Theo giai đoạn)', viDuSoLieu:"GĐ1: '15/05/2026'\nGĐ2: '31/05/2026'", trangThai:'Đang dùng', ghiChu:'Nếu NV chỉ có 1 GĐ thì = @ToDate. BA truyền @SliceToDate khi muốn giá trị đổi theo từng GĐ QTLV (Phân bổ = Theo giai đoạn).'},
+  {ma:'@BPTL', kieu:'varchar(20)', mucDich:'Mã bộ phận tính lương', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetDonGia(@BPTL, @CongDoanMa) → đơn giá theo BP tính lương + công đoạn', viDuSoLieu:"'BPTL_001'", trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@NTL', kieu:'varchar(20)', mucDich:'Mã nhóm tính lương', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetHeSo(@NTL, @PRMonth) → hệ số theo nhóm tính lương', viDuSoLieu:"'NTL_A'", trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@CongDoanMa', kieu:'varchar(20)', mucDich:'Mã công đoạn sản xuất', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetDonGia(@BPTL, @CongDoanMa)', viDuSoLieu:"'CD01'", trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@DeptL1..L5', kieu:'nvarchar(100)', mucDich:'Tên đơn vị cấp 1 đến cấp 5', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetBQ_VS(@DeptL3) → bình quân VS theo đơn vị cấp 3', viDuSoLieu:"@DeptL1 = 'Cty MPHG'\n@DeptL2 = 'NM Cà Mau'\n@DeptL3 = 'PX Chế biến 2'\n@DeptL4 = 'Ca 1'\n@DeptL5 = 'CB101'", trangThai:'Đang dùng', ghiChu:'5 param riêng: @DeptL1, @DeptL2, @DeptL3, @DeptL4, @DeptL5'},
+  {ma:'@SliceIndex', kieu:'int', mucDich:'Số thứ tự giai đoạn QTLV (1, 2, 3...)', khaDung:'Khi NV có quá trình công tác', viDu:'CASE WHEN @SliceIndex = 1 THEN ... → xử lý khác biệt giai đoạn đầu', viDuSoLieu:'GĐ1: 1\nGĐ2: 2', trangThai:'Đang dùng', ghiChu:''},
+  {ma:'@TotalSlices', kieu:'int', mucDich:'Tổng số giai đoạn QTLV trong kỳ', khaDung:'Khi NV có quá trình công tác', viDu:'CASE WHEN @SliceIndex = @TotalSlices THEN ... → nhận biết giai đoạn cuối', viDuSoLieu:'2', trangThai:'Đang dùng', ghiChu:'Dùng kết hợp @SliceIndex để biết giai đoạn nào là cuối'},
+  {ma:'@Prev_<Mã>', kieu:'float / nvarchar / datetime', mucDich:'Kết quả tiêu chí có Rank thấp hơn (thay <Mã> = mã tiêu chí đích)', khaDung:'Khi tiêu chí có Rank > 1', viDu:'dbo.PR_LSP_fnGetHeSo(@Prev_HT_TS_CongThucTe, @EmpID, @PRMonth) → truyền kết quả tiêu chí HT_TS_CongThucTe (đã tính ở Rank thấp hơn) vào function', viDuSoLieu:'@Prev_HT_TS_CongThucTe = 22.5\n(số công thực tế đã tính ở Rank thấp hơn)', trangThai:'Đang dùng', ghiChu:'<b>Template động</b> — engine auto-parse regex <code>@Prev_&lt;Mã&gt;</code> từ SQL để build dependency graph. Kiểu dữ liệu = kiểu output của tiêu chí đích (HT_/TT_ float, TK_ nvarchar/datetime). TK_ chỉ được dùng trong CASE WHEN, không dùng làm số.'},
+  {ma:'@CompanyID', kieu:'varchar(20)', mucDich:'Mã công ty', khaDung:'Luôn có', viDu:'dbo.PR_fnGetLuongCoSo(@CompanyID, @PRMonth) → lấy mức lương cơ sở theo công ty', viDuSoLieu:"'MPHG'", trangThai:'Đang dùng', ghiChu:'Dùng khi cần phân biệt chính sách lương theo công ty'},
+  {ma:'@KaID', kieu:'varchar(20)', mucDich:'Mã ca làm việc (Ka)', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetBQ_Ka(@BPTL, @KaID) → bình quân LSP theo ca', viDuSoLieu:"'KA_SANG'", trangThai:'Đang dùng', ghiChu:'Ka sáng / Ka chiều'},
+  {ma:'@BanID', kieu:'varchar(20)', mucDich:'Mã bàn / dây chuyền', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetMax_Ban(@BanID) → lương cao nhất bàn', viDuSoLieu:"'CB101'", trangThai:'Đang dùng', ghiChu:'Dùng cho tiêu chí Aggregate group theo Bàn'},
+  {ma:'@TaxYear', kieu:'int', mucDich:'Năm thuế TNCN', khaDung:'Luôn có', viDu:'dbo.PIT_fnGetGiamTru(@EmpID, @TaxYear) → giảm trừ gia cảnh theo năm thuế', viDuSoLieu:'2026', trangThai:'Đang dùng', ghiChu:'Có thể khác @PRYear khi kỳ lương tháng 12 tính thuế năm sau'},
+  {ma:'@NVID', kieu:'varchar(20)', mucDich:'Mã nhân viên (alias @EmpID theo module cũ)', khaDung:'Luôn có', viDu:'dbo.HR_fnGetThongTinNV(@NVID) → thông tin NV từ module HR cũ', viDuSoLieu:"'1022907668'  (= @EmpID)", trangThai:'Đang dùng', ghiChu:'Alias của @EmpID — một số function module cũ dùng @NVID thay vì @EmpID. <b>Khuyến nghị</b>: ưu tiên @EmpID cho function mới.'},
+  {ma:'@NTL2', kieu:'varchar(20)', mucDich:'Mã nhóm tính lương cấp 2', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetHeSoNTL2(@NTL2, @PRMonth) → hệ số theo nhóm TL cấp 2', viDuSoLieu:'(chưa có mẫu — chờ khách confirm)', trangThai:'Dự phòng', ghiChu:'Con của @NTL (nhóm tính lương cấp 1). Chưa có function nào của MPHG dùng — chờ nghiệp vụ xác nhận có 3 cấp NTL hay không.'},
+  {ma:'@NTL3', kieu:'varchar(20)', mucDich:'Mã nhóm tính lương cấp 3', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetDonGiaNTL3(@NTL3, @CongDoanMa) → đơn giá theo nhóm TL cấp 3', viDuSoLieu:'(chưa có mẫu — chờ khách confirm)', trangThai:'Dự phòng', ghiChu:'Con của @NTL2. Chưa có function nào dùng — chờ confirm nghiệp vụ.'},
+  {ma:'@BPBK', kieu:'varchar(20)', mucDich:'Mã bộ phận bảng kê', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetTongLSP_BPBK(@BPBK, @PRMonth) → tổng LSP theo BP bảng kê', viDuSoLieu:'(chưa có mẫu — chờ khách confirm)', trangThai:'Dự phòng', ghiChu:'Bộ phận dùng cho bảng kê lương. Chưa có function dùng — cần confirm có khác @DeptID/@BPTL không.'},
+  {ma:'@QCTL', kieu:'varchar(20)', mucDich:'Mã quy cách tính lương', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetDonGiaQC(@QCTL, @CongDoanMa) → đơn giá theo quy cách', viDuSoLieu:'(chưa có mẫu — chờ khách confirm)', trangThai:'Dự phòng', ghiChu:'Quy cách xác định cách tính đơn giá/hệ số. Chưa có function — cần confirm có trùng khái niệm với @NTL không.'},
+  {ma:'@TienTrinh', kieu:'varchar(20)', mucDich:'Mã tiến trình sản xuất', khaDung:'Luôn có', viDu:'dbo.PR_LSP_fnGetNS_TienTrinh(@EmpID, @TienTrinh, @PRMonth) → năng suất theo tiến trình', viDuSoLieu:'(chưa có mẫu — chờ khách confirm)', trangThai:'Dự phòng', ghiChu:'Tiến trình: Tươi, Hấp, Luộc, Chiên... Đặc thù ngành thủy sản, chưa có function của MPHG dùng.'},
+  {ma:'@SliceDays', kieu:'int', mucDich:'Số ngày trong giai đoạn hiện tại', khaDung:'Khi NV có quá trình công tác', viDu:'LuongGD = LuongThang * @SliceDays / @TotalDays → prorata theo ngày giai đoạn', viDuSoLieu:'GĐ1: 15\nGĐ2: 16', trangThai:'Engine internal', ghiChu:'Engine tự tính từ @SliceFromDate/@SliceToDate. <b>Khuyến nghị</b>: dùng Phân bổ đầu ra = Prorata + Căn cứ = HT_TS_CongThucTe thay vì tham chiếu thủ công.'},
+  {ma:'@TotalDays', kieu:'int', mucDich:'Tổng số ngày trong kỳ lương', khaDung:'Luôn có', viDu:'TyLe = @SliceDays / @TotalDays → tỷ lệ phân bổ theo ngày', viDuSoLieu:'31', trangThai:'Engine internal', ghiChu:'Engine tự tính từ @FromDate/@ToDate. <b>Khuyến nghị</b>: dùng Phân bổ đầu ra = Prorata thay vì tham chiếu thủ công.'},
+  {ma:'@SliceRatio', kieu:'float', mucDich:'Tỷ lệ ngày GĐ / tổng ngày kỳ (0.0–1.0)', khaDung:'Khi NV có quá trình công tác', viDu:'LuongGD = LuongThang * @SliceRatio → phân bổ tỷ lệ trực tiếp', viDuSoLieu:'GĐ1: 0.484 (=15/31)\nGĐ2: 0.516 (=16/31)', trangThai:'Engine internal', ghiChu:'= @SliceDays / @TotalDays, engine tính sẵn. <b>Khuyến nghị</b>: dùng Phân bổ đầu ra = Prorata (đồng nghĩa) — tránh 2 nguồn sự thật.'},
+  {ma:'@IsLastSlice', kieu:'bit', mucDich:'=1 nếu là giai đoạn cuối cùng', khaDung:'Khi NV có quá trình công tác', viDu:'CASE WHEN @IsLastSlice = 1 THEN dồn phần dư vào GĐ cuối END', viDuSoLieu:'GĐ1: 0\nGĐ2: 1', trangThai:'Engine internal', ghiChu:'Hỗ trợ LastStageRow allocation. <b>Khuyến nghị</b>: dùng Phân bổ đầu ra = Mới nhất thay vì CASE WHEN thủ công.'},
+  {ma:'@LuotDong', kieu:'int', mucDich:'Số thứ tự dòng lương của NV trong kỳ (1, 2, 3...) — dùng cho cross-row per-row logic', khaDung:'Luôn có', viDu:'CASE WHEN @LuotDong = 1 THEN ... → xử lý riêng dòng đầu tiên\nCASE WHEN @LuotDong = @TotalLuot THEN ... → dòng cuối', viDuSoLieu:'Dòng 1: 1\nDòng 2: 2\n...', trangThai:'Engine internal', ghiChu:'Engine inject khi loop qua các dòng lương của 1 NV trong 1 kỳ (khi 1 NV có nhiều dòng: nhiều BPTL, nhiều công đoạn, nhiều QTLV...). <b>Khuyến nghị</b>: KHÔNG tham chiếu thủ công — ưu tiên dùng function scalar cross-row aggregate (VD <code>PR_LSP_fnGetMaxLuongKy(@EmpID, @KyID)</code>) hoặc Phân bổ đầu ra ở set2/set4. Chỉ expose để debug/audit.'},
+];
+
+function statusBadge(trangThai) {
+  const cls = trangThai === 'Đang dùng'       ? 'status-active'
+            : trangThai === 'Dự phòng'         ? 'status-reserved'
+            : trangThai === 'Engine internal'  ? 'status-internal'
+            : 'status-internal';
+  return `<span class="status-badge ${cls}">${trangThai || '—'}</span>`;
+}
+
+function renderGrid(data) {
+  const tbody = document.getElementById('gridBody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#999;">Không tìm thấy param phù hợp.</td></tr>';
+    return;
+  }
+  const nl2br = s => (s || '').replace(/\n/g, '<br>');
+  tbody.innerHTML = data.map((p, i) => {
+    const khaDungShort = p.khaDung.includes('quá trình') ? 'Khi NV có quá trình' : p.khaDung;
+    return `<tr>
+      <td style="text-align:center;">${i + 1}</td>
+      <td class="col-ma">${p.ma}</td>
+      <td class="col-kieu">${p.kieu}</td>
+      <td class="col-mucdich">${p.mucDich}</td>
+      <td class="col-khadung">${khaDungShort}</td>
+      <td class="col-vidu">${p.viDu}</td>
+      <td class="col-vidu-num">${nl2br(p.viDuSoLieu)}</td>
+      <td class="col-status">${statusBadge(p.trangThai)}</td>
+      <td class="col-ghichu">${p.ghiChu}</td>
+    </tr>`;
+  }).join('');
+}
+
+function doSearch() {
+  const txt = document.getElementById('fltParam').value.trim().toLowerCase();
+  const kd = document.getElementById('fltKhaDung').value;
+  const st = document.getElementById('fltTrangThai').value;
+  let filtered = MOCK_PARAMS.filter(p => {
+    if (txt && !p.ma.toLowerCase().includes(txt)) return false;
+    if (kd) {
+      if (kd === 'Luôn có' && p.khaDung !== 'Luôn có') return false;
+      if (kd === 'Khi NV có quá trình' && !p.khaDung.includes('quá trình') && !p.khaDung.includes('Rank')) return false;
+    }
+    if (st && p.trangThai !== st) return false;
+    return true;
+  });
+  renderGrid(filtered);
+}
+
+function doRefresh() {
+  document.getElementById('fltParam').value = '';
+  document.getElementById('fltKhaDung').value = '';
+  document.getElementById('fltTrangThai').value = '';
+  renderGrid(MOCK_PARAMS);
+}
+
+// Init
+renderGrid(MOCK_PARAMS);
+  </script>
+</body>
+</html>

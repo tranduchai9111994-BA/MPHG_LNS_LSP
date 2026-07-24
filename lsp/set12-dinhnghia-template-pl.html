@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Định nghĩa template phiếu lương</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .form-panel { padding: 15px 20px; }
+    .form-grid-pl { display:grid; grid-template-columns: 160px 1fr 160px 1fr; gap: 10px 25px; align-items:center; }
+    .form-grid-pl label { font-size:12px; color:#333; font-weight:bold; }
+    .form-grid-pl label.text-red { color:#d32f2f; }
+    .form-grid-pl input[type="text"],
+    .form-grid-pl input[type="date"],
+    .form-grid-pl select,
+    .form-grid-pl textarea { border:1px solid #ccc; padding:4px 6px; height:26px; font-size:12px; width:100%; box-sizing:border-box; }
+    .form-grid-pl textarea { height:auto; min-height:26px; resize:vertical; }
+    .form-grid-pl .row-full { grid-column: 1 / span 4; display:grid; grid-template-columns: 160px 1fr; gap:10px 25px; align-items:center; }
+
+    /* MPHG badge highlight */
+    .mphg-highlight-wrap { position:relative; padding:8px 10px; border:2px dashed #17a2b8; border-radius:4px; background:#e8f7fa; margin: 8px 0; }
+    .mphg-highlight-wrap::before {
+      content:"🆕 MPHG EXTENSION"; position:absolute; top:-10px; left:12px;
+      background:#17a2b8; color:#fff; font-size:10px; font-weight:bold; padding:2px 8px; border-radius:3px;
+    }
+    .badge-mphg { display:inline-block; background:#17a2b8; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; margin-left:6px; }
+    .badge-mill { display:inline-block; background:#6c757d; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; margin-left:6px; }
+    .badge-new  { display:inline-block; background:#dc3545; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:8px; margin-left:4px; vertical-align:middle; }
+
+    /* Grid */
+    .pl-grid { min-width:1200px; }
+    .pl-grid th, .pl-grid td { font-size:11px; vertical-align:middle; }
+    .pl-grid td.col-ma { font-family:Consolas,monospace; font-weight:bold; color:#0056b3; white-space:nowrap; text-align:left; }
+    .pl-grid td.col-source { text-align:center; }
+    .pl-grid td.col-file { font-family:Consolas,monospace; font-size:10px; color:#555; }
+    .pl-grid td.col-check { text-align:center; }
+    .row-mphg { background:#f0fbfc !important; }
+
+    .checkbox-inline { display:inline-flex; align-items:center; gap:6px; font-weight:normal; color:#333; }
+    .checkbox-inline input[type="checkbox"] { width:14px; height:14px; }
+
+    /* Quy tac button + modal */
+    .page-title-row { position:relative; text-align:center; }
+    .btn-quy-tac {
+      position:absolute; right:0; top:50%; transform:translateY(-50%);
+      background:#6f42c1; color:#fff; border:none; border-radius:4px;
+      padding:6px 14px; font-size:12px; font-weight:bold; cursor:pointer;
+    }
+    .btn-quy-tac:hover { background:#5a349a; }
+    .quy-tac-note { background:#eaf6ea; border-left:4px solid #28a745; padding:8px 12px; margin: 8px 0; font-size:11.5px; color:#155724; }
+    .quy-tac-note a { color:#0056b3; font-weight:bold; cursor:pointer; text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Phiếu lương › Định nghĩa template phiếu lương</div>
+    <div class="page-title page-title-row">
+      <span>ĐỊNH NGHĨA TEMPLATE PHIẾU LƯƠNG</span>
+      <button class="btn-quy-tac" onclick="openQuyTacModal()">❓ Quy tắc</button>
+    </div>
+
+    <div class="quy-tac-note">
+      📄 Template áp dụng cho <b>tất cả dòng lương</b> của NV. NV có N dòng → in <b>N trang A4</b>
+      (đã handle ở màn Tính lương set7). <a onclick="openQuyTacModal()">Xem quy tắc chi tiết →</a>
+    </div>
+
+    <div class="info-bar" style="margin-bottom:10px;">
+      RÀNG BUỘC: Đây là màn <strong>core Millennium (dùng chung nhiều dự án)</strong>. Field
+      <strong style="color:#17a2b8">Nguồn dữ liệu tính</strong> <span class="badge-new">MỚI</span> là extension MPHG —
+      mặc định <b>Millennium (core)</b> để không ảnh hưởng dự án khác. Chỉ tenant có role
+      <code>MPHG_PAYSLIP_ENGINE</code> mới thấy option <b>MPHG LSP</b>.
+    </div>
+
+    <div id="alertBox" class="alert-box"></div>
+
+    <div class="form-panel">
+      <div class="form-grid-pl">
+        <label class="text-red">Tên (EN)</label>
+        <input type="text" id="tenEN" placeholder="VD: Payslip - MPHG">
+
+        <label class="text-red">Tên (VN)</label>
+        <input type="text" id="tenVN" placeholder="VD: Phiếu lương - MPHG">
+
+        <label>Tiêu đề Mail</label>
+        <input type="text" id="tieuDeMail" placeholder="Phiếu lương tháng [PRMonth]">
+
+        <label>Đính kèm phiếu vào thư</label>
+        <div>
+          <label class="checkbox-inline"><input type="checkbox" id="chkAttach"> Có đính kèm PDF</label>
+        </div>
+
+        <div class="row-full">
+          <label>Ghi chú</label>
+          <textarea id="ghiChu" rows="2" placeholder="Ghi chú nội bộ về template..."></textarea>
+        </div>
+
+        <label>Ngày được xem PL</label>
+        <input type="date" id="ngayXem">
+
+        <label>Web chưa thức</label>
+        <div>
+          <label class="checkbox-inline"><input type="checkbox" id="chkWebChuaThuc"> Cho phép xem web chưa chính thức</label>
+        </div>
+
+        <label>File template</label>
+        <div>
+          <input type="text" id="fileTpl" placeholder="MPHG_PL.docx" style="width:70%">
+          <button type="button" class="btn btn-list" style="padding:2px 10px;font-size:11px;">Chọn...</button>
+          <div style="font-size:10px;color:#666;margin-top:2px;">Chỉ chấp nhận .doc / .docx</div>
+        </div>
+
+        <label>Chèn watermark</label>
+        <div>
+          <label class="checkbox-inline"><input type="checkbox" id="chkWatermark"> In watermark "CONFIDENTIAL"</label>
+        </div>
+
+        <label>Bắt buộc nhập mật khẩu</label>
+        <div>
+          <label class="checkbox-inline"><input type="checkbox" id="chkPwd"> Y/c nhập lại mật khẩu khi xem</label>
+        </div>
+
+        <label>Mặc định</label>
+        <div>
+          <label class="checkbox-inline"><input type="checkbox" id="chkDefault"> Đặt làm template mặc định</label>
+        </div>
+      </div>
+
+      <!-- MPHG EXTENSION FIELD -->
+      <div class="mphg-highlight-wrap">
+        <div class="form-grid-pl" style="grid-template-columns:160px 1fr 160px 1fr;">
+          <label class="text-red">Nguồn dữ liệu tính <span class="badge-new">MỚI</span></label>
+          <select id="nguonDL" onchange="onNguonDLChange()">
+            <option value="MILLENNIUM">MILLENNIUM - Millennium (core)</option>
+            <option value="MPHG_LSP">MPHG_LSP - MPHG LSP (engine mới)</option>
+          </select>
+
+          <label>Trạng thái tính</label>
+          <div id="statusHint" style="font-size:11px;color:#555;">
+            <b>Millennium core</b>: dùng tham số Millennium (A.*, E.*, HR.*) — mặc định.
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:#0c5460;margin-top:6px;padding-top:6px;border-top:1px dashed #17a2b8;">
+          <b>Tại sao có field này?</b> Core phiếu lương Millennium dùng chung cho nhiều dự án. Khách hàng MPHG có engine
+          mới (set5/6/7) tính tiêu chí phong phú hơn — chọn <code>MPHG_LSP</code> để bật thêm tab "Tiêu chí MPHG LSP"
+          trong <a href="set11-gancongthuc-phieuluong.html" target="_top">màn Gán công thức</a>.
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-bar" style="justify-content:center;text-align:center;">
+      <button class="btn btn-search"  onclick="onSearch()">🔍 Tìm Kiếm</button>
+      <button class="btn btn-refresh" onclick="onReset()">↻ Làm mới</button>
+      <button class="btn btn-save"    onclick="onSave()">💾 Lưu</button>
+      <button class="btn btn-delete"  onclick="onDelete()">🗑 Xóa</button>
+      <button class="btn btn-export"  onclick="onExport()">⬇ Xuất dữ liệu</button>
+    </div>
+
+    <div class="grid-wrap" style="margin-top:15px;overflow-x:auto;">
+      <table class="pl-grid" style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width:30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+            <th style="width:40px;">STT</th>
+            <th style="width:30px;">Sửa</th>
+            <th style="width:70px;">Mã</th>
+            <th>Tên EN</th>
+            <th>Tên VN</th>
+            <th style="width:130px;">Nguồn dữ liệu <span class="badge-new">MỚI</span></th>
+            <th style="width:130px;">File template</th>
+            <th style="width:110px;">Ngày được xem</th>
+            <th style="width:60px;">Watermark</th>
+            <th style="width:60px;">Mật khẩu</th>
+            <th style="width:60px;">Mặc định</th>
+            <th style="width:120px;">Người tạo</th>
+            <th style="width:120px;">Ngày tạo</th>
+          </tr>
+        </thead>
+        <tbody id="tplBody"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="BA nhập open points, điểm cần confirm với khách hàng...">- RF-3: Đổi Nguồn DL từ MPHG_LSP → MILLENNIUM khi template đã gán HT_/TT_ → engine tự unbind hay chỉ cảnh báo? (mock hiện tại: chỉ cảnh báo)
+- RF-5: Role MPHG_PAYSLIP_ENGINE cần seed ở đâu? Mặc định gán tenant MPHG.
+- Migration: bản ghi cũ không có nguonDL → default MILLENNIUM, không lỗi.</textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+      <div style="margin-top:10px;padding:8px 12px;background:#e7f5ff;border-left:3px solid #0d6efd;border-radius:3px;font-size:11.5px;color:#1c3a5b;">
+        📱💼 <b>Template dùng chung cho 3 kênh phân phối:</b>
+        (1) <b>HR bulk export</b> - HR xuất PDF/Excel hàng loạt từ set7;
+        (2) <b>ESS self-view</b> - NV xem/tải phiếu lương của mình qua Web Dịch vụ cá nhân;
+        (3) <b>Mobile view</b> - Hiển thị trong Mobile app MPHG với biometric authentication.
+        Chi tiết follow-up giai đoạn 2 xem tại <a href="set7-tinhluong-thang.html#ghichu-ess-mobile" style="color:#0d6efd;font-weight:bold;">set7 › Follow-up ESS/Mobile</a>.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ MODAL QUY TAC ============ -->
+  <div class="modal-overlay" id="quyTacModal" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:88vw;max-width:820px;">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>❓ Quy tắc — Định nghĩa template phiếu lương</span>
+        <button class="x" onclick="closeQuyTacModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 18px;font-size:12px;line-height:1.55;">
+        <h4 style="color:#0056b3;margin:0 0 6px 0;">1. Template áp dụng cho tất cả dòng lương</h4>
+        <p>1 template PL = 1 layout A4 cố định. Khi NV có N dòng lương (kiêm nhiệm BPTL, làm 2 ca…), engine dùng
+        <b>cùng 1 template</b> render N lần, sinh ra <b>N trang A4 độc lập</b>. Mỗi trang chứa data per-row của dòng đó.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">2. Cross-row BH/Thuế</h4>
+        <p>BHXH/BHYT/BHTN và Thuế TNCN theo luật phải trích/tính <b>1 lần/kỳ</b> — engine set7 đã handle:
+        gán vào dòng có <code>HT_HeSoBHXH</code> MAX (thường là dòng HĐLĐ chính), dòng phụ = 0.
+        Template không cần biết logic cross-row — chỉ hiển thị đúng field trong record.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">3. Fallback template thiếu file</h4>
+        <p>Nếu <code>File template</code> trống hoặc file không tồn tại → engine dùng template mặc định
+        (checkbox <b>Đặt làm template mặc định</b> ở form). Nếu không có template default → hiển thị lỗi
+        "Chưa cấu hình template" ở ESS/Mobile.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">4. Nguồn dữ liệu tính</h4>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li><b>Millennium (core)</b>: dùng tham số Millennium (A.*, E.*, HR.*, PR.*) — mặc định cho các dự án khác MPHG.</li>
+          <li><b>MPHG LSP (engine mới)</b>: bật thêm tab "Tiêu chí MPHG LSP" (Cột grid set7 / HT_ set2 / TT_ set3) trong màn Gán CT.
+              Chỉ tenant có role <code>MPHG_PAYSLIP_ENGINE</code> mới thấy option này.</li>
+        </ul>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">5. Legacy migration</h4>
+        <p>Record cũ không có <code>nguonDL</code> → default = <b>MILLENNIUM</b>. Zero-impact với các dự án đang chạy.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">6. Kênh phân phối phiếu lương</h4>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li><b>HR bulk export</b>: HR xuất PDF/Excel hàng loạt từ set7.</li>
+          <li><b>ESS self-view</b>: NV xem/tải phiếu qua Web Dịch vụ cá nhân.</li>
+          <li><b>Mobile view</b>: Mobile app MPHG với biometric auth.</li>
+        </ul>
+        <p>Chi tiết follow-up ESS/Mobile → <a href="set7-tinhluong-thang.html#ghichu-ess-mobile" style="color:#0056b3;font-weight:bold;">set7 › Follow-up</a>.</p>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="closeQuyTacModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal cảnh báo khi đổi nguồn -->
+  <div class="modal-overlay" id="modal-warn-source"
+       style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box" style="max-width:520px;">
+      <div class="modal-hdr" style="background:#dc3545;color:#fff;">
+        ⚠ CẢNH BÁO ĐỔI NGUỒN DỮ LIỆU
+        <button class="x" onclick="closeWarn()">✕</button>
+      </div>
+      <div class="modal-body" id="warnBody" style="padding:15px;font-size:12px;">
+      </div>
+      <div class="modal-ftr">
+        <button class="btn btn-cancel" onclick="closeWarn()">Huỷ</button>
+        <button class="btn btn-lock" onclick="confirmChangeSource()">Vẫn đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CURRENT_USER = 'FPT Admin';
+    function nowStr() {
+      const d = new Date(), pad = n => String(n).padStart(2,'0');
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    function showAlert(msg, type) {
+      const b = document.getElementById('alertBox');
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display='none', 3500);
+    }
+
+    // Mock data — 2 template MPHG + 3 template Millennium (mô phỏng các dự án khác đang triển khai)
+    const MOCK_PHIEU_LUONG = [
+      { ma:'PL_01', tenEN:'Payslip - MPHG Chế biến', tenVN:'Phiếu lương - MPHG chế biến',
+        nguonDL:'MPHG_LSP', template:'MPHG_PL_CB.docx', ghiChu:'Phiếu chế biến LSP',
+        ngayXem:'2026-08-05', watermark:true,  matKhau:false, macDinh:true,
+        createdBy:'FPT Admin', createdDate:'01/07/2026 08:00', gccnt:22 },
+      { ma:'PL_02', tenEN:'Payslip - MPHG Văn phòng', tenVN:'Phiếu lương - MPHG văn phòng',
+        nguonDL:'MPHG_LSP', template:'MPHG_PL_VP.docx', ghiChu:'VP thường chỉ 1 dòng',
+        ngayXem:'2026-08-05', watermark:true,  matKhau:true,  macDinh:false,
+        createdBy:'FPT Admin', createdDate:'01/07/2026 08:00', gccnt:15 },
+      { ma:'PL_03', tenEN:'Payslip - Client A (VN)', tenVN:'Phiếu lương - KH A',
+        nguonDL:'MILLENNIUM', template:'ClientA_PL.docx', ghiChu:'Dự án KH A',
+        ngayXem:'2026-08-01', watermark:false, matKhau:false, macDinh:false,
+        createdBy:'admin', createdDate:'15/06/2026 10:20', gccnt:8 },
+      { ma:'PL_04', tenEN:'Payslip - Client B (EN)', tenVN:'Phiếu lương - KH B',
+        nguonDL:'MILLENNIUM', template:'ClientB_PL_v2.docx', ghiChu:'',
+        ngayXem:'2026-08-10', watermark:true,  matKhau:true,  macDinh:false,
+        createdBy:'admin', createdDate:'20/06/2026 09:15', gccnt:12 },
+      // Record CŨ (không có nguonDL) — test backward compat
+      { ma:'PL_05', tenEN:'Legacy payslip', tenVN:'Phiếu lương legacy',
+        /* nguonDL: undefined */ template:'legacy_PL.doc', ghiChu:'Bản cũ trước migration',
+        ngayXem:'2026-07-05', watermark:false, matKhau:false, macDinh:false,
+        createdBy:'admin', createdDate:'10/03/2024 09:00', gccnt:5 }
+    ];
+
+    function sourceBadge(source) {
+      const s = source || 'MILLENNIUM';
+      if (s === 'MPHG_LSP') return '<span class="badge-mphg">🆕 MPHG_LSP</span>';
+      return '<span class="badge-mill">Millennium</span>';
+    }
+
+    function renderGrid() {
+      const rows = MOCK_PHIEU_LUONG.map((t, i) => {
+        const isMPHG = t.nguonDL === 'MPHG_LSP';
+        return `<tr class="${isMPHG ? 'row-mphg' : ''}" data-ma="${t.ma}">
+          <td class="col-check"><input type="checkbox" class="chk-row"></td>
+          <td style="text-align:center;">${i+1}</td>
+          <td style="text-align:center;"><span class="edit-icon" onclick="startEdit(this)" style="cursor:pointer;color:#e67e22;">✎</span></td>
+          <td class="col-ma">${t.ma}</td>
+          <td>${t.tenEN}</td>
+          <td>${t.tenVN}</td>
+          <td class="col-source">${sourceBadge(t.nguonDL)}</td>
+          <td class="col-file">${t.template}</td>
+          <td style="text-align:center;">${formatDate(t.ngayXem)}</td>
+          <td class="col-check">${t.watermark ? '✓' : ''}</td>
+          <td class="col-check">${t.matKhau ? '✓' : ''}</td>
+          <td class="col-check">${t.macDinh ? '<b style="color:#28a745;">✓</b>' : ''}</td>
+          <td>${t.createdBy}</td>
+          <td style="font-size:10px;">${t.createdDate}</td>
+        </tr>`;
+      }).join('');
+      document.getElementById('tplBody').innerHTML = rows;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const p = iso.split('-'); return `${p[2]}/${p[1]}/${p[0]}`;
+    }
+
+    function toggleAll(cb) {
+      document.querySelectorAll('.chk-row').forEach(c => c.checked = cb.checked);
+    }
+
+    let editingMa = null;
+    function startEdit(icon) {
+      const row = icon.closest('tr');
+      const ma = row.getAttribute('data-ma');
+      const t = MOCK_PHIEU_LUONG.find(x => x.ma === ma);
+      if (!t) return;
+      editingMa = ma;
+      document.getElementById('tenEN').value = t.tenEN;
+      document.getElementById('tenVN').value = t.tenVN;
+      document.getElementById('ghiChu').value = t.ghiChu || '';
+      document.getElementById('ngayXem').value = t.ngayXem || '';
+      document.getElementById('fileTpl').value = t.template;
+      document.getElementById('chkWatermark').checked = !!t.watermark;
+      document.getElementById('chkPwd').checked = !!t.matKhau;
+      document.getElementById('chkDefault').checked = !!t.macDinh;
+      document.getElementById('nguonDL').value = t.nguonDL || 'MILLENNIUM';
+      onNguonDLChange();
+      window.scrollTo(0, 0);
+    }
+
+    function openQuyTacModal()  { document.getElementById('quyTacModal').style.display = 'flex'; }
+    function closeQuyTacModal() { document.getElementById('quyTacModal').style.display = 'none'; }
+
+    function onNguonDLChange() {
+      const src = document.getElementById('nguonDL').value;
+      const hint = document.getElementById('statusHint');
+      if (src === 'MPHG_LSP') {
+        hint.innerHTML = '<b style="color:#17a2b8;">🆕 MPHG LSP engine</b>: bật thêm tab "Tiêu chí MPHG LSP" ' +
+          '(Cột grid set7 / HT_ set2 / TT_ set3) trong màn Gán CT.';
+      } else {
+        hint.innerHTML = '<b>Millennium core</b>: dùng tham số Millennium (A.*, E.*, HR.*) — mặc định.';
+      }
+    }
+
+    let pendingSourceChange = null;
+    function onSave() {
+      if (!editingMa) {
+        showAlert('Vui lòng bấm ✎ để chọn record cần sửa (mock: chưa hỗ trợ tạo mới).', 'warning');
+        return;
+      }
+      const t = MOCK_PHIEU_LUONG.find(x => x.ma === editingMa);
+      const newSrc = document.getElementById('nguonDL').value;
+      const oldSrc = t.nguonDL || 'MILLENNIUM';
+      // RF-3: cảnh báo khi downgrade từ MPHG_LSP → MILLENNIUM
+      if (oldSrc === 'MPHG_LSP' && newSrc === 'MILLENNIUM' && (t.gccnt || 0) > 0) {
+        pendingSourceChange = { ma: editingMa, newSrc: newSrc };
+        document.getElementById('warnBody').innerHTML =
+          `Template <b>${t.ma}</b> đang có <b style="color:#dc3545;">${t.gccnt} cột</b> tham chiếu tiêu chí ` +
+          `<code>HT_*</code> / <code>TT_*</code> của MPHG LSP. ` +
+          `Nếu đổi Nguồn DL sang <b>Millennium (core)</b>, các cột này sẽ <b>mất tham chiếu</b>.<br><br>` +
+          `<b>Lựa chọn:</b> Huỷ (giữ nguồn cũ) hoặc Vẫn đổi (BA sẽ tự xoá / thay các cột này ở màn Gán CT).`;
+        document.getElementById('modal-warn-source').style.display = 'flex';
+        return;
+      }
+      doSave(newSrc);
+    }
+
+    function confirmChangeSource() {
+      if (!pendingSourceChange) return;
+      doSave(pendingSourceChange.newSrc);
+      pendingSourceChange = null;
+      document.getElementById('modal-warn-source').style.display = 'none';
+    }
+    function closeWarn() {
+      pendingSourceChange = null;
+      document.getElementById('modal-warn-source').style.display = 'none';
+      // Rollback UI
+      const t = MOCK_PHIEU_LUONG.find(x => x.ma === editingMa);
+      if (t) document.getElementById('nguonDL').value = t.nguonDL || 'MILLENNIUM';
+      onNguonDLChange();
+    }
+
+    function doSave(newSrc) {
+      const t = MOCK_PHIEU_LUONG.find(x => x.ma === editingMa);
+      t.tenEN = document.getElementById('tenEN').value;
+      t.tenVN = document.getElementById('tenVN').value;
+      t.ghiChu = document.getElementById('ghiChu').value;
+      t.ngayXem = document.getElementById('ngayXem').value;
+      t.template = document.getElementById('fileTpl').value;
+      t.watermark = document.getElementById('chkWatermark').checked;
+      t.matKhau = document.getElementById('chkPwd').checked;
+      t.macDinh = document.getElementById('chkDefault').checked;
+      t.nguonDL = newSrc;
+      renderGrid();
+      showAlert(`Đã lưu template <b>${t.ma}</b> — Nguồn: <b>${newSrc}</b>.`, 'success');
+      editingMa = null;
+      onReset();
+    }
+
+    function onReset() {
+      ['tenEN','tenVN','ghiChu','ngayXem','fileTpl','tieuDeMail'].forEach(id => document.getElementById(id).value = '');
+      ['chkAttach','chkWebChuaThuc','chkWatermark','chkPwd','chkDefault'].forEach(id => document.getElementById(id).checked = false);
+      document.getElementById('nguonDL').value = 'MILLENNIUM';
+      onNguonDLChange();
+      editingMa = null;
+    }
+
+    function onSearch()  { showAlert('Mock: đã filter theo tiêu chí trên form.', 'success'); }
+    function onDelete()  { showAlert('Mock: xóa các record đã tick.', 'success'); }
+    function onExport()  { showAlert('Mock: xuất file Excel danh sách template.', 'success'); }
+
+    // init
+    renderGrid();
+    onNguonDLChange();
+  </script>
+</body>
+</html>

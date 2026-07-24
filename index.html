@@ -10,28 +10,168 @@
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
     .app { display: flex; height: 100vh; }
-    .sidebar { width: 280px; flex-shrink: 0; background: #1f2a44; color: #fff; overflow-y: auto; transition: background-color 0.3s; }
+    .sidebar {
+      width: 290px; flex-shrink: 0;
+      background: #1f2a44; color: #fff;
+      display: flex; flex-direction: column;
+      transition: background-color 0.3s;
+    }
     .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
     #main-frame { flex: 1; width: 100%; border: none; background: #fff; }
-    .brand { padding: 16px 18px; font-size: 18px; font-weight: bold; background: #d32f2f; display: flex; align-items: center; gap: 8px; }
+
+    .brand { padding: 14px 18px; font-size: 18px; font-weight: bold; background: #d32f2f; display: flex; align-items: center; gap: 8px; }
     .brand small { display:block; font-weight: normal; font-size: 11px; opacity: .9; }
     .topbar { background: #ffd600; color: #5a4b00; padding: 10px 18px; font-weight: bold; font-size: 14px; display:flex; justify-content: space-between; align-items:center; }
     .topbar .hint { font-weight: normal; font-size: 11px; color: #7a6700; }
-    
-    .nav-group { padding: 10px 0 4px; }
-    .nav-group .grp-title { padding: 8px 18px; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #9fb0d0; }
-    .nav-item { padding: 10px 18px 10px 26px; cursor: pointer; font-size: 13px; border-left: 4px solid transparent; display: flex; gap: 8px; }
-    .nav-item:hover { background: rgba(0,0,0,0.1); }
-    .nav-item.active { border-left-color: #ffd600; font-weight: bold; background-color: rgba(255,214,0,0.15); }
-    .nav-item .idx { color: #ffd600; font-weight: bold; width: 18px; }
+
+    /* Search box */
+    .nav-search-wrap { padding: 10px 12px 6px; position: relative; }
+    .nav-search {
+      width: 100%; box-sizing: border-box;
+      padding: 6px 28px 6px 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 4px; color: #fff; font-size: 12px;
+      outline: none;
+    }
+    .nav-search::placeholder { color: rgba(255,255,255,0.55); }
+    .nav-search:focus { border-color: #ffd600; background: rgba(255,255,255,0.12); }
+    .nav-search-clear {
+      position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+      color: rgba(255,255,255,0.55); cursor: pointer; font-size: 14px;
+      display: none; user-select: none;
+    }
+    .nav-search-wrap.has-value .nav-search-clear { display: block; }
+
+    /* Scroll container */
+    .nav-scroll { flex: 1; overflow-y: auto; }
+
+    /* ---------- TIER 1: MODULE ---------- */
+    .nav-module {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-module.hidden { display: none; }
+
+    .nav-module-header {
+      width: 100%; box-sizing: border-box;
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.18); border: 0;
+      color: #fff;
+      font-size: 13px; font-weight: bold;
+      cursor: pointer; text-align: left;
+      transition: background-color .15s ease;
+    }
+    .nav-module-header:hover { background: rgba(0,0,0,0.28); }
+    .nav-module-header .chev {
+      display: inline-block; width: 10px; color: #ffd600;
+      transition: transform .25s ease;
+      font-size: 11px; line-height: 1;
+    }
+    .nav-module[data-expanded="false"] .nav-module-header .chev { transform: rotate(-90deg); }
+    .nav-module-header .m-icon { font-size: 15px; line-height: 1; }
+    .nav-module-header .title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-module-header .count {
+      font-size: 10px; color: #1f2a44;
+      background: #ffd600; font-weight: bold;
+      padding: 1px 7px; border-radius: 8px;
+      min-width: 20px; text-align: center;
+    }
+
+    .nav-module-body {
+      overflow: hidden;
+      max-height: 4000px;
+      transition: max-height .3s ease;
+    }
+    .nav-module[data-expanded="false"] .nav-module-body { max-height: 0; }
+
+    /* ---------- TIER 2: GROUP ---------- */
+    .nav-group { border-top: 1px solid rgba(255,255,255,0.04); }
+    .nav-group.hidden { display: none; }
+
+    .nav-group-header {
+      width: 100%; box-sizing: border-box;
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px 8px 22px;
+      background: transparent; border: 0;
+      color: #cfd8f0;
+      font-size: 11px; font-weight: bold;
+      text-transform: uppercase; letter-spacing: .4px;
+      cursor: pointer; text-align: left;
+      transition: background-color .15s ease;
+    }
+    .nav-group-header:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-group-header .chev {
+      display: inline-block; width: 8px; color: #ffd600;
+      transition: transform .25s ease;
+      font-size: 9px; line-height: 1;
+    }
+    .nav-group[data-expanded="false"] .nav-group-header .chev { transform: rotate(-90deg); }
+    .nav-group-header .title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-group-header .count {
+      font-size: 10px; color: rgba(255,255,255,0.65);
+      background: rgba(255,255,255,0.08);
+      padding: 1px 6px; border-radius: 8px;
+      min-width: 18px; text-align: center;
+    }
+
+    /* Group items */
+    .nav-group-items {
+      list-style: none; margin: 0; padding: 0;
+      max-height: 2000px; overflow: hidden;
+      transition: max-height .28s ease;
+    }
+    .nav-group[data-expanded="false"] .nav-group-items { max-height: 0; }
+
+    /* ---------- TIER 3: ITEM ---------- */
+    .nav-item {
+      padding: 7px 14px 7px 38px; cursor: pointer;
+      font-size: 12.5px; border-left: 4px solid transparent;
+      display: flex; gap: 8px; align-items: center;
+      color: #e5e9f2;
+    }
+    .nav-item:hover { background: rgba(0,0,0,0.15); color: #fff; }
+    .nav-item.active {
+      border-left-color: #ffd600;
+      font-weight: bold;
+      background-color: rgba(255,214,0,0.12);
+      color: #fff;
+    }
+    .nav-item .idx {
+      color: #ffd600; font-weight: bold;
+      min-width: 22px; font-size: 11px;
+      opacity: .85;
+    }
+    .nav-item.hidden { display: none; }
+
+    /* Empty search state */
+    .nav-empty {
+      padding: 20px 18px; font-size: 12px;
+      color: rgba(255,255,255,0.55); font-style: italic;
+      display: none;
+    }
+    .nav-empty.show { display: block; }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="sidebar" id="sidebar">
-      <div class="brand"><span style="font-size:22px;">&#10086;</span> <span>MINH PHU<small>Lương Sản Phẩm - Demo</small></span></div>
-      <div id="nav-container"></div>
-    </div>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="assets/mp-logo.png" alt="Minh Phú"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+             style="height:28px; vertical-align:middle;">
+        <span class="brand-text-fallback" style="display:none; font-weight:bold; color:#fff;">MINH PHÚ</span>
+        <small style="font-weight:normal; font-size:11px; opacity:.9; margin-left:8px;">Lương – Demo</small>
+      </div>
+      <div class="nav-search-wrap" id="nav-search-wrap">
+        <input class="nav-search" id="nav-search" type="text" placeholder="Tìm màn hình... (Esc để xóa)" autocomplete="off">
+        <span class="nav-search-clear" id="nav-search-clear" title="Xóa tìm kiếm">✕</span>
+      </div>
+      <div class="nav-scroll">
+        <nav id="nav-container" aria-label="Sidebar navigation"></nav>
+        <div class="nav-empty" id="nav-empty">Không tìm thấy màn hình phù hợp.</div>
+      </div>
+    </aside>
     <div class="main">
       <div class="topbar" id="topbar">
         <span id="pg-title">...</span>
@@ -43,68 +183,322 @@
       <iframe id="main-frame" title="content"></iframe>
     </div>
   </div>
+
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const navContainer = document.getElementById('nav-container');
-      const mainFrame = document.getElementById('main-frame');
-      const pgTitle = document.getElementById('pg-title');
-      
-      let navHtml = '';
-      let itemIndex = 1;
-      let allItems = {};
-      
-      window.NAV_CONFIG.groups.forEach(group => {
-        navHtml += `<div class="nav-group"><div class="grp-title">${group.title}</div>`;
-        group.items.forEach(item => {
-           const isLNS = group.title.includes('LNS');
-           const prefix = isLNS ? '›' : itemIndex++;
-           navHtml += `<div class="nav-item" data-id="${item.id}" data-src="${item.src}" data-title="${item.label}" data-lns="${isLNS}"><span class="idx">${prefix}</span> ${item.label}</div>`;
-           allItems[item.id] = item;
+  (function() {
+    'use strict';
+
+    const APP_VERSION = '20260724b';
+    const LS_EXPANDED_KEY = 'mphg:navExpanded';
+    const SS_LAST_PAGE_KEY = 'lastPageId';
+
+    // ---- Helpers ---------------------------------------------------
+    function normalize(s) {
+      return (s || '')
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd');
+    }
+    function escHtml(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    /**
+     * Persist schema mới:
+     *   { modules: { <mid>: bool }, groups: { <gid>: bool } }
+     * Migration schema cũ (chỉ {gid:bool}) → wrap vào { groups: old }.
+     */
+    function loadExpandedState() {
+      try {
+        const raw = localStorage.getItem(LS_EXPANDED_KEY);
+        if (!raw) return { modules: {}, groups: {} };
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.modules && parsed.groups) return parsed;
+        // Legacy flat {gid: bool} → migrate
+        return { modules: {}, groups: parsed || {} };
+      } catch (e) { return { modules: {}, groups: {} }; }
+    }
+    function saveExpandedState(state) {
+      try { localStorage.setItem(LS_EXPANDED_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    // ---- Build indices ---------------------------------------------
+    const modules = window.NAV_CONFIG.modules;
+    const itemsById = {};        // id -> { item, groupId, moduleId, isLNS }
+    const groupById = {};        // gid -> { group, moduleId }
+    const moduleById = {};       // mid -> module
+
+    modules.forEach(m => {
+      moduleById[m.id] = m;
+      const isLNS = m.id === 'lns';
+      m.groups.forEach(g => {
+        groupById[g.id] = { group: g, moduleId: m.id };
+        (g.items || []).forEach(item => {
+          itemsById[item.id] = { item, groupId: g.id, moduleId: m.id, isLNS };
         });
-        navHtml += `</div>`;
       });
-      navContainer.innerHTML = navHtml;
-      
-      const navItems = document.querySelectorAll('.nav-item');
-      
-      function loadPage(id) {
-         const itemEl = document.querySelector(`.nav-item[data-id="${id}"]`);
-         if (!itemEl) return;
-         
-         navItems.forEach(el => el.classList.remove('active'));
-         itemEl.classList.add('active');
-         
-         const srcUrl = itemEl.getAttribute('data-src');
-         const src = srcUrl + (srcUrl.includes('?') ? '&v=' : '?v=') + new Date().getTime();
-         const title = itemEl.getAttribute('data-title');
-         const isLNS = itemEl.getAttribute('data-lns') === 'true';
-         
-         mainFrame.src = src;
-         pgTitle.textContent = title;
-         
-         const sidebar = document.getElementById('sidebar');
-         if (isLNS) {
-             sidebar.style.backgroundColor = '#1e3a5f';
-         } else {
-             sidebar.style.backgroundColor = '#1f2a44';
-         }
-         
-         sessionStorage.setItem('lastPageId', id);
+    });
+
+    // ---- Render ----------------------------------------------------
+    const navContainer = document.getElementById('nav-container');
+    const navEmpty = document.getElementById('nav-empty');
+    const searchInput = document.getElementById('nav-search');
+    const searchWrap = document.getElementById('nav-search-wrap');
+    const searchClear = document.getElementById('nav-search-clear');
+    const mainFrame = document.getElementById('main-frame');
+    const pgTitle = document.getElementById('pg-title');
+    const sidebarEl = document.getElementById('sidebar');
+
+    const persistedExpanded = loadExpandedState();
+
+    function isModuleExpanded(m) {
+      return (m.id in persistedExpanded.modules)
+        ? !!persistedExpanded.modules[m.id]
+        : !!m.defaultExpanded;
+    }
+    function isGroupExpanded(g) {
+      return (g.id in persistedExpanded.groups)
+        ? !!persistedExpanded.groups[g.id]
+        : !!g.defaultExpanded;
+    }
+
+    function renderNav() {
+      let html = '';
+      let displayIndex = 1;
+
+      modules.forEach(m => {
+        const visibleGroups = (m.groups || []).filter(g => g.items && g.items.length);
+        if (visibleGroups.length === 0) return;
+
+        const mExpanded = isModuleExpanded(m);
+        const totalItems = visibleGroups.reduce((n, g) => n + g.items.length, 0);
+        const isLNS = m.id === 'lns';
+
+        html += `<div class="nav-module" data-module-id="${escHtml(m.id)}" data-expanded="${mExpanded}">`;
+        html += `<button type="button" class="nav-module-header" aria-expanded="${mExpanded}">`
+             +  `<span class="chev">▾</span>`
+             +  `<span class="m-icon">${escHtml(m.icon || '•')}</span>`
+             +  `<span class="title">${escHtml(m.title)}</span>`
+             +  `<span class="count">${totalItems}</span>`
+             +  `</button>`;
+        html += `<div class="nav-module-body">`;
+
+        visibleGroups.forEach(g => {
+          const gExpanded = isGroupExpanded(g);
+          html += `<div class="nav-group" data-group-id="${escHtml(g.id)}" data-expanded="${gExpanded}">`;
+          html += `<button type="button" class="nav-group-header" aria-expanded="${gExpanded}" aria-controls="grp-items-${escHtml(g.id)}">`
+               +  `<span class="chev">▾</span>`
+               +  `<span class="title">${escHtml(g.title)}</span>`
+               +  `<span class="count">${g.items.length}</span>`
+               +  `</button>`;
+          html += `<ul class="nav-group-items" id="grp-items-${escHtml(g.id)}" role="list">`;
+          g.items.forEach(item => {
+            const idx = isLNS ? '›' : (displayIndex++);
+            html += `<li class="nav-item" role="button" tabindex="0"`
+                 +  ` data-id="${escHtml(item.id)}"`
+                 +  ` data-src="${escHtml(item.src)}"`
+                 +  ` data-title="${escHtml(item.label)}"`
+                 +  ` data-lns="${isLNS}"`
+                 +  ` data-search="${escHtml(normalize(item.label))}">`
+                 +  `<span class="idx">${idx}</span>`
+                 +  `<span class="label">${escHtml(item.label)}</span>`
+                 +  `</li>`;
+          });
+          html += `</ul></div>`;
+        });
+
+        html += `</div></div>`;
+      });
+
+      navContainer.innerHTML = html;
+    }
+
+    renderNav();
+
+    // ---- Expand/collapse -------------------------------------------
+    function setModuleExpanded(modEl, expanded, persist) {
+      modEl.setAttribute('data-expanded', expanded ? 'true' : 'false');
+      const btn = modEl.querySelector('.nav-module-header');
+      if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      if (persist) {
+        persistedExpanded.modules[modEl.getAttribute('data-module-id')] = expanded;
+        saveExpandedState(persistedExpanded);
       }
-      
-      navItems.forEach(item => {
-         item.addEventListener('click', function() {
-             loadPage(this.getAttribute('data-id'));
-         });
-      });
-      
-      const lastPageId = sessionStorage.getItem('lastPageId');
-      if (lastPageId && allItems[lastPageId]) {
-         loadPage(lastPageId);
-      } else if (window.NAV_CONFIG.groups[0] && window.NAV_CONFIG.groups[0].items[0]) {
-         loadPage(window.NAV_CONFIG.groups[0].items[0].id);
+    }
+    function setGroupExpanded(grpEl, expanded, persist) {
+      grpEl.setAttribute('data-expanded', expanded ? 'true' : 'false');
+      const btn = grpEl.querySelector('.nav-group-header');
+      if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      if (persist) {
+        persistedExpanded.groups[grpEl.getAttribute('data-group-id')] = expanded;
+        saveExpandedState(persistedExpanded);
+      }
+    }
+
+    navContainer.addEventListener('click', function(e) {
+      const modHeader = e.target.closest('.nav-module-header');
+      if (modHeader) {
+        const modEl = modHeader.closest('.nav-module');
+        const now = modEl.getAttribute('data-expanded') !== 'true';
+        setModuleExpanded(modEl, now, true);
+        return;
+      }
+      const grpHeader = e.target.closest('.nav-group-header');
+      if (grpHeader) {
+        const grpEl = grpHeader.closest('.nav-group');
+        const now = grpEl.getAttribute('data-expanded') !== 'true';
+        setGroupExpanded(grpEl, now, true);
+        return;
+      }
+      const itemEl = e.target.closest('.nav-item');
+      if (itemEl) {
+        loadPage(itemEl.getAttribute('data-id'));
       }
     });
+
+    navContainer.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const itemEl = e.target.closest('.nav-item');
+      if (itemEl) {
+        e.preventDefault();
+        loadPage(itemEl.getAttribute('data-id'));
+      }
+    });
+
+    // ---- Page load -------------------------------------------------
+    function loadPage(id) {
+      const meta = itemsById[id];
+      if (!meta) return;
+      const itemEl = navContainer.querySelector(`.nav-item[data-id="${CSS.escape(id)}"]`);
+      if (!itemEl) return;
+
+      navContainer.querySelectorAll('.nav-item.active').forEach(el => el.classList.remove('active'));
+      itemEl.classList.add('active');
+
+      // Expand ancestors (module + group)
+      const grpEl = itemEl.closest('.nav-group');
+      if (grpEl && grpEl.getAttribute('data-expanded') !== 'true') {
+        setGroupExpanded(grpEl, true, true);
+      }
+      const modEl = itemEl.closest('.nav-module');
+      if (modEl && modEl.getAttribute('data-expanded') !== 'true') {
+        setModuleExpanded(modEl, true, true);
+      }
+
+      const srcUrl = meta.item.src;
+      const src = srcUrl + (srcUrl.includes('?') ? '&v=' : '?v=') + APP_VERSION;
+      mainFrame.src = src;
+      pgTitle.textContent = meta.item.label;
+      sidebarEl.style.backgroundColor = meta.isLNS ? '#1e3a5f' : '#1f2a44';
+
+      sessionStorage.setItem(SS_LAST_PAGE_KEY, id);
+
+      if (location.hash.replace(/^#/, '') !== id) {
+        suppressHashChange = true;
+        location.hash = id;
+        setTimeout(() => { suppressHashChange = false; }, 0);
+      }
+    }
+
+    // ---- Deep-link -------------------------------------------------
+    let suppressHashChange = false;
+    window.addEventListener('hashchange', function() {
+      if (suppressHashChange) return;
+      const id = location.hash.replace(/^#/, '');
+      if (id && itemsById[id]) loadPage(id);
+    });
+
+    // ---- Search ----------------------------------------------------
+    let savedExpandedBeforeSearch = null;
+
+    function applySearch(qRaw) {
+      const q = normalize((qRaw || '').trim());
+      const hasQuery = q.length > 0;
+
+      searchWrap.classList.toggle('has-value', hasQuery);
+
+      if (!hasQuery) {
+        navContainer.querySelectorAll('.nav-item.hidden').forEach(el => el.classList.remove('hidden'));
+        navContainer.querySelectorAll('.nav-group.hidden').forEach(el => el.classList.remove('hidden'));
+        navContainer.querySelectorAll('.nav-module.hidden').forEach(el => el.classList.remove('hidden'));
+        navEmpty.classList.remove('show');
+        if (savedExpandedBeforeSearch) {
+          navContainer.querySelectorAll('.nav-module').forEach(mEl => {
+            const mid = mEl.getAttribute('data-module-id');
+            setModuleExpanded(mEl, !!savedExpandedBeforeSearch.modules[mid], false);
+          });
+          navContainer.querySelectorAll('.nav-group').forEach(gEl => {
+            const gid = gEl.getAttribute('data-group-id');
+            setGroupExpanded(gEl, !!savedExpandedBeforeSearch.groups[gid], false);
+          });
+          savedExpandedBeforeSearch = null;
+        }
+        return;
+      }
+
+      // Snapshot current expand state on first search
+      if (!savedExpandedBeforeSearch) {
+        savedExpandedBeforeSearch = { modules: {}, groups: {} };
+        navContainer.querySelectorAll('.nav-module').forEach(mEl => {
+          savedExpandedBeforeSearch.modules[mEl.getAttribute('data-module-id')] =
+            mEl.getAttribute('data-expanded') === 'true';
+        });
+        navContainer.querySelectorAll('.nav-group').forEach(gEl => {
+          savedExpandedBeforeSearch.groups[gEl.getAttribute('data-group-id')] =
+            gEl.getAttribute('data-expanded') === 'true';
+        });
+      }
+
+      let totalMatches = 0;
+      navContainer.querySelectorAll('.nav-module').forEach(mEl => {
+        let moduleMatch = 0;
+        mEl.querySelectorAll('.nav-group').forEach(gEl => {
+          let groupMatch = 0;
+          gEl.querySelectorAll('.nav-item').forEach(iEl => {
+            const hay = iEl.getAttribute('data-search') || '';
+            const match = hay.includes(q);
+            iEl.classList.toggle('hidden', !match);
+            if (match) groupMatch++;
+          });
+          gEl.classList.toggle('hidden', groupMatch === 0);
+          if (groupMatch > 0) setGroupExpanded(gEl, true, false);
+          moduleMatch += groupMatch;
+        });
+        mEl.classList.toggle('hidden', moduleMatch === 0);
+        if (moduleMatch > 0) setModuleExpanded(mEl, true, false);
+        totalMatches += moduleMatch;
+      });
+
+      navEmpty.classList.toggle('show', totalMatches === 0);
+    }
+
+    searchInput.addEventListener('input', function() { applySearch(this.value); });
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { this.value = ''; applySearch(''); }
+    });
+    searchClear.addEventListener('click', function() {
+      searchInput.value = ''; applySearch(''); searchInput.focus();
+    });
+
+    // ---- Init ------------------------------------------------------
+    function pickInitialId() {
+      const hashId = location.hash.replace(/^#/, '');
+      if (hashId && itemsById[hashId]) return hashId;
+      const lastId = sessionStorage.getItem(SS_LAST_PAGE_KEY);
+      if (lastId && itemsById[lastId]) return lastId;
+      for (const m of modules) {
+        for (const g of m.groups) {
+          if (g.items && g.items.length) return g.items[0].id;
+        }
+      }
+      return null;
+    }
+
+    const initialId = pickInitialId();
+    if (initialId) loadPage(initialId);
+  })();
   </script>
 </body>
 </html>

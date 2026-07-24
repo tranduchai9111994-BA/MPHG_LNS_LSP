@@ -280,8 +280,7 @@ window.MOCK_LSP_EMP = {
 // QA assertions for MOCK_LSP_EMP:
 // - 2 rows generated (2 QTLV stages)
 // - TT_LSP_LuongThoiGian (Prorata): row1 = total*12/25, row2 = total*13/25
-// - TT_LSP_LuongDongBH (MaxSalaryRow): 100% on row with higher Final (stage2), row1 = 0
-// - TT_LSP_ThuNhapTinhThue (LastStageRow): 100% on row with to='2026-05-31' (stage2), row1 = 0
+// - TT_TNChiuThueTNCN (LastStageRow): 100% on row with to='2026-05-31' (stage2), row1 = 0
 // - Sum of Detail rows per criterion = value if calculated as single row (no loss)
 // Boundary: 1 slice -> all Allocation = same as that single row
 // Negative: sum(cong) = 0 -> Prorata returns 0, no error

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Gán phiếu lương cho cơ cấu</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .filter-grid { display:grid; grid-template-columns: 130px 1fr 130px 1fr 130px 1fr; gap: 8px 15px; padding:10px 15px; align-items:center; }
+    .filter-grid label { font-size:12px; color:#333; font-weight:bold; }
+    .filter-grid label.text-red { color:#d32f2f; }
+    .filter-grid input[type="text"], .filter-grid input[type="date"], .filter-grid select {
+      border:1px solid #ccc; padding:4px 6px; height:26px; font-size:12px; width:100%; box-sizing:border-box;
+    }
+
+    /* Tabs */
+    .tab-bar { display:flex; border-bottom:2px solid #ffd600; margin-top:10px; }
+    .tab { padding:8px 20px; font-size:12px; font-weight:bold; cursor:pointer; color:#555; background:#f4f5f7; border-right:1px solid #ddd; }
+    .tab.active { background:#ffd600; color:#333; }
+    .tab-panel { display:none; padding-top:10px; }
+    .tab-panel.active { display:block; }
+
+    /* Grid */
+    .cc-grid { min-width:1100px; }
+    .cc-grid th, .cc-grid td { font-size:11px; vertical-align:middle; }
+    .cc-grid td.col-ma { font-family:Consolas,monospace; font-weight:bold; color:#0056b3; }
+    .cc-grid td.col-source { text-align:center; }
+    .row-mphg   { background:#f0fbfc !important; }
+    .row-warn   { background:#fff5f5 !important; }
+
+    .badge-mphg { display:inline-block; background:#17a2b8; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; }
+    .badge-mill { display:inline-block; background:#6c757d; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; }
+    .badge-new  { display:inline-block; background:#dc3545; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:8px; margin-left:4px; vertical-align:middle; }
+    .badge-warn { display:inline-block; background:#dc3545; color:#fff; font-size:9px; padding:1px 5px; border-radius:8px; }
+
+    .info-warn { background:#fff5f5; border-left:4px solid #dc3545; padding:6px 10px; font-size:11px; color:#721c24; margin: 6px 0; }
+
+    /* Quy tac */
+    .page-title-row { position:relative; text-align:center; }
+    .btn-quy-tac {
+      position:absolute; right:0; top:50%; transform:translateY(-50%);
+      background:#6f42c1; color:#fff; border:none; border-radius:4px;
+      padding:6px 14px; font-size:12px; font-weight:bold; cursor:pointer;
+    }
+    .btn-quy-tac:hover { background:#5a349a; }
+    .quy-tac-note { background:#eaf6ea; border-left:4px solid #28a745; padding:8px 12px; margin: 8px 0; font-size:11.5px; color:#155724; }
+    .quy-tac-note a { color:#0056b3; font-weight:bold; cursor:pointer; text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Phiếu lương › Gán phiếu lương cho cơ cấu</div>
+    <div class="page-title page-title-row">
+      <span>GÁN PHIẾU LƯƠNG CHO CƠ CẤU</span>
+      <button class="btn-quy-tac" onclick="openQuyTacModal()">❓ Quy tắc</button>
+    </div>
+
+    <div class="quy-tac-note">
+      📄 Template áp dụng cho <b>tất cả BPTL</b> của NV trong OrgUnit đã gán.
+      <a onclick="openQuyTacModal()">Xem quy tắc chi tiết →</a>
+    </div>
+
+    <div id="alertBox" class="alert-box"></div>
+
+    <div class="form-panel">
+      <div class="filter-grid">
+        <label class="text-red">Cấu trúc org</label>
+        <select id="fltOrg">
+          <option value="">-- Chọn OrgUnit --</option>
+          <option value="OU_ROOT">OU_ROOT - Công ty Minh Phú</option>
+          <option value="OU_CB">OU_CB - Khối chế biến</option>
+          <option value="OU_CB_LINE1">OU_CB_LINE1 - Chế biến - Line 1</option>
+          <option value="OU_CB_LINE2">OU_CB_LINE2 - Chế biến - Line 2</option>
+          <option value="OU_VP">OU_VP - Khối văn phòng</option>
+          <option value="OU_VP_HR">OU_VP_HR - VP - Nhân sự</option>
+          <option value="OU_VP_ACC">OU_VP_ACC - VP - Kế toán</option>
+          <option value="OU_KHO">OU_KHO - Khối kho vận</option>
+        </select>
+
+        <label>Tên template</label>
+        <select id="fltTpl">
+          <option value="">-- Tất cả --</option>
+          <option value="PL_01">PL_01 - Phiếu lương MPHG chế biến (🆕 MPHG_LSP)</option>
+          <option value="PL_02">PL_02 - Phiếu lương MPHG văn phòng (🆕 MPHG_LSP)</option>
+          <option value="PL_03">PL_03 - Phiếu lương KH A (Millennium)</option>
+          <option value="PL_04">PL_04 - Phiếu lương KH B (Millennium)</option>
+          <option value="PL_05">PL_05 - Phiếu lương legacy (Millennium)</option>
+        </select>
+
+        <label>Ngày hiệu lực</label>
+        <input type="date" id="fltEff" value="2026-08-01">
+      </div>
+    </div>
+
+    <div class="actions-bar" style="justify-content:center;text-align:center;">
+      <button class="btn btn-search"  onclick="applyFilter()">🔍 Tìm Kiếm</button>
+      <button class="btn btn-refresh" onclick="onReset()">↻ Làm mới</button>
+      <button class="btn btn-save"    onclick="onSave()">💾 Lưu</button>
+      <button class="btn btn-delete"  onclick="onDelete()">🗑 Xóa</button>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active" data-tab="TIMKIEM" onclick="switchTab('TIMKIEM')">🔍 Tìm Kiếm</div>
+      <div class="tab"        data-tab="THEMMOI" onclick="switchTab('THEMMOI')">+ Thêm mới</div>
+    </div>
+
+    <!-- Tab TÌM KIẾM -->
+    <div class="tab-panel active" id="panel-TIMKIEM">
+      <div id="warnBar"></div>
+      <div class="grid-wrap" style="overflow-x:auto;">
+        <table class="cc-grid" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="width:30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+              <th style="width:40px;">STT</th>
+              <th style="width:30px;">Sửa</th>
+              <th style="width:130px;">OrgUnit</th>
+              <th>Tên OrgUnit</th>
+              <th style="width:100px;">Template</th>
+              <th style="width:180px;">Tên template</th>
+              <th style="width:120px;">Nguồn DL <span class="badge-new">MỚI</span></th>
+              <th style="width:100px;">Ngày hiệu lực</th>
+              <th style="width:80px;">Số NV MPHG</th>
+              <th style="width:150px;">Cảnh báo</th>
+            </tr>
+          </thead>
+          <tbody id="ccBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab THÊM MỚI -->
+    <div class="tab-panel" id="panel-THEMMOI">
+      <div class="form-panel" style="padding:15px 20px;">
+        <div class="filter-grid" style="grid-template-columns:150px 1fr 150px 1fr;">
+          <label class="text-red">OrgUnit</label>
+          <select id="addOrg"></select>
+          <label class="text-red">Template</label>
+          <select id="addTpl" onchange="onAddTplChange()"></select>
+          <label class="text-red">Ngày hiệu lực</label>
+          <input type="date" id="addEff" value="2026-08-01">
+          <label>Nguồn DL của template</label>
+          <div id="addSourceBadge" style="font-size:11px;color:#333;">—</div>
+        </div>
+        <div id="addWarn" style="margin-top:8px;"></div>
+        <div style="text-align:center;margin-top:10px;">
+          <button class="btn btn-save" onclick="onAdd()">➕ Thêm gán</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="Điểm cần confirm với khách hàng...">- Sanity check: khi gán template MPHG_LSP cho OrgUnit không có NV MPHG → chỉ WARNING, không chặn.
+- Số NV MPHG lấy từ set6 (Cập nhật DS NV tính lương). Mock: OU_CB* có NV, OU_VP_ACC không có.
+- Nếu tenant không phải MPHG → không hiển thị cột "Số NV MPHG" (feature flag).</textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL QUY TAC ============ -->
+  <div class="modal-overlay" id="quyTacModal" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:88vw;max-width:820px;">
+      <div class="modal-hdr" style="background:#6f42c1;color:#fff;">
+        <span>❓ Quy tắc — Gán phiếu lương cho cơ cấu</span>
+        <button class="x" onclick="closeQuyTacModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 18px;font-size:12px;line-height:1.55;">
+        <h4 style="color:#0056b3;margin:0 0 6px 0;">1. Rule apply per-row cho tất cả BPTL</h4>
+        <p>Mỗi OrgUnit (cấu trúc org) được gán <b>1 template phiếu lương</b> + <b>1 ngày hiệu lực</b>. Khi engine phát hành phiếu:</p>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li>Với mỗi NV thuộc OrgUnit đó, lấy <b>tất cả dòng lương</b> của NV (từ set7) → render N phiếu (1 dòng/phiếu) bằng template đã gán.</li>
+          <li>Nếu NV làm ở nhiều BPTL trong cùng OrgUnit → mỗi BPTL sinh 1 dòng, mỗi dòng 1 trang A4 riêng, <b>đều dùng cùng template</b>.</li>
+        </ul>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">2. Multi-BPTL — mỗi BPTL 1 config template riêng (nếu cần)</h4>
+        <p>Nếu 1 NV kiêm nhiệm ở nhiều <b>OrgUnit khác nhau</b> (VD Chế biến Line 1 + Vệ sinh Xưởng 01), và các OrgUnit đó gán template khác nhau:</p>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li>Dòng lương của BPTL nào → dùng template gán cho OrgUnit của BPTL đó.</li>
+          <li>NV có thể nhận N phiếu với M layout khác nhau (thường M=1, ít khi M&gt;1).</li>
+        </ul>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">3. Ngày hiệu lực (versioning)</h4>
+        <p>Gán template có <code>ngayHieuLuc</code>. Khi phát hành phiếu kỳ tháng T → engine chọn <b>bản gán có ngayHieuLuc ≤ ngày phát hành</b> và mới nhất. Cho phép rollback template mà không mất lịch sử.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">4. Cảnh báo "Không có NV MPHG"</h4>
+        <p>Nếu template có <b>Nguồn DL = MPHG_LSP</b> nhưng OrgUnit không có NV nào trong <a href="set6-danhsach-nv-tinh-luong.html" target="_top">DS NV tính lương MPHG (set6)</a> → hiển thị badge <b>⚠ Không có NV MPHG</b>.
+        <b>Không chặn</b> — BA có thể vẫn gán (chuẩn bị cho tương lai). Khi engine chạy sẽ trả về 0 phiếu cho OrgUnit đó — không lỗi.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">5. Fallback template mất</h4>
+        <p>Nếu OrgUnit không có bản gán nào có hiệu lực → engine dùng template <b>mặc định của tenant</b> (checkbox "Đặt làm template mặc định" ở set12). Không có default → log warning, phiếu hiện "Chưa cấu hình".</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">6. Feature flag</h4>
+        <p>Cột <b>Số NV MPHG</b> chỉ hiển thị cho tenant có role <code>MPHG_PAYSLIP_ENGINE</code>. Tenant khác không thấy cột này — zero-impact UX.</p>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="closeQuyTacModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showAlert(msg, type) {
+      const b = document.getElementById('alertBox');
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display='none', 3500);
+    }
+
+    // Mock templates
+    const MOCK_TPL = [
+      { ma:'PL_01', ten:'Phiếu lương MPHG chế biến',  nguonDL:'MPHG_LSP'   },
+      { ma:'PL_02', ten:'Phiếu lương MPHG văn phòng', nguonDL:'MPHG_LSP'   },
+      { ma:'PL_03', ten:'Phiếu lương KH A',            nguonDL:'MILLENNIUM' },
+      { ma:'PL_04', ten:'Phiếu lương KH B',            nguonDL:'MILLENNIUM' },
+      { ma:'PL_05', ten:'Phiếu lương legacy',          nguonDL:undefined    }  /* backward compat */
+    ];
+
+    // Mock OrgUnits với số NV MPHG (từ set6)
+    const MOCK_ORG = [
+      { ma:'OU_ROOT',     ten:'Công ty Minh Phú',   nvMPHG: 5000 },
+      { ma:'OU_CB',       ten:'Khối chế biến',      nvMPHG: 3200 },
+      { ma:'OU_CB_LINE1', ten:'Chế biến - Line 1',  nvMPHG: 850  },
+      { ma:'OU_CB_LINE2', ten:'Chế biến - Line 2',  nvMPHG: 780  },
+      { ma:'OU_VP',       ten:'Khối văn phòng',     nvMPHG: 180  },
+      { ma:'OU_VP_HR',    ten:'VP - Nhân sự',       nvMPHG: 25   },
+      { ma:'OU_VP_ACC',   ten:'VP - Kế toán',       nvMPHG: 0    },
+      { ma:'OU_KHO',      ten:'Khối kho vận',       nvMPHG: 0    }
+    ];
+
+    // Assignment mock
+    const MOCK_ASSIGN = [
+      { orgMa:'OU_CB_LINE1', tplMa:'PL_01', ngayHieuLuc:'2026-08-01' },
+      { orgMa:'OU_CB_LINE2', tplMa:'PL_01', ngayHieuLuc:'2026-08-01' },
+      { orgMa:'OU_VP_HR',    tplMa:'PL_02', ngayHieuLuc:'2026-08-01' },
+      { orgMa:'OU_VP_ACC',   tplMa:'PL_02', ngayHieuLuc:'2026-08-01' }, // WARN: OU_VP_ACC không có NV MPHG
+      { orgMa:'OU_KHO',      tplMa:'PL_03', ngayHieuLuc:'2026-08-01' },
+      { orgMa:'OU_ROOT',     tplMa:'PL_04', ngayHieuLuc:'2026-01-01' },
+      { orgMa:'OU_VP',       tplMa:'PL_05', ngayHieuLuc:'2024-01-01' }  // Backward compat
+    ];
+
+    function tplInfo(ma) { return MOCK_TPL.find(t => t.ma === ma) || { ten:'?', nguonDL:'MILLENNIUM' }; }
+    function orgInfo(ma) { return MOCK_ORG.find(o => o.ma === ma) || { ten:'?', nvMPHG:0 }; }
+
+    function sourceBadge(source) {
+      const s = source || 'MILLENNIUM';
+      if (s === 'MPHG_LSP') return '<span class="badge-mphg">🆕 MPHG_LSP</span>';
+      return '<span class="badge-mill">Millennium</span>';
+    }
+
+    function toggleAll(cb) {
+      document.querySelectorAll('.chk-row').forEach(c => c.checked = cb.checked);
+    }
+
+    function openQuyTacModal()  { document.getElementById('quyTacModal').style.display = 'flex'; }
+    function closeQuyTacModal() { document.getElementById('quyTacModal').style.display = 'none'; }
+
+    function renderGrid() {
+      const org = document.getElementById('fltOrg').value;
+      const tpl = document.getElementById('fltTpl').value;
+      const eff = document.getElementById('fltEff').value;
+
+      let list = MOCK_ASSIGN.slice();
+      if (org) list = list.filter(a => a.orgMa === org);
+      if (tpl) list = list.filter(a => a.tplMa === tpl);
+      if (eff) list = list.filter(a => a.ngayHieuLuc <= eff);
+
+      let warnCnt = 0;
+      const html = list.map((a, i) => {
+        const t = tplInfo(a.tplMa);
+        const o = orgInfo(a.orgMa);
+        const nguonDL = t.nguonDL || 'MILLENNIUM';
+        const isMPHG = (nguonDL === 'MPHG_LSP');
+        const hasNoNV = isMPHG && o.nvMPHG === 0;
+        if (hasNoNV) warnCnt++;
+        const rowCls = hasNoNV ? 'row-warn' : (isMPHG ? 'row-mphg' : '');
+        const warns = [];
+        if (hasNoNV) warns.push('<span class="badge-warn">⚠ Không có NV MPHG</span>');
+        return `<tr class="${rowCls}">
+          <td style="text-align:center;"><input type="checkbox" class="chk-row"></td>
+          <td style="text-align:center;">${i+1}</td>
+          <td style="text-align:center;"><span class="edit-icon" style="cursor:pointer;color:#e67e22;">✎</span></td>
+          <td class="col-ma">${a.orgMa}</td>
+          <td>${o.ten}</td>
+          <td class="col-ma">${a.tplMa}</td>
+          <td>${t.ten}</td>
+          <td class="col-source">${sourceBadge(nguonDL)}</td>
+          <td style="text-align:center;">${formatDate(a.ngayHieuLuc)}</td>
+          <td style="text-align:center;font-weight:bold;color:${isMPHG ? (o.nvMPHG > 0 ? '#28a745' : '#dc3545') : '#999'};">
+            ${isMPHG ? o.nvMPHG : '—'}
+          </td>
+          <td style="text-align:center;">${warns.join(' ') || ''}</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('ccBody').innerHTML = html ||
+        '<tr><td colspan="11" style="text-align:center;padding:30px;color:#999;">Chưa có gán nào theo filter.</td></tr>';
+
+      const warnBar = document.getElementById('warnBar');
+      const msgs = [];
+      if (warnCnt > 0) {
+        msgs.push(`⚠ Có <b>${warnCnt}</b> gán template MPHG_LSP nhưng OrgUnit không có NV trong DS MPHG. ` +
+          `Kiểm tra <a href="set6-danhsach-nv-tinh-luong.html" target="_top">DS NV tính lương</a> hoặc đổi template.`);
+      }
+      warnBar.innerHTML = msgs.length ? `<div class="info-warn">${msgs.join('<br>')}</div>` : '';
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const p = iso.split('-'); return `${p[2]}/${p[1]}/${p[0]}`;
+    }
+
+    function applyFilter() { renderGrid(); }
+    function onReset() {
+      document.getElementById('fltOrg').value = '';
+      document.getElementById('fltTpl').value = '';
+      document.getElementById('fltEff').value = '2026-08-01';
+      renderGrid();
+    }
+    function onSave()   { showAlert('Mock: đã lưu thay đổi gán template.', 'success'); }
+    function onDelete() { showAlert('Mock: xóa các gán đã tick.', 'success'); }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === name));
+      document.querySelectorAll('.tab-panel').forEach(el => el.classList.toggle('active', el.id === 'panel-'+name));
+    }
+
+    // Add tab
+    function initAddCombos() {
+      const orgOpts = MOCK_ORG.map(o => `<option value="${o.ma}">${o.ma} - ${o.ten}</option>`).join('');
+      const tplOpts = MOCK_TPL.map(t => `<option value="${t.ma}">${t.ma} - ${t.ten}</option>`).join('');
+      document.getElementById('addOrg').innerHTML = '<option value="">-- Chọn --</option>' + orgOpts;
+      document.getElementById('addTpl').innerHTML = '<option value="">-- Chọn --</option>' + tplOpts;
+    }
+
+    function onAddTplChange() {
+      const tplMa = document.getElementById('addTpl').value;
+      if (!tplMa) {
+        document.getElementById('addSourceBadge').innerHTML = '—';
+        document.getElementById('addWarn').innerHTML = '';
+        return;
+      }
+      const t = tplInfo(tplMa);
+      const nguonDL = t.nguonDL || 'MILLENNIUM';
+      document.getElementById('addSourceBadge').innerHTML = sourceBadge(nguonDL);
+      checkAddWarn();
+    }
+
+    function checkAddWarn() {
+      const orgMa = document.getElementById('addOrg').value;
+      const tplMa = document.getElementById('addTpl').value;
+      if (!orgMa || !tplMa) { document.getElementById('addWarn').innerHTML = ''; return; }
+      const o = orgInfo(orgMa);
+      const t = tplInfo(tplMa);
+      if ((t.nguonDL || 'MILLENNIUM') === 'MPHG_LSP' && o.nvMPHG === 0) {
+        document.getElementById('addWarn').innerHTML =
+          '<div class="info-warn">⚠ OrgUnit <b>' + orgMa + '</b> không có NV trong DS MPHG. ' +
+          'Bạn vẫn có thể gán nhưng khi tạo phiếu lương sẽ không có dữ liệu.</div>';
+      } else {
+        document.getElementById('addWarn').innerHTML = '';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('addOrg').addEventListener('change', checkAddWarn);
+    });
+
+    function onAdd() {
+      const orgMa = document.getElementById('addOrg').value;
+      const tplMa = document.getElementById('addTpl').value;
+      const eff   = document.getElementById('addEff').value;
+      if (!orgMa || !tplMa || !eff) {
+        showAlert('Vui lòng nhập đủ OrgUnit + Template + Ngày hiệu lực.', 'error'); return;
+      }
+      MOCK_ASSIGN.push({ orgMa, tplMa, ngayHieuLuc: eff });
+      switchTab('TIMKIEM');
+      renderGrid();
+      showAlert(`Đã gán <b>${tplMa}</b> cho <b>${orgMa}</b>.`, 'success');
+    }
+
+    // init
+    initAddCombos();
+    renderGrid();
+  </script>
+</body>
+</html>

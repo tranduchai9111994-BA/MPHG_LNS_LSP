@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Gán công thức cột Xem lương</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <script src="../shared/xlsx-export.js"></script>
+  <style>
+    /* ===== SGC layout ===== */
+    .sgc-info {
+      background: #eaf4ff; border: 1px solid #b6d4f0; color: #0056b3;
+      padding: 8px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 10px;
+    }
+    .sgc-actions { display: flex; gap: 8px; justify-content: center; margin: 10px 0 14px; flex-wrap: wrap; }
+    .sgc-actions button {
+      padding: 6px 16px; font-size: 12px; font-weight: bold; border: none;
+      border-radius: 3px; cursor: pointer; color: #fff;
+    }
+    .sgc-btn-save   { background: #5c9b00; }  .sgc-btn-save:hover   { background: #4a8000; }
+    .sgc-btn-export { background: #fd7e14; }  .sgc-btn-export:hover { background: #e56b00; }
+    .sgc-btn-rules  { background: #6f42c1; }  .sgc-btn-rules:hover  { background: #5a2b9a; }
+    .sgc-btn-reset  { background: #6c757d; }  .sgc-btn-reset:hover  { background: #545b62; }
+
+    /* ===== Grid ===== */
+    .sgc-grid-wrap { border: 1px solid #ddd; max-height: 560px; overflow: auto; }
+    .sgc-grid-wrap table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .sgc-grid-wrap th {
+      background: #f4d03f; color: #333; padding: 6px 8px; border: 1px solid #ddd;
+      text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 3;
+      white-space: nowrap;
+    }
+    .sgc-grid-wrap td { padding: 4px 6px; border: 1px solid #eee; vertical-align: middle; }
+    .sgc-grid-wrap tbody tr:nth-child(even) { background: #fbfbfb; }
+    .sgc-grid-wrap tbody tr:hover:not(.row-readonly) { background: #f1f8ff; }
+    .sgc-grid-wrap tr.row-readonly { background: #f0f0f0; color: #666; font-style: italic; }
+    .sgc-grid-wrap tr.row-readonly:nth-child(even) { background: #ebebeb; }
+
+    .sgc-grid-wrap .c-stt   { width: 44px; text-align: center; position: sticky; left: 0; background: #fff; z-index: 2; }
+    .sgc-grid-wrap tr:nth-child(even) .c-stt { background: #fbfbfb; }
+    .sgc-grid-wrap tr.row-readonly .c-stt { background: #f0f0f0; }
+    .sgc-grid-wrap .c-ma    { width: 130px; font-family: Consolas, monospace; color: #0056b3; font-weight: bold; position: sticky; left: 44px; background: #fff; z-index: 2; }
+    .sgc-grid-wrap tr:nth-child(even) .c-ma { background: #fbfbfb; }
+    .sgc-grid-wrap tr.row-readonly .c-ma { background: #f0f0f0; }
+    .sgc-grid-wrap .c-tenvn { width: 170px; font-weight: bold; color: #333; }
+    .sgc-grid-wrap .c-ct    { min-width: 320px; }
+    .sgc-grid-wrap .c-note  { width: 200px; }
+    .sgc-grid-wrap .c-an    { width: 56px; text-align: center; }
+
+    .sgc-grid-wrap thead th.c-stt { z-index: 4; left: 0; }
+    .sgc-grid-wrap thead th.c-ma  { z-index: 4; left: 44px; background: #f4d03f; }
+
+    .sgc-grid-wrap textarea {
+      width: 100%; box-sizing: border-box; min-height: 36px;
+      border: 1px solid #ccc; padding: 4px 6px; font-size: 12px;
+      font-family: Consolas, monospace; resize: vertical;
+    }
+    .sgc-grid-wrap textarea:disabled { background: #e9ecef; color: #6c757d; }
+    .sgc-grid-wrap input[type="text"]:disabled { background: #e9ecef; color: #6c757d; }
+    .sgc-grid-wrap input.note-inp {
+      width: 100%; box-sizing: border-box; height: 26px;
+      border: 1px solid #ccc; padding: 2px 6px; font-size: 12px;
+    }
+
+    .btn-pick {
+      background: #6f42c1; color: #fff; border: none; padding: 4px 8px; border-radius: 3px;
+      cursor: pointer; font-size: 11px; font-weight: bold; margin-left: 4px; white-space: nowrap;
+    }
+    .btn-pick:hover { background: #5a2b9a; }
+    .btn-pick:disabled { background: #adb5bd; cursor: not-allowed; }
+
+    .ct-cell-wrap { display: flex; align-items: flex-start; gap: 4px; }
+    .ct-cell-wrap textarea { flex: 1; }
+
+    /* ===== Modal chọn tiêu chí ===== */
+    .sgc-modal-tc { z-index: 1100; }
+    .sgc-modal-tc .modal-box {
+      width: 60vw; max-width: 900px; min-width: 640px; height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sgc-modal-tc .modal-hdr { background: #6f42c1; }
+    .sgc-modal-tc .modal-body { padding: 0; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+    .sgc-tabs { display: flex; background: #eef2f7; border-bottom: 1px solid #d1d9e6; }
+    .sgc-tab {
+      padding: 10px 18px; border: none; background: transparent; cursor: pointer;
+      font-size: 12px; font-weight: bold; color: #555; border-right: 1px solid #d1d9e6;
+    }
+    .sgc-tab.active { background: #fff; color: #6f42c1; border-bottom: 3px solid #6f42c1; }
+    .sgc-tab-count { display: inline-block; background: #6c757d; color: #fff; border-radius: 8px; padding: 1px 7px; font-size: 10px; margin-left: 6px; }
+    .sgc-tab.active .sgc-tab-count { background: #6f42c1; }
+
+    .sgc-tc-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .sgc-tc-search-wrap { padding: 8px 12px; background: #fafbfc; border-bottom: 1px solid #eee; }
+    .sgc-tc-search-wrap input { width: 100%; box-sizing: border-box; height: 30px; padding: 4px 10px; border: 1px solid #ccc; font-size: 12px; }
+    .sgc-tc-list { flex: 1; overflow: auto; padding: 6px 12px; }
+    .sgc-tc-item {
+      display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-bottom: 1px solid #f0f0f0;
+      font-size: 12px; cursor: pointer;
+    }
+    .sgc-tc-item:hover { background: #f8f9fa; }
+    .sgc-tc-item input[type="checkbox"] { margin: 0; }
+    .sgc-tc-item .ma  { font-family: Consolas, monospace; color: #0056b3; font-weight: bold; min-width: 220px; }
+    .sgc-tc-item .ten { color: #333; flex: 1; }
+
+    .sgc-tc-ops {
+      padding: 8px 12px; background: #f8f9fa; border-top: 1px solid #eee;
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .sgc-tc-ops .op-btn {
+      min-width: 32px; height: 30px; padding: 0 8px; border: 1px solid #ced4da; background: #fff; cursor: pointer;
+      font-size: 12px; font-weight: bold; color: #0056b3; border-radius: 3px;
+    }
+    .sgc-tc-ops .op-btn:hover { background: #e8eef5; }
+    .sgc-tc-ops .op-btn.kw { color: #b71c1c; font-family: Consolas, monospace; font-size: 11px; }
+    .sgc-tc-ops .lbl { font-size: 11px; color: #666; margin-right: 4px; }
+    .sgc-tc-preview {
+      flex: 1; min-width: 200px; padding: 6px 10px; background: #fff; border: 1px solid #ccc;
+      border-radius: 3px; font-family: Consolas, monospace; font-size: 12px; min-height: 30px;
+      color: #b71c1c; word-break: break-all;
+    }
+    .sgc-tc-preview.empty { color: #adb5bd; font-style: italic; font-family: inherit; }
+
+    .sgc-modal-tc .modal-ftr { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; gap: 8px; flex-wrap: wrap; }
+    .sgc-modal-tc .modal-ftr .left-info { font-size: 11px; color: #6c757d; flex: 1; min-width: 200px; }
+    .sgc-modal-tc .btn-insert  { background: #28a745; color: #fff; }
+    .sgc-modal-tc .btn-insert:hover  { background: #218838; }
+    .sgc-modal-tc .btn-replace { background: #17a2b8; color: #fff; }
+    .sgc-modal-tc .btn-replace:hover { background: #117a8b; }
+    .sgc-modal-tc .btn-clear   { background: #ffc107; color: #333; }
+    .sgc-modal-tc .btn-close   { background: #6c757d; color: #fff; }
+
+    /* ===== Rule modal ===== */
+    .rule-body { padding: 15px 20px; font-size: 12px; max-height: 70vh; overflow: auto; line-height: 1.55; }
+    .rule-body h4 { color: #0056b3; margin: 10px 0 6px; font-size: 13px; border-bottom: 1px dashed #cfd8dc; padding-bottom: 4px; }
+    .rule-body ul { margin: 4px 0 8px 18px; padding: 0; }
+    .rule-body li { margin: 3px 0; }
+    .rule-body code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; color: #b71c1c; font-size: 11px; }
+    .rule-body .box-tip { background: #fff9c4; border-left: 3px solid #f9a825; padding: 8px 10px; margin: 8px 0; }
+    .rule-body .box-warn { background: #ffebee; border-left: 3px solid #d32f2f; padding: 8px 10px; margin: 8px 0; color: #b71c1c; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+    <div class="breadcrumb">Lương › Thiết lập › Gán công thức cột Tính lương</div>
+    <div class="page-title" style="text-align:center;">
+      GÁN CÔNG THỨC CỘT XEM LƯƠNG
+    </div>
+
+    <div class="sgc-info">
+      💡 Cấu hình công thức cho từng cột trong grid <b>Tính lương tháng (set7)</b>.
+      Áp dụng cho các kỳ tính từ lần lưu tiếp theo — <b>kỳ đã khóa không bị ảnh hưởng</b>.
+      Cột hệ thống (Mã NV, Họ tên) không cấu hình được.
+    </div>
+
+    <div id="sgc-alert" class="alert-box"></div>
+
+    <!-- ===== ACTIONS ===== -->
+    <div class="sgc-actions">
+      <button class="sgc-btn-save"   onclick="sgcSave()">💾 Save</button>
+      <button class="sgc-btn-export" onclick="sgcExport()">📤 Xuất dữ liệu</button>
+      <button class="sgc-btn-rules"  onclick="sgcShowRules()">📋 Quy tắc</button>
+      <button class="sgc-btn-reset"  onclick="sgcReset()">🔄 Reset về mặc định</button>
+    </div>
+
+    <!-- ===== GRID ===== -->
+    <div class="sgc-grid-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="c-stt">STT</th>
+            <th class="c-ma">Mã cột</th>
+            <th class="c-tenvn">Tên cột (VN)</th>
+            <th class="c-ct">Công thức</th>
+            <th class="c-note">Ghi chú</th>
+            <th class="c-an">Ẩn</th>
+          </tr>
+        </thead>
+        <tbody id="sgc-tbody"><!-- render động --></tbody>
+      </table>
+    </div>
+
+    <!-- ===== GHI CHÚ NGHIỆP VỤ ===== -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="4" style="width:100%;box-sizing:border-box;border:1px dashed #ffd600;padding:8px;
+        font-size:12px;background:#fffef0;resize:vertical;font-family:inherit;">
+Vai trò trong workflow:
+  • set5 định nghĩa công thức lương (LSP) → set6 chọn NV đưa vào kỳ tính → set7 hiển thị grid tính lương → publish.
+  • Màn này (Gán CT cột Xem lương) là layer mapping GIỮA tiêu chí động (TK_/HT_/TT_) VÀ cột grid tĩnh của set7.
+  • Khi BA đổi công thức ở đây → engine tính lương của kỳ TIẾP THEO sẽ dùng công thức mới. Kỳ đã khóa vẫn giữ số liệu cũ.
+  • Các cột "Mã NV", "Họ tên" là cột hệ thống — engine tự lấy từ HR master, không cần công thức.</textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button style="font-size:11px;padding:4px 14px;background:#5c9b00;color:#fff;border:none;border-radius:3px;font-weight:bold;cursor:pointer;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: CHỌN TIÊU CHÍ ===== -->
+  <div class="modal-overlay sgc-modal-tc" id="sgc-modal-tc" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        🔍 CHỌN TIÊU CHÍ — Ghép công thức cho cột: <span id="sgc-modal-target" style="color:#fff9c4;"></span>
+        <button class="x" onclick="sgcCloseModalTC()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="sgc-tabs" id="sgc-tabs"></div>
+        <div class="sgc-tc-body">
+          <div class="sgc-tc-search-wrap">
+            <input type="text" id="sgc-tc-search" placeholder="🔎 Tìm mã hoặc tên tiêu chí trong tab đang chọn..." oninput="sgcRenderTCList()">
+          </div>
+          <div class="sgc-tc-list" id="sgc-tc-list"></div>
+        </div>
+        <div class="sgc-tc-ops">
+          <span class="lbl">Toán tử:</span>
+          <button class="op-btn" onclick="sgcAppendPreview(' + ')">+</button>
+          <button class="op-btn" onclick="sgcAppendPreview(' − ')">−</button>
+          <button class="op-btn" onclick="sgcAppendPreview(' × ')">×</button>
+          <button class="op-btn" onclick="sgcAppendPreview(' ÷ ')">÷</button>
+          <button class="op-btn" onclick="sgcAppendPreview('(')">(</button>
+          <button class="op-btn" onclick="sgcAppendPreview(')')">)</button>
+          <button class="op-btn kw" onclick="sgcAppendPreview(' case when ')">case when</button>
+          <button class="op-btn kw" onclick="sgcAppendPreview(' then ')">then</button>
+          <button class="op-btn kw" onclick="sgcAppendPreview(' else ')">else</button>
+          <button class="op-btn kw" onclick="sgcAppendPreview(' end')">end</button>
+          <button class="op-btn kw" onclick="sgcAppendPreview(' > 0')">&gt; 0</button>
+          <button class="op-btn kw" onclick="sgcAppendPreview(' AND ')">AND</button>
+          <button class="op-btn kw" onclick="sgcAppendPreview(' OR ')">OR</button>
+          <div style="flex-basis:100%;height:6px;"></div>
+          <span class="lbl">Preview:</span>
+          <div class="sgc-tc-preview empty" id="sgc-tc-preview">(trống — tick chọn tiêu chí và bấm toán tử để ghép)</div>
+        </div>
+      </div>
+      <div class="modal-ftr">
+        <div class="left-info">
+          💡 <b>Chèn</b>: append vào cuối công thức hiện tại (giữ nguyên).
+          <b>Thay thế</b>: ghi đè toàn bộ (dùng khi làm lại từ đầu).
+        </div>
+        <div>
+          <button class="btn btn-clear" onclick="sgcClearPreview()"
+                  style="padding:6px 12px;border-radius:3px;border:none;font-weight:bold;cursor:pointer;">🧹 Xóa</button>
+          <button class="btn btn-close" onclick="sgcCloseModalTC()"
+                  style="padding:6px 12px;border-radius:3px;border:none;font-weight:bold;cursor:pointer;margin-left:6px;">Đóng</button>
+          <button class="btn btn-replace" onclick="sgcReplacePreview()"
+                  style="padding:6px 12px;border-radius:3px;border:none;font-weight:bold;cursor:pointer;margin-left:6px;">🔁 Thay thế</button>
+          <button class="btn btn-insert" onclick="sgcInsertPreview()"
+                  style="padding:6px 12px;border-radius:3px;border:none;font-weight:bold;cursor:pointer;margin-left:6px;">✅ Chèn</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: QUY TẮC ===== -->
+  <div class="modal-overlay" id="sgc-modal-rules" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:780px;max-width:94vw;">
+      <div class="modal-hdr">
+        📋 QUY TẮC — GÁN CÔNG THỨC CỘT XEM LƯƠNG
+        <button class="x" onclick="document.getElementById('sgc-modal-rules').style.display='none'">✕</button>
+      </div>
+      <div class="rule-body">
+        <h4>1. Cột hệ thống không cấu hình được</h4>
+        <p>Cột <code>maNV</code> (Mã NV) và <code>hoTen</code> (Họ tên) là cột <b>hệ thống</b> — engine tự lấy từ HR master (nhân sự cứng), <b>không có ô công thức</b>. Row hiển thị nền xám nhạt, textarea disabled.</p>
+
+        <h4>2. Cú pháp tham chiếu tiêu chí</h4>
+        <p>Công thức tham chiếu tiêu chí phải có <b>prefix <code>PR.</code></b> (viết tắt "Payroll"). Ví dụ:</p>
+        <ul>
+          <li><code>PR.HT_TS_CongThucTe</code> — tiêu chí hệ thống (HT_) </li>
+          <li><code>PR.TT_LSP_KetQua_Final</code> — tiêu chí tính toán (TT_)</li>
+        </ul>
+        <p>Engine sẽ tự resolve prefix <code>PR.</code> về đúng bảng dữ liệu payroll đang tính.</p>
+
+        <h4>3. Ghép nhiều tiêu chí</h4>
+        <ul>
+          <li>Toán tử số học: <code>+ − × ÷</code> và ngoặc <code>( )</code>.</li>
+          <li>Điều kiện: <code>case when &lt;đk&gt; then &lt;A&gt; else &lt;B&gt; end</code> — kèm <code>AND</code>, <code>OR</code>, <code>&gt; 0</code>.</li>
+          <li>Ví dụ: <code>case when PR.HT_TS_CongThucTe &gt; 0 then PR.TT_LSP_KetQua_Final else 0 end</code>.</li>
+        </ul>
+
+        <h4>4. Gọi trực tiếp function scalar SQL</h4>
+        <p>Cho phép gọi <code>dbo.HR_fnXxx(...)</code> ngay trong công thức, bên cạnh các mã tiêu chí:</p>
+        <div class="box-tip">
+          <code>dbo.HR_fnGetDonVi(PR.EmpID, PR.ToDate, 5)</code><br>
+          <code>dbo.PR_fnGetKhoanTruThang(PR.EmpID, PR.PRMonth, PR.PRYear)</code>
+        </div>
+
+        <h4>5. Save & phạm vi áp dụng</h4>
+        <ul>
+          <li>Bấm <b>💾 Save</b> → cấu hình lưu vào localStorage (mockup DB).</li>
+          <li><b>Áp dụng cho kỳ tính từ lần lưu tiếp theo</b>.</li>
+          <li><b>Kỳ đã khóa không bị ảnh hưởng</b> — giữ nguyên số liệu đã tính. Muốn thấy đổi phải rerun kỳ hoặc mở khóa.</li>
+        </ul>
+
+        <h4>6. Kiểm công thức (nếu bật)</h4>
+        <p>Nút "Kiểm công thức" (nếu có) chỉ tokenize + check mã tiêu chí có hợp lệ trong 3 tab TK_/HT_/TT_ hay không, <b>không validate business rule</b> (không kiểm tra logic case-when có đúng ngữ nghĩa hay không).</p>
+
+        <div class="box-warn">
+          <b>Lưu ý:</b> Màn này KHÁC set9 (gán CT báo cáo động). Ở đây danh sách cột <b>cố định 11 cột grid set7</b>, không config được thứ tự / ẩn / thêm cột (nếu cần → yêu cầu dev refactor set7).
+        </div>
+      </div>
+      <div class="modal-ftr">
+        <button onclick="document.getElementById('sgc-modal-rules').style.display='none'"
+                style="background:#6c757d;color:#fff;padding:6px 16px;font-weight:bold;border:none;border-radius:3px;cursor:pointer;">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ============================================================
+     SET-GANCONGTHUC-COT-TINHLUONG
+     Layer mapping: cột grid set7 (STATIC) → công thức tham chiếu tiêu chí động
+     ============================================================ */
+  const SGC_STORAGE_KEY = 'MPHG_LSP_GAN_CT_COT_LUONG';
+
+  /* ---------- Mock: danh sách 11 cột grid set7 (đồng bộ tay với set7) ---------- */
+  const MOCK_COT_GRID_XEMLUONG = [
+    { stt:1,  ma:'maNV',       tenVN:'Mã NV',        congThuc:'', ghiChu:'Định danh NV (từ HR master)',    an:false, readonly:true  },
+    { stt:2,  ma:'hoTen',      tenVN:'Họ tên',       congThuc:'', ghiChu:'Từ HR master',                    an:false, readonly:true  },
+    { stt:3,  ma:'donVi',      tenVN:'Đơn vị',       congThuc:'dbo.HR_fnGetDonVi(PR.EmpID, PR.ToDate, 5)',                             ghiChu:'Đơn vị cấp 5',                        an:false, readonly:false },
+    { stt:4,  ma:'bptl',       tenVN:'BPTL',         congThuc:'dbo.HR_fnGetBPTinhLuong(PR.EmpID, PR.PRMonth, PR.PRYear)',              ghiChu:'Bộ phận tính lương',                  an:false, readonly:false },
+    { stt:5,  ma:'ngayCong',   tenVN:'Ngày công',    congThuc:'PR.HT_TS_CongThucTe',                                                   ghiChu:'Số ngày công thực tế',                an:false, readonly:false },
+    { stt:6,  ma:'tongTLSP',   tenVN:'Tổng TLSP',    congThuc:'PR.TT_LSP_KetQua_Final',                                                ghiChu:'Tổng cộng lương sản phẩm',            an:false, readonly:false },
+    { stt:7,  ma:'tongTG',     tenVN:'Tổng TG',      congThuc:'PR.TT_LSP_LuongThoiGian',                                               ghiChu:'Lương thời gian (theo ngày công)',    an:false, readonly:false },
+    { stt:8,  ma:'boSungKhac', tenVN:'Bổ sung khác', congThuc:'PR.TT_BoSungKhac',                                                      ghiChu:'Các khoản bổ sung khác',              an:false, readonly:false },
+    { stt:9,  ma:'tongCong',   tenVN:'TỔNG CỘNG',    congThuc:'PR.TT_LSP_TongCong',                                                    ghiChu:'Tổng cộng tiền lương trước trừ',      an:false, readonly:false },
+    { stt:10, ma:'khoanTru',   tenVN:'Khoản trừ',    congThuc:'dbo.PR_fnGetKhoanTruThang(PR.EmpID, PR.PRMonth, PR.PRYear)',            ghiChu:'BHXH + BHYT + BHTN + Thuế TNCN',      an:false, readonly:false },
+    { stt:11, ma:'thucNhan',   tenVN:'Thực nhận',    congThuc:'PR.TT_ThucNhan',                                                        ghiChu:'Chuyển ATM',                          an:false, readonly:false }
+  ];
+
+  /* ---------- Mock: tiêu chí khả dụng theo 3 tab ---------- */
+  const MOCK_TIEU_CHI_AVAILABLE = {
+    'TK_ (Tìm kiếm)': [
+      { ma:'TK_HR_DonViCap1',   ten:'Đơn vị cấp 1' },
+      { ma:'TK_HR_DonViCap2',   ten:'Đơn vị cấp 2' },
+      { ma:'TK_HR_DonViCap3',   ten:'Đơn vị cấp 3' },
+      { ma:'TK_HR_DonViCap4',   ten:'Đơn vị cấp 4' },
+      { ma:'TK_HR_DonViCap5',   ten:'Đơn vị cấp 5' },
+      { ma:'TK_HR_NhomLuong',   ten:'Nhóm lương' },
+      { ma:'TK_HR_ChucVu',      ten:'Chức vụ' },
+      { ma:'TK_HR_LoaiHopDong', ten:'Loại hợp đồng' }
+    ],
+    'HT_ (Hệ thống)': [
+      { ma:'HT_TS_CongThucTe',        ten:'Công thực tế mỗi giai đoạn' },
+      { ma:'HT_TS_CongChuan',         ten:'Công chuẩn tháng' },
+      { ma:'HT_PR_NangSuatTinhLuong', ten:'Năng suất tính lương (NS_FINAL)' },
+      { ma:'HT_PR_LSP_DonGia',        ten:'Đơn giá lương sản phẩm' },
+      { ma:'HT_PR_LSP_HeSo1',         ten:'Hệ số điều chỉnh lần 1' },
+      { ma:'HT_PR_LSP_HeSo2',         ten:'Hệ số điều chỉnh lần 2' },
+      { ma:'HT_PR_LSP_HeSo3',         ten:'Hệ số điều chỉnh lần 3' },
+      { ma:'HT_PR_LSP_HeSo4',         ten:'Hệ số điều chỉnh lần 4' },
+      { ma:'HT_PR_KhoanTruThang',     ten:'Khoản trừ tháng (BHXH+YT+TN+Thuế)' },
+      { ma:'HT_PR_LSP_TongLSP_Dept',  ten:'Tổng LSP của bộ phận (chia BQ)' },
+      { ma:'HT_PR_LSP_BinhQuanKa',    ten:'Bình quân tính chuyền/ca' }
+    ],
+    'TT_ (Tính toán)': [
+      { ma:'TT_LSP_Base_L0',         ten:'Lương gốc L0 (base)' },
+      { ma:'TT_LSP_TienL1',          ten:'Tiền sau điều chỉnh lần 1' },
+      { ma:'TT_LSP_TienL2',          ten:'Tiền sau điều chỉnh lần 2' },
+      { ma:'TT_LSP_TienL3',          ten:'Tiền sau điều chỉnh lần 3' },
+      { ma:'TT_LSP_HoTroChuyenSan',  ten:'Hỗ trợ chuyển sàn' },
+      { ma:'TT_LSP_LuongThoiGian',   ten:'Lương thời gian (theo công)' },
+      { ma:'TT_TNChiuThueTNCN',      ten:'Thu nhập chịu thuế TNCN' },
+      { ma:'TT_LSP_KetQua_Final',    ten:'Kết quả LSP cuối cùng (Final)' },
+      { ma:'TT_LSP_TongCong',        ten:'Tổng cộng tiền lương' },
+      { ma:'TT_ThucNhan',            ten:'Thực nhận sau khấu trừ' }
+    ]
+  };
+
+  const SGC_TAB_KEYS = Object.keys(MOCK_TIEU_CHI_AVAILABLE);
+
+  /* ---------- Runtime state ---------- */
+  let SGC_ROWS = [];              // Bản đang edit
+  let SGC_MODAL_TARGET_IDX = -1;  // Row index đang mở modal
+  let SGC_MODAL_TAB = SGC_TAB_KEYS[0];
+  let SGC_MODAL_PREVIEW = '';
+
+  /* ---------- Persist ---------- */
+  function sgcLoad() {
+    try {
+      const raw = localStorage.getItem(SGC_STORAGE_KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) {
+          // Merge cẩn thận: giữ meta (ma, tenVN, readonly, stt) từ MOCK, chỉ nhận congThuc/ghiChu/an từ storage
+          SGC_ROWS = MOCK_COT_GRID_XEMLUONG.map(m => {
+            const saved = arr.find(x => x.ma === m.ma);
+            return {
+              ...m,
+              congThuc: saved ? (saved.congThuc || '') : m.congThuc,
+              ghiChu:   saved ? (saved.ghiChu   || '') : m.ghiChu,
+              an:       saved ? !!saved.an              : m.an
+            };
+          });
+          return;
+        }
+      }
+    } catch(e) {}
+    SGC_ROWS = JSON.parse(JSON.stringify(MOCK_COT_GRID_XEMLUONG));
+  }
+  function sgcPersist() {
+    try {
+      const slim = SGC_ROWS.map(r => ({ ma:r.ma, congThuc:r.congThuc, ghiChu:r.ghiChu, an:r.an }));
+      localStorage.setItem(SGC_STORAGE_KEY, JSON.stringify(slim));
+    } catch(e) {}
+  }
+
+  /* ---------- Render grid ---------- */
+  function sgcRenderGrid() {
+    const tb = document.getElementById('sgc-tbody');
+    tb.innerHTML = SGC_ROWS.map((r, i) => {
+      const ro = r.readonly;
+      return `
+      <tr class="${ro ? 'row-readonly' : ''}" data-idx="${i}">
+        <td class="c-stt">${r.stt}</td>
+        <td class="c-ma">${escHtml(r.ma)}</td>
+        <td class="c-tenvn">${escHtml(r.tenVN)}</td>
+        <td class="c-ct">
+          <div class="ct-cell-wrap">
+            <textarea id="sgc-ct-${i}"
+              ${ro ? 'disabled title="Cột hệ thống — engine tự lấy từ HR master"' : `oninput="sgcOnCTChange(${i}, this.value)"`}
+            >${escHtml(r.congThuc || (ro ? '(cột hệ thống — engine tự lấy)' : ''))}</textarea>
+            <button class="btn-pick" title="Chọn tiêu chí"
+              ${ro ? 'disabled' : `onclick="sgcOpenModalTC(${i})"`}>[...]</button>
+          </div>
+        </td>
+        <td class="c-note">
+          <input type="text" class="note-inp"
+            value="${escHtml(r.ghiChu || '')}"
+            ${ro ? 'disabled' : `oninput="sgcOnFieldChange(${i}, 'ghiChu', this.value)"`}>
+        </td>
+        <td class="c-an">
+          <input type="checkbox" ${r.an ? 'checked' : ''}
+            ${ro ? 'disabled title="Cột hệ thống — luôn hiển thị"' : `onchange="sgcOnFieldChange(${i}, 'an', this.checked)"`}>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+  function sgcOnCTChange(i, val)             { SGC_ROWS[i].congThuc = val; }
+  function sgcOnFieldChange(i, field, val)   { SGC_ROWS[i][field]   = val; }
+
+  /* ---------- Modal chọn tiêu chí ---------- */
+  function sgcOpenModalTC(idx) {
+    if (SGC_ROWS[idx].readonly) return;
+    SGC_MODAL_TARGET_IDX = idx;
+    SGC_MODAL_PREVIEW = '';
+    SGC_MODAL_TAB = SGC_TAB_KEYS[0];
+    document.getElementById('sgc-modal-target').textContent = SGC_ROWS[idx].tenVN;
+    document.getElementById('sgc-tc-search').value = '';
+    sgcRenderTabs();
+    sgcRenderTCList();
+    sgcUpdatePreview();
+    document.getElementById('sgc-modal-tc').style.display = 'flex';
+  }
+  function sgcCloseModalTC() {
+    document.getElementById('sgc-modal-tc').style.display = 'none';
+    SGC_MODAL_TARGET_IDX = -1;
+  }
+  function sgcRenderTabs() {
+    const html = SGC_TAB_KEYS.map(k => `
+      <button class="sgc-tab ${k===SGC_MODAL_TAB?'active':''}" onclick="sgcSwitchTab('${k.replace(/'/g,"\\'")}')">
+        ${escHtml(k)} <span class="sgc-tab-count">${MOCK_TIEU_CHI_AVAILABLE[k].length}</span>
+      </button>`).join('');
+    document.getElementById('sgc-tabs').innerHTML = html;
+  }
+  function sgcSwitchTab(k) {
+    SGC_MODAL_TAB = k;
+    document.getElementById('sgc-tc-search').value = '';
+    sgcRenderTabs();
+    sgcRenderTCList();
+  }
+  function sgcRenderTCList() {
+    const list = MOCK_TIEU_CHI_AVAILABLE[SGC_MODAL_TAB] || [];
+    const q = (document.getElementById('sgc-tc-search').value || '').toLowerCase().trim();
+    const filtered = q ? list.filter(x =>
+      x.ma.toLowerCase().includes(q) || x.ten.toLowerCase().includes(q)
+    ) : list;
+    document.getElementById('sgc-tc-list').innerHTML = filtered.length
+      ? filtered.map(x => `
+          <div class="sgc-tc-item" onclick="sgcToggleItem('${x.ma}', this)">
+            <input type="checkbox" onclick="event.stopPropagation();sgcToggleItem('${x.ma}', this.parentElement)">
+            <span class="ma">${escHtml(x.ma)}</span>
+            <span class="ten">${escHtml(x.ten)}</span>
+          </div>`).join('')
+      : `<div style="padding:20px;text-align:center;color:#999;">Không tìm thấy tiêu chí "${escHtml(q)}"</div>`;
+  }
+  function sgcToggleItem(ma, itemEl) {
+    const chk = itemEl.querySelector('input[type="checkbox"]');
+    if (chk && !chk.checked) chk.checked = true;
+    // Append với prefix PR. (engine convention)
+    sgcAppendPreview('PR.' + ma);
+  }
+  function sgcAppendPreview(token) {
+    // Chèn khoảng trắng nếu cần (nhưng không giữa "PR." và mã, không sau "(" đầu ngoặc)
+    if (SGC_MODAL_PREVIEW &&
+        !/[\s\+\−\×\÷\(]$/.test(SGC_MODAL_PREVIEW) &&
+        !/^[\s\+\−\×\÷\)]/.test(token) &&
+        !/^\s/.test(token)) {
+      SGC_MODAL_PREVIEW += ' ';
+    }
+    SGC_MODAL_PREVIEW += token;
+    sgcUpdatePreview();
+  }
+  function sgcClearPreview() {
+    SGC_MODAL_PREVIEW = '';
+    document.querySelectorAll('#sgc-tc-list input[type="checkbox"]').forEach(c => c.checked = false);
+    sgcUpdatePreview();
+  }
+  function sgcUpdatePreview() {
+    const el = document.getElementById('sgc-tc-preview');
+    if (!SGC_MODAL_PREVIEW.trim()) {
+      el.className = 'sgc-tc-preview empty';
+      el.textContent = '(trống — tick chọn tiêu chí và bấm toán tử để ghép)';
+    } else {
+      el.className = 'sgc-tc-preview';
+      el.textContent = SGC_MODAL_PREVIEW.trim();
+    }
+  }
+  function sgcInsertPreview() {
+    if (SGC_MODAL_TARGET_IDX < 0) return;
+    const txt = SGC_MODAL_PREVIEW.trim();
+    if (!txt) { alert('⚠️ Preview đang trống. Vui lòng chọn tiêu chí trước khi Chèn.'); return; }
+    const ta = document.getElementById('sgc-ct-' + SGC_MODAL_TARGET_IDX);
+    if (!ta) return;
+    const cur = ta.value || '';
+    const sep = (cur && !/\s$/.test(cur)) ? ' + ' : '';
+    ta.value = cur + sep + txt;
+    SGC_ROWS[SGC_MODAL_TARGET_IDX].congThuc = ta.value;
+    sgcCloseModalTC();
+    sgcShowAlert(`✅ Đã chèn công thức vào cột "<b>${escHtml(SGC_ROWS[SGC_MODAL_TARGET_IDX].tenVN)}</b>"`, 'success');
+  }
+  function sgcReplacePreview() {
+    if (SGC_MODAL_TARGET_IDX < 0) return;
+    const txt = SGC_MODAL_PREVIEW.trim();
+    if (!txt) { alert('⚠️ Preview đang trống. Vui lòng chọn tiêu chí trước khi Thay thế.'); return; }
+    const ta = document.getElementById('sgc-ct-' + SGC_MODAL_TARGET_IDX);
+    if (!ta) return;
+    if (ta.value && ta.value.trim() &&
+        !confirm(`Ghi đè công thức hiện tại của cột "${SGC_ROWS[SGC_MODAL_TARGET_IDX].tenVN}"?\n\nHiện tại: ${ta.value}\n\nMới: ${txt}`)) {
+      return;
+    }
+    ta.value = txt;
+    SGC_ROWS[SGC_MODAL_TARGET_IDX].congThuc = txt;
+    sgcCloseModalTC();
+    sgcShowAlert(`🔁 Đã thay thế công thức cột "<b>${escHtml(SGC_ROWS[SGC_MODAL_TARGET_IDX].tenVN)}</b>"`, 'success');
+  }
+
+  /* ---------- Actions ---------- */
+  function sgcSave() {
+    // Đếm số cột có công thức (bỏ readonly)
+    const nHasCT = SGC_ROWS.filter(r => !r.readonly && (r.congThuc || '').trim()).length;
+    sgcPersist();
+    sgcShowAlert(`💾 Đã lưu <b>${nHasCT}</b>/${SGC_ROWS.length - 2} cột công thức (2 cột hệ thống không tính).<br>Áp dụng cho kỳ tính từ lần tiếp theo — kỳ đã khóa không đổi.`, 'success');
+  }
+  function sgcExport() {
+    if (typeof XLSXExport === 'undefined') {
+      sgcShowAlert('Helper XLSXExport chưa load. Vui lòng reload trang.', 'error'); return;
+    }
+    var data = SGC_ROWS.map(function (r) {
+      return {
+        stt: r.stt,
+        ma: r.ma,
+        tenVN: r.tenVN,
+        loai: r.readonly ? 'Hệ thống (readonly)' : 'Cấu hình',
+        congThuc: r.congThuc || '',
+        ghiChu: r.ghiChu || '',
+        an: r.an ? 'Ẩn' : 'Hiện'
+      };
+    });
+    var fname = 'GanCT_CotXemLuong_' + new Date().toISOString().slice(0, 10);
+    XLSXExport.export({
+      filename: fname,
+      sheetName: 'Gán CT cột',
+      columns: [
+        { key: 'stt',      header: 'STT',       width: 6  },
+        { key: 'ma',       header: 'Mã cột',    width: 16 },
+        { key: 'tenVN',    header: 'Tên VN',    width: 22 },
+        { key: 'loai',     header: 'Loại cột',  width: 20 },
+        { key: 'congThuc', header: 'Công thức', width: 60 },
+        { key: 'ghiChu',   header: 'Ghi chú',   width: 40 },
+        { key: 'an',       header: 'Hiển thị',  width: 10 }
+      ],
+      data: data
+    });
+    sgcShowAlert('📤 Đang xuất <b>' + data.length + '</b> cột ra <b>' + fname + '.xlsx</b>.', 'success');
+  }
+  function sgcReset() {
+    if (!confirm('Reset toàn bộ cấu hình về mặc định?\n\nMọi công thức và ghi chú đã sửa sẽ bị mất (localStorage sẽ bị xóa).')) return;
+    try { localStorage.removeItem(SGC_STORAGE_KEY); } catch(e) {}
+    SGC_ROWS = JSON.parse(JSON.stringify(MOCK_COT_GRID_XEMLUONG));
+    sgcRenderGrid();
+    sgcShowAlert('🔄 Đã reset về cấu hình mặc định (11 cột).', 'success');
+  }
+  function sgcShowRules() { document.getElementById('sgc-modal-rules').style.display = 'flex'; }
+
+  /* ---------- Helpers ---------- */
+  function escHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, m => (
+      {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+    ));
+  }
+  function sgcShowAlert(msg, type) {
+    const b = document.getElementById('sgc-alert');
+    b.className = 'alert-box alert-' + (type || 'success');
+    b.innerHTML = msg;
+    b.style.display = 'block';
+    if (type !== 'error') setTimeout(() => { b.style.display = 'none'; }, 4500);
+  }
+
+  /* ---------- Init ---------- */
+  document.addEventListener('DOMContentLoaded', function() {
+    sgcLoad();
+    sgcRenderGrid();
+  });
+  </script>
+</body>
+</html>

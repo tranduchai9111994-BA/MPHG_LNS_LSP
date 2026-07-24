@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Tính lương tháng (LSP)</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    /* ====== SET7 - Tính lương tháng ====== */
+    .set7-filter {
+      display: grid;
+      grid-template-columns: 110px 1fr 110px 1fr 110px 1fr 110px 1fr;
+      gap: 8px 12px; align-items: center;
+    }
+    .set7-filter label { font-size: 12px; color: #333; text-align: right; }
+    .set7-filter label.lbl-red { color: #d32f2f; font-weight: bold; }
+    .set7-filter input[type="text"], .set7-filter select {
+      width: 100%; height: 26px; padding: 3px 6px; border: 1px solid #ccc; font-size: 12px;
+    }
+    .set7-filter .radio-group { display: flex; gap: 10px; font-size: 11px; align-items: center; flex-wrap: wrap; }
+    .set7-filter .radio-group label { color: #333; font-weight: normal; text-align: left; }
+    .set7-filter .radio-group input[type="radio"] { margin-right: 3px; }
+    .set7-filter .col-span-2 { grid-column: span 2; }
+    .set7-filter .col-span-3 { grid-column: span 3; }
+
+    .set7-actions { display: flex; gap: 8px; justify-content: center; margin: 12px 0 6px 0; flex-wrap: wrap; }
+    .set7-actions button { padding: 7px 18px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: #fff; }
+    .btn-search { background: #ffc107; color: #333 !important; }
+    .btn-refresh { background: #007bff; }
+    .btn-calc { background: #28a745; }
+    .btn-calc:hover { background: #218838; }
+
+    /* Toolbar bulk actions */
+    .set7-toolbar {
+      display: flex; gap: 8px; justify-content: flex-start; margin: 10px 0 6px 0; flex-wrap: wrap;
+      align-items: center; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px 12px;
+    }
+    .set7-toolbar .info { margin-left: auto; font-size: 11px; color: #555; }
+    .set7-toolbar .info b { color: #0056b3; }
+    .set7-toolbar button { padding: 6px 14px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: #fff; }
+    .btn-lock         { background: #fd7e14; }       /* orange - khóa dòng chọn */
+    .btn-unlock       { background: #007bff; }       /* blue   - mở khóa dòng chọn */
+    .btn-lock-all     { background: #c85a00; }       /* dark orange - khóa TẤT CẢ theo filter */
+    .btn-unlock-all   { background: #003f80; }       /* dark blue   - mở khóa TẤT CẢ theo filter */
+    .set7-toolbar .toolbar-sep {
+      width: 1px; height: 24px; background: #ccc; margin: 0 4px;
+    }
+    .btn-remove { background: #dc3545; }
+    .btn-export { background: #fd7e14; }
+    .btn-publish {
+      background: #adb5bd; cursor: not-allowed; position: relative;
+    }
+    .btn-publish:hover::after {
+      content: 'Triển khai giai đoạn 2 (ESS/Mobile)';
+      position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+      background: #333; color: #fff; padding: 3px 8px; border-radius: 3px; font-size: 10px;
+      font-weight: normal; white-space: nowrap; z-index: 10;
+    }
+
+    /* Grid wrap */
+    .set7-grid-wrap {
+      border: 1px solid #ddd; background: #fff; overflow: auto; max-height: 620px;
+      position: relative;
+    }
+    .set7-grid { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; table-layout: auto; }
+    .set7-grid thead th {
+      background: #f4d03f; color: #333; padding: 6px 8px; border: 1px solid #ddd;
+      text-align: center; font-weight: bold; font-size: 11px;
+      position: sticky; top: 0; z-index: 4; white-space: nowrap;
+    }
+    .set7-grid tbody td { padding: 5px 8px; border: 1px solid #eee; text-align: center; white-space: nowrap; }
+    .set7-grid tbody tr:nth-child(even) { background: #fbfbfb; }
+    .set7-grid tbody tr:hover { background: #f1f8ff; }
+    .set7-grid tbody tr.row-locked { background: #ececec !important; color: #666; font-style: italic; }
+    .set7-grid tbody tr.row-locked td.c-manv,
+    .set7-grid tbody tr.row-locked td.c-hoten { color: #666; }
+
+    .set7-grid td.c-manv  { font-family: Consolas, monospace; color: #0056b3; font-weight: bold; text-align: left; }
+    .set7-grid td.c-hoten { text-align: left; font-weight: 500; }
+    .set7-grid td.c-money { text-align: right; font-variant-numeric: tabular-nums; }
+    .set7-grid td.c-money.bold { font-weight: bold; }
+    .set7-grid td.c-money.thucnhan { color: #0f6b2f; font-weight: bold; }
+    .set7-grid td.c-num   { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Sticky-left columns */
+    .set7-grid th.stk-1, .set7-grid td.stk-1 { position: sticky; left: 0; z-index: 2; background: #fff; }
+    .set7-grid th.stk-2, .set7-grid td.stk-2 { position: sticky; left: 100px; z-index: 2; background: #fff; }
+    .set7-grid thead th.stk-1, .set7-grid thead th.stk-2 { z-index: 5; background: #f4d03f; }
+    .set7-grid tbody tr:nth-child(even) td.stk-1,
+    .set7-grid tbody tr:nth-child(even) td.stk-2 { background: #fbfbfb; }
+    .set7-grid tbody tr:hover td.stk-1,
+    .set7-grid tbody tr:hover td.stk-2 { background: #f1f8ff; }
+    .set7-grid tbody tr.row-locked td.stk-1,
+    .set7-grid tbody tr.row-locked td.stk-2 { background: #ececec; }
+
+    .set7-grid col.c-chk    { width: 34px; }
+    .set7-grid col.c-stt    { width: 42px; }
+    .set7-grid col.c-lock   { width: 30px; }
+    .set7-grid col.c-manv   { width: 100px; }
+    .set7-grid col.c-hoten  { width: 200px; }
+    .set7-grid col.c-dv     { width: 90px; }
+    .set7-grid col.c-bptl   { width: 100px; }
+    .set7-grid col.c-nc     { width: 70px; }
+    .set7-grid col.c-money  { width: 110px; }
+    .set7-grid col.c-tong   { width: 120px; }
+    .set7-grid col.c-tn     { width: 120px; }
+    .set7-grid col.c-act    { width: 60px; }
+
+    .badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+    .badge-dv   { background: #e3f2fd; color: #0d47a1; }
+    .badge-bptl { background: #f3e5f5; color: #6a1b9a; }
+
+    .icon-lock  { color: #dc3545; font-size: 13px; }
+    .icon-view  {
+      display: inline-block; padding: 2px 10px; background: #0056b3; color: #fff;
+      border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: bold;
+    }
+    .icon-view:hover { background: #003f80; }
+
+    /* Popup Chi tiết */
+    .popup-header-info {
+      background: #eef2f7; padding: 10px 14px; border-radius: 4px; margin-bottom: 10px;
+      font-size: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px 20px;
+    }
+    .popup-header-info .lbl { color: #555; font-size: 11px; }
+    .popup-header-info .val { color: #0056b3; font-weight: bold; font-size: 12px; }
+
+    .tab-header {
+      display: flex; border-bottom: 2px solid #0056b3; margin-bottom: 8px;
+    }
+    .tab-header .tab { padding: 6px 20px; background: #0056b3; color: #fff; font-weight: bold; font-size: 12px; border-radius: 4px 4px 0 0; }
+
+    .ct-grid { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .ct-grid th { background: #0056b3; color: #fff; padding: 6px 8px; border: 1px solid #003f80; text-align: center; font-weight: bold; }
+    .ct-grid td { padding: 4px 8px; border: 1px solid #ddd; }
+    .ct-grid tbody tr:nth-child(even) { background: #fafafa; }
+    .ct-grid td.tl { text-align: left; }
+    .ct-grid td.tr { text-align: right; font-variant-numeric: tabular-nums; }
+    .ct-grid td.tc { text-align: center; }
+    .ct-grid td.c-ma { font-family: Consolas, monospace; color: #0056b3; }
+    .ct-grid td.c-nhom-tk { color: #6c757d; font-weight: bold; }
+    .ct-grid td.c-nhom-ht { color: #0d47a1; font-weight: bold; }
+    .ct-grid td.c-nhom-tt { color: #28a745; font-weight: bold; }
+    .ct-grid .badge-status { padding: 1px 6px; border-radius: 8px; font-size: 10px; font-weight: bold; }
+    .ct-grid .st-ok   { background: #d4edda; color: #155724; }
+    .ct-grid .st-skip { background: #f8f9fa; color: #6c757d; }
+
+    /* Modal Quy tắc */
+    .rules-section { margin-bottom: 12px; padding: 8px 12px; background: #f8f9fa; border-left: 3px solid #6f42c1; border-radius: 3px; }
+    .rules-section h4 { margin: 0 0 6px 0; color: #6f42c1; font-size: 13px; }
+    .rules-section p, .rules-section li { font-size: 12px; line-height: 1.55; color: #333; margin: 3px 0; }
+    .rules-section ol { margin: 4px 0 4px 20px; padding: 0; }
+
+    .btn-rules {
+      background: #6f42c1; color: #fff; border: none; border-radius: 4px;
+      padding: 6px 14px; font-size: 12px; font-weight: bold; cursor: pointer;
+    }
+    .btn-rules:hover { background: #5a35a0; }
+
+    /* ===== Info panel: giải pháp end-to-end ESS + Mobile ===== */
+    .ess-mobile-note {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: #e7f5ff; border-left: 4px solid #0d6efd;
+      border-radius: 4px; padding: 10px 14px; margin: 0 0 10px 0;
+    }
+    .ess-mobile-note-icon { font-size: 22px; line-height: 1.1; flex: 0 0 auto; }
+    .ess-mobile-note-body { flex: 1; font-size: 12px; color: #1c3a5b; }
+    .ess-mobile-note-title { font-weight: bold; color: #0d47a1; margin-bottom: 2px; }
+    .ess-mobile-note-desc  { line-height: 1.5; }
+    .ess-mobile-note-link {
+      color: #0d6efd; font-weight: bold; text-decoration: none; margin-left: 6px;
+    }
+    .ess-mobile-note-link:hover { text-decoration: underline; }
+
+    /* ===== Section follow-up cuối trang ===== */
+    .ghichu-block {
+      margin-top: 18px; padding: 14px 16px;
+      background: #f8fafc; border: 1px solid #cfd8e3;
+      border-radius: 6px;
+    }
+    .ghichu-title {
+      font-weight: bold; color: #0d47a1; font-size: 13px;
+      padding-bottom: 8px; margin-bottom: 10px;
+      border-bottom: 2px dashed #ffd600;
+    }
+    .ghichu-content p { margin: 4px 0 8px 0; font-size: 12px; line-height: 1.55; }
+
+    .followup-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin: 10px 0;
+    }
+    .followup-col {
+      background: #fff; border: 1px solid #dee2e6;
+      border-radius: 6px; padding: 10px 12px;
+    }
+    .followup-head {
+      font-weight: 600; color: #0d6efd; margin-bottom: 8px;
+      padding-bottom: 6px; border-bottom: 1px dashed #ced4da; font-size: 12px;
+    }
+    .followup-col ul { margin: 0; padding-left: 20px; }
+    .followup-col li { font-size: 11.5px; line-height: 1.55; color: #333; }
+    .followup-col li b { color: #0056b3; }
+
+    .followup-tech, .followup-uxtest {
+      margin-top: 10px; padding: 8px 12px;
+      background: #fff8e1; border-left: 3px solid #ffc107;
+      border-radius: 4px; font-size: 12px;
+    }
+    .followup-tech b, .followup-uxtest b { color: #856404; }
+    .followup-tech ul, .followup-uxtest ul { margin: 4px 0 0 0; padding-left: 20px; }
+    .followup-tech li, .followup-uxtest li { line-height: 1.5; }
+    .followup-tech code {
+      background: #fff; padding: 1px 6px; border-radius: 3px;
+      border: 1px solid #ddd; font-family: Consolas, monospace; font-size: 11px;
+      color: #d63384;
+    }
+    @media (max-width: 900px) {
+      .followup-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">&#10086;</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>&#127483;&#127475; VN &#8964;</span>
+      <span>&#128276; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>&#9993; <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+
+    <div class="breadcrumb">Lương &#8250; Chức năng &#8250; Tính lương tháng (LSP)</div>
+    <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>TÍNH LƯƠNG THÁNG - LSP</span>
+      <button class="btn-rules" onclick="showModal('modal-rules')">&#128203; Quy tắc</button>
+    </div>
+
+    <div class="info-bar" style="margin-bottom:10px;">
+      VAI TRÒ: Màn hình sử dụng <strong>sau khi DS NV đã chốt (set6) và công thức đã gán (set4/set5)</strong>. Engine tính ra kết quả lương tháng theo từng NV; HR review, khóa dòng, xuất Excel trước khi publish sang phiếu lương (giai đoạn 2 sang ESS/Mobile).
+    </div>
+    <div id="alertBox" class="alert-box"></div>
+
+    <!-- ============ NOTE: GIẢI PHÁP END-TO-END (ESS + Mobile) ============ -->
+    <div class="ess-mobile-note">
+      <div class="ess-mobile-note-icon">&#128241;&#128188;</div>
+      <div class="ess-mobile-note-body">
+        <div class="ess-mobile-note-title">Giải pháp end-to-end - Publish sang ESS &amp; Mobile app</div>
+        <div class="ess-mobile-note-desc">
+          Sau khi engine tính lương xong &amp; HR khóa dòng, dữ liệu sẽ được publish sang
+          <b>Dịch vụ cá nhân (ESS Web)</b> và <b>Mobile app MPHG</b> để NV tự tra cứu lương/phiếu lương.
+          &#128161; <a href="#" onclick="showModal('modal-rules'); return false;" class="ess-mobile-note-link">Xem chi tiết Follow-up ESS/Mobile giai đoạn 2 tại Quy tắc &rarr; Rule 10</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ FILTER PANEL (EmpHeader chuẩn Millennium - 5 hàng × 4 cột) ============ -->
+    <div class="form-panel">
+      <div class="set7-filter">
+        <!-- Row 1: Kỳ | Mã NV | Tên NV | Đơn vị cấp 1 -->
+        <label class="lbl-red">Kỳ lương</label>
+        <select id="f-ky"></select>
+
+        <label>Mã NV</label>
+        <input type="text" id="f-manv" placeholder="Chứa...">
+
+        <label>Tên NV</label>
+        <input type="text" id="f-ten" placeholder="Chứa...">
+
+        <label>Đơn vị cấp 1</label>
+        <select id="f-dv1" onchange="onDvCap1Change()"><option value="">Tất cả</option></select>
+
+        <!-- Row 2: Đơn vị cấp 2..5 (cascade) -->
+        <label>Đơn vị cấp 2</label>
+        <select id="f-dv2" onchange="onDvCap2Change()"><option value="">Tất cả</option></select>
+
+        <label>Đơn vị cấp 3</label>
+        <select id="f-dv3" onchange="onDvCap3Change()"><option value="">Tất cả</option></select>
+
+        <label>Đơn vị cấp 4</label>
+        <select id="f-dv4" onchange="onDvCap4Change()"><option value="">Tất cả</option></select>
+
+        <label>Đơn vị cấp 5</label>
+        <select id="f-dv5"><option value="">Tất cả</option></select>
+
+        <!-- Row 3: Chức vụ | NTL cấp 1..3 (cascade) -->
+        <label>Chức vụ</label>
+        <select id="f-cv"><option value="">Tất cả</option></select>
+
+        <label>NTL cấp 1</label>
+        <select id="f-ntl1" onchange="onNtl1Change()"><option value="">Tất cả</option></select>
+
+        <label>NTL cấp 2</label>
+        <select id="f-ntl2" onchange="onNtl2Change()"><option value="">Tất cả</option></select>
+
+        <label>NTL cấp 3</label>
+        <select id="f-ntl3"><option value="">Tất cả</option></select>
+
+        <!-- Row 4: BPTL | Nghỉ việc từ ngày | NLV cuối từ ngày | (Loại Tháng năm - đã có Kỳ) -->
+        <label>BPTL</label>
+        <select id="f-bptl"><option value="">Tất cả</option></select>
+
+        <label>Nghỉ việc từ</label>
+        <input type="date" id="f-nghiviec-tu">
+
+        <label>Ngày LV cuối từ <span title="Lọc NV có ngày làm việc cuối cùng >= ngày này. Dùng để filter NV thôi việc gần đây." style="cursor:help;color:#0d6efd;font-weight:bold;">&#10067;</span></label>
+        <input type="date" id="f-nlv-tu">
+
+        <label>Nhóm lương (LSP)</label>
+        <select id="f-nl"><option value="">Tất cả</option></select>
+
+        <!-- Row 5: Radio "Khóa lương" | Radio "Tình trạng" -->
+        <label>Khóa lương</label>
+        <div class="radio-group col-span-3">
+          <label><input type="radio" name="f-kl" value="all" checked> Tất cả</label>
+          <label><input type="radio" name="f-kl" value="khoa"> Đã khóa</label>
+          <label><input type="radio" name="f-kl" value="chuakhoa"> Chưa khóa</label>
+        </div>
+
+        <label>Tình trạng</label>
+        <div class="radio-group col-span-3">
+          <label><input type="radio" name="f-tt" value="all" checked> Tất cả</label>
+          <label><input type="radio" name="f-tt" value="DangLamViec"> Đang làm việc</label>
+          <label><input type="radio" name="f-tt" value="ThoiViec"> Thôi việc</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="set7-actions">
+      <button class="btn-search"  onclick="applyFilter()">&#128269; Tìm kiếm</button>
+      <button class="btn-refresh" onclick="resetFilter()">Làm mới</button>
+      <button class="btn-calc"    onclick="runCalc()">&#9881; Chạy tính lương</button>
+    </div>
+
+    <!-- ============ BULK TOOLBAR ============ -->
+    <div class="set7-toolbar">
+      <button class="btn-lock"        onclick="bulkLock()"        title="Khóa các dòng đang tick">&#128274; Khóa dòng chọn</button>
+      <button class="btn-unlock"      onclick="bulkUnlock()"      title="Mở khóa các dòng đang tick">&#128275; Mở khóa dòng chọn</button>
+      <span class="toolbar-sep"></span>
+      <button class="btn-lock-all"    onclick="lockAllFiltered()"   title="Khóa TẤT CẢ dòng theo filter hiện tại">&#128274;&#128274; Khóa tất cả</button>
+      <button class="btn-unlock-all"  onclick="unlockAllFiltered()" title="Mở khóa TẤT CẢ dòng theo filter hiện tại">&#128275;&#128275; Mở khóa tất cả</button>
+      <span class="toolbar-sep"></span>
+      <button class="btn-remove"  onclick="bulkRemove()">&#128465; Xóa khỏi bảng tính</button>
+      <button class="btn-export"  onclick="exportExcel()">&#128228; Xuất Excel</button>
+      <button class="btn-publish" disabled title="Triển khai giai đoạn 2">&#128228; Publish ESS/Mobile</button>
+      <div class="info" id="grid-info">Chưa có dữ liệu</div>
+    </div>
+
+    <!-- ============ GRID ============ -->
+    <div class="set7-grid-wrap">
+      <table class="set7-grid" id="set7-grid">
+        <colgroup>
+          <col class="c-chk"><col class="c-stt"><col class="c-lock">
+          <col class="c-manv"><col class="c-hoten">
+          <col class="c-dv"><col class="c-bptl"><col class="c-nc">
+          <col class="c-money"><col class="c-money"><col class="c-money">
+          <col class="c-tong"><col class="c-money"><col class="c-tn"><col class="c-act">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="chk-all" onclick="toggleAll(this)"></th>
+            <th>STT</th>
+            <th>&#128274;</th>
+            <th class="stk-1">Mã NV</th>
+            <th class="stk-2">Họ tên</th>
+            <th>Đơn vị</th>
+            <th>BPTL</th>
+            <th>Ngày công</th>
+            <th>Tổng TLSP</th>
+            <th>Tổng TG</th>
+            <th>Bổ sung khác</th>
+            <th>TỔNG CỘNG</th>
+            <th>Khoản trừ</th>
+            <th>Thực nhận</th>
+            <th>&#8942;</th>
+          </tr>
+        </thead>
+        <tbody id="grid-body"><!-- render bằng JS --></tbody>
+      </table>
+    </div>
+
+    <!-- ============ GHI CHÚ NGHIỆP VỤ ============ -->
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        &#128203; GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="7" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;">
+Màn set7 - Tính lương tháng, mắt xích cuối của chuỗi TÍNH LƯƠNG LSP:
+  set5 (Tạo kỳ)  →  set6 (Chốt DS NV)  →  set4/set5 (Gán CT lương)  →  set7 (Chạy engine + Review + Khóa)  →  publish sang phiếu lương / ESS - Mobile (giai đoạn 2)
+
+Điểm cần chốt với KH:
+- Filter (Đơn vị/BPTL/Nhóm lương/Trạng thái) ở màn này chỉ dùng để LỌC HIỂN THỊ, không thay đổi tập engine tính (đã cố định từ set6).
+- Quy trình khóa dòng: HR review từng NV, tick 🔒 → engine không tính lại dòng đó khi bấm "Chạy tính lương" (idempotent per-row lock).
+- Publish sang ESS/Mobile chưa nằm trong scope giai đoạn 1 - button hiện disabled + tooltip.
+      </textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">&#128190; Lưu ghi chú</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================== MODAL: Chi tiết tiêu chí ================== -->
+  <div class="modal-overlay" id="modal-ct" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:94vw;max-width:1100px;">
+      <div class="modal-hdr" style="background:#0056b3;">
+        <span>&#128269; Chi tiết tính toán tiêu chí</span>
+        <button class="x" onclick="hideModal('modal-ct')">&#10005;</button>
+      </div>
+      <div class="modal-body" style="max-height:78vh;overflow-y:auto;padding:14px 18px;">
+        <div class="popup-header-info" id="ct-header">
+          <!-- render động -->
+        </div>
+        <div class="tab-header">
+          <div class="tab">Chi tiết tính toán</div>
+        </div>
+        <table class="ct-grid" id="ct-body">
+          <thead>
+            <tr>
+              <th style="width:40px">STT</th>
+              <th style="width:70px">Nhóm</th>
+              <th style="width:140px">Mã TC</th>
+              <th>Tên tiêu chí</th>
+              <th style="width:220px">Công thức / Nguồn</th>
+              <th style="width:110px">Kết quả</th>
+              <th style="width:60px">Đơn vị</th>
+              <th style="width:80px">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody><!-- render động --></tbody>
+        </table>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="hideModal('modal-ct')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== MODAL: Quy tắc ================== -->
+  <div class="modal-overlay" id="modal-rules" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:88vw;max-width:820px;">
+      <div class="modal-hdr" style="background:#6f42c1;">
+        <span>&#128203; Quy tắc nghiệp vụ - Tính lương tháng</span>
+        <button class="x" onclick="hideModal('modal-rules')">&#10005;</button>
+      </div>
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 18px;">
+        <div class="rules-section">
+          <h4>1. Kỳ đã khóa - không tính lại được</h4>
+          <p>Nếu kỳ có cờ <b>daKhoa=true</b>, nút "Chạy tính lương" sẽ block. HR phải quay lại màn <i>Tạo kỳ</i> để mở khóa kỳ trước khi tính lại.</p>
+        </div>
+        <div class="rules-section">
+          <h4>2. Chỉ NV nằm trong DS set6 mới được tính lương</h4>
+          <p>Engine không tự thêm NV. Nếu thiếu NV cần tính → quay lại set6 (<i>Cập nhật DS NV tính lương</i>) để add rồi mới quay lại set7.</p>
+        </div>
+        <div class="rules-section">
+          <h4>3. "Chạy tính lương" ghi đè kết quả cũ (confirm blocking)</h4>
+          <p>Mỗi lần bấm → engine tính lại toàn bộ dòng CHƯA khóa. Dòng đã 🔒 giữ nguyên. HR sẽ nhận cảnh báo confirm trước khi ghi đè.</p>
+        </div>
+        <div class="rules-section">
+          <h4>4. Xóa dòng chỉ ẨN TẠM khỏi bảng tính (không xóa DB)</h4>
+          <p>Bấm "Xóa khỏi bảng tính" chỉ set flag <code>hidden</code>. Muốn tính lại NV đó → chạy lại "Chạy tính lương" (dòng sẽ hiện trở lại nếu vẫn còn trong DS set6).</p>
+        </div>
+        <div class="rules-section">
+          <h4>5. Publish sang ESS/Mobile (giai đoạn 2)</h4>
+          <p>Nút "Publish ESS/Mobile" hiện <b>disabled</b>. Sẽ triển khai ở giai đoạn 2: sinh phiếu lương từ template (set12) và push sang self-service + app mobile của NV. Chi tiết đầy đủ xem <b>Rule 10</b> bên dưới.</p>
+        </div>
+        <div class="rules-section">
+          <h4>6. Cross-row BH/Thuế cho NV nhiều dòng lương</h4>
+          <p>NV có thể có <b>N dòng lương</b> trong 1 kỳ (kiêm nhiệm BPTL, làm 2 ca, gộp cấu trúc org khác nhau — VD case NV <code>1022906002-01/-02</code>). Engine đã áp dụng rule pháp lý:</p>
+          <ul style="margin:4px 0 4px 20px;padding:0;">
+            <li><b>BHXH/BHYT/BHTN</b>: chỉ trích <b>1 lần</b> ở <b>dòng MAX</b> (dòng có <code>HT_HeSoBHXH</code> lớn nhất, thường là dòng HĐLĐ chính). Base = <code>MIN(MAX(LuongDongBH), 20 × MucLuongToiThieuVung)</code>. Các dòng phụ có <code>TT_TruBHXH = 0</code>.</li>
+            <li><b>Thuế TNCN</b>: chỉ tính <b>1 lần</b> trên <code>SUM(TN chịu thuế toàn kỳ)</code>. Gán vào dòng MAX; dòng phụ = 0.</li>
+            <li><b>Không lặp per-dòng</b>: nếu lặp sẽ trích N lần → sai luật, NV thiệt hại.</li>
+          </ul>
+          <p>Kết quả tính này được lưu <b>per-row</b> trong <code>SalaryResult</code>. Màn <b>Xem phiếu lương</b> chỉ đọc lại, không tính lại — mỗi dòng = 1 trang A4 độc lập.</p>
+        </div>
+        <div class="rules-section">
+          <h4>7. Bulk actions (khóa / mở khóa / xóa / xuất Excel)</h4>
+          <ul style="margin:4px 0 4px 20px;padding:0;">
+            <li><b>Khóa dòng đã tick</b>: set flag <code>daKhoa=true</code>. Engine skip khi tính lại. HR đảm bảo dòng review OK trước khi khóa.</li>
+            <li><b>Mở khóa</b>: revert flag → tính lại khi bấm "Chạy tính lương".</li>
+            <li><b>Xóa khỏi bảng tính</b>: set flag <code>hidden=true</code> (soft-hide, không xóa DB). Muốn hiện lại → chạy engine.</li>
+            <li><b>Xuất Excel</b>: xuất theo <b>filter hiện tại</b> (không phụ thuộc tick). Nếu muốn xuất subset → dùng filter Đơn vị/BPTL để giới hạn.</li>
+            <li><b>Idempotent per-row</b>: mọi bulk action apply per-row độc lập, không cascade.</li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h4>8. Filter "Khóa lương" - phân nhóm audit</h4>
+          <p>Radio <b>Khóa lương</b> tách 3 nhóm: <i>Tất cả / Đã khóa / Chưa khóa</i>. Mục đích:</p>
+          <ul style="margin:4px 0 4px 20px;padding:0;">
+            <li><b>Đã khóa</b>: HR review nhóm chốt cuối cùng trước khi publish sang phiếu lương / ESS.</li>
+            <li><b>Chưa khóa</b>: HR đang review, có thể chạy engine tính lại + tick khóa hàng loạt sau khi OK.</li>
+            <li>Kết hợp AND với radio <b>Tình trạng</b> (Đang làm việc / Thôi việc) để narrow xuống case cụ thể. VD: <i>Đã khóa + Thôi việc</i> → xác nhận NV thôi việc đã chốt lương lần cuối.</li>
+            <li><b>Trade-off</b>: sau khi tách radio "Khóa lương" khỏi radio "Trạng thái tính" cũ, mất filter <i>Chưa tính / Đã tính</i>. Với set7, dòng có <code>tinhLuc</code> rỗng = chưa tính; audit qua cột <b>Người tính / Ngày tính</b> trên grid thay vì filter riêng.</li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h4>9. Bulk Lock/Unlock TẤT CẢ theo filter - audit trail</h4>
+          <p>2 nút mới <b>"🔒🔒 Khóa tất cả"</b> và <b>"🔓🔓 Mở khóa tất cả"</b> apply cho toàn bộ dòng theo <b>filter hiện tại</b> (không phụ thuộc tick). Đây là action <b>rủi ro cao</b> - nếu HR quên set filter → khóa nhầm cả kỳ.</p>
+          <ul style="margin:4px 0 4px 20px;padding:0;">
+            <li><b>Confirm dialog bắt buộc</b>: hiển thị chính xác số lượng dòng sẽ bị apply, HR phải OK trước khi thực thi.</li>
+            <li><b>Idempotent</b>: <i>Khóa tất cả</i> chỉ apply cho dòng CHƯA khóa; <i>Mở khóa tất cả</i> chỉ apply cho dòng ĐÃ khóa. Không double-toggle.</li>
+            <li><b>Audit log</b> lưu: <code>userId</code>, <code>action=lock_all|unlock_all</code>, <code>filterSnapshot</code> (JSON toàn bộ filter tại thời điểm bấm), <code>affectedRowIds[]</code>, <code>timestamp</code>. Cho phép <b>export log ra Excel</b> để audit trail.</li>
+            <li><b>Không cascade tự động</b>: khóa dòng A không auto-khóa NV nhiều dòng (case NV kiêm 2 BPTL - <code>1022906002-01/-02</code> per-row độc lập).</li>
+            <li><b>Best practice</b>: HR nên filter theo <i>Đơn vị cấp 1/2</i> hoặc <i>BPTL</i> trước khi bấm "Khóa tất cả" để giới hạn scope.</li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h4>10. Follow-up giải pháp - Dịch vụ cá nhân (ESS) + Mobile app MPHG (giai đoạn 2)</h4>
+          <p><b>Mục tiêu:</b> Hoàn thiện giải pháp end-to-end - sau khi engine tính lương ở set7 &amp; HR đã khóa dòng, dữ liệu phải đến được NV qua 2 kênh phân phối: <b>Web ESS</b> và <b>Mobile App</b>. Giúp giảm tải HR (không gửi phiếu lương thủ công) và tăng minh bạch cho NV.</p>
+
+          <div class="followup-grid">
+            <div class="followup-col">
+              <div class="followup-head">&#128188; Dịch vụ cá nhân (ESS Web) - <code>/ess/luong</code></div>
+              <ul>
+                <li>Xem lương tháng của mình (read-only, không sửa được)</li>
+                <li>Xem/tải phiếu lương template MPHG (dùng lại template từ set10-14, nếu Nguồn DL = <b>MPHG LSP</b>)</li>
+                <li>Xem chi tiết tiêu chí (mirror popup <i>Xem</i> của set7, filter chỉ hiện NV mình)</li>
+                <li>Tạo ticket giải đáp thắc mắc lương (feature riêng, link module Support)</li>
+                <li>Xuất PDF phiếu lương (dùng template từ set12)</li>
+                <li><b>Điều kiện xem:</b> kỳ đã <i>Khóa</i> (set5) + đã <i>Publish ESS</i> (flag mới)</li>
+              </ul>
+            </div>
+            <div class="followup-col">
+              <div class="followup-head">&#128241; Mobile app MPHG HR</div>
+              <ul>
+                <li>Push notification khi kỳ lương được publish</li>
+                <li>Widget xem lương tháng hiện tại (rút gọn: Lương gộp, Thực nhận, biến động vs tháng trước)</li>
+                <li>Full phiếu lương với <b>biometric authentication</b> (FaceID / vân tay)</li>
+                <li>Chart 6/12 tháng gần nhất (line chart Thực nhận)</li>
+                <li>Chat trực tiếp với HR về thắc mắc lương</li>
+                <li>Offline cache lần cuối xem (khi mất mạng vẫn thấy dữ liệu cũ nhất)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="followup-tech" style="margin-top:8px;">
+            <b>&#128295; API / Integration point (kỹ thuật):</b>
+            <ul style="margin:4px 0 4px 20px;padding:0;">
+              <li><code>GET /api/lsp/salary/self?kyId=xxx</code> - trả dữ liệu 1 dòng grid + breakdown per-criterion cho NV self</li>
+              <li><code>GET /api/lsp/payslip/self?kyId=xxx&amp;templateId=yyy</code> - render PDF / HTML template phiếu lương</li>
+              <li><code>POST /api/lsp/salary/publish</code> - HR trigger publish sang ESS/mobile (chỉ khi kỳ đã khóa + đủ điều kiện)</li>
+              <li>Middleware kiểm tra quyền: NV chỉ thấy dữ liệu của mình (<code>@EmpID = user.EmpID</code>)</li>
+              <li>Rate limit endpoint self-view để tránh scan / probe dữ liệu người khác</li>
+            </ul>
+          </div>
+
+          <div class="followup-uxtest" style="margin-top:8px;">
+            <b>&#128373; UX test scenario (BA test khi triển khai giai đoạn 2):</b>
+            <ul style="margin:4px 0 4px 20px;padding:0;">
+              <li>NV login mobile &rarr; thấy widget lương tháng 05/2026 (rút gọn)</li>
+              <li>NV tap widget &rarr; mở full phiếu lương yêu cầu biometric authentication</li>
+              <li>Kỳ chưa được publish &rarr; widget hiện "Chưa có dữ liệu" (KHÔNG show error / stack trace)</li>
+              <li>NV cố truy cập kỳ của người khác qua URL &rarr; middleware block, log audit</li>
+              <li>HR quay lại set7, bấm <i>Publish ESS/Mobile</i> &rarr; NV nhận push notification trong 1 phút</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="hideModal('modal-rules')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ================================================================
+ *  MOCK DATA (embed - không đụng shared)
+ * ================================================================ */
+const CURRENT_USER = 'FPT Admin';
+function nowStr(){
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function money(n){ return (n||0).toLocaleString('vi-VN'); }
+
+const MOCK_KY_LUONG = [
+  { ma:'KY_202605_LSP', ten:'Kỳ 05/2026 - LSP MPHG',   thang:5, nam:2026, daKhoa:false, isCurrent:true },
+  { ma:'KY_202604_LSP', ten:'Kỳ 04/2026 - LSP MPHG',   thang:4, nam:2026, daKhoa:true,  isCurrent:false },
+  { ma:'KY_202605_VS',  ten:'Kỳ 05/2026 - LSP Vệ sinh', thang:5, nam:2026, daKhoa:false, isCurrent:false }
+];
+
+const MOCK_DONVI = [
+  { ma:'CB101', ten:'Chế biến 101' },
+  { ma:'CB102', ten:'Chế biến 102' },
+  { ma:'TP01',  ten:'Thành phẩm 01' },
+  { ma:'KCS01', ten:'KCS 01' },
+  { ma:'VS01',  ten:'Vệ sinh 01' }
+];
+
+const MOCK_BPTL = [
+  { ma:'BPTL_001', ten:'BPTL Chế biến A' },
+  { ma:'BPTL_002', ten:'BPTL Chế biến B' },
+  { ma:'BPTL_003', ten:'BPTL Thành phẩm' },
+  { ma:'BPTL_004', ten:'BPTL Vệ sinh' },
+  { ma:'BPTL_005', ten:'BPTL KCS' }
+];
+
+const MOCK_NHOM_LUONG = [
+  { ma:'NL_CB', ten:'Nhóm lương Chế biến' },
+  { ma:'NL_TP', ten:'Nhóm lương Thành phẩm' },
+  { ma:'NL_VS', ten:'Nhóm lương Vệ sinh' }
+];
+
+/* ====== MOCK EmpHeader chuẩn Millennium ====== */
+const MOCK_DVCC = {
+  cap1: [
+    { ma:'DV_1', ten:'Minh Phú HG' },
+    { ma:'DV_2', ten:'Minh Phú CM' },
+    { ma:'DV_3', ten:'Minh Phú Kiên Giang' }
+  ],
+  cap2: {
+    'DV_1': [
+      { ma:'DV_1.1', ten:'Nhà máy Chế biến' },
+      { ma:'DV_1.2', ten:'Khối Kho vận - KCS' },
+      { ma:'DV_1.3', ten:'Vệ sinh - phụ trợ' }
+    ],
+    'DV_2': [
+      { ma:'DV_2.1', ten:'Xưởng CB 1 CM' },
+      { ma:'DV_2.2', ten:'Xưởng CB 2 CM' }
+    ],
+    'DV_3': [
+      { ma:'DV_3.1', ten:'Nhà máy KG' }
+    ]
+  },
+  cap3: {
+    'DV_1.1': [
+      { ma:'DV_1.1.1', ten:'Line A - CB101' },
+      { ma:'DV_1.1.2', ten:'Line B - CB102' },
+      { ma:'DV_1.1.3', ten:'Thành phẩm TP01' }
+    ],
+    'DV_1.2': [
+      { ma:'DV_1.2.1', ten:'KCS01' }
+    ],
+    'DV_2.1': [
+      { ma:'DV_2.1.1', ten:'Ca 1' },
+      { ma:'DV_2.1.2', ten:'Ca 2' }
+    ]
+  },
+  cap4: {
+    'DV_1.1.1': [
+      { ma:'DV_1.1.1.1', ten:'Tổ 1' },
+      { ma:'DV_1.1.1.2', ten:'Tổ 2' }
+    ],
+    'DV_1.1.2': [
+      { ma:'DV_1.1.2.1', ten:'Tổ 3' }
+    ]
+  },
+  cap5: {
+    'DV_1.1.1.1': [
+      { ma:'DV_1.1.1.1.1', ten:'Nhóm A1' },
+      { ma:'DV_1.1.1.1.2', ten:'Nhóm A2' }
+    ]
+  }
+};
+
+const MOCK_NTL = {
+  cap1: [
+    { ma:'NTL_A', ten:'Sản xuất' },
+    { ma:'NTL_B', ten:'Vệ sinh' },
+    { ma:'NTL_C', ten:'Văn phòng - QL' }
+  ],
+  cap2: {
+    'NTL_A': [
+      { ma:'NTL_A.1', ten:'CB chính' },
+      { ma:'NTL_A.2', ten:'Xếp lạnh - Kho' }
+    ],
+    'NTL_B': [
+      { ma:'NTL_B.1', ten:'Vệ sinh xưởng' }
+    ],
+    'NTL_C': [
+      { ma:'NTL_C.1', ten:'Khối HR - Kế toán' }
+    ]
+  },
+  cap3: {
+    'NTL_A.1': [
+      { ma:'NTL_A.1.1', ten:'Ca 1 sáng' },
+      { ma:'NTL_A.1.2', ten:'Ca 2 chiều' },
+      { ma:'NTL_A.1.3', ten:'Ca 3 đêm' }
+    ],
+    'NTL_A.2': [
+      { ma:'NTL_A.2.1', ten:'Ca lạnh AM' }
+    ]
+  }
+};
+
+const MOCK_CHUCVU = [
+  { ma:'CV_NV', ten:'Nhân viên' },
+  { ma:'CV_TN', ten:'Trưởng nhóm' },
+  { ma:'CV_TT', ten:'Tổ trưởng' },
+  { ma:'CV_CT', ten:'Ca trưởng' },
+  { ma:'CV_TP', ten:'Trưởng phòng' }
+];
+
+// Map từ donVi (mã cũ) → dvCap1..5 (mã cascade mới)
+const MAP_DV_TO_CASCADE = {
+  'CB101': ['DV_1','DV_1.1','DV_1.1.1','DV_1.1.1.1','DV_1.1.1.1.1'],
+  'CB102': ['DV_1','DV_1.1','DV_1.1.2','DV_1.1.2.1',''],
+  'TP01':  ['DV_1','DV_1.1','DV_1.1.3','',''],
+  'KCS01': ['DV_1','DV_1.2','DV_1.2.1','',''],
+  'VS01':  ['DV_2','DV_2.1','DV_2.1.1','','']
+};
+const MAP_NL_TO_NTL = {
+  'NL_CB': ['NTL_A','NTL_A.1','NTL_A.1.1'],
+  'NL_TP': ['NTL_A','NTL_A.2','NTL_A.2.1'],
+  'NL_VS': ['NTL_B','NTL_B.1','']
+};
+
+// Kết quả lương - 10 NV đại diện 10 CASE DEMO (NV #2 tách 2 dòng do kiêm 2 BPTL)
+// Mỗi NV = 1 case business rule để BA giải thích logic tính lương.
+const MOCK_KETQUA_LUONG = [
+  // ---- CASE 1: NV bình thường, 1 dòng, đủ công ----
+  { maNV:'1022906001', hoTen:'NV 1 dòng - Bình thường', donVi:'CB101', bptl:'BPTL_001', nhomLuong:'NL_CB',
+    ngayCong:26.0, tongTLSP:8500000, tongTG:1200000, boSung:0,
+    tongCong:9700000, khoanTru:650000, thucNhan:9050000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 2a: NV kiêm 2 BPTL - dòng MAX (trích BH đầy đủ) ----
+  { maNV:'1022906002-01', hoTen:'NV nhiều dòng - BH dòng MAX (dòng 1)', donVi:'CB101', bptl:'BPTL_001', nhomLuong:'NL_CB',
+    ngayCong:15.0, tongTLSP:5200000, tongTG:1000000, boSung:0,
+    tongCong:6200000, khoanTru:430000, thucNhan:5770000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 2b: Cùng NV như trên - dòng KHÔNG max (BH=0 vì đã trích ở dòng 1) ----
+  { maNV:'1022906002-02', hoTen:'NV nhiều dòng - BH dòng phụ (dòng 2)', donVi:'CB102', bptl:'BPTL_002', nhomLuong:'NL_CB',
+    ngayCong:11.0, tongTLSP:3800000, tongTG:700000, boSung:0,
+    tongCong:4500000, khoanTru:0, thucNhan:4500000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 3: NV lương cao - Vượt trần BHXH (20×LTT vùng) + Thuế TNCN bậc 6 ----
+  { maNV:'1022906003', hoTen:'NV lương cao - Vượt trần BH', donVi:'TP01', bptl:'BPTL_003', nhomLuong:'NL_TP',
+    ngayCong:26.0, tongTLSP:0, tongTG:90000000, boSung:5000000,
+    tongCong:95000000, khoanTru:23715000, thucNhan:71285000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 4: NV thôi việc giữa tháng (thanh toán phép + trợ cấp thôi việc) → daKhoa=true ----
+  { maNV:'1022906004', hoTen:'NV thôi việc 15/07 - TT phép + trợ cấp', donVi:'KCS01', bptl:'BPTL_005', nhomLuong:'NL_TP',
+    ngayCong:11.0, tongTLSP:3800000, tongTG:0, boSung:5500000,
+    tongCong:9300000, khoanTru:400000, thucNhan:8900000,
+    daTinh:true, daKhoa:true, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 5: NV mới vào giữa tháng - HT CN mới + HT KSK ----
+  { maNV:'1022906005', hoTen:'NV mới vào 10/07 - HT CN mới + KSK', donVi:'CB102', bptl:'BPTL_002', nhomLuong:'NL_CB',
+    ngayCong:17.0, tongTLSP:6200000, tongTG:600000, boSung:700000,
+    tongCong:7500000, khoanTru:550000, thucNhan:6950000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 6: NV nghỉ thai sản - BH vẫn trích theo HS BHXH → thực nhận ÂM (nợ BH) ----
+  { maNV:'1022906006', hoTen:'NV nghỉ thai sản - Nợ BH tháng', donVi:'CB101', bptl:'BPTL_001', nhomLuong:'NL_CB',
+    ngayCong:0, tongTLSP:0, tongTG:0, boSung:0,
+    tongCong:0, khoanTru:630000, thucNhan:-630000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 7: NV làm ca đêm + tăng ca lễ - TL_TG cao + phụ cấp cơm lễ ka3 ----
+  { maNV:'1022906007', hoTen:'NV ca đêm + tăng ca lễ', donVi:'CB102', bptl:'BPTL_002', nhomLuong:'NL_CB',
+    ngayCong:24.0, tongTLSP:6500000, tongTG:5650000, boSung:350000,
+    tongCong:12500000, khoanTru:950000, thucNhan:11550000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 8: NV nhiều khoản trừ - Quỹ TT + Ăn + Phạt khác ----
+  { maNV:'1022906008', hoTen:'NV nhiều khoản trừ - Quỹ TT + phạt', donVi:'TP01', bptl:'BPTL_003', nhomLuong:'NL_TP',
+    ngayCong:22.0, tongTLSP:7500000, tongTG:1000000, boSung:0,
+    tongCong:8500000, khoanTru:1480000, thucNhan:7020000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 9: NV bán hàng - Có hoa hồng bán hàng (TT_BS_TL_BanHang) ----
+  { maNV:'1022906009', hoTen:'NV bán hàng - Có hoa hồng', donVi:'TP01', bptl:'BPTL_003', nhomLuong:'NL_TP',
+    ngayCong:26.0, tongTLSP:8000000, tongTG:3500000, boSung:3500000,
+    tongCong:15000000, khoanTru:1100000, thucNhan:13900000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' },
+
+  // ---- CASE 10: NV nhiều phụ thuộc - Giảm trừ 24.2tr → Thuế TNCN gần 0 ----
+  { maNV:'1022906010', hoTen:'NV 3 phụ thuộc - Giảm trừ thuế cao', donVi:'KCS01', bptl:'BPTL_005', nhomLuong:'NL_TP',
+    ngayCong:26.0, tongTLSP:0, tongTG:25000000, boSung:0,
+    tongCong:25000000, khoanTru:2665000, thucNhan:22335000,
+    daTinh:true, daKhoa:false, hidden:false,
+    tinhLuc:'2026-05-31 22:14', tinhBoi:'FPT Admin' }
+];
+
+// -------- Chi tiết tiêu chí: HIGHLIGHT 3 case đại diện (NV #1 / #3 / #10) --------
+// Các NV còn lại dùng chiTietChungFor() fallback.
+
+// CASE 1: NV bình thường (baseline demo cách engine tính TT_TIEN_SP + TT_TIEN_TG + BH cơ bản)
+const CHITIET_NV_001 = [
+  { stt:1, nhom:'TK', maTC:'TK_MANV',      tenTC:'Mã nhân viên',                    congThuc:'HR.employee.id',                       kq:'1022906001',                  dvi:'',       tt:'ok'   },
+  { stt:2, nhom:'TK', maTC:'TK_TENNV',     tenTC:'Họ tên',                          congThuc:'HR.employee.fullName',                 kq:'NV 1 dòng - Bình thường',     dvi:'',       tt:'ok'   },
+  { stt:3, nhom:'TK', maTC:'TK_DONVI',     tenTC:'Đơn vị công tác',                 congThuc:'HR.employee.dept',                     kq:'CB101',                       dvi:'',       tt:'ok'   },
+  { stt:4, nhom:'TK', maTC:'TK_CHUCDANH',  tenTC:'Chức danh',                       congThuc:'HR.employee.title',                    kq:'CN Chế biến',                 dvi:'',       tt:'ok'   },
+  { stt:5, nhom:'TK', maTC:'TK_KYLUONG',   tenTC:'Mã kỳ lương',                     congThuc:'PayrollPeriod.code',                   kq:'KY_202605_LSP',               dvi:'',       tt:'ok'   },
+
+  { stt:6, nhom:'HT', maTC:'HT_NGAYCONG',  tenTC:'Ngày công thực tế',               congThuc:'ChấmCông.sumWorkDays',                 kq:'26.0',                        dvi:'ngày',   tt:'ok'   },
+  { stt:7, nhom:'HT', maTC:'HT_HESO_KN',   tenTC:'Hệ số kỹ năng (H1)',              congThuc:'set-pg9-hs123?lan=1',                  kq:'1.10',                        dvi:'',       tt:'ok'   },
+  { stt:8, nhom:'HT', maTC:'HT_NANGSUAT',  tenTC:'Năng suất SP quy đổi',            congThuc:'LNS.sumSPquyDoi',                      kq:'7 727',                       dvi:'kg',     tt:'ok'   },
+  { stt:9, nhom:'HT', maTC:'HT_LUONG_CB',  tenTC:'Lương cơ bản BPTL',               congThuc:'DM.BPTL[001].luongCB',                 kq:'1 100',                       dvi:'đ/kg',   tt:'ok'   },
+  { stt:10,nhom:'HT', maTC:'HT_HESO_DH',   tenTC:'Hệ số độc hại chiên',             congThuc:'pg8-ho-tro-cd-chien.heso',             kq:'0',                           dvi:'',       tt:'skip' },
+
+  { stt:11,nhom:'TT', maTC:'TT_TIEN_SP',   tenTC:'Tiền lương sản phẩm',             congThuc:'HT_NANGSUAT × HT_LUONG_CB × H1',       kq:money(8500000),                dvi:'đ',      tt:'ok'   },
+  { stt:12,nhom:'TT', maTC:'TT_TIEN_TG',   tenTC:'Tiền lương thời gian',            congThuc:'HT_NGAYCONG × mức TG BPTL',            kq:money(1200000),                dvi:'đ',      tt:'ok'   },
+  { stt:13,nhom:'TT', maTC:'TT_TONG',      tenTC:'Tổng cộng trước trừ',             congThuc:'TT_TIEN_SP + TT_TIEN_TG + Bổ sung',    kq:money(9700000),                dvi:'đ',      tt:'ok'   },
+  { stt:14,nhom:'TT', maTC:'TT_KHOAN_TRU', tenTC:'Khoản trừ (BHXH/BHYT/BHTN)',      congThuc:'HS BHXH (~6.2tr) × 10.5%',             kq:money(650000),                 dvi:'đ',      tt:'ok'   },
+  { stt:15,nhom:'TT', maTC:'TT_THUC_NHAN', tenTC:'Thực nhận',                       congThuc:'TT_TONG - TT_KHOAN_TRU',               kq:money(9050000),                dvi:'đ',      tt:'ok'   }
+];
+
+// CASE 3: NV lương cao - highlight LOGIC TRẦN BHXH (20×LTT vùng) + Thuế TNCN bậc 6
+const CHITIET_NV_003 = [
+  { stt:1, nhom:'TK', maTC:'TK_MANV',      tenTC:'Mã nhân viên',                    congThuc:'HR.employee.id',                       kq:'1022906003',                  dvi:'',       tt:'ok'   },
+  { stt:2, nhom:'TK', maTC:'TK_TENNV',     tenTC:'Họ tên',                          congThuc:'HR.employee.fullName',                 kq:'NV lương cao - Vượt trần BH', dvi:'',       tt:'ok'   },
+  { stt:3, nhom:'TK', maTC:'TK_DONVI',     tenTC:'Đơn vị công tác',                 congThuc:'HR.employee.dept',                     kq:'TP01',                        dvi:'',       tt:'ok'   },
+  { stt:4, nhom:'TK', maTC:'TK_CHUCDANH',  tenTC:'Chức danh',                       congThuc:'HR.employee.title',                    kq:'Trưởng ca sản xuất (QL)',     dvi:'',       tt:'ok'   },
+  { stt:5, nhom:'TK', maTC:'TK_KYLUONG',   tenTC:'Mã kỳ lương',                     congThuc:'PayrollPeriod.code',                   kq:'KY_202605_LSP',               dvi:'',       tt:'ok'   },
+
+  { stt:6, nhom:'HT', maTC:'HT_NGAYCONG',  tenTC:'Ngày công thực tế',               congThuc:'ChấmCông.sumWorkDays',                 kq:'26.0',                        dvi:'ngày',   tt:'ok'   },
+  { stt:7, nhom:'HT', maTC:'HT_HESO_KN',   tenTC:'Hệ số trách nhiệm QL',            congThuc:'DM.HeSo.QuanLy',                       kq:'1.60',                        dvi:'',       tt:'ok'   },
+  { stt:8, nhom:'HT', maTC:'HT_LTT_VUNG',  tenTC:'LTT vùng 2026 (căn cứ trần BH)',  congThuc:'DM.LTT_Vung1.2026',                    kq:'4 150 000',                   dvi:'đ',      tt:'ok'   },
+  { stt:9, nhom:'HT', maTC:'HT_LUONG_HD',  tenTC:'Lương HĐLĐ (chức vụ QL)',         congThuc:'HR.HDLD.luongHD',                      kq:'90 000 000',                  dvi:'đ',      tt:'ok'   },
+  { stt:10,nhom:'HT', maTC:'HT_TRAN_BHXH', tenTC:'Trần BHXH = 20 × LTT vùng',       congThuc:'20 × 4 150 000',                       kq:'83 000 000',                  dvi:'đ',      tt:'ok'   },
+
+  { stt:11,nhom:'TT', maTC:'TT_TIEN_TG',   tenTC:'Tiền lương thời gian',            congThuc:'HT_LUONG_HD × H1 (đầy tháng)',         kq:money(90000000),               dvi:'đ',      tt:'ok'   },
+  { stt:12,nhom:'TT', maTC:'TT_BS_TN',     tenTC:'Phụ cấp trách nhiệm QL',          congThuc:'DM.PhuCap.TrachNhiem_QL',              kq:money(5000000),                dvi:'đ',      tt:'ok'   },
+  { stt:13,nhom:'TT', maTC:'TT_TONG',      tenTC:'Tổng cộng trước trừ',             congThuc:'TT_TIEN_TG + TT_BS_TN',                kq:money(95000000),               dvi:'đ',      tt:'ok'   },
+  { stt:14,nhom:'TT', maTC:'TT_KHOAN_TRU', tenTC:'Khoản trừ (BH CAP + Thuế TNCN)',  congThuc:'BH: min(TN,83tr)×10.5%=8.715tr + TNCN bậc 6 ≈15tr', kq:money(23715000),  dvi:'đ',      tt:'ok'   },
+  { stt:15,nhom:'TT', maTC:'TT_THUC_NHAN', tenTC:'Thực nhận',                       congThuc:'TT_TONG - TT_KHOAN_TRU',               kq:money(71285000),               dvi:'đ',      tt:'ok'   }
+];
+
+// CASE 10: NV 3 phụ thuộc - highlight LOGIC GIẢM TRỪ THUẾ TNCN (bản thân + phụ thuộc)
+const CHITIET_NV_010 = [
+  { stt:1, nhom:'TK', maTC:'TK_MANV',       tenTC:'Mã nhân viên',                   congThuc:'HR.employee.id',                       kq:'1022906010',                  dvi:'',       tt:'ok'   },
+  { stt:2, nhom:'TK', maTC:'TK_TENNV',      tenTC:'Họ tên',                         congThuc:'HR.employee.fullName',                 kq:'NV 3 phụ thuộc - GT thuế cao', dvi:'',      tt:'ok'   },
+  { stt:3, nhom:'TK', maTC:'TK_DONVI',      tenTC:'Đơn vị công tác',                congThuc:'HR.employee.dept',                     kq:'KCS01',                       dvi:'',       tt:'ok'   },
+  { stt:4, nhom:'TK', maTC:'TK_CHUCDANH',   tenTC:'Chức danh',                      congThuc:'HR.employee.title',                    kq:'NV KCS văn phòng',            dvi:'',       tt:'ok'   },
+  { stt:5, nhom:'TK', maTC:'TK_KYLUONG',    tenTC:'Mã kỳ lương',                    congThuc:'PayrollPeriod.code',                   kq:'KY_202605_LSP',               dvi:'',       tt:'ok'   },
+
+  { stt:6, nhom:'HT', maTC:'HT_NGAYCONG',   tenTC:'Ngày công thực tế',              congThuc:'ChấmCông.sumWorkDays',                 kq:'26.0',                        dvi:'ngày',   tt:'ok'   },
+  { stt:7, nhom:'HT', maTC:'HT_GT_BANTHAN', tenTC:'Giảm trừ bản thân',              congThuc:'DM.Thue.GT_BanThan_2020',              kq:'11 000 000',                  dvi:'đ',      tt:'ok'   },
+  { stt:8, nhom:'HT', maTC:'HT_SL_PT',      tenTC:'Số người phụ thuộc đăng ký',     congThuc:'HR.TaxDependent.count',                kq:'3',                           dvi:'người',  tt:'ok'   },
+  { stt:9, nhom:'HT', maTC:'HT_GT_PT',      tenTC:'Giảm trừ phụ thuộc',             congThuc:'HT_SL_PT × 4 400 000',                 kq:'13 200 000',                  dvi:'đ',      tt:'ok'   },
+  { stt:10,nhom:'HT', maTC:'HT_LUONG_HD',   tenTC:'Lương HĐLĐ căn cứ',              congThuc:'HR.HDLD.luongHD',                      kq:'25 000 000',                  dvi:'đ',      tt:'ok'   },
+
+  { stt:11,nhom:'TT', maTC:'TT_TIEN_TG',    tenTC:'Tiền lương thời gian',           congThuc:'HT_LUONG_HD (đầy tháng)',              kq:money(25000000),               dvi:'đ',      tt:'ok'   },
+  { stt:12,nhom:'TT', maTC:'TT_BH',         tenTC:'Trích BH bắt buộc (10.5%)',      congThuc:'25 000 000 × 10.5%',                   kq:money(2625000),                dvi:'đ',      tt:'ok'   },
+  { stt:13,nhom:'TT', maTC:'TT_TNCT',       tenTC:'TN chịu thuế sau giảm trừ',      congThuc:'25tr - 2.625tr BH - 11tr GT.BT - 13.2tr GT.PT ≈ TN khác ~0.8tr', kq:money(800000), dvi:'đ', tt:'ok'   },
+  { stt:14,nhom:'TT', maTC:'TT_KHOAN_TRU',  tenTC:'Khoản trừ (BH + TNCN)',          congThuc:'BH 2.625tr + Thuế bậc 1 (5% × 800k) = 40k', kq:money(2665000),         dvi:'đ',      tt:'ok'   },
+  { stt:15,nhom:'TT', maTC:'TT_THUC_NHAN',  tenTC:'Thực nhận',                      congThuc:'TT_TONG - TT_KHOAN_TRU',               kq:money(22335000),               dvi:'đ',      tt:'ok'   }
+];
+
+// Chi tiết tiêu chí chung cho các NV khác (giá trị hiển thị "..." để cho biết mockup)
+function chiTietChungFor(row){
+  return [
+    { stt:1, nhom:'TK', maTC:'TK_MANV',      tenTC:'Mã nhân viên',        congThuc:'HR.employee.id',                 kq:row.maNV,           dvi:'',     tt:'ok' },
+    { stt:2, nhom:'TK', maTC:'TK_TENNV',     tenTC:'Họ tên',              congThuc:'HR.employee.fullName',           kq:row.hoTen,          dvi:'',     tt:'ok' },
+    { stt:3, nhom:'TK', maTC:'TK_DONVI',     tenTC:'Đơn vị công tác',     congThuc:'HR.employee.dept',               kq:row.donVi,          dvi:'',     tt:'ok' },
+    { stt:4, nhom:'TK', maTC:'TK_CHUCDANH',  tenTC:'Chức danh',           congThuc:'HR.employee.title',              kq:'CN sản xuất',      dvi:'',     tt:'ok' },
+    { stt:5, nhom:'TK', maTC:'TK_KYLUONG',   tenTC:'Mã kỳ lương',         congThuc:'PayrollPeriod.code',             kq:state.kyMa,         dvi:'',     tt:'ok' },
+
+    { stt:6, nhom:'HT', maTC:'HT_NGAYCONG',  tenTC:'Ngày công thực tế',   congThuc:'ChấmCông.sumWorkDays',           kq:String(row.ngayCong),dvi:'ngày',tt:'ok' },
+    { stt:7, nhom:'HT', maTC:'HT_HESO_KN',   tenTC:'Hệ số kỹ năng (H1)',  congThuc:'set-pg9-hs123?lan=1',            kq:'1.10',             dvi:'',     tt:'ok' },
+    { stt:8, nhom:'HT', maTC:'HT_NANGSUAT',  tenTC:'Năng suất SP quy đổi',congThuc:'LNS.sumSPquyDoi',                kq:row.tongTLSP>0?'—':'0', dvi:'kg', tt:row.tongTLSP>0?'ok':'skip' },
+    { stt:9, nhom:'HT', maTC:'HT_LUONG_CB',  tenTC:'Lương cơ bản BPTL',   congThuc:'DM.BPTL['+row.bptl+'].luongCB',  kq:'1 100',            dvi:'đ/kg', tt:'ok' },
+    { stt:10,nhom:'HT', maTC:'HT_HESO_DH',   tenTC:'Hệ số độc hại',       congThuc:'pg8-ho-tro-cd.heso',             kq:'0',                dvi:'',     tt:'skip' },
+
+    { stt:11,nhom:'TT', maTC:'TT_TIEN_SP',   tenTC:'Tiền lương sản phẩm', congThuc:'HT_NANGSUAT × HT_LUONG_CB × H1', kq:money(row.tongTLSP), dvi:'đ',   tt:row.tongTLSP>0?'ok':'skip' },
+    { stt:12,nhom:'TT', maTC:'TT_TIEN_TG',   tenTC:'Tiền lương thời gian',congThuc:'HT_NGAYCONG × mức TG BPTL',      kq:money(row.tongTG),   dvi:'đ',   tt:'ok' },
+    { stt:13,nhom:'TT', maTC:'TT_TONG',      tenTC:'Tổng cộng trước trừ', congThuc:'TT_TIEN_SP + TT_TIEN_TG + Bổ sung', kq:money(row.tongCong), dvi:'đ',tt:'ok' },
+    { stt:14,nhom:'TT', maTC:'TT_KHOAN_TRU', tenTC:'Khoản trừ',           congThuc:'set-khoan-tru.calc',             kq:money(row.khoanTru), dvi:'đ',   tt:'ok' },
+    { stt:15,nhom:'TT', maTC:'TT_THUC_NHAN', tenTC:'Thực nhận',           congThuc:'TT_TONG - TT_KHOAN_TRU',         kq:money(row.thucNhan), dvi:'đ',   tt:'ok' }
+  ];
+}
+
+const MOCK_CHITIET_TIEUCHI = {
+  '1022906001': CHITIET_NV_001,
+  '1022906003': CHITIET_NV_003,
+  '1022906010': CHITIET_NV_010
+};
+
+/* ================================================================
+ *  STATE
+ * ================================================================ */
+const state = {
+  kyMa: 'KY_202605_LSP',
+  rows: MOCK_KETQUA_LUONG.slice(),    // toàn bộ dữ liệu kết quả (không bao gồm hidden)
+  filtered: [],                       // sau khi apply filter
+  checked: new Set()                  // maNV được tick
+};
+
+/* ================================================================
+ *  INIT
+ * ================================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  enrichRows();
+  populateKy();
+  populateSelect('f-bptl', MOCK_BPTL);
+  populateSelect('f-nl',   MOCK_NHOM_LUONG);
+  populateSelect('f-cv',   MOCK_CHUCVU);
+  populateSelect('f-dv1',  MOCK_DVCC.cap1);
+  populateSelect('f-ntl1', MOCK_NTL.cap1);
+  applyFilter();
+});
+
+// Enrich existing rows với các field EmpHeader (dvCap1..5, ntlCap1..3, chucVu, trangThai, ngày nghỉ việc/NLV cuối)
+function enrichRows(){
+  const chucVuMap = {
+    '1022906001': 'CV_NV', '1022906002-01': 'CV_NV', '1022906002-02': 'CV_NV',
+    '1022906003': 'CV_TP', '1022906004': 'CV_NV', '1022906005': 'CV_NV',
+    '1022906006': 'CV_NV', '1022906007': 'CV_CT', '1022906008': 'CV_TT',
+    '1022906009': 'CV_TN', '1022906010': 'CV_TN'
+  };
+  state.rows.forEach(r => {
+    const dv = MAP_DV_TO_CASCADE[r.donVi] || ['DV_1','','','',''];
+    r.dvCap1 = dv[0]; r.dvCap2 = dv[1]; r.dvCap3 = dv[2]; r.dvCap4 = dv[3]; r.dvCap5 = dv[4];
+
+    const ntl = MAP_NL_TO_NTL[r.nhomLuong] || ['NTL_A','',''];
+    r.ntlCap1 = ntl[0]; r.ntlCap2 = ntl[1]; r.ntlCap3 = ntl[2];
+
+    r.chucVu         = chucVuMap[r.maNV] || 'CV_NV';
+    r.trangThai      = 'DangLamViec';
+    r.nghiViecTuNgay = null;
+    r.nlvCuoiCung    = null;
+  });
+  const r4 = state.rows.find(r => r.maNV === '1022906004');
+  if (r4){
+    r4.trangThai      = 'ThoiViec';
+    r4.nghiViecTuNgay = '2026-07-15';
+    r4.nlvCuoiCung    = '2026-07-15';
+  }
+  const r5 = state.rows.find(r => r.maNV === '1022906005');
+  if (r5){ r5.nlvCuoiCung = '2026-06-30'; }
+  const r7 = state.rows.find(r => r.maNV === '1022906007');
+  if (r7){ r7.nlvCuoiCung = '2026-07-20'; }
+}
+
+function populateKy(){
+  const sel = document.getElementById('f-ky');
+  MOCK_KY_LUONG.forEach(k => {
+    const o = document.createElement('option');
+    o.value = k.ma;
+    o.textContent = `${k.ma} - ${k.ten}${k.daKhoa ? ' [ĐÃ KHÓA]' : ''}${k.isCurrent ? ' ★' : ''}`;
+    sel.appendChild(o);
+  });
+  sel.value = state.kyMa;
+  sel.addEventListener('change', e => { state.kyMa = e.target.value; applyFilter(); });
+}
+function populateSelect(id, arr){
+  const sel = document.getElementById(id);
+  (arr||[]).forEach(x => {
+    const o = document.createElement('option');
+    o.value = x.ma; o.textContent = `${x.ma} - ${x.ten}`;
+    sel.appendChild(o);
+  });
+}
+function repopulateCascade(id, arr){
+  const sel = document.getElementById(id);
+  sel.innerHTML = '<option value="">Tất cả</option>';
+  (arr||[]).forEach(x => {
+    const o = document.createElement('option');
+    o.value = x.ma; o.textContent = `${x.ma} - ${x.ten}`;
+    sel.appendChild(o);
+  });
+}
+
+/* ====== CASCADE HANDLERS ====== */
+function onDvCap1Change(){
+  const v = document.getElementById('f-dv1').value;
+  repopulateCascade('f-dv2', v ? MOCK_DVCC.cap2[v] : []);
+  repopulateCascade('f-dv3', []);
+  repopulateCascade('f-dv4', []);
+  repopulateCascade('f-dv5', []);
+}
+function onDvCap2Change(){
+  const v = document.getElementById('f-dv2').value;
+  repopulateCascade('f-dv3', v ? MOCK_DVCC.cap3[v] : []);
+  repopulateCascade('f-dv4', []);
+  repopulateCascade('f-dv5', []);
+}
+function onDvCap3Change(){
+  const v = document.getElementById('f-dv3').value;
+  repopulateCascade('f-dv4', v ? MOCK_DVCC.cap4[v] : []);
+  repopulateCascade('f-dv5', []);
+}
+function onDvCap4Change(){
+  const v = document.getElementById('f-dv4').value;
+  repopulateCascade('f-dv5', v ? MOCK_DVCC.cap5[v] : []);
+}
+function onNtl1Change(){
+  const v = document.getElementById('f-ntl1').value;
+  repopulateCascade('f-ntl2', v ? MOCK_NTL.cap2[v] : []);
+  repopulateCascade('f-ntl3', []);
+}
+function onNtl2Change(){
+  const v = document.getElementById('f-ntl2').value;
+  repopulateCascade('f-ntl3', v ? MOCK_NTL.cap3[v] : []);
+}
+
+/* ================================================================
+ *  FILTER + RENDER GRID
+ * ================================================================ */
+function applyFilter(){
+  const f = {
+    maNV: (document.getElementById('f-manv').value || '').trim().toLowerCase(),
+    ten:  (document.getElementById('f-ten').value  || '').trim().toLowerCase(),
+    dv1:  document.getElementById('f-dv1').value,
+    dv2:  document.getElementById('f-dv2').value,
+    dv3:  document.getElementById('f-dv3').value,
+    dv4:  document.getElementById('f-dv4').value,
+    dv5:  document.getElementById('f-dv5').value,
+    cv:   document.getElementById('f-cv').value,
+    ntl1: document.getElementById('f-ntl1').value,
+    ntl2: document.getElementById('f-ntl2').value,
+    ntl3: document.getElementById('f-ntl3').value,
+    bptl: document.getElementById('f-bptl').value,
+    nl:   document.getElementById('f-nl').value,
+    nghiTu: document.getElementById('f-nghiviec-tu').value,
+    nlvTu:  document.getElementById('f-nlv-tu').value,
+    kl:   (document.querySelector('input[name="f-kl"]:checked') || {value:'all'}).value,
+    tt:   (document.querySelector('input[name="f-tt"]:checked') || {value:'all'}).value
+  };
+
+  state.filtered = state.rows.filter(r => {
+    if (r.hidden) return false;
+    if (f.maNV && !r.maNV.toLowerCase().includes(f.maNV)) return false;
+    if (f.ten  && !r.hoTen.toLowerCase().includes(f.ten)) return false;
+    if (f.dv1  && r.dvCap1 !== f.dv1) return false;
+    if (f.dv2  && r.dvCap2 !== f.dv2) return false;
+    if (f.dv3  && r.dvCap3 !== f.dv3) return false;
+    if (f.dv4  && r.dvCap4 !== f.dv4) return false;
+    if (f.dv5  && r.dvCap5 !== f.dv5) return false;
+    if (f.cv   && r.chucVu !== f.cv)  return false;
+    if (f.ntl1 && r.ntlCap1 !== f.ntl1) return false;
+    if (f.ntl2 && r.ntlCap2 !== f.ntl2) return false;
+    if (f.ntl3 && r.ntlCap3 !== f.ntl3) return false;
+    if (f.bptl && r.bptl !== f.bptl) return false;
+    if (f.nl   && r.nhomLuong !== f.nl) return false;
+    if (f.nghiTu && (!r.nghiViecTuNgay || r.nghiViecTuNgay < f.nghiTu)) return false;
+    if (f.nlvTu  && (!r.nlvCuoiCung    || r.nlvCuoiCung    < f.nlvTu)) return false;
+    if (f.kl === 'khoa'     && !r.daKhoa) return false;
+    if (f.kl === 'chuakhoa' &&  r.daKhoa) return false;
+    if (f.tt === 'DangLamViec' && r.trangThai !== 'DangLamViec') return false;
+    if (f.tt === 'ThoiViec'    && r.trangThai !== 'ThoiViec')    return false;
+    return true;
+  });
+  renderGrid();
+}
+function resetFilter(){
+  ['f-manv','f-ten','f-nghiviec-tu','f-nlv-tu'].forEach(id => document.getElementById(id).value = '');
+  ['f-dv1','f-cv','f-ntl1','f-bptl','f-nl'].forEach(id => document.getElementById(id).value = '');
+  // Reset cascade dropdowns về rỗng
+  repopulateCascade('f-dv2', []);
+  repopulateCascade('f-dv3', []);
+  repopulateCascade('f-dv4', []);
+  repopulateCascade('f-dv5', []);
+  repopulateCascade('f-ntl2', []);
+  repopulateCascade('f-ntl3', []);
+  document.querySelector('input[name="f-kl"][value="all"]').checked = true;
+  document.querySelector('input[name="f-tt"][value="all"]').checked = true;
+  state.checked.clear();
+  applyFilter();
+}
+
+function renderGrid(){
+  const tbody = document.getElementById('grid-body');
+  if (state.filtered.length === 0){
+    tbody.innerHTML = `<tr><td colspan="15" style="padding:30px;color:#999;text-align:center;">Không có nhân viên nào phù hợp.</td></tr>`;
+    document.getElementById('grid-info').innerHTML = 'Hiển thị <b>0</b> / <b>' + state.rows.filter(r=>!r.hidden).length + '</b> NV';
+    return;
+  }
+  const html = state.filtered.map((r, idx) => {
+    const isChecked = state.checked.has(r.maNV);
+    const rowCls = r.daKhoa ? 'row-locked' : '';
+    return `
+      <tr class="${rowCls}" data-manv="${r.maNV}">
+        <td><input type="checkbox" class="chk-row" ${isChecked?'checked':''} onclick="toggleRow('${r.maNV}', this)"></td>
+        <td>${idx+1}</td>
+        <td>${r.daKhoa ? '<span class="icon-lock">&#128274;</span>' : ''}</td>
+        <td class="stk-1 c-manv">${r.maNV}</td>
+        <td class="stk-2 c-hoten">${r.hoTen}</td>
+        <td><span class="badge badge-dv">${r.donVi}</span></td>
+        <td><span class="badge badge-bptl">${r.bptl}</span></td>
+        <td class="c-num">${r.ngayCong.toFixed(1)}</td>
+        <td class="c-money">${money(r.tongTLSP)}</td>
+        <td class="c-money">${money(r.tongTG)}</td>
+        <td class="c-money">${money(r.boSung)}</td>
+        <td class="c-money bold">${money(r.tongCong)}</td>
+        <td class="c-money">${money(r.khoanTru)}</td>
+        <td class="c-money thucnhan">${money(r.thucNhan)}</td>
+        <td><span class="icon-view" onclick="showChiTiet('${r.maNV}')">Xem</span></td>
+      </tr>`;
+  }).join('');
+  tbody.innerHTML = html;
+  const total = state.rows.filter(r=>!r.hidden).length;
+  const nDaKhoa = state.filtered.filter(r=>r.daKhoa).length;
+  const sumThucNhan = state.filtered.reduce((s,r)=>s+r.thucNhan,0);
+  document.getElementById('grid-info').innerHTML =
+    `Hiển thị <b>${state.filtered.length}</b> / <b>${total}</b> NV · Đã khóa <b>${nDaKhoa}</b> · Tổng thực nhận <b>${money(sumThucNhan)} đ</b>`;
+}
+
+/* ================================================================
+ *  CHECKBOX
+ * ================================================================ */
+function toggleAll(chk){
+  if (chk.checked) state.filtered.forEach(r => state.checked.add(r.maNV));
+  else             state.filtered.forEach(r => state.checked.delete(r.maNV));
+  renderGrid();
+}
+function toggleRow(maNV, chk){
+  if (chk.checked) state.checked.add(maNV);
+  else             state.checked.delete(maNV);
+}
+
+/* ================================================================
+ *  BULK ACTIONS
+ * ================================================================ */
+function bulkLock(){
+  if (state.checked.size === 0){ showAlert('Vui lòng tick ít nhất 1 NV để khóa.', 'warning'); return; }
+  let n = 0;
+  state.rows.forEach(r => { if (state.checked.has(r.maNV) && !r.daKhoa){ r.daKhoa = true; n++; } });
+  state.checked.clear();
+  applyFilter();
+  showAlert(`Đã <b>khóa ${n}</b> dòng lương lúc ${nowStr()} bởi ${CURRENT_USER}.`, 'success');
+}
+function bulkUnlock(){
+  if (state.checked.size === 0){ showAlert('Vui lòng tick ít nhất 1 NV để mở khóa.', 'warning'); return; }
+  let n = 0;
+  state.rows.forEach(r => { if (state.checked.has(r.maNV) && r.daKhoa){ r.daKhoa = false; n++; } });
+  state.checked.clear();
+  applyFilter();
+  showAlert(`Đã <b>mở khóa ${n}</b> dòng lương.`, 'success');
+}
+
+/* ====== BULK Lock/Unlock TẤT CẢ theo filter hiện tại ====== */
+function lockAllFiltered(){
+  const target = state.filtered.filter(r => !r.daKhoa);
+  if (target.length === 0){
+    showAlert('Không có dòng nào <b>chưa khóa</b> trong danh sách filter.', 'warning');
+    return;
+  }
+  const preview = target.slice(0, 3).map(r => `- ${r.maNV} · ${r.hoTen}`).join('\n');
+  const more = target.length > 3 ? `\n... và ${target.length - 3} dòng khác` : '';
+  if (!confirm(
+    `KHÓA TẤT CẢ ${target.length} dòng (chưa khóa) theo filter hiện tại?\n\n` +
+    `Preview:\n${preview}${more}\n\n` +
+    `Sau khi khóa, engine sẽ KHÔNG tính lại các dòng này.\n` +
+    `Audit log sẽ được lưu (user + timestamp + filter snapshot).`
+  )) return;
+  target.forEach(r => { r.daKhoa = true; });
+  state.checked.clear();
+  applyFilter();
+  showAlert(`Đã <b>khóa hàng loạt ${target.length}</b> dòng theo filter hiện tại lúc ${nowStr()} bởi ${CURRENT_USER}.`, 'success');
+}
+function unlockAllFiltered(){
+  const target = state.filtered.filter(r => r.daKhoa);
+  if (target.length === 0){
+    showAlert('Không có dòng nào <b>đã khóa</b> trong danh sách filter.', 'warning');
+    return;
+  }
+  const preview = target.slice(0, 3).map(r => `- ${r.maNV} · ${r.hoTen}`).join('\n');
+  const more = target.length > 3 ? `\n... và ${target.length - 3} dòng khác` : '';
+  if (!confirm(
+    `MỞ KHÓA TẤT CẢ ${target.length} dòng (đã khóa) theo filter hiện tại?\n\n` +
+    `Preview:\n${preview}${more}\n\n` +
+    `Sau khi mở khóa, engine SẼ tính lại các dòng này khi bấm "Chạy tính lương".`
+  )) return;
+  target.forEach(r => { r.daKhoa = false; });
+  state.checked.clear();
+  applyFilter();
+  showAlert(`Đã <b>mở khóa hàng loạt ${target.length}</b> dòng theo filter hiện tại lúc ${nowStr()} bởi ${CURRENT_USER}.`, 'success');
+}
+function bulkRemove(){
+  if (state.checked.size === 0){ showAlert('Vui lòng tick ít nhất 1 NV để xóa khỏi bảng tính.', 'warning'); return; }
+  if (!confirm(`Xóa ${state.checked.size} dòng khỏi bảng tính?\n\nLƯU Ý: Chỉ ẨN tạm, không xóa DB. NV sẽ hiện lại nếu bấm "Chạy tính lương".`)) return;
+  let n = 0;
+  state.rows.forEach(r => { if (state.checked.has(r.maNV)){ r.hidden = true; n++; } });
+  state.checked.clear();
+  applyFilter();
+  showAlert(`Đã ẨN <b>${n}</b> dòng khỏi bảng tính (không xóa DB).`, 'success');
+}
+function exportExcel(){
+  alert(`[MOCKUP] Xuất Excel bảng lương\n\nKỳ: ${state.kyMa}\nSố dòng: ${state.filtered.length}\nFile: BangLuong_${state.kyMa}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+/* ================================================================
+ *  CHẠY TÍNH LƯƠNG
+ * ================================================================ */
+function runCalc(){
+  const ky = MOCK_KY_LUONG.find(k => k.ma === state.kyMa);
+  if (ky && ky.daKhoa){
+    showAlert('Kỳ <b>' + ky.ma + '</b> đã KHÓA - không tính lại được. Mở khóa kỳ ở màn Tạo kỳ trước.', 'error');
+    return;
+  }
+  const targetRows = state.rows.filter(r => !r.hidden && !r.daKhoa);
+  if (targetRows.length === 0){
+    showAlert('Không có dòng nào để tính (tất cả đã khóa hoặc bị ẩn).', 'warning');
+    return;
+  }
+  if (!confirm(`Chạy tính lương cho kỳ ${state.kyMa}?\n\n- Sẽ GHI ĐÈ kết quả cũ trên ${targetRows.length} NV chưa khóa.\n- Dòng đã 🔒 giữ nguyên.\n- Tiếp tục?`)) return;
+
+  targetRows.forEach(r => {
+    r.daTinh  = true;
+    r.tinhLuc = nowStr();
+    r.tinhBoi = CURRENT_USER;
+  });
+  applyFilter();
+  showAlert(`Đã tính lương cho <b>${targetRows.length}</b> NV thuộc kỳ <b>${state.kyMa}</b> lúc ${nowStr()} bởi ${CURRENT_USER}.`, 'success');
+}
+
+/* ================================================================
+ *  POPUP CHI TIẾT
+ * ================================================================ */
+function showChiTiet(maNV){
+  const r = state.rows.find(x => x.maNV === maNV);
+  if (!r) return;
+  const ky = MOCK_KY_LUONG.find(k => k.ma === state.kyMa);
+
+  document.getElementById('ct-header').innerHTML = `
+    <div><span class="lbl">Mã NV:</span><br><span class="val">${r.maNV}</span></div>
+    <div><span class="lbl">Họ tên:</span><br><span class="val">${r.hoTen}</span></div>
+    <div><span class="lbl">Kỳ lương:</span><br><span class="val">${ky ? ky.ma : state.kyMa}</span></div>
+    <div><span class="lbl">Đơn vị / BPTL:</span><br><span class="val">${r.donVi} / ${r.bptl}</span></div>
+  `;
+
+  const dsChiTiet = MOCK_CHITIET_TIEUCHI[maNV] || chiTietChungFor(r);
+  const nhomLabel = { TK:'TK · Tìm kiếm', HT:'HT · Hệ thống', TT:'TT · Tính toán' };
+  const nhomCls   = { TK:'c-nhom-tk',     HT:'c-nhom-ht',     TT:'c-nhom-tt' };
+
+  const bodyRows = dsChiTiet.map(d => `
+    <tr>
+      <td class="tc">${d.stt}</td>
+      <td class="tc ${nhomCls[d.nhom]}">${nhomLabel[d.nhom]}</td>
+      <td class="c-ma">${d.maTC}</td>
+      <td class="tl">${d.tenTC}</td>
+      <td class="tl" style="color:#555;font-family:Consolas,monospace;font-size:10px;">${d.congThuc}</td>
+      <td class="tr">${d.kq}</td>
+      <td class="tc">${d.dvi}</td>
+      <td class="tc"><span class="badge-status ${d.tt==='ok'?'st-ok':'st-skip'}">${d.tt==='ok'?'OK':'skip'}</span></td>
+    </tr>`).join('');
+
+  document.querySelector('#ct-body tbody').innerHTML = bodyRows;
+  showModal('modal-ct');
+}
+
+/* ================================================================
+ *  UTIL
+ * ================================================================ */
+function showModal(id){ document.getElementById(id).style.display = 'flex'; }
+function hideModal(id){ document.getElementById(id).style.display = 'none'; }
+
+function showAlert(msg, type){
+  const box = document.getElementById('alertBox');
+  box.className = 'alert-box alert-' + (type || 'success');
+  box.innerHTML = msg;
+  box.style.display = 'block';
+  if (type !== 'error') setTimeout(() => box.style.display = 'none', 5000);
+}
+</script>
+</body>
+</html>

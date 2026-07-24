@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINH PHU – Tham số được sử dụng (phiếu lương)</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .form-grid-ts { display:grid; grid-template-columns: 130px 1fr 130px 1fr; gap: 10px 20px; align-items:center; padding: 10px 15px; }
+    .form-grid-ts label { font-size:12px; color:#333; font-weight:bold; }
+    .form-grid-ts label.text-red { color:#d32f2f; }
+    .form-grid-ts input[type="text"], .form-grid-ts select, .form-grid-ts textarea {
+      border:1px solid #ccc; padding:4px 6px; height:26px; font-size:12px; width:100%; box-sizing:border-box;
+    }
+    .form-grid-ts textarea { height:auto; min-height:26px; resize:vertical; }
+
+    .radio-group { display:inline-flex; gap:15px; align-items:center; font-weight:normal; color:#333; }
+    .radio-group label { font-weight:normal; }
+
+    .ts-grid { min-width:1050px; }
+    .ts-grid th, .ts-grid td { font-size:11px; vertical-align:middle; }
+    .ts-grid td.col-ma { font-family:Consolas,monospace; font-weight:bold; color:#0056b3; }
+    .ts-grid td.col-source { text-align:center; }
+    .ts-grid td.col-check  { text-align:center; }
+
+    .badge-mphg { display:inline-block; background:#17a2b8; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; }
+    .badge-mill { display:inline-block; background:#6c757d; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; }
+    .badge-new  { display:inline-block; background:#dc3545; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:8px; margin-left:4px; vertical-align:middle; }
+    .row-mphg { background:#f0fbfc !important; }
+
+    .info-bar-mphg { background:#e8f7fa; border-left:4px solid #17a2b8; padding:8px 12px; margin: 8px 0; font-size:11px; color:#0c5460; }
+    .info-bar-mphg a { color:#0056b3; font-weight:bold; }
+
+    /* Quy tac */
+    .page-title-row { position:relative; text-align:center; }
+    .btn-quy-tac {
+      position:absolute; right:0; top:50%; transform:translateY(-50%);
+      background:#6f42c1; color:#fff; border:none; border-radius:4px;
+      padding:6px 14px; font-size:12px; font-weight:bold; cursor:pointer;
+    }
+    .btn-quy-tac:hover { background:#5a349a; }
+    .quy-tac-note { background:#eaf6ea; border-left:4px solid #28a745; padding:8px 12px; margin: 8px 0; font-size:11.5px; color:#155724; }
+    .quy-tac-note a { color:#0056b3; font-weight:bold; cursor:pointer; text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="logo"><span style="font-size:24px;color:#e74c3c">❦</span> MINH PHU</div>
+    <div class="search-bar"><input type="text" placeholder="Tìm kiếm hồ sơ và chức năng"></div>
+    <div class="user-actions">
+      <span>🇻🇳 VN ⌄</span>
+      <span>🔔 <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">6</span></span>
+      <span>✉ <span style="background:red;color:white;border-radius:50%;padding:1px 4px;font-size:9px">45</span></span>
+      <span style="font-size:11px;text-align:right;line-height:1.2">Xin chào,<br><b>FPT Admin</b></span>
+    </div>
+  </div>
+  <div class="main-menu">
+    <a href="#">Nhân sự</a><a href="#">Thôi việc</a><a href="#">Chấm công</a>
+    <a href="#">Bảo hiểm</a><a href="#" class="active">Lương</a>
+    <a href="#">Thưởng</a><a href="#">Thuế</a><a href="#">Hệ thống</a><a href="#">DV cá nhân</a>
+  </div>
+
+  <div class="container">
+    <div class="demo-badge">DEMO</div>
+    <div class="breadcrumb">Lương › Phiếu lương › Tham số được sử dụng</div>
+    <div class="page-title page-title-row">
+      <span>THAM SỐ ĐƯỢC SỬ DỤNG (PHIẾU LƯƠNG)</span>
+      <button class="btn-quy-tac" onclick="openQuyTacModal()">❓ Quy tắc</button>
+    </div>
+
+    <div class="quy-tac-note">
+      📄 Tham số của phiếu lương được resolve <b>theo từng dòng lương (per-row)</b>. Cross-row BH/Thuế đã handle ở engine set7.
+      <a onclick="openQuyTacModal()">Xem quy tắc chi tiết →</a>
+    </div>
+
+    <div class="info-bar-mphg">
+      🆕 <b>Tenant MPHG</b>: bạn có sẵn <b>26 cột grid</b> (set7) + <b>12 HT_</b> (set2) + <b>11 TT_</b> (set3)
+      dùng được cho phiếu lương. Bấm <a href="set11-gancongthuc-phieuluong.html" target="_top">Gán CT</a> để dùng.
+    </div>
+
+    <div id="alertBox" class="alert-box"></div>
+
+    <div class="form-panel">
+      <div class="form-grid-ts">
+        <label>Mã tham số</label>
+        <input type="text" id="fltMa" placeholder="VD: E.EmpCode, HT_TS_*">
+
+        <label>Tên tham số</label>
+        <input type="text" id="fltTen" placeholder="Nhập tên VN hoặc EN">
+
+        <label>Loại tiêu chí</label>
+        <select id="fltLoai">
+          <option value="">Tất cả</option>
+          <option value="HR">HR — Nhân sự</option>
+          <option value="PR">PR — Payroll</option>
+          <option value="set7">MPHG - Cột grid set7</option>
+          <option value="HT">MPHG - HT_ (set2)</option>
+          <option value="TT">MPHG - TT_ (set3)</option>
+        </select>
+
+        <label>Nhóm nguồn <span class="badge-new">MỚI</span></label>
+        <select id="fltSource" onchange="applyFilter()">
+          <option value="">Tất cả</option>
+          <option value="MILLENNIUM">Millennium (core)</option>
+          <option value="MPHG_LSP">MPHG LSP</option>
+        </select>
+
+        <label>Sử dụng</label>
+        <div class="radio-group">
+          <label><input type="radio" name="fltSD" value="all" checked> Tất cả</label>
+          <label><input type="radio" name="fltSD" value="1"> Có sử dụng</label>
+          <label><input type="radio" name="fltSD" value="0"> Không SD</label>
+        </div>
+
+        <label>Ghi chú</label>
+        <textarea id="fltGhiChu" rows="1" placeholder="Chỉ để filter theo ghi chú..."></textarea>
+      </div>
+    </div>
+
+    <div class="actions-bar" style="justify-content:center;text-align:center;">
+      <button class="btn btn-search"  onclick="applyFilter()">🔍 Tìm Kiếm</button>
+      <button class="btn btn-refresh" onclick="onReset()">↻ Làm mới</button>
+      <button class="btn btn-save"    onclick="onSave()">💾 Lưu</button>
+      <button class="btn btn-delete"  onclick="onDelete()">🗑 Xóa</button>
+      <button class="btn btn-import"  onclick="onImport()">⬆ Nhập dữ liệu</button>
+      <button class="btn btn-export"  onclick="onExport()">⬇ Xuất dữ liệu</button>
+    </div>
+
+    <div class="grid-wrap" style="margin-top:8px;overflow-x:auto;">
+      <table class="ts-grid" style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width:30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+            <th style="width:40px;">STT</th>
+            <th style="width:30px;">Sửa</th>
+            <th style="width:180px;">Mã</th>
+            <th>Tên VN</th>
+            <th style="width:150px;">Tên EN</th>
+            <th style="width:180px;">Ghi chú</th>
+            <th style="width:90px;">Loại</th>
+            <th style="width:110px;">Nhóm nguồn <span class="badge-new">MỚI</span></th>
+            <th style="width:70px;">Sử dụng</th>
+          </tr>
+        </thead>
+        <tbody id="tsBody"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;border-top:2px dashed #ffd600;padding-top:15px;">
+      <div style="font-weight:bold;color:#856404;margin-bottom:8px;font-size:12px;">
+        📋 GHI CHÚ NGHIỆP VỤ (dành cho thẩm định)
+      </div>
+      <textarea rows="3" style="width:100%;border:1px dashed #ffd600;padding:8px;font-size:12px;background:#fffef0;resize:vertical;"
+        placeholder="Điểm cần confirm với khách hàng...">- Cột "Nhóm nguồn" là extension MPHG. Tenant khác thấy tất cả nguonNhom='MILLENNIUM' → không thay đổi UX.
+- Tham số MPHG (HT_/TT_/C##) là READ-ONLY ở màn này — cấu hình chính ở set2/set3.
+- Cho phép edit ghi chú và toggle Sử dụng (radio) cho cả 2 nhóm.</textarea>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="btn-save2" style="font-size:11px;padding:4px 14px;">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL QUY TAC ============ -->
+  <div class="modal-overlay" id="quyTacModal" style="display:none;justify-content:center;align-items:center;">
+    <div class="modal-box wide" style="width:88vw;max-width:820px;">
+      <div class="modal-hdr" style="background:#6f42c1;color:#fff;">
+        <span>❓ Quy tắc — Tham số phiếu lương</span>
+        <button class="x" onclick="closeQuyTacModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 18px;font-size:12px;line-height:1.55;">
+        <h4 style="color:#0056b3;margin:0 0 6px 0;">1. Bộ tham số khả dụng (~36 tham số)</h4>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li><b>Millennium HR (A.*, E.*)</b>: mã NV, họ tên, chức danh, đơn vị, ngày sinh, ngân hàng, MST — 15 tham số.</li>
+          <li><b>Millennium PR (PR.*)</b>: lương cơ bản, lương thời gian, phụ cấp, thưởng, khoản trừ, BHXH, thuế, Net — 9 tham số.</li>
+          <li><b>MPHG set7 (C##)</b>: cột grid từ màn Tính lương (mã NV, BPTL, sản lượng, đơn giá, các L1/L2/L3, kết quả final) — 5 tham số ví dụ.</li>
+          <li><b>MPHG HT_ (set2)</b>: số liệu hệ thống (công thực tế GĐ, đơn giá, hệ số ĐC) — 3 tham số.</li>
+          <li><b>MPHG TT_ (set3)</b>: kết quả tính toán (Base L0, sau ĐC L3, TN chịu thuế, LSP final) — 3 tham số.</li>
+          <li><b>MPHG LSP cross-row</b>: tổng lương kỳ, tổng BH trích, thuế TNCN kỳ — 3 tham số.</li>
+        </ul>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">2. Scope resolve per-row</h4>
+        <p>Vì màn <b>Xem phiếu lương</b> render <b>1 dòng lương = 1 trang A4</b>, các tham số được resolve <b>per-row</b>:
+        engine đọc record của dòng đó từ <code>SalaryResult</code>, map giá trị theo mã tham số, chèn vào template.
+        Không có logic gộp / partition ở tầng tham số nữa.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">3. Distinction Millennium vs MPHG_LSP</h4>
+        <p>Cột <b>Nhóm nguồn</b> phân biệt:</p>
+        <ul style="margin:4px 0 4px 20px;padding:0;">
+          <li><b>MILLENNIUM</b>: core dùng chung, có ở mọi tenant. Đây là mặc định.</li>
+          <li><b>MPHG_LSP</b>: extension chỉ tenant có role <code>MPHG_PAYSLIP_ENGINE</code> mới thấy. Tenant khác được ẩn hoàn toàn khỏi combo lọc — zero-impact.</li>
+        </ul>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">4. Cross-row đã handle ở engine</h4>
+        <p>Các tham số như <code>LSP.trichBH</code>, <code>LSP.thueTNCN</code>, <code>LSP.tongLuongKy</code>
+        được engine set7 tính <b>1 lần/kỳ</b> theo luật (BH trên MAX(LuongDongBH), thuế trên SUM TN toàn kỳ), sau đó gán vào dòng MAX
+        của NV. Các dòng phụ = 0. Tham số này <b>không cần biểu diễn ở đây</b> — chỉ là placeholder mã để template gọi qua.</p>
+
+        <h4 style="color:#0056b3;margin:14px 0 6px 0;">5. Chỉnh sửa</h4>
+        <p>Cột <b>Ghi chú</b> và <b>Sử dụng</b> có thể sửa. Các field khác (Mã, Nhóm nguồn, Loại) là <b>read-only</b> — cấu hình chính ở set2/set3/set7.</p>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel" onclick="closeQuyTacModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showAlert(msg, type) {
+      const b = document.getElementById('alertBox');
+      b.className = 'alert-box alert-' + type;
+      b.innerHTML = msg;
+      b.style.display = 'block';
+      if (type !== 'error') setTimeout(() => b.style.display='none', 3500);
+    }
+
+    // Mix Millennium + MPHG parameters trong CÙNG 1 list — cột "Nhóm nguồn" giúp phân biệt.
+    // phamVi: 'per' (per-dòng), 'cross' (cross-row/toàn kỳ), 'mixed' (giống nhau mọi dòng — HR info)
+    const MOCK = [
+      // Millennium HR — mixed (mã NV, họ tên giống nhau mọi dòng)
+      { ma:'A.SoQD',        vi:'Số Quyết định',   en:'Decision No.',   ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'A.NgayQD',      vi:'Ngày QĐ',         en:'Decision Date',  ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'A.NgayHieuLuc', vi:'Ngày hiệu lực',   en:'Effective Date', ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.EmpCode',     vi:'Mã nhân viên',    en:'Employee Code',  ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.EmpName',     vi:'Họ và tên',       en:'Full Name',      ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.GenderStr',   vi:'Giới tính',       en:'Gender',         ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.DOB',         vi:'Ngày sinh',       en:'DOB',            ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.NationalID',  vi:'CMND/CCCD',       en:'National ID',    ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.JobTitleVN',  vi:'Chức danh (VN)',  en:'Job Title',      ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.Level1VN',    vi:'Đơn vị cấp 1',    en:'Dept L1',        ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.Level2VN',    vi:'Đơn vị cấp 2',    en:'Dept L2',        ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.Level3VN',    vi:'Đơn vị cấp 3',    en:'Dept L3',        ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.HireDate',    vi:'Ngày vào làm',    en:'Hire Date',      ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.BankAcc',     vi:'STK ngân hàng',   en:'Bank Account',   ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'E.TaxCode',     vi:'Mã số thuế',      en:'Tax Code',       ghiChu:'', loai:'HR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      // Millennium PR — BHXH/Thuế = cross (chỉ 1 lần cho NV); còn lại per (theo dòng)
+      { ma:'PR.PRMonth',       vi:'Tháng lương',       en:'Payroll Month', ghiChu:'', loai:'PR', source:'MILLENNIUM', phamVi:'mixed', sd:true },
+      { ma:'PR.LuongCoBan',    vi:'Lương cơ bản',      en:'Basic',        ghiChu:'', loai:'PR', source:'MILLENNIUM', phamVi:'per',   sd:true },
+      { ma:'PR.LuongThoiGian', vi:'Lương thời gian',   en:'Time salary',  ghiChu:'', loai:'PR', source:'MILLENNIUM', phamVi:'per',   sd:true },
+      { ma:'PR.PhuCap',        vi:'Tổng phụ cấp',      en:'Allowance',    ghiChu:'', loai:'PR', source:'MILLENNIUM', phamVi:'per',   sd:true },
+      { ma:'PR.Thuong',        vi:'Thưởng',            en:'Bonus',        ghiChu:'', loai:'PR', source:'MILLENNIUM', phamVi:'per',   sd:true },
+      { ma:'PR.KhoanTru',      vi:'Khoản trừ',         en:'Deduction',    ghiChu:'', loai:'PR', source:'MILLENNIUM', phamVi:'per',   sd:false },
+      { ma:'PR.BHXH',          vi:'BHXH NV',           en:'Insurance',    ghiChu:'Trích 1 lần trên MAX(LuongDongBH)', loai:'PR', source:'MILLENNIUM', phamVi:'cross', sd:true },
+      { ma:'PR.Thue',          vi:'Thuế TNCN',         en:'PIT',          ghiChu:'Trích 1 lần trên SUM(TN chịu thuế)', loai:'PR', source:'MILLENNIUM', phamVi:'cross', sd:true },
+      { ma:'PR.LuongNet',      vi:'Lương Net',         en:'Net',          ghiChu:'SUM per-dòng - BH - Thuế (cross)',   loai:'PR', source:'MILLENNIUM', phamVi:'cross', sd:true },
+      // MPHG set7 (rút gọn) — hầu hết per-dòng, cột 25/26 = cross
+      { ma:'C08_NangSuat',      vi:'Sản lượng NS_FINAL', en:'Productivity',  ghiChu:'MPHG set7',  loai:'set7', source:'MPHG_LSP', phamVi:'per',   sd:true },
+      { ma:'C09_DonGia',        vi:'Đơn giá tiền lương', en:'Unit Price',    ghiChu:'MPHG set7',  loai:'set7', source:'MPHG_LSP', phamVi:'per',   sd:true },
+      { ma:'C10_LuongGoc',      vi:'Lương gốc L0',       en:'Base L0',       ghiChu:'MPHG set7',  loai:'set7', source:'MPHG_LSP', phamVi:'per',   sd:true },
+      { ma:'C25_LuyKeLuong',    vi:'Lương lũy kế',       en:'Cumulative',    ghiChu:'MPHG set7 — cross-row (lũy kế toàn kỳ)', loai:'set7', source:'MPHG_LSP', phamVi:'cross', sd:true },
+      { ma:'C26_KetQuaFinal',   vi:'Tổng LSP cuối cùng', en:'Final result',  ghiChu:'MPHG set7',  loai:'set7', source:'MPHG_LSP', phamVi:'per',   sd:true },
+      // MPHG HT_ (rút gọn)
+      { ma:'HT_TS_CongThucTe',  vi:'Công thực tế GĐ',    en:'',              ghiChu:'MPHG HT_',   loai:'HT',   source:'MPHG_LSP', phamVi:'per',   sd:true },
+      { ma:'HT_PR_LSP_DonGia',  vi:'Đơn giá tiền lương', en:'',              ghiChu:'MPHG HT_',   loai:'HT',   source:'MPHG_LSP', phamVi:'per',   sd:true },
+      { ma:'HT_PR_LSP_HeSo1',   vi:'Hệ số ĐC lần 1',     en:'',              ghiChu:'MPHG HT_',   loai:'HT',   source:'MPHG_LSP', phamVi:'per',   sd:true },
+      // MPHG TT_ (rút gọn) — Final = cross (SUM toàn kỳ)
+      { ma:'TT_LSP_Base_L0',     vi:'Lương gốc L0',      en:'Base L0',       ghiChu:'MPHG TT_',   loai:'TT',   source:'MPHG_LSP', phamVi:'per',   sd:true },
+      { ma:'TT_LSP_TienL3',      vi:'Tiền sau ĐC L3',    en:'After L3',      ghiChu:'MPHG TT_',   loai:'TT',   source:'MPHG_LSP', phamVi:'per',   sd:true },
+      { ma:'TT_LSP_KetQua_Final',vi:'Tổng LSP cuối cùng',en:'Final',         ghiChu:'MPHG TT_ — SUM cross-row', loai:'TT', source:'MPHG_LSP', phamVi:'cross', sd:true },
+      // MPHG cross-row mới (BH/Thuế theo LSP engine)
+      { ma:'LSP.tongLuongKy', vi:'Tổng lương toàn kỳ (SUM N dòng)', en:'Total Period Salary', ghiChu:'MPHG LSP cross-row', loai:'PR', source:'MPHG_LSP', phamVi:'cross', sd:true },
+      { ma:'LSP.trichBH',     vi:'Tổng BHXH/BHYT/BHTN trích',       en:'Total Insurance',     ghiChu:'MPHG LSP cross-row — 1 lần/kỳ', loai:'PR', source:'MPHG_LSP', phamVi:'cross', sd:true },
+      { ma:'LSP.thueTNCN',    vi:'Thuế TNCN kỳ',                    en:'PIT Total',           ghiChu:'MPHG LSP cross-row — 1 lần/kỳ', loai:'PR', source:'MPHG_LSP', phamVi:'cross', sd:true }
+    ];
+
+    function sourceBadge(source) {
+      const s = source || 'MILLENNIUM';
+      if (s === 'MPHG_LSP') return '<span class="badge-mphg">🆕 MPHG_LSP</span>';
+      return '<span class="badge-mill">Millennium</span>';
+    }
+
+    function toggleAll(cb) {
+      document.querySelectorAll('.chk-row').forEach(c => c.checked = cb.checked);
+    }
+
+    function openQuyTacModal()  { document.getElementById('quyTacModal').style.display = 'flex'; }
+    function closeQuyTacModal() { document.getElementById('quyTacModal').style.display = 'none'; }
+
+    function renderGrid(list) {
+      const html = list.map((r, i) => {
+        const isMPHG = (r.source === 'MPHG_LSP');
+        return `<tr class="${isMPHG ? 'row-mphg':''}">
+          <td class="col-check"><input type="checkbox" class="chk-row"></td>
+          <td style="text-align:center;">${i+1}</td>
+          <td style="text-align:center;"><span class="edit-icon" style="cursor:pointer;color:#e67e22;">✎</span></td>
+          <td class="col-ma">${r.ma}</td>
+          <td>${r.vi}</td>
+          <td style="color:#666;">${r.en||''}</td>
+          <td style="color:#555;font-size:10px;">${r.ghiChu||''}</td>
+          <td style="text-align:center;font-family:Consolas,monospace;font-size:10px;">${r.loai}</td>
+          <td class="col-source">${sourceBadge(r.source)}</td>
+          <td class="col-check">${r.sd ? '<b style="color:#28a745;">✓</b>' : '<span style="color:#dc3545;">✕</span>'}</td>
+        </tr>`;
+      }).join('');
+      document.getElementById('tsBody').innerHTML = html ||
+        '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Không tìm thấy tham số khớp.</td></tr>';
+    }
+
+    function applyFilter() {
+      const ma  = document.getElementById('fltMa').value.trim().toLowerCase();
+      const ten = document.getElementById('fltTen').value.trim().toLowerCase();
+      const loai = document.getElementById('fltLoai').value;
+      const src = document.getElementById('fltSource').value;
+      const sd  = document.querySelector('input[name="fltSD"]:checked').value;
+      const gc  = document.getElementById('fltGhiChu').value.trim().toLowerCase();
+
+      let list = MOCK.slice();
+      if (ma)   list = list.filter(r => r.ma.toLowerCase().includes(ma));
+      if (ten)  list = list.filter(r => (r.vi+' '+(r.en||'')).toLowerCase().includes(ten));
+      if (loai) list = list.filter(r => r.loai === loai);
+      if (src)  list = list.filter(r => (r.source || 'MILLENNIUM') === src);
+      if (sd !== 'all') list = list.filter(r => (r.sd ? '1' : '0') === sd);
+      if (gc)   list = list.filter(r => (r.ghiChu||'').toLowerCase().includes(gc));
+
+      renderGrid(list);
+    }
+
+    function onReset() {
+      ['fltMa','fltTen','fltGhiChu'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('fltLoai').value = '';
+      document.getElementById('fltSource').value = '';
+      document.querySelector('input[name="fltSD"][value="all"]').checked = true;
+      applyFilter();
+    }
+
+    function onSave()   { showAlert('Mock: đã lưu ghi chú + trạng thái sử dụng.', 'success'); }
+    function onDelete() { showAlert('Mock: xóa các record đã tick.', 'success'); }
+    function onImport() { showAlert('Mock: nhập từ file Excel.', 'success'); }
+    function onExport() { showAlert('Mock: xuất file Excel.', 'success'); }
+
+    // init
+    renderGrid(MOCK);
+  </script>
+</body>
+</html>
